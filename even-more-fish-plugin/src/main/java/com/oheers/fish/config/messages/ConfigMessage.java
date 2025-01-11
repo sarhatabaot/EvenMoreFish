@@ -1,8 +1,12 @@
 package com.oheers.fish.config.messages;
 
+import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.adapter.AbstractMessage;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public enum ConfigMessage {
 
@@ -19,22 +23,22 @@ public enum ConfigMessage {
     ),
     ADMIN_NBT_NOT_REQUIRED("&rChange \"require-nbt-rod\" to true in order to use this feature.", PrefixType.ERROR, false, true, "admin.nbt-not-required"),
     ADMIN_NO_BAIT_SPECIFIED("&rYou must specify a bait name.", PrefixType.ERROR, false, true, "admin.no-bait-specified"),
-    ADMIN_NOT_HOLDING_ROD("&rYou need to be holding a fishing rod to run that command.", PrefixType.ERROR, false, false, "admin.must-be-holding-rod"),
+    ADMIN_NOT_HOLDING_ROD("&rYou need to be holding a fishing rod to run that command.", PrefixType.ERROR, false, true, "admin.must-be-holding-rod"),
     ADMIN_NUMBER_FORMAT_ERROR("&r{amount} is not a valid number.", PrefixType.ERROR, false, true, "admin.number-format-error"),
     ADMIN_NUMBER_RANGE_ERROR("&r{amount} is not a number between 1-64.", PrefixType.ERROR, false, true, "admin.number-range-error"),
     ADMIN_UNKNOWN_PLAYER("&r{player} could not be found.", PrefixType.ERROR, false, true, "admin.player-not-found"),
     ADMIN_UPDATE_AVAILABLE("&rThere is an update available: " + "https://www.spigotmc.org/resources/evenmorefish.91310/updates", PrefixType.ADMIN, false, false, "admin.update-available"),
     ADMIN_LIST_REWARD_TYPES("&rRegistered Reward Types: ", PrefixType.ADMIN, false, false, "admin.list-reward-types"),
 
-    BAITS_CLEARED("&rYou have removed all {amount} baits from your fishing rod.", PrefixType.ADMIN, true, false, "admin.all-baits-cleared"),
-    BAIT_CAUGHT("&r&l{player} &rhas caught a {bait_theme}&l{bait} &rbait!", PrefixType.NONE, true, false, "bait-catch"),
-    BAIT_USED("&rYou have used one of your rod's {bait_theme}&l{bait} &rbait.", PrefixType.DEFAULT, true, false, "bait-use"),
-    BAIT_WRONG_GAMEMODE("&rYou must be in &nsurvival or adventure mode&r to apply baits to fishing rods.", PrefixType.ERROR, false, false, "bait-survival-limited"),
+    BAITS_CLEARED("&rYou have removed all {amount} baits from your fishing rod.", PrefixType.ADMIN, true, true, "admin.all-baits-cleared"),
+    BAIT_CAUGHT("&r&l{player} &rhas caught a {bait_theme}&l{bait} &rbait!", PrefixType.NONE, true, true, "bait-catch"),
+    BAIT_USED("&rYou have used one of your rod's {bait_theme}&l{bait} &rbait.", PrefixType.DEFAULT, true, true, "bait-use"),
+    BAIT_WRONG_GAMEMODE("&rYou must be in &nsurvival or adventure mode&r to apply baits to fishing rods.", PrefixType.ERROR, false, true, "bait-survival-limited"),
     BAITS_MAXED("&rYou have reached the maximum number of types of baits for this fishing rod.", PrefixType.DEFAULT, false, true, "max-baits-reached"),
-    BAITS_MAXED_ON_ROD("&rYou have reached the maximum number of {bait_theme}{bait} &rbait that can be applied to one rod.", PrefixType.ERROR, false, false, "max-baits-reached"),
-    BAIT_ROD_PROTECTION("&rProtected your baited fishing rod. If you are trying to repair it, please put it in the first slot instead.", PrefixType.ERROR, false, false, "bait-rod-protection"),
+    BAITS_MAXED_ON_ROD("&rYou have reached the maximum number of {bait_theme}{bait} &rbait that can be applied to one rod.", PrefixType.ERROR, false, true, "max-baits-reached"),
+    BAIT_ROD_PROTECTION("&rProtected your baited fishing rod. If you are trying to repair it, please put it in the first slot instead.", PrefixType.ERROR, false, true, "bait-rod-protection"),
 
-    BAR_LAYOUT("{prefix}&r{time-formatted}&r{time-remaining}", PrefixType.NONE, true, false, "bossbar.layout"),
+    BAR_LAYOUT("{prefix}&r{time-formatted}&r {remaining}", PrefixType.NONE, true, false, "bossbar.layout"),
     BAR_SECOND("&r{second}s", PrefixType.NONE, true, false, "bossbar.second"),
     BAR_MINUTE("&r{minute}m", PrefixType.NONE, true, false, "bossbar.minute"),
     BAR_HOUR("&r{hour}h", PrefixType.NONE, true, false, "bossbar.hour"),
@@ -42,36 +46,40 @@ public enum ConfigMessage {
 
     COMPETITION_ALREADY_RUNNING("&rThere's already a competition running.", PrefixType.ADMIN, false, true, "admin.competition-already-running"),
 
-    COMPETITION_END("&rThe fishing contest has ended.", PrefixType.DEFAULT, false, false, "contest-end"),
-    COMPETITION_JOIN("&rA fishing contest for {type} is going on.", PrefixType.DEFAULT, true, false, "contest-join"),
-    COMPETITION_START("&rA fishing contest for {type} has started.", PrefixType.DEFAULT, false, false, "contest-start"),
+    COMPETITION_END("&rThe fishing contest has ended.", PrefixType.DEFAULT, false, true, "contest-end"),
+    COMPETITION_JOIN("&rA fishing contest for {type} is going on.", PrefixType.DEFAULT, true, true, "contest-join"),
+    COMPETITION_START("&rA fishing contest for {type} has started.", PrefixType.DEFAULT, false, true, "contest-start"),
 
-    COMPETITION_TYPE_LARGEST("the largest fish", PrefixType.NONE, true, false, "competition-types.largest"),
-    COMPETITION_TYPE_LARGEST_TOTAL("the largest total fish length", PrefixType.NONE, true, false, "competition-types.largest-total"),
-    COMPETITION_TYPE_MOST("the most fish", PrefixType.NONE, true, false, "competition-types.most"),
-    COMPETITION_TYPE_SPECIFIC("{amount} {rarity_colour}&l{rarity} {rarity_colour}{fish}&r", PrefixType.NONE, true, false, "competition-types.specific"),
-    COMPETITION_TYPE_SPECIFIC_RARITY("{amount} {rarity_colour}&l{rarity}&r fish", PrefixType.NONE, true, false, "competition-types.specific-rarity"),
+    COMPETITION_TYPE_LARGEST("the largest fish", PrefixType.NONE, true, true, "competition-types.largest"),
+    COMPETITION_TYPE_LARGEST_TOTAL("the largest total fish length", PrefixType.NONE, true, true, "competition-types.largest-total"),
+    COMPETITION_TYPE_MOST("the most fish", PrefixType.NONE, true, true, "competition-types.most"),
+    COMPETITION_TYPE_SPECIFIC("{amount} {rarity_colour}&l{rarity} {rarity_colour}{fish}&r", PrefixType.NONE, true, true, "competition-types.specific"),
+    COMPETITION_TYPE_SPECIFIC_RARITY("{amount} {rarity_colour}&l{rarity}&r fish", PrefixType.NONE, true, true, "competition-types.specific-rarity"),
+    COMPETITION_TYPE_SHORTEST("the shortest fish", PrefixType.NONE, true, true, "competition-types.shortest"),
+    COMPETITION_TYPE_SHORTEST_TOTAL("the shortest total fish length", PrefixType.NONE, true, true, "competition-types.shortest-total"),
 
     COMPETITION_SINGLE_WINNER("&r{player} has won the competition for {type}. Congratulations!", PrefixType.DEFAULT, true, true, "single-winner"),
+
+
 
     ECONOMY_DISABLED("&rEvenMoreFish's economy features are disabled.", PrefixType.ERROR, false, false, "admin.economy-disabled"),
 
     FISH_CANT_BE_PLACED("&rYou cannot place this fish.", PrefixType.ERROR, true, true, "place-fish-blocked"),
-    FISH_CAUGHT("&r&l{player} &rhas fished a {rarity_colour}{length}cm &l{rarity} {rarity_colour}{fish}!", PrefixType.NONE, true, false, "fish-caught"),
-    FISH_LENGTHLESS_CAUGHT("&r&l{player} &rhas fished a {rarity_colour}&l{rarity} {rarity_colour}{fish}!", PrefixType.NONE, true, false, "lengthless-fish-caught"),
+    FISH_CAUGHT("&r&l{player} &rhas fished a {rarity_colour}{length}cm &l{rarity} {rarity_colour}{fish}!", PrefixType.NONE, true, true, "fish-caught"),
+    FISH_LENGTHLESS_CAUGHT("&r&l{player} &rhas fished a {rarity_colour}&l{rarity} {rarity_colour}{fish}!", PrefixType.NONE, true, true, "lengthless-fish-caught"),
     FISH_LORE(Arrays.asList(
             "{fisherman_lore}",
             "{length_lore}",
             "",
             "{fish_lore}",
             "{rarity_colour}&l{rarity}"
-    ), PrefixType.NONE, false, false, "fish-lore"),
+    ), PrefixType.NONE, false, true, "fish-lore"),
     FISHERMAN_LORE(Collections.singletonList(
             "&fCaught by {player}"
-    ), PrefixType.NONE, false, false, "fisherman-lore"),
+    ), PrefixType.NONE, false, true, "fisherman-lore"),
     LENGTH_LORE(Collections.singletonList(
             "&fMeasures {length}cm"
-    ), PrefixType.NONE, false, false, "length-lore"),
+    ), PrefixType.NONE, false, true, "length-lore"),
     FISH_SALE("&rYou've sold &a{amount} &ffish for &a{sell-price}&f.", PrefixType.DEFAULT, true, true, "fish-sale"),
     HELP_FORMAT(
             "[noPrefix]&b{command} &e- {description}",
@@ -95,6 +103,7 @@ public enum ConfigMessage {
     HELP_GENERAL_ADMIN("[noPrefix]Admin command help page.", PrefixType.DEFAULT, false, true, "help-general.admin"),
     HELP_GENERAL_NEXT("[noPrefix]Show how much time is until the next competition.", PrefixType.DEFAULT, false, true, "help-general.next"),
     HELP_GENERAL_SELLALL("[noPrefix]Sell all the fish in your inventory.", PrefixType.DEFAULT, false, true, "help-general.sellall"),
+    HELP_GENERAL_APPLYBAITS("[noPrefix]Apply baits to your fishing rod.", PrefixType.DEFAULT, false, true, "help-general.applybaits"),
     HELP_ADMIN_TITLE(
             "[noPrefix]&f&m &#ffedeb&m &#ffdcd7&m &#ffcac3&m &#ffb8b0&m &#ffa69d&m &#ff948a&m &#ff8078&m &#ff6c66&m &c&m &f &c&lEvenMoreFish &c&m &#ff6c66&m&m &#ff8078&m &#ff948a&m &#ffa69d&m &#ffb8b0&m &#ffcac3&m &#ffdcd7&m &#ffedeb&m &f&m &f",
             PrefixType.ADMIN,
@@ -117,6 +126,7 @@ public enum ConfigMessage {
     HELP_COMPETITION_START("[noPrefix]Starts a competition of a specified duration", PrefixType.ADMIN, false, true, "help-competition.start"),
     HELP_COMPETITION_END("[noPrefix]Ends the current competition (if there is one)", PrefixType.ADMIN, false, true, "help-competition.end"),
     INVALID_COMPETITION_TYPE("&rThat isn't a type of competition type, available types: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH", PrefixType.ADMIN, false, false, "admin.competition-type-invalid"),
+    INVALID_COMPETITION_ID("&rThat isn't a valid competition id.", PrefixType.ADMIN, false, false, "admin.competition-id-invalid"),
 
     LEADERBOARD_LARGEST_FISH(
             "&r#{position} | {pos_colour}{player} &r({rarity_colour}&l{rarity} {rarity_colour}{fish}&r, {length}cm&r)",
@@ -128,6 +138,14 @@ public enum ConfigMessage {
     LEADERBOARD_LARGEST_TOTAL("&r#{position} | {pos_colour}{player} &r({pos_colour}{amount}cm&r)", PrefixType.DEFAULT, false, true, "leaderboard-largest-total"),
     LEADERBOARD_MOST_FISH("&r#{position} | {pos_colour}{player} &r({pos_colour}{amount} &rfish)", PrefixType.DEFAULT, false, true, "leaderboard-most-fish"),
     LEADERBOARD_TOTAL_PLAYERS("&rThere are a total of {amount} player(s) in the leaderboard.", PrefixType.DEFAULT, true, true, "total-players"),
+    LEADERBOARD_SHORTEST_FISH(
+            "&r#{position} | {pos_colour}{player} &r({rarity_colour}&l{rarity} {rarity_colour}{fish}&r, {length}cm&r)",
+            PrefixType.DEFAULT,
+            false,
+            true,
+            "leaderboard-shortest-fish"
+    ),
+    LEADERBOARD_SHORTEST_TOTAL("&r#{position} | {pos_colour}{player} &r({pos_colour}{amount}cm&r)", PrefixType.DEFAULT, false, true, "leaderboard-shortest-total"),
 
     NEW_FIRST_PLACE_NOTIFICATION("&r{player} is now #1", PrefixType.DEFAULT, true, true, "new-first"),
 
@@ -138,6 +156,9 @@ public enum ConfigMessage {
     NO_PERMISSION("&cYou don't have permission to run that command.", PrefixType.ERROR, false, true, "no-permission"),
     NO_WINNERS("&rThere were no fishing records.", PrefixType.DEFAULT, true, true, "no-winners"),
     NOT_ENOUGH_PLAYERS("&rThere's not enough players online to start the scheduled fishing competition.", PrefixType.ERROR, true, false, "not-enough-players"),
+   
+    CUSTOM_FISHING_ENABLED("&aEnabled", PrefixType.NONE, false, true, "custom-fishing-enabled"),
+    CUSTOM_FISHING_DISABLED("&cDisabled", PrefixType.NONE, false, true, "custom-fishing-disabled"),
 
     PLACEHOLDER_FISH_FORMAT("{rarity_colour}{length}cm &l{rarity} {fish}", PrefixType.NONE, true, false, "emf-competition-fish-format"),
     PLACEHOLDER_FISH_LENGTHLESS_FORMAT("{rarity_colour}&l{rarity} {fish}", PrefixType.NONE, true, false, "emf-lengthless-fish-format"),
@@ -212,7 +233,7 @@ public enum ConfigMessage {
 
     /**
      * This is the config enum for a value in the messages.yml file. It does not store the actual data but references
-     * where to look in the file for the data. This must be passed through a Message object before it can be sent to
+     * where to look in the file for the data. This must be passed through an AbstractMessage object before it can be sent to
      * players. In there, it is possible to add variable options, and it will be colour formatted too.
      *
      * @param id            The id in messages.yml for the ConfigMessage.
@@ -231,7 +252,7 @@ public enum ConfigMessage {
 
     /**
      * This is the config enum for a list value in the messages.yml file. It does not store the actual data but references
-     * where to look in the file for the data. This must be passed through a Message object before it can be sent to
+     * where to look in the file for the data. This must be passed through an AbstractMessage object before it can be sent to
      * players. In there, it is possible to add variable options, and it will be colour formatted too. It also must be
      * a list within the file.
      *
@@ -248,7 +269,6 @@ public enum ConfigMessage {
         this.canHidePrefix = canHidePrefix;
         this.prefixType = prefixType;
     }
-
 
     public String getId() {
         return this.id;
@@ -271,11 +291,81 @@ public enum ConfigMessage {
     }
 
     public boolean isListForm() {
-        return this.normal == null;
+        return !Messages.getInstance().getConfig().getStringList(getId()).isEmpty();
     }
 
     public PrefixType getPrefixType() {
         return prefixType;
     }
+
+    public AbstractMessage getMessage() {
+        AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+        if (isListForm()) {
+            List<String> list = getStringList(getNormalList(), getId());
+            for (String line : list) {
+                if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
+                    message.appendString(line.substring(10));
+                } else {
+                    message.appendMessage(getPrefixType().getPrefix());
+                    message.appendString(line);
+                }
+
+                if (!Objects.equals(line, list.get(list.size() - 1))) {
+                    message.appendString("\n");
+                }
+            }
+        } else {
+            String line = getString(getNormal(), getId());
+
+            if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
+                message.appendString(line.substring(10));
+            } else {
+                message.appendMessage(getPrefixType().getPrefix());
+                message.appendString(line);
+            }
+        }
+        message.setCanSilent(this.canSilent);
+        return message;
+    }
+
+    /**
+     * If there is a value in the config that matches the id of this enum, that is returned. If not though, the default
+     * value stored will be returned and a message is outputted to the console alerting of a missing value.
+     *
+     * @return The string from config that matches the value of id.
+     */
+    private String getString(String normal, String id) {
+        Messages messageConfig = Messages.getInstance();
+        String string = messageConfig.getConfig().getString(id, null);
+        if (string == null) {
+            EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Attempting to insert the default value.");
+            messageConfig.getConfig().set(id, normal);
+            messageConfig.save();
+            EvenMoreFish.getInstance().getLogger().info("Filled " + id + " in your messages.yml with the default value.");
+            return normal;
+        }
+        return string;
+    }
+
+    /**
+     * If there is a value in the config that matches the id of this enum, that is returned. If not though, the default
+     * value stored will be returned and a message is outputted to the console alerting of a missing value. This is for
+     * string values however rather than just strings.
+     *
+     * @return The string list from config that matches the value of id.
+     */
+    private List<String> getStringList(List<String> normal, String id) {
+        Messages messageConfig = Messages.getInstance();
+        List<String> list = messageConfig.getConfig().getStringList(id);
+        if (list.isEmpty()) {
+            EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Attempting to insert the default value.");
+            messageConfig.getConfig().set(id, null);
+            messageConfig.save();
+            EvenMoreFish.getInstance().getLogger().info("Filled " + id + " in your messages.yml with the default value.");
+            return normal;
+        }
+        return list;
+    }
+
 }
 

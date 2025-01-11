@@ -3,12 +3,12 @@ package com.oheers.fish.gui.guis;
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.selling.SellHelper;
-import com.oheers.fish.selling.WorthNBT;
 import com.oheers.fish.gui.GUIUtils;
+import com.oheers.fish.selling.SellHelper;
 import de.themoep.inventorygui.GuiStorageElement;
 import de.themoep.inventorygui.InventoryGui;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
@@ -16,11 +16,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class SellGUI implements EMFGUI {
@@ -29,10 +30,8 @@ public class SellGUI implements EMFGUI {
     private final Player player;
     private final Inventory fishInventory;
     private MyScheduledTask task;
-    private final SellState sellState;
 
     public SellGUI(@NotNull Player player, @NotNull SellState sellState, @Nullable Inventory fishInventory) {
-        this.sellState = sellState;
         this.player = player;
         Section section;
         if (sellState == SellState.NORMAL) {
@@ -48,12 +47,13 @@ public class SellGUI implements EMFGUI {
         }
         // Add filler and configured elements
         gui.setFiller(GUIUtils.getFillerItem(section.getString("filler"), Material.GRAY_STAINED_GLASS_PANE));
+        Economy economy = Economy.getInstance();
         gui.addElements(GUIUtils.getElements(section, this, () -> {
             Map<String, String> replacements = new HashMap<>();
             SellHelper playerHelper = new SellHelper(player.getInventory(), player);
             SellHelper shopHelper = new SellHelper(this.fishInventory, player);
-            replacements.put("{sell-price}", String.valueOf(shopHelper.formatWorth(shopHelper.getTotalWorth())));
-            replacements.put("{sell-all-price}", String.valueOf(playerHelper.formatWorth(playerHelper.getTotalWorth())));
+            replacements.put("{sell-price}", economy.getWorthFormat(shopHelper.getTotalWorth(), true));
+            replacements.put("{sell-all-price}", economy.getWorthFormat(playerHelper.getTotalWorth(), true));
             return replacements;
         }));
         gui.addElements(GUIFillerConfig.getInstance().getDefaultFillerElements());
@@ -90,17 +90,9 @@ public class SellGUI implements EMFGUI {
         gui.close();
     }
 
-    // for each item in the menu, if it isn't a default menu item, it's dropped at the player's feet
+    @Override
     public void doRescue() {
-        List<ItemStack> throwing = new ArrayList<>();
-        for (ItemStack i : this.fishInventory.getContents()) {
-            if (i != null) {
-                if (!WorthNBT.isDefault(i)) {
-                    throwing.add(i);
-                }
-            }
-        }
-        FishUtils.giveItems(throwing, this.player);
+        GUIUtils.doRescue(this.fishInventory, this.player);
     }
 
     @Override

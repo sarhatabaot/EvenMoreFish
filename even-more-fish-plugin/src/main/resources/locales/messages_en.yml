@@ -1,10 +1,9 @@
 # If a message contains EvenMoreFish placeholders, e.g. {player} or {rarity} it also supports placeholderapi placeholders.
 
-# These messages partially support the MiniMessage format (Things like hoverable and clickable text will not work).
-# MiniMessage is in strict mode, meaning all tags need to be closed in order to work.
-# You are able to mix MiniMessage with the existing legacy codes, however this is not recommended.
-# Here is the MiniMessage Pull Request for more info: https://github.com/Oheers/EvenMoreFish/pull/387
-# Here are the MiniMessage Docs: https://docs.advntr.dev/minimessage/format.html
+# Important: Read the following if you are on a Paper server.
+# These messages are able to support the MiniMessage format (in strict mode) if you are on a Paper server.
+# You are able to mix both formats on the same line, however this is not recommended.
+# Here are the MiniMessage Docs for help with using MiniMessage: https://docs.advntr.dev/minimessage/format.html
 
 # Sent to players when they fish an EvenMoreFish fish
 fish-caught: "&l{player} &rhas fished a {rarity_colour}{length}cm &l{rarity} {rarity_colour}{fish}!"
@@ -35,13 +34,17 @@ competition-types:
   largest: "the largest fish"
   # LARGEST_TOTAL_FISH
   largest-total: "the largest total fish length"
+  # SHORTEST_FISH
+  shortest: "the shortest fish"
+  # SHORTEST_TOTAL_FISH
+  shortest-total: "the shortest total fish length"
   # SPECIFIC_FISH
   specific: "{amount} {rarity_colour}&l{rarity} {rarity_colour}{fish}&r"
   # SPECIFIC_RARITY
   specific-rarity: "{amount} {rarity_colour}&l{rarity}&r fish"
 # Segments shown in the bossbar when competitions run
 bossbar:
-  layout: "{prefix}&r{time-formatted}&r{remaining}"
+  layout: "{prefix}&r{time-formatted} &r{remaining}"
   # The abbreviations used for different units of time in the {time-formatted} variable.
   hour: "&r{hour}h"
   minute: "&r{minute}m"
@@ -78,6 +81,8 @@ length-lore:
 leaderboard-largest-fish: "&r#{position} | {pos_colour}{player} &r({rarity_colour}&l{rarity} {rarity_colour}{fish}&r, {length}cm&r)"
 leaderboard-largest-total: "&r#{position} | {pos_colour}{player} &r({pos_colour}{amount}cm&r)"
 leaderboard-most-fish: "&r#{position} | {pos_colour}{player} &r({pos_colour}{amount} &rfish)"
+leaderboard-shortest-fish: "&r#{position} | {pos_colour}{player} &r({rarity_colour}&l{rarity} {rarity_colour}{fish}&r, {length}cm&r)"
+leaderboard-shortest-total: "&r#{position} | {pos_colour}{player} &r({pos_colour}{amount}cm&r)"
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: "&r{player} has won the competition for {type}. Congratulations!"
 # This shows the number of players currently in the competition, set to "" to disable.
@@ -123,6 +128,7 @@ help-general:
   admin: "[noPrefix]Admin command help page."
   sellall: "[noPrefix]Sell all the fish in your inventory."
   next: "[noPrefix]Show how much time is until the next competition."
+  applybaits: "[noPrefix]Apply baits to your fishing rod."
 
 help-list:
   fish: "[noPrefix]Display all fish in a specific rarity."
@@ -157,6 +163,10 @@ no-competition-running: "No competition running right now."
 no-competition-running-fish: "No competition running right now."
 # Shown when the emf %emf_competition_place_size_*% placeholder is used when there's no competition running
 no-competition-running-size: "No competition running right now."
+
+# HOw should %emf_custom_fishing_status% be formatted?
+custom-fishing-enabled: '&aEnabled'
+custom-fishing-disabled: '&cDisabled'
 
 
 # How should the %emf_competition_place_fish_*% be formatted?
@@ -222,8 +232,10 @@ admin:
 
   # Sent when a competition is already running when using /emf admin competition start
   competition-already-running: "&rThere's already a competition running."
-  # When an invalid competition type is tried to be started
+  # When an invalid competition type is provided
   competition-type-invalid: "&rThat isn't a type of competition type, available types: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
+  # When an invalid competition id is provided
+  competition-id-invalid: "&rThat isn't a valid competition id."
 
   # When the command /emf admin nbt-rod is run.
   nbt-rod-given: "&rYou have given {player} a NBT rod, make sure \"require-nbt-rod\" is set to &atrue &rfor this to be different from any other fishing rod."
@@ -239,4 +251,4 @@ admin:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 5
+config-version: 8

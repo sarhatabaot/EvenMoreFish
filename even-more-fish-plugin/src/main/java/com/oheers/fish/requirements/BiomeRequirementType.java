@@ -1,6 +1,7 @@
 package com.oheers.fish.requirements;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.requirement.RequirementContext;
 import com.oheers.fish.api.requirement.RequirementType;
 import org.bukkit.Location;
@@ -9,7 +10,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BiomeRequirementType implements RequirementType {
@@ -32,16 +32,17 @@ public class BiomeRequirementType implements RequirementType {
                     "default. The player may not have been given a fish if you see this message multiple times.");
             return false;
         }
-        List<Biome> biomes = new ArrayList<>();
-        values.forEach(value -> {
-            try {
-                biomes.add(Biome.valueOf(value));
-            } catch (IllegalArgumentException exception) {
-                EvenMoreFish.getInstance().getLogger().severe(value + " is not a valid biome.");
-            }
-        });
         Biome hookBiome = location.getBlock().getBiome();
-        return biomes.contains(hookBiome);
+        for (String value : values) {
+            Biome biome = FishUtils.getBiome(value);
+            if (biome == null) {
+                continue;
+            }
+            if (hookBiome.equals(biome)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

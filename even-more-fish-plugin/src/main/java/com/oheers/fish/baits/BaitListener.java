@@ -1,9 +1,9 @@
 package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Message;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.utils.nbt.NbtKeys;
@@ -45,12 +45,16 @@ public class BaitListener implements Listener {
         GameMode gameMode = event.getWhoClicked().getGameMode();
 
         if (!gameMode.equals(GameMode.SURVIVAL) && !gameMode.equals(GameMode.ADVENTURE)) {
-            new Message(ConfigMessage.BAIT_WRONG_GAMEMODE).broadcast(event.getWhoClicked(), false);
+            ConfigMessage.BAIT_WRONG_GAMEMODE.getMessage().send(event.getWhoClicked());
             return;
         }
 
         ApplicationResult result;
-        Bait bait = EvenMoreFish.getInstance().getBaits().get(BaitNBTManager.getBaitName(event.getCursor()));
+        Bait bait = BaitManager.getInstance().getBait(BaitNBTManager.getBaitName(event.getCursor()));
+
+        if (bait == null) {
+            return;
+        }
 
         NbtVersion nbtVersion = NbtVersion.getVersion(potentialFishingRod);
         if (nbtVersion != NbtVersion.COMPAT) {
@@ -67,14 +71,14 @@ public class BaitListener implements Listener {
             }
 
         } catch (MaxBaitsReachedException exception) {
-            new Message(ConfigMessage.BAITS_MAXED).broadcast(event.getWhoClicked(), false);
+            ConfigMessage.BAITS_MAXED.getMessage().send(event.getWhoClicked());
             result = exception.getRecoveryResult();
         } catch (MaxBaitReachedException exception) {
             result = exception.getRecoveryResult();
-            Message message = new Message(ConfigMessage.BAITS_MAXED_ON_ROD);
+            AbstractMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
             message.setBaitTheme(bait.getTheme());
             message.setBait(bait.getName());
-            message.broadcast(event.getWhoClicked(), true);
+            message.send(event.getWhoClicked());
         }
 
         if (result == null || result.getFishingRod() == null)
@@ -132,7 +136,7 @@ public class BaitListener implements Listener {
         if (event.getSlot() == 2 && BaitNBTManager.isBaitedRod(inv.getItem(1))) {
             event.setCancelled(true);
             player.closeInventory();
-            new Message(ConfigMessage.BAIT_ROD_PROTECTION).broadcast(player, false);
+            ConfigMessage.BAIT_ROD_PROTECTION.getMessage().send(player);
             return true;
         }
         return false;

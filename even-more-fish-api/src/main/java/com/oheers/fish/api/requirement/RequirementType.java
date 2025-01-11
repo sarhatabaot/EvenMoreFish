@@ -1,6 +1,5 @@
 package com.oheers.fish.api.requirement;
 
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,8 +13,8 @@ public interface RequirementType {
 
     /**
      * Checks if a player meets this requirement.
-     * @param player The player to check
-     * @param value The value to check
+     * @param context The context to check
+     * @param values The values to check this context against
      */
     boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values);
 

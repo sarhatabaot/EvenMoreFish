@@ -3,7 +3,6 @@ package com.oheers.fish.gui;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.GUIConfig;
-import com.oheers.fish.config.messages.Message;
 import com.oheers.fish.gui.guis.BaitsGUI;
 import com.oheers.fish.gui.guis.EMFGUI;
 import com.oheers.fish.gui.guis.MainMenuGUI;
@@ -19,6 +18,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -34,16 +35,6 @@ import java.util.stream.Collectors;
 public class GUIUtils {
 
     private static Map<String, GuiElement.Action> externalActionMap;
-
-    public static ItemStack getExitItem() {
-        YamlDocument config = GUIConfig.getInstance().getConfig();
-        return createItemStack(
-                config.getString("gui.global.exit.material", "structure_void"),
-                Material.STRUCTURE_VOID,
-                config.getString("gui.global.exit.name", "&cExit"),
-                config.getStringList("gui.global.exit.lore")
-        );
-    }
 
     public static GuiPageElement getFirstPageButton() {
         YamlDocument config = GUIConfig.getInstance().getConfig();
@@ -117,13 +108,13 @@ public class GUIUtils {
         if (section == null) {
             return new InventoryGui(
                     EvenMoreFish.getInstance(),
-                    new Message("&cBroken GUI! Please tell an admin!").getRawMessage(false),
+                    EvenMoreFish.getAdapter().createMessage("&cBroken GUI! Please tell an admin!").getLegacyMessage(),
                     new String[0]
             );
         }
         return new InventoryGui(
                 EvenMoreFish.getInstance(),
-                new Message(section.getString("title", "EvenMoreFish Inventory")).getRawMessage(false),
+                EvenMoreFish.getAdapter().createMessage(section.getString("title", "EvenMoreFish Inventory")).getLegacyMessage(),
                 section.getStringList("layout").toArray(new String[0])
         );
     }
@@ -131,21 +122,22 @@ public class GUIUtils {
     public static ItemStack getFillerItem(@Nullable String materialName, @NotNull Material defaultMaterial) {
         Material material = ItemUtils.getMaterial(materialName, defaultMaterial);
         ItemStack stack = new ItemStack(material);
-        ItemMeta meta = stack.getItemMeta();
-        if (meta == null) {
-            return stack;
-        }
-        meta.setDisplayName("");
-        stack.setItemMeta(meta);
+        FishUtils.editMeta(stack, meta -> meta.setDisplayName(""));
         return stack;
     }
 
-    public static GuiElement getElement(@NotNull String configLocation, @NotNull Section section, @Nullable EMFGUI gui, @Nullable Supplier<Map<String, String>> replacementSupplier) {
-
+    public static GuiElement getElement(@Nullable String configLocation, @NotNull Section section, @Nullable EMFGUI gui, @Nullable Supplier<Map<String, String>> replacementSupplier) {
         // Get Character
         char character = FishUtils.getCharFromString(section.getString("character", "#"), '#');
 
-        String clickAction = section.getString("click-action", "none");
+        Map<ClickType, String> clickTypeStringMap = new HashMap<>();
+        if (section.isSection("click-action")) {
+            clickTypeStringMap.put(ClickType.LEFT, section.getString("click-action.left", "none"));
+            clickTypeStringMap.put(ClickType.RIGHT, section.getString("click-action.right", "none"));
+        } else {
+            clickTypeStringMap.put(ClickType.LEFT, section.getString("click-action", "none"));
+        }
+        List<String> commands = section.getStringList("click-commands");
 
         ItemFactory factory = new ItemFactory(configLocation, section);
         factory.enableAllChecks();
@@ -158,52 +150,42 @@ public class GUIUtils {
         }
 
         // Create the element
-        return switch (clickAction) {
-            case "next-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.NEXT);
-            case "first-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.FIRST);
-            case "previous-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.PREVIOUS);
-            case "last-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.LAST);
-            default -> new DynamicGuiElement(character, (viewer) -> {
-                // Get Click Action
-                GuiElement.Action action = getActionMap(gui).get(clickAction);
-                return new StaticGuiElement(character, item, action);
-            });
-        };
-    }
-
-    public static GuiElement getElement(@NotNull Section section, @Nullable EMFGUI gui, @Nullable Supplier<Map<String, String>> replacementSupplier) {
-        // Get Character
-        char character = FishUtils.getCharFromString(section.getString("character", "#"), '#');
-
-        String clickAction = section.getString("click-action", "none");
-        List<String> commands = section.getStringList("click-commands");
-
-        ItemFactory factory = new ItemFactory(null, section);
-        factory.enableAllChecks();
-        // Get ItemStack
-        ItemStack item;
-        if (replacementSupplier == null) {
-            item = factory.createItem(null, -1, null);
+        if (eitherClickTypeMatchesString(clickTypeStringMap, "next-page")) {
+            return new GuiPageElement(character, item, GuiPageElement.PageAction.NEXT);
+        } else if (eitherClickTypeMatchesString(clickTypeStringMap, "first-page")) {
+            return new GuiPageElement(character, item, GuiPageElement.PageAction.FIRST);
+        } else if (eitherClickTypeMatchesString(clickTypeStringMap, "previous-page")) {
+            return new GuiPageElement(character, item, GuiPageElement.PageAction.PREVIOUS);
+        } else if (eitherClickTypeMatchesString(clickTypeStringMap, "last-page")) {
+            return new GuiPageElement(character, item, GuiPageElement.PageAction.LAST);
         } else {
-            item = factory.createItem(null, -1, replacementSupplier.get());
-        }
-
-        // Create the element
-        return switch (clickAction) {
-            case "next-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.NEXT);
-            case "first-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.FIRST);
-            case "previous-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.PREVIOUS);
-            case "last-page" -> new GuiPageElement(character, item, GuiPageElement.PageAction.LAST);
-            default -> new DynamicGuiElement(character, (viewer) -> {
-                // Get Click Action
-                GuiElement.Action action = getActionMap(gui).get(clickAction);
+            return new DynamicGuiElement(character, (viewer) -> {
+                GuiElement.Action left = getActionMap(gui).get(clickTypeStringMap.get(ClickType.LEFT));
+                GuiElement.Action right = getActionMap(gui).get(clickTypeStringMap.get(ClickType.RIGHT));
                 return new StaticGuiElement(character, item, click -> {
                     HumanEntity sender = click.getWhoClicked();
                     commands.forEach(command -> Bukkit.dispatchCommand(sender, command));
-                    return action.onClick(click);
+                    if (click.getType().equals(ClickType.LEFT) && left != null) {
+                        return left.onClick(click);
+                    } else if (click.getType().equals(ClickType.RIGHT) && right != null) {
+                        return right.onClick(click);
+                    }
+                    return true;
                 });
             });
-        };
+        }
+    }
+
+
+    private static boolean eitherClickTypeMatchesString(@NotNull Map<ClickType, String> map, @NotNull String matcher) {
+        boolean matches = true;
+        for (String string : map.values()) {
+            if (!string.equalsIgnoreCase(matcher)) {
+                matches = false;
+                break;
+            }
+        }
+        return matches;
     }
 
     public static List<GuiElement> getElements(@NotNull Section section, @Nullable EMFGUI gui, @Nullable Supplier<Map<String, String>> replacementSupplier) {
@@ -213,7 +195,7 @@ public class GUIUtils {
                 .filter(Objects::nonNull)
                 // Exclude non-item config sections, if there are any
                 .filter(loopSection -> loopSection.getRoutesAsStrings(false).contains("item"))
-                .map(loopSection -> GUIUtils.getElement(loopSection, gui, replacementSupplier))
+                .map(loopSection -> GUIUtils.getElement(null, loopSection, gui, replacementSupplier))
                 .collect(Collectors.toList());
     }
 
@@ -232,11 +214,17 @@ public class GUIUtils {
         Map<String, GuiElement.Action> newActionMap = new HashMap<>();
         // Exiting the main menu should close the GUI
         newActionMap.put("full-exit", click -> {
+            if (gui != null) {
+                gui.doRescue();
+            }
             click.getGui().close();
             return true;
         });
         // Exiting a sub-menu should open the main menu
         newActionMap.put("open-main-menu", click -> {
+            if (gui != null) {
+                gui.doRescue();
+            }
             new MainMenuGUI(click.getWhoClicked()).open();
             return true;
         });
@@ -250,6 +238,11 @@ public class GUIUtils {
         });
         // The shop action should just open the shop menu
         newActionMap.put("open-shop", click -> {
+
+            if (gui != null) {
+                gui.doRescue();
+            }
+
             HumanEntity humanEntity = click.getWhoClicked();
 
             if (!(humanEntity instanceof Player player)) {
@@ -291,8 +284,8 @@ public class GUIUtils {
                 return true;
             }
             new SellHelper(click.getWhoClicked().getInventory(), player).sellFish();
-            if (gui instanceof SellGUI sellGUI) {
-                sellGUI.doRescue();
+            if (gui != null) {
+                gui.doRescue();
             }
             click.getGui().close();
             return true;
@@ -303,6 +296,9 @@ public class GUIUtils {
             return true;
         });
         newActionMap.put("open-baits-menu", click -> {
+            if (gui != null) {
+                gui.doRescue();
+            }
             new BaitsGUI(click.getWhoClicked()).open();
             return true;
         });
@@ -315,6 +311,12 @@ public class GUIUtils {
             newActionMap.putAll(externalActionMap);
         }
         return newActionMap;
+    }
+
+    // Returns all items from the provided inventory to the player.
+    public static void doRescue(@NotNull Inventory inventory, @NotNull Player player) {
+        FishUtils.giveItems(inventory.getContents(), player);
+        inventory.clear();
     }
 
 }

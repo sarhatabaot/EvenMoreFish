@@ -1,12 +1,16 @@
 package com.oheers.fish.config;
 
-import com.oheers.fish.Economy;
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.economy.EconomyType;
+import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import dev.dejvokep.boostedyaml.route.Route;
 import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.block.Biome;
 import org.bukkit.boss.BarStyle;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -17,6 +21,7 @@ public class MainConfig extends ConfigBase {
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
+        applyOneTimeConversions();
     }
 
     public static MainConfig getInstance() {
@@ -34,8 +39,6 @@ public class MainConfig extends ConfigBase {
     public boolean doingRandomDurability() {
         return getConfig().getBoolean("random-durability", true);
     }
-
-
 
     public boolean isDatabaseOnline() {
         return databaseEnabled() && !EvenMoreFish.getInstance().getDatabaseV3().usingVersionV2();
@@ -59,24 +62,6 @@ public class MainConfig extends ConfigBase {
 
     public List<String> getAllowedWorlds() {
         return getConfig().getStringList("allowed-worlds");
-    }
-
-    public boolean isEconomyEnabled() {
-        return getConfig().getBoolean("enable-economy", true);
-    }
-
-    public boolean isEconomyDisabled() {
-        return !isEconomyEnabled();
-    }
-
-    public Economy.EconomyType economyType() {
-        String economyString = getConfig().getString("economy-type", "Vault");
-        return switch (economyString) {
-            case "Vault" -> Economy.EconomyType.VAULT;
-            case "PlayerPoints" -> Economy.EconomyType.PLAYER_POINTS;
-            case "GriefPrevention" -> Economy.EconomyType.GRIEF_PREVENTION;
-            default -> Economy.EconomyType.NONE;
-        };
     }
 
     public boolean shouldRespectVanish() { return getConfig().getBoolean("respect-vanished", true); }
@@ -207,23 +192,6 @@ public class MainConfig extends ConfigBase {
     public List<String> getMainCommandAliases() {
         return getConfig().getStringList("command.aliases");
     }
-  
-    public String[] getSellGUILayout() {
-        List<String> layout = getConfig().getStringList("gui.layout");
-
-        // Return default layout if the config is empty
-        if (layout.isEmpty()) {
-            return new String[]{
-                    "iiiiiiiii",
-                    "iiiiiiiii",
-                    "iiiiiiiii",
-                    "fffsfafff"
-            };
-        }
-
-        // Convert the List<String> to a String[] and return
-        return layout.toArray(new String[0]);
-    }
 
     public boolean giveStraightToInventory() {
         return getConfig().getBoolean("give-straight-to-inventory");
@@ -238,15 +206,66 @@ public class MainConfig extends ConfigBase {
         section.getRoutesAsStrings(false).forEach(key -> {
             List<Biome> biomes = new ArrayList<>();
             section.getStringList(key).forEach(biomeString -> {
-                try {
-                    biomes.add(Biome.valueOf(biomeString));
-                } catch (IllegalArgumentException exception) {
+                Biome biome = FishUtils.getBiome(biomeString);
+                if (biome == null) {
                     EvenMoreFish.getInstance().getLogger().severe(biomeString + " is not a valid biome, found when loading in biome set " + key + ".");
                 }
+                biomes.add(biome);
             });
             biomeSetMap.put(key, biomes);
         });
         return biomeSetMap;
+    }
+
+    public double getRegionBoost(String region, String rarity) {
+        if (region == null || rarity == null) {
+            return 1.0; // Default boost rate is 1.0 if region or rarity is null
+        }
+
+        Section regionBoosts = getConfig().getSection("region-boosts");
+        if (regionBoosts == null) {
+            return 1.0; // Default boost rate is 1.0 if not specified
+        }
+
+        Section regionSection = regionBoosts.getSection(region);
+        if (regionSection == null) {
+            return 1.0; // Default boost rate is 1.0 if not specified
+        }
+
+        return regionSection.getDouble(rarity, 1.0); // Default boost rate is 1.0 if not specified
+    }
+
+    public boolean isRegionBoostsEnabled() {
+        return getConfig().contains("region-boosts") && getConfig().isSection("region-boosts");
+    }
+
+    public boolean isEconomyEnabled(@NotNull EconomyType type) {
+        return getConfig().getBoolean("economy." + type.getIdentifier().toLowerCase() + ".enabled");
+    }
+
+    public double getEconomyMultiplier(@NotNull EconomyType type) {
+        return getConfig().getDouble("economy." + type.getIdentifier().toLowerCase() + ".multiplier");
+    }
+
+    public @Nullable String getEconomyDisplay(@NotNull EconomyType type) {
+        return getConfig().getString("economy." + type.getIdentifier().toLowerCase() + ".display");
+    }
+
+    private void applyOneTimeConversions() {
+        YamlDocument yamlDocument = getConfig();
+
+        // Economy Rework - Requires the config to contain the new format first.
+        String economyType = yamlDocument.getString("economy-type");
+        if (economyType != null) {
+            yamlDocument.remove("enable-economy");
+            yamlDocument.remove("economy-type");
+            if (!economyType.equalsIgnoreCase("NONE")) {
+                String path = "economy." + economyType.toLowerCase();
+                yamlDocument.set(path + ".enabled", true);
+            }
+        }
+
+        save();
     }
 
 }

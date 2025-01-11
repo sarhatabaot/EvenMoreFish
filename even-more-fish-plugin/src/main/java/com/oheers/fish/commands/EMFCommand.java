@@ -5,11 +5,12 @@ import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.competition.Competition;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Message;
 import com.oheers.fish.config.messages.PrefixType;
+import com.oheers.fish.gui.guis.ApplyBaitsGUI;
 import com.oheers.fish.gui.guis.MainMenuGUI;
 import com.oheers.fish.gui.guis.SellGUI;
 import com.oheers.fish.permissions.AdminPerms;
@@ -27,9 +28,9 @@ public class EMFCommand extends BaseCommand {
     @Description("%desc_general_next")
     @CommandPermission(UserPerms.NEXT)
     public void onNext(final CommandSender sender) {
-        Message message = Competition.getNextCompetitionMessage();
-        message.usePrefix(PrefixType.DEFAULT);
-        message.broadcast(sender, true);
+        AbstractMessage message = Competition.getNextCompetitionMessage();
+        message.prependMessage(PrefixType.DEFAULT.getPrefix());
+        message.send(sender);
     }
 
     @Subcommand("toggle")
@@ -51,12 +52,12 @@ public class EMFCommand extends BaseCommand {
     @CommandPermission(UserPerms.HELP)
     @Description("%desc_general_help")
     public void onHelp(final CommandHelp help, final CommandSender sender) {
-        new Message(ConfigMessage.HELP_GENERAL_TITLE).broadcast(sender, false);
+        ConfigMessage.HELP_GENERAL_TITLE.getMessage().send(sender);
         help.getHelpEntries().forEach(helpEntry -> {
-            Message helpMessage = new Message(ConfigMessage.HELP_FORMAT);
+            AbstractMessage helpMessage = ConfigMessage.HELP_FORMAT.getMessage();
             helpMessage.setVariable("{command}", "/" + helpEntry.getCommand());
             helpMessage.setVariable("{description}", helpEntry.getDescription());
-            helpMessage.broadcast(sender, true);
+            helpMessage.send(sender);
         });
     }
 
@@ -64,18 +65,20 @@ public class EMFCommand extends BaseCommand {
     @CommandPermission(UserPerms.TOP)
     @Description("%desc_general_top")
     public void onTop(final CommandSender sender) {
-        if (!Competition.isActive()) {
-            new Message(ConfigMessage.NO_COMPETITION_RUNNING).broadcast(sender, true);
+        Competition active = Competition.getCurrentlyActive();
+
+        if (active == null) {
+            ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(sender);
             return;
         }
 
         if (sender instanceof Player player) {
-            EvenMoreFish.getInstance().getActiveCompetition().sendPlayerLeaderboard(player);
+            active.sendPlayerLeaderboard(player);
             return;
         }
 
         if (sender instanceof ConsoleCommandSender consoleCommandSender) {
-            EvenMoreFish.getInstance().getActiveCompetition().sendConsoleLeaderboard(consoleCommandSender);
+            active.sendConsoleLeaderboard(consoleCommandSender);
         }
     }
 
@@ -83,14 +86,14 @@ public class EMFCommand extends BaseCommand {
     @CommandPermission(UserPerms.SHOP)
     @Description("%desc_general_shop")
     public void onShop(final CommandSender sender, @Optional final OnlinePlayer onlinePlayer) {
-        if (MainConfig.getInstance().isEconomyDisabled()) {
-            new Message(ConfigMessage.ECONOMY_DISABLED).broadcast(sender, false);
+        if (!Economy.getInstance().isEnabled()) {
+            ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
             return;
         }
 
         if (onlinePlayer == null) {
             if (!(sender instanceof Player player)) {
-                new Message("&cYou must specify a player when running from console.").broadcast(sender, false);
+                EvenMoreFish.getAdapter().createMessage("&cYou must specify a player when running from console.").send(sender);
                 return;
             }
             new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
@@ -99,9 +102,9 @@ public class EMFCommand extends BaseCommand {
 
         if (sender.hasPermission(AdminPerms.ADMIN)) {
             new SellGUI(onlinePlayer.player, SellGUI.SellState.NORMAL, null).open();
-            Message message = new Message(ConfigMessage.ADMIN_OPEN_FISH_SHOP);
-            message.setPlayer(onlinePlayer.player.getName());
-            message.broadcast(sender, true);
+            AbstractMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
+            message.setPlayer(onlinePlayer.player);
+            message.send(sender);
         }
     }
 
@@ -109,13 +112,18 @@ public class EMFCommand extends BaseCommand {
     @CommandPermission(UserPerms.SELL_ALL)
     @Description("%desc_general_sellall")
     public void onSellAll(final Player sender) {
-        if (MainConfig.getInstance().isEconomyDisabled()) {
-            new Message(ConfigMessage.ECONOMY_DISABLED).broadcast(sender, false);
+        if (!Economy.getInstance().isEnabled()) {
+            ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
             return;
         }
-
         new SellHelper(sender.getInventory(), sender).sellFish();
     }
 
+    @Subcommand("applybaits")
+    @CommandPermission(UserPerms.APPLYBAITS)
+    @Description("%desc_general_applybaits%")
+    public void onApplyBaits(final Player sender) {
+        new ApplyBaitsGUI(sender, null).open();
+    }
 
 }

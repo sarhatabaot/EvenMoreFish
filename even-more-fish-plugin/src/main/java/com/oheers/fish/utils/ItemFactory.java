@@ -2,13 +2,12 @@ package com.oheers.fish.utils;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.addons.exceptions.IncorrectAssignedMaterialException;
 import com.oheers.fish.api.addons.exceptions.NoPrefixException;
-import com.oheers.fish.config.BaitFile;
-import com.oheers.fish.config.FishFile;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.Message;
-import dev.dejvokep.boostedyaml.YamlDocument;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.NbtApiException;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -51,19 +50,12 @@ public class ItemFactory {
      * @param configurationFile The config to check
      */
     public ItemFactory(@Nullable String configLocation, @NotNull Section configurationFile) {
-        if (configLocation != null) {
+        if (configLocation != null && !configLocation.isEmpty()) {
             this.configLocation = configLocation + ".";
         } else {
             this.configLocation = "";
         }
         this.configurationFile = configurationFile;
-        this.rawMaterial = false;
-        this.product = getType(null);
-    }
-
-    public ItemFactory(@NotNull String configLocation) {
-        this.configLocation = configLocation + ".";
-        this.configurationFile = getConfiguration();
         this.rawMaterial = false;
         this.product = getType(null);
     }
@@ -112,6 +104,9 @@ public class ItemFactory {
      * @return The ItemStack of the item, with only skull metadata set if it's a player head.
      */
     public ItemStack getType(OfflinePlayer player) {
+
+        ItemStack raw = checkRaw();
+        if (raw != null) return raw;
 
         ItemStack material = checkMaterial();
         if (material != null) return material;
@@ -218,6 +213,30 @@ public class ItemFactory {
         }
 
         return null;
+    }
+
+    /**
+     * Checks for a value in the item.raw setting for the item.
+     *
+     * @return Null if the setting doesn't exist or is invalid, the item in ItemStack form if it does.
+     */
+    private ItemStack checkRaw() {
+        // The fish has item.raw selected
+        String rawValue = this.configurationFile.getString(configLocation + "item.raw-nbt");
+        if (rawValue == null) {
+            return null;
+        }
+        ItemStack item = null;
+        try {
+            item = NBT.itemStackFromNBT(NBT.parseNBT(rawValue));
+        } catch (NbtApiException exception) {
+            EvenMoreFish.getInstance().getLogger().severe(configLocation + " has invalid raw NBT: " + rawValue);
+        }
+        if (item == null) {
+            return null;
+        }
+        rawMaterial = true;
+        return item;
     }
 
     /**
@@ -465,19 +484,15 @@ public class ItemFactory {
         String dyeColour = this.configurationFile.getString(configLocation + "dye-colour");
 
         if (dyeColour != null) {
+            @NotNull Color colour;
             try {
-                LeatherArmorMeta meta = (LeatherArmorMeta) product.getItemMeta();
-
-                Color colour = Color.decode(dyeColour);
-
-                if (meta != null) {
-                    meta.setColor(org.bukkit.Color.fromRGB(colour.getRed(), colour.getGreen(), colour.getBlue()));
-                }
-
-                product.setItemMeta(meta);
-            } catch (ClassCastException exception) {
-                EvenMoreFish.getInstance().getLogger().severe("Could not fetch hex value: " + dyeColour + " from config location + " + configLocation + " Item is likely not a leather material.");
+                colour = Color.decode(dyeColour);
+            } catch (NumberFormatException exception) {
+                return;
             }
+            FishUtils.editMeta(product, LeatherArmorMeta.class,
+                    meta -> meta.setColor(org.bukkit.Color.fromRGB(colour.getRed(), colour.getGreen(), colour.getBlue()))
+            );
         }
     }
 
@@ -486,22 +501,17 @@ public class ItemFactory {
      * item if the config has random durability enabled.
      */
     public void applyDamage() {
-
-        ItemMeta meta = product.getItemMeta();
-        if (meta instanceof Damageable nonDamaged) {
-
+        FishUtils.editMeta(product, Damageable.class, meta -> {
             int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
             if (predefinedDamage >= 0 && predefinedDamage <= 100) {
-                nonDamaged.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
+                meta.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
             } else {
                 if (MainConfig.getInstance().doingRandomDurability()) {
                     int max = product.getType().getMaxDurability();
-                    nonDamaged.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
+                    meta.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
                 }
             }
-
-            product.setItemMeta((ItemMeta) nonDamaged);
-        }
+        });
     }
 
     /**
@@ -510,13 +520,7 @@ public class ItemFactory {
     private void applyModelData() {
         int value = this.configurationFile.getInt(configLocation + "item.custom-model-data");
         if (value != 0) {
-            ItemMeta meta = product.getItemMeta();
-
-            if (meta != null) {
-                meta.setCustomModelData(value);
-            }
-
-            product.setItemMeta(meta);
+            FishUtils.editMeta(product, meta -> meta.setCustomModelData(value));
         }
     }
 
@@ -524,14 +528,11 @@ public class ItemFactory {
         List<String> loreConfig = this.configurationFile.getStringList(configLocation + "lore");
         if (loreConfig.isEmpty()) return;
 
-        ItemMeta meta = product.getItemMeta();
-        if (meta == null) return;
-
-        Message lore = new Message(loreConfig);
-        lore.setVariables(replacements);
-
-        meta.setLore(lore.getRawListMessage(true));
-        product.setItemMeta(meta);
+        FishUtils.editMeta(product, meta -> {
+            AbstractMessage lore = EvenMoreFish.getAdapter().createMessage(loreConfig);
+            lore.setVariables(replacements);
+            meta.setLore(lore.getLegacyListMessage());
+        });
     }
 
     /**
@@ -539,25 +540,17 @@ public class ItemFactory {
      * reason is.
      */
     private void applyDisplayName(@Nullable Map<String, String> replacements) {
-        String displayName = this.configurationFile.getString(configLocation + "item.displayname");
+        final String displayName = this.configurationFile.getString(configLocation + "item.displayname", this.displayName);
 
-        if (displayName == null && this.displayName != null) displayName = this.displayName;
-
-        if (displayName != null) {
-            ItemMeta meta = product.getItemMeta();
-
-            if (meta != null) {
-                if (displayName.isEmpty()) {
-                    meta.setDisplayName("");
-                } else {
-                    Message display = new Message(displayName);
-                    display.setVariables(replacements);
-                    meta.setDisplayName(display.getRawMessage(true));
-                }
+        FishUtils.editMeta(product, meta -> {
+            if (displayName == null || displayName.isEmpty()) {
+                meta.setDisplayName("");
+            } else {
+                AbstractMessage display = EvenMoreFish.getAdapter().createMessage(displayName);
+                display.setVariables(replacements);
+                meta.setDisplayName(display.getLegacyMessage());
             }
-
-            product.setItemMeta(meta);
-        }
+        });
     }
 
     /**
@@ -569,7 +562,6 @@ public class ItemFactory {
         String potionSettings = this.configurationFile.getString(configLocation + "item.potion");
 
         if (potionSettings == null) return;
-        if (!(product.getItemMeta() instanceof PotionMeta meta)) return;
 
         String[] split = potionSettings.split(":");
         if (split.length != 3) {
@@ -577,15 +569,18 @@ public class ItemFactory {
         }
 
         try {
-            meta.addCustomEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(split[0])), Integer.parseInt(split[1]) * 20, Integer.parseInt(split[2]) - 1, false), true);
+            PotionEffect effect = new PotionEffect(
+                    Objects.requireNonNull(PotionEffectType.getByName(split[0])),
+                    Integer.parseInt(split[1]) * 20,
+                    Integer.parseInt(split[2]) - 1,
+                    false
+            );
+            FishUtils.editMeta(product, PotionMeta.class, meta -> meta.addCustomEffect(effect, true));
         } catch (NumberFormatException exception) {
             EvenMoreFish.getInstance().getLogger().severe(configLocation + "item.potion: is formatted incorrectly in the fish.yml file. Use \"potion:duration:amplifier\", where duration & amplifier are integer values.");
         } catch (NullPointerException exception) {
             EvenMoreFish.getInstance().getLogger().severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
         }
-
-        product.setItemMeta(meta);
-
     }
 
     /**
@@ -594,26 +589,10 @@ public class ItemFactory {
      * before they're added.
      */
     private void applyFlags() {
-        ItemMeta meta = product.getItemMeta();
-
-        if (meta != null) {
+        FishUtils.editMeta(product, meta -> {
             if (itemDyeCheck) meta.addItemFlags(ItemFlag.HIDE_DYE);
             if (itemGlowCheck) meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            this.product.setItemMeta(meta);
-        }
-    }
-
-    private YamlDocument getConfiguration() {
-        if (this.configLocation.startsWith("fish.")) {
-            return FishFile.getInstance().getConfig();
-        } else if (this.configLocation.startsWith("baits.")) {
-            return BaitFile.getInstance().getConfig();
-        } else if (this.configLocation.startsWith("nbt-rod-item")) {
-            return MainConfig.getInstance().getConfig();
-        } else {
-            EvenMoreFish.getInstance().getLogger().severe("Could not fetch file configuration for: " + this.configLocation);
-            return null;
-        }
+        });
     }
 
     public void enableDefaultChecks() {

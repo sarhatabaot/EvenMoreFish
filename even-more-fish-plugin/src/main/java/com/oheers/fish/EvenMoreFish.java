@@ -3,18 +3,20 @@ package com.oheers.fish;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
-import com.Zrips.CMI.Containers.CMIUser;
-import com.earth2me.essentials.Essentials;
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
+import com.oheers.fish.adapter.PaperAdapter;
+import com.oheers.fish.adapter.SpigotAdapter;
 import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
+import com.oheers.fish.api.adapter.PlatformAdapter;
+import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementManager;
 import com.oheers.fish.api.reward.RewardManager;
-import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitListener;
+import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
 import com.oheers.fish.commands.EMFCommand;
 import com.oheers.fish.competition.AutoRunner;
@@ -23,18 +25,23 @@ import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.competition.rewardtypes.*;
 import com.oheers.fish.competition.rewardtypes.external.*;
-import com.oheers.fish.config.*;
+import com.oheers.fish.config.BaitFile;
+import com.oheers.fish.config.GUIConfig;
+import com.oheers.fish.config.GUIFillerConfig;
+import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Message;
 import com.oheers.fish.config.messages.Messages;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.DatabaseV3;
-import com.oheers.fish.database.FishReport;
-import com.oheers.fish.database.UserReport;
+import com.oheers.fish.database.model.FishReport;
+import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.economy.GriefPreventionEconomyType;
+import com.oheers.fish.economy.PlayerPointsEconomyType;
+import com.oheers.fish.economy.VaultEconomyType;
 import com.oheers.fish.events.*;
 import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.items.Fish;
-import com.oheers.fish.fishing.items.Names;
+import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.requirements.*;
 import com.oheers.fish.utils.AntiCraft;
@@ -45,6 +52,7 @@ import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.permission.Permission;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
@@ -54,43 +62,37 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
+public class EvenMoreFish extends EMFPlugin {
+
     private final Random random = new Random();
 
     private Permission permission = null;
-    private Economy economy;
-    private Map<Integer, Set<String>> fish = new HashMap<>();
-    private final Map<String, Bait> baits = new HashMap<>();
-    private Map<Rarity, List<Fish>> fishCollection = new HashMap<>();
     private ItemStack customNBTRod;
     private boolean checkingEatEvent;
     private boolean checkingIntEvent;
     // Do some fish in some rarities have the comp-check-exempt: true.
     private boolean raritiesCompCheckExempt = false;
-    private Competition active;
     private CompetitionQueue competitionQueue;
     private Logger logger;
     private PluginManager pluginManager;
     private int metric_fishCaught = 0;
     private int metric_baitsUsed = 0;
     private int metric_baitsApplied = 0;
+    private boolean firstLoad = false;
 
     // this is for pre-deciding a rarity and running particles if it will be chosen
     // it's a work-in-progress solution and probably won't stick.
@@ -108,6 +110,7 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
+    private static PlatformAdapter platformAdapter;
     private EMFAPI api;
 
     private AddonManager addonManager;
@@ -129,10 +132,17 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
 
+        // This should only ever be done once.
+        EMFPlugin.setInstance(this);
+
+        // If EMF folder does not exist, this is the first load.
+        firstLoad = !getDataFolder().exists();
+
         instance = this;
         scheduler = UniversalScheduler.getScheduler(this);
-        this.api = new EMFAPI();
+        platformAdapter = loadAdapter();
 
+        this.api = new EMFAPI();
 
         decidedRarities = new HashMap<>();
 
@@ -143,9 +153,6 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
         usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
 
-        getConfig().options().copyDefaults();
-        saveDefaultConfig();
-
         new MainConfig();
         new Messages();
 
@@ -153,10 +160,7 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         this.addonManager = new AddonManager(this);
         this.addonManager.load();
 
-        new FishFile();
-        new RaritiesFile();
         new BaitFile();
-        new CompetitionConfig();
 
         new GUIConfig();
         new GUIFillerConfig();
@@ -167,20 +171,19 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
             customNBTRod = createCustomNBTRod();
         }
 
-        if (MainConfig.getInstance().isEconomyEnabled()) {
-            // could not set up economy.
-            if (!setupEconomy()) {
-                EvenMoreFish.getInstance().getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
-            }
+        loadEconomy();
+
+        // could not set up economy.
+        if (!Economy.getInstance().isEnabled()) {
+            EvenMoreFish.getInstance().getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
         }
 
         setupPermissions();
 
         loadRequirementManager();
 
-        Names names = new Names();
-        names.loadRarities(FishFile.getInstance().getConfig(), RaritiesFile.getInstance().getConfig());
-        names.loadBaits(BaitFile.getInstance().getConfig());
+        FishManager.getInstance().load();
+        BaitManager.getInstance().load();
 
         // Do this before anything competition related.
         loadRewardManager();
@@ -220,16 +223,26 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         }
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");
+
+        // Set this to false as the plugin is now loaded.
+        firstLoad = false;
     }
 
     @Override
     public void onDisable() {
+
+        // Prevent issues when NBT preload fails.
+        if (instance == null) {
+            return;
+        }
+
         terminateGUIS();
         // Don't use the scheduler here because it will throw errors on disable
         saveUserData(false);
 
         // Ends the current competition in case the plugin is being disabled when the server will continue running
-        if (Competition.isActive()) {
+        Competition active = Competition.getCurrentlyActive();
+        if (active != null) {
             active.end(false);
         }
 
@@ -238,6 +251,10 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         if (MainConfig.getInstance().databaseEnabled()) {
             databaseV3.shutdown();
         }
+
+        FishManager.getInstance().unload();
+        BaitManager.getInstance().unload();
+
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Disabled");
     }
 
@@ -342,12 +359,15 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         }));
 
         metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
+
+        metrics.addCustomChart(new SimplePie("paper-adapter", () -> (platformAdapter instanceof PaperAdapter) ? "true" : "false"));
     }
 
     private void loadCommandManager() {
         PaperCommandManager manager = new PaperCommandManager(this);
 
-        manager.enableUnstableAPI("brigadier");
+        // Brigadier should stay disabled until ACF updates their implementation.
+        //manager.enableUnstableAPI("brigadier");
         manager.enableUnstableAPI("help");
 
         StringBuilder main = new StringBuilder(MainConfig.getInstance().getMainCommandName());
@@ -359,31 +379,32 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         manager.getCommandReplacements().addReplacement("duration", String.valueOf(MainConfig.getInstance().getCompetitionDuration() * 60));
         //desc_admin_<command>_<id>
         manager.getCommandReplacements().addReplacements(
-                "desc_admin_bait", new Message(ConfigMessage.HELP_ADMIN_BAIT).getRawMessage(true),
-                "desc_admin_competition", new Message(ConfigMessage.HELP_ADMIN_COMPETITION).getRawMessage(true),
-                "desc_admin_clearbaits", new Message(ConfigMessage.HELP_ADMIN_CLEARBAITS).getRawMessage(true),
-                "desc_admin_fish", new Message(ConfigMessage.HELP_ADMIN_FISH).getRawMessage(true),
-                "desc_admin_nbtrod", new Message(ConfigMessage.HELP_ADMIN_NBTROD).getRawMessage(true),
-                "desc_admin_reload", new Message(ConfigMessage.HELP_ADMIN_RELOAD).getRawMessage(true),
-                "desc_admin_version", new Message(ConfigMessage.HELP_ADMIN_VERSION).getRawMessage(true),
-                "desc_admin_migrate", new Message(ConfigMessage.HELP_ADMIN_MIGRATE).getRawMessage(true),
-                "desc_admin_rewardtypes", new Message(ConfigMessage.HELP_ADMIN_REWARDTYPES).getRawMessage(true),
-                "desc_admin_addons", new Message(ConfigMessage.HELP_ADMIN_ADDONS).getRawMessage(true),
+                "desc_admin_bait", ConfigMessage.HELP_ADMIN_BAIT.getMessage().getLegacyMessage(),
+                "desc_admin_competition", ConfigMessage.HELP_ADMIN_COMPETITION.getMessage().getLegacyMessage(),
+                "desc_admin_clearbaits", ConfigMessage.HELP_ADMIN_CLEARBAITS.getMessage().getLegacyMessage(),
+                "desc_admin_fish", ConfigMessage.HELP_ADMIN_FISH.getMessage().getLegacyMessage(),
+                "desc_admin_nbtrod", ConfigMessage.HELP_ADMIN_NBTROD.getMessage().getLegacyMessage(),
+                "desc_admin_reload", ConfigMessage.HELP_ADMIN_RELOAD.getMessage().getLegacyMessage(),
+                "desc_admin_version", ConfigMessage.HELP_ADMIN_VERSION.getMessage().getLegacyMessage(),
+                "desc_admin_migrate", ConfigMessage.HELP_ADMIN_MIGRATE.getMessage().getLegacyMessage(),
+                "desc_admin_rewardtypes", ConfigMessage.HELP_ADMIN_REWARDTYPES.getMessage().getLegacyMessage(),
+                "desc_admin_addons", ConfigMessage.HELP_ADMIN_ADDONS.getMessage().getLegacyMessage(),
 
-                "desc_list_fish", new Message(ConfigMessage.HELP_LIST_FISH).getRawMessage(true),
-                "desc_list_rarities", new Message(ConfigMessage.HELP_LIST_RARITIES).getRawMessage(true),
+                "desc_list_fish", ConfigMessage.HELP_LIST_FISH.getMessage().getLegacyMessage(),
+                "desc_list_rarities", ConfigMessage.HELP_LIST_RARITIES.getMessage().getLegacyMessage(),
 
-                "desc_competition_start", new Message(ConfigMessage.HELP_COMPETITION_START).getRawMessage(true),
-                "desc_competition_end", new Message(ConfigMessage.HELP_COMPETITION_END).getRawMessage(true),
+                "desc_competition_start", ConfigMessage.HELP_COMPETITION_START.getMessage().getLegacyMessage(),
+                "desc_competition_end", ConfigMessage.HELP_COMPETITION_END.getMessage().getLegacyMessage(),
 
-                "desc_general_top", new Message(ConfigMessage.HELP_GENERAL_TOP).getRawMessage(true),
-                "desc_general_help", new Message(ConfigMessage.HELP_GENERAL_HELP).getRawMessage(true),
-                "desc_general_shop", new Message(ConfigMessage.HELP_GENERAL_SHOP).getRawMessage(true),
-                "desc_general_toggle", new Message(ConfigMessage.HELP_GENERAL_TOGGLE).getRawMessage(true),
-                "desc_general_gui", new Message(ConfigMessage.HELP_GENERAL_GUI).getRawMessage(true),
-                "desc_general_admin", new Message(ConfigMessage.HELP_GENERAL_ADMIN).getRawMessage(true),
-                "desc_general_next", new Message(ConfigMessage.HELP_GENERAL_NEXT).getRawMessage(true),
-                "desc_general_sellall", new Message(ConfigMessage.HELP_GENERAL_SELLALL).getRawMessage(true)
+                "desc_general_top", ConfigMessage.HELP_GENERAL_TOP.getMessage().getLegacyMessage(),
+                "desc_general_help", ConfigMessage.HELP_GENERAL_HELP.getMessage().getLegacyMessage(),
+                "desc_general_shop", ConfigMessage.HELP_GENERAL_SHOP.getMessage().getLegacyMessage(),
+                "desc_general_toggle", ConfigMessage.HELP_GENERAL_TOGGLE.getMessage().getLegacyMessage(),
+                "desc_general_gui", ConfigMessage.HELP_GENERAL_GUI.getMessage().getLegacyMessage(),
+                "desc_general_admin", ConfigMessage.HELP_GENERAL_ADMIN.getMessage().getLegacyMessage(),
+                "desc_general_next", ConfigMessage.HELP_GENERAL_NEXT.getMessage().getLegacyMessage(),
+                "desc_general_sellall", ConfigMessage.HELP_GENERAL_SELLALL.getMessage().getLegacyMessage(),
+                "desc_general_applybaits", ConfigMessage.HELP_GENERAL_APPLYBAITS.getMessage().getLegacyMessage()
         );
 
 
@@ -401,40 +422,34 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         });
         manager.getCommandContexts().registerContext(Rarity.class, c -> {
             final String rarityId = c.popFirstArg().replace("\"", "");
-            Optional<Rarity> potentialRarity = EvenMoreFish.getInstance().getFishCollection().keySet().stream()
-                    .filter(rarity -> rarity.getValue().equalsIgnoreCase(rarityId))
-                    .findFirst();
-            if (potentialRarity.isEmpty()) {
+            Rarity rarity = FishManager.getInstance().getRarity(rarityId);
+            if (rarity == null) {
                 throw new InvalidCommandArgument("No such rarity: " + rarityId);
             }
-
-            return potentialRarity.get();
+            return rarity;
         });
         manager.getCommandContexts().registerContext(Fish.class, c -> {
             final Rarity rarity = (Rarity) c.getResolvedArg(Rarity.class);
             final String fishId = c.popFirstArg();
-            Optional<Fish> potentialFish = EvenMoreFish.getInstance().getFishCollection().get(rarity).stream()
-                    .filter(f -> f.getName().equalsIgnoreCase(fishId.replace("_", " ")) || f.getName().equalsIgnoreCase(fishId))
-                    .findFirst();
-
-            if (potentialFish.isEmpty()) {
+            Fish fish = rarity.getFish(fishId);
+            if (fish == null) {
+                fish = rarity.getFish(fishId.replace("_", " "));
+            }
+            if (fish == null) {
                 throw new InvalidCommandArgument("No such fish: " + fishId);
             }
-
-            return potentialFish.get();
+            return fish;
         });
-        manager.getCommandCompletions().registerCompletion("baits", c -> EvenMoreFish.getInstance().getBaits().keySet().stream().map(s -> s.replace(" ", "_")).collect(Collectors.toList()));
-        manager.getCommandCompletions().registerCompletion("rarities", c -> EvenMoreFish.getInstance().getFishCollection().keySet().stream().map(Rarity::getValue).collect(Collectors.toList()));
+        manager.getCommandCompletions().registerCompletion("baits", c -> BaitManager.getInstance().getBaitMap().keySet().stream().map(s -> s.replace(" ", "_")).toList());
+        manager.getCommandCompletions().registerCompletion("rarities", c -> FishManager.getInstance().getRarityMap().values().stream().map(Rarity::getId).toList());
         manager.getCommandCompletions().registerCompletion("fish", c -> {
             final Rarity rarity = c.getContextValue(Rarity.class);
-            return EvenMoreFish.getInstance().getFishCollection().get(rarity).stream().map(f -> f.getName().replace(" ", "_")).collect(Collectors.toList());
+            return rarity.getFishList().stream().map(f -> f.getName().replace(" ", "_")).toList();
         });
+        manager.getCommandCompletions().registerCompletion("competitionId", c -> getCompetitionQueue().getFileMap().keySet());
 
         manager.registerCommand(new EMFCommand());
         manager.registerCommand(new AdminCommand());
-
-        // Make server admins aware the deprecation warning is nothing to worry about
-        getLogger().warning("The above warning, if you are on Paper, can safely be ignored for now, we are waiting for a fix from the developers of our command library.");
     }
 
 
@@ -443,17 +458,8 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
             return false;
         }
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        permission = rsp.getProvider();
+        permission = rsp == null ? null : rsp.getProvider();
         return permission != null;
-    }
-
-    private boolean setupEconomy() {
-        if (MainConfig.getInstance().isEconomyEnabled()) {
-            economy = new Economy(MainConfig.getInstance().economyType());
-            return economy.isEnabled();
-        } else {
-            return false;
-        }
     }
 
     // gets called on server shutdown to simulate all players closing their GUIs
@@ -486,7 +492,7 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     private void saveFishReports() {
         ConcurrentMap<UUID, List<FishReport>> allReports = DataManager.getInstance().getAllFishReports();
-        logger.info("Saving " + allReports.keySet().size() + " fish reports.");
+        logger.info("Saving " + allReports.size() + " fish reports.");
         for (Map.Entry<UUID, List<FishReport>> entry : allReports.entrySet()) {
             databaseV3.writeFishReports(entry.getKey(), entry.getValue());
 
@@ -506,42 +512,43 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
     }
 
     public ItemStack createCustomNBTRod() {
-        ItemFactory itemFactory = new ItemFactory("nbt-rod-item");
+        ItemFactory itemFactory = new ItemFactory("nbt-rod-item", MainConfig.getInstance().getConfig());
         itemFactory.enableDefaultChecks();
         itemFactory.setItemDisplayNameCheck(true);
         itemFactory.setItemLoreCheck(true);
 
         ItemStack customRod = itemFactory.createItem(null, 0);
-        NBT.modify(customRod,nbt -> {
-            nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND).setBoolean(NbtKeys.EMF_ROD_NBT,true);
-        });
+
+        setCustomNBTRod(customRod);
+
         return customRod;
+    }
+
+    /**
+     * Allows external plugins to set their own items as an EMF NBT-rod.
+     * @param item The item to set as an EMF NBT-rod.
+     */
+    public void setCustomNBTRod(@NotNull ItemStack item) {
+        NBT.modify(item, nbt -> {
+            nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND).setBoolean(NbtKeys.EMF_ROD_NBT, true);
+        });
     }
 
     public void reload(@Nullable CommandSender sender) {
 
         terminateGUIS();
 
-        fish.clear();
-        fishCollection.clear();
-
         reloadConfig();
         saveDefaultConfig();
 
         MainConfig.getInstance().reload();
         Messages.getInstance().reload();
-        CompetitionConfig.getInstance().reload();
         GUIConfig.getInstance().reload();
         GUIFillerConfig.getInstance().reload();
-        FishFile.getInstance().reload();
-        RaritiesFile.getInstance().reload();
         BaitFile.getInstance().reload();
 
-        setupEconomy();
-
-        Names names = new Names();
-        names.loadRarities(FishFile.getInstance().getConfig(), RaritiesFile.getInstance().getConfig());
-        names.loadBaits(BaitFile.getInstance().getConfig());
+        FishManager.getInstance().reload();
+        BaitManager.getInstance().reload();
 
         HandlerList.unregisterAll(FishEatEvent.getInstance());
         HandlerList.unregisterAll(FishInteractEvent.getInstance());
@@ -555,27 +562,16 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         competitionQueue.load();
 
         if (sender != null) {
-            new Message(ConfigMessage.RELOAD_SUCCESS).broadcast(sender, false);
+            ConfigMessage.RELOAD_SUCCESS.getMessage().send(sender);
         }
 
     }
 
     // Checks for updates, surprisingly
     private boolean checkUpdate() {
-
-        String[] spigotVersion = new UpdateChecker(this, 91310).getVersion().split("\\.");
-        String[] serverVersion = getDescription().getVersion().split("\\.");
-
-        for (int i = 0; i < serverVersion.length; i++) {
-            if (i < spigotVersion.length) {
-                if (Integer.parseInt(spigotVersion[i]) > Integer.parseInt(serverVersion[i])) {
-                    return true;
-                }
-            } else {
-                return false;
-            }
-        }
-        return false;
+        ComparableVersion spigotVersion = new ComparableVersion(new UpdateChecker(this, 91310).getVersion());
+        ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
+        return spigotVersion.compareTo(serverVersion) > 0;
     }
 
     private void checkPapi() {
@@ -591,22 +587,6 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     public Permission getPermission() {
         return permission;
-    }
-
-    public Economy getEconomy() {
-        return economy;
-    }
-
-    public Map<Integer, Set<String>> getFish() {
-        return fish;
-    }
-
-    public Map<String, Bait> getBaits() {
-        return baits;
-    }
-
-    public Map<Rarity, List<Fish>> getFishCollection() {
-        return fishCollection;
     }
 
     public ItemStack getCustomNBTRod() {
@@ -635,14 +615,6 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     public void setRaritiesCompCheckExempt(boolean bool) {
         this.raritiesCompCheckExempt = bool;
-    }
-
-    public Competition getActiveCompetition() {
-        return active;
-    }
-
-    public void setActiveCompetition(Competition competition) {
-        this.active = competition;
     }
 
     public CompetitionQueue getCompetitionQueue() {
@@ -721,6 +693,19 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         return api;
     }
 
+    private void loadEconomy() {
+        PluginManager pm = Bukkit.getPluginManager();
+
+        if (pm.isPluginEnabled("Vault")) {
+            new VaultEconomyType().register();
+        }
+        if (pm.isPluginEnabled("PlayerPoints")) {
+            new PlayerPointsEconomyType().register();
+        }
+        if (pm.isPluginEnabled("GriefPrevention")) {
+            new GriefPreventionEconomyType().register();
+        }
+    }
 
     private void loadRewardManager() {
         // Load RewardManager
@@ -755,6 +740,14 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         new RegionRequirementType().register();
         new WeatherRequirementType().register();
         new WorldRequirementType().register();
+
+        // Load Group RequirementType
+        if (isUsingVault()) {
+            RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+            if (rsp != null) {
+                new GroupRequirementType(rsp.getProvider()).register();
+            }
+        }
     }
 
     private void loadExternalRewardTypes() {
@@ -775,51 +768,15 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         if (getPermission() != null && getPermission().isEnabled()) {
             new PermissionRewardType().register();
         }
-        // Only enable the MONEY type if the economy is loaded.
-        if (getEconomy() != null && getEconomy().isEnabled()) {
+        // Only enable the Money RewardType is Vault is enabled.
+        if (pm.isPluginEnabled("Vault")) {
             new MoneyRewardType().register();
         }
     }
 
-    /**
-     * Retrieves online players excluding those who are vanished.
-     *
-     * @return A list of online players excluding those who are vanished.
-     */
-    public List<Player> getOnlinePlayersExcludingVanish() {
-        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
-
-        if (!MainConfig.getInstance().shouldRespectVanish()) {
-            return players;
-        }
-
-        // Check Essentials
-        if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
-            Plugin plugin = Bukkit.getPluginManager().getPlugin("Essentials");
-            if (plugin instanceof Essentials essentials) {
-                players = players.stream().filter(player -> !essentials.getUser(player).isVanished()).collect(Collectors.toList());
-            }
-        }
-
-        // Check CMI
-        if (Bukkit.getPluginManager().isPluginEnabled("CMI")) {
-            players = players.stream().filter(player -> !CMIUser.getUser(player).isVanished()).collect(Collectors.toList());
-        }
-
-        // Metadata check - A more generic way of checking if a player is vanished.
-        // SuperVanish, PremiumVanish, and VanishNoPacket support this according to the SuperVanish Spigot page.
-        players = players.stream().filter(player -> {
-            for (MetadataValue meta : player.getMetadata("vanished")) {
-                if (meta.asBoolean()) {
-                    return false;
-                }
-            }
-            return true;
-        }).collect(Collectors.toList());
-
-        return players;
+    public List<Player> getVisibleOnlinePlayers() {
+        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
     }
-
 
     // FISH TOGGLE METHODS
     // We use Strings here because Spigot 1.16.5 does not have PersistentDataType.BOOLEAN.
@@ -830,11 +787,11 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         // If it is enabled, disable it
         if (isCustomFishing(player)) {
             pdc.set(key, PersistentDataType.STRING, "false");
-            new Message(ConfigMessage.TOGGLE_OFF).broadcast(player, false);
-        // If it is disabled, enable it
+            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
+            // If it is disabled, enable it
         } else {
             pdc.set(key, PersistentDataType.STRING, "true");
-            new Message(ConfigMessage.TOGGLE_ON).broadcast(player, false);
+            ConfigMessage.TOGGLE_ON.getMessage().send(player);
         }
     }
 
@@ -843,6 +800,28 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         NamespacedKey key = new NamespacedKey(this, "fish-enabled");
         String toggleValue = pdc.getOrDefault(key, PersistentDataType.STRING, "true");
         return toggleValue.equals("true");
+    }
+
+    private static PlatformAdapter loadAdapter() {
+        // Class names taken from PaperLib's initialize method
+        if (FishUtils.classExists(("com.destroystokyo.paper.PaperConfig"))) {
+            return new PaperAdapter();
+        } else if (FishUtils.classExists("io.papermc.paper.configuration.Configuration")) {
+            return new PaperAdapter();
+        }
+        return new SpigotAdapter();
+    }
+
+    public static @NotNull PlatformAdapter getAdapter() {
+        if (platformAdapter == null) {
+            instance.getLogger().warning("No PlatformAdapter found! Defaulting to SpigotAdapter.");
+            platformAdapter = new SpigotAdapter();
+        }
+        return platformAdapter;
+    }
+
+    public boolean isFirstLoad() {
+        return firstLoad;
     }
 
 }
