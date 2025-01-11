@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +43,7 @@ public class FishingProcessor implements Listener {
     private final DecimalFormat decimalFormat = new DecimalFormat("#.0");
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void process(PlayerFishEvent event) {
+    public void processFishing(PlayerFishEvent event) {
         if (!isCustomFishAllowed(event.getPlayer())) {
             return;
         }
@@ -89,6 +90,45 @@ public class FishingProcessor implements Listener {
                 } else {
                     nonCustom.setItemStack(fish);
                 }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void processHunting(EntityDeathEvent event) {
+        final Player player = event.getEntity().getKiller();
+        if (player == null) { return; }
+
+        if (event.getEntity() instanceof org.bukkit.entity.Fish) {
+            if (!isCustomFishAllowed(player)) {
+                return;
+            }
+        }
+
+        if (MainConfig.getInstance().requireFishingPermission()) {
+            new Message(ConfigMessage.NO_PERMISSION_FISHING).broadcast(player);
+            return;
+        }
+
+        ItemStack fish = getFish(player, event.getEntity().getLocation(), player.getInventory().getItemInMainHand());
+
+        if (fish == null) {
+            return;
+        }
+
+        for (ItemStack drop : event.getDrops()) {
+            if (!(drop instanceof Item nonCustom)) {
+                return;
+            }
+        }
+
+        event.getDrops().removeAll(event.getDrops());
+        if (MainConfig.getInstance().giveStraightToInventory() && isSpaceForNewFish(player.getInventory())) {
+            FishUtils.giveItem(fish, player);
+        } else {
+            // replaces the fishing item with a custom evenmorefish fish.
+            if (!fish.getType().isAir()) {
+                event.getDrops().add(fish);
             }
         }
     }

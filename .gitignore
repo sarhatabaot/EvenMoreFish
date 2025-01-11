@@ -50,6 +50,7 @@ hs_err_pid*
 
 # Gradle
 .gradle/
+gradle/
 
 # Icon must end with two \r
 Icon

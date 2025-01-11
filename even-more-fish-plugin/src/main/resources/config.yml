@@ -15,6 +15,11 @@ decimal-locale: en_US
 # Should EMF fish only be given during a competition?
 fish-only-in-competition: false
 
+# Can players catch fish by killing fish with swords?
+fish-hunting: true
+# Should the plugin ignore fish hunted that came from a mob spawner?
+ignore-spawner-fish: true
+
 # Should competition player requirements respect vanished players?
 # Supports EssentialsX and CMI.
 respect-vanished: true

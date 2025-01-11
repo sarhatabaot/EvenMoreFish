@@ -50,6 +50,14 @@ public class MainConfig extends ConfigBase {
         return getConfig().getBoolean("fish-only-in-competition", false);
     }
 
+    public boolean isHuntingEnabled() {
+        return getConfig().getBoolean("fish-hunting", true);
+    }
+
+    public boolean ignoringSpawnerFish() {
+        return getConfig().getBoolean("ignore-spawner-fish", true);
+    }
+
     public boolean getEnabled() {
         return getConfig().getBoolean("enabled", true);
     }
