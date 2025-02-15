@@ -7,27 +7,33 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-public class FishReport {
+/**
+ * This is a per-player fish report.
+ * Should probably also include the referenced player id, to properly reflect the database
+ */
+public class FishReportOld {
+    private final int userId;
     private final String name;
     private final String rarity;
-    private int numCaught;
+    private int timesCaught;
     private float size;
-    private final LocalDateTime localDateTime;
+    private final LocalDateTime catchTime;
 
-    public FishReport(String rarity, String name, float size, int numCaught, long timeEpoch) {
+
+    public FishReportOld(String rarity, String name, float size, int timesCaught, long timeEpoch) {
         this.rarity = rarity;
         this.name = name;
-        this.numCaught = numCaught;
+        this.timesCaught = timesCaught;
         this.size = size;
-        this.localDateTime = getLocalDateTimeFromEpoch(timeEpoch);
+        this.catchTime = getLocalDateTimeFromEpoch(timeEpoch);
     }
 
-    public FishReport(String rarity, String name, float size, int numCaught, LocalDateTime time) {
+    public FishReportOld(String rarity, String name, float size, int timesCaught, LocalDateTime time) {
         this.rarity = rarity;
         this.name = name;
-        this.numCaught = numCaught;
+        this.timesCaught = timesCaught;
         this.size = size;
-        this.localDateTime = time;
+        this.catchTime = time;
     }
 
 
@@ -40,12 +46,12 @@ public class FishReport {
                 .toLocalDateTime();
     }
 
-    public int getNumCaught() {
-        return numCaught;
+    public int getTimesCaught() {
+        return timesCaught;
     }
 
-    public void setNumCaught(int numCaught) {
-        this.numCaught = numCaught;
+    public void setTimesCaught(int timesCaught) {
+        this.timesCaught = timesCaught;
     }
 
     public String getRarity() {
@@ -65,19 +71,19 @@ public class FishReport {
     }
 
     public long getTimeEpoch() {
-        return localDateTime.atZone(ZoneId.systemDefault()) // Use system's default time zone
+        return catchTime.atZone(ZoneId.systemDefault()) // Use system's default time zone
                 .toEpochSecond();
     }
 
-    public LocalDateTime getLocalDateTime() {
-        return localDateTime;
+    public LocalDateTime getCatchTime() {
+        return catchTime;
     }
 
     public void addFish(final @NotNull Fish fish) {
         if (fish.getLength() > this.size) {
             this.size = fish.getLength();
         }
-        numCaught++;
+        timesCaught++;
     }
 
     @Override
@@ -85,9 +91,9 @@ public class FishReport {
         return "FishReport{" +
                 "name='" + name + '\'' +
                 ", rarity='" + rarity + '\'' +
-                ", numCaught=" + numCaught +
+                ", numCaught=" + timesCaught +
                 ", size=" + size +
-                ", localDateTime=" + localDateTime +
+                ", localDateTime=" + catchTime +
                 '}';
     }
 

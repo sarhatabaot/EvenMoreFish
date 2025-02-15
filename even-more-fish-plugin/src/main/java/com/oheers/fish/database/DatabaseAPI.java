@@ -1,7 +1,7 @@
 package com.oheers.fish.database;
 
 import com.oheers.fish.competition.Competition;
-import com.oheers.fish.database.model.FishReport;
+import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.entity.HumanEntity;
@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -56,15 +55,15 @@ public interface DatabaseAPI {
     void updateLargestFish(@NotNull Fish fish, @NotNull UUID uuid);
 
     // Fish report methods
-    List<FishReport> getFishReportsForPlayer(@NotNull UUID uuid);
+    List<FishReportOld> getFishReportsForPlayer(@NotNull UUID uuid);
 
-    List<FishReport> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish);
+    List<FishReportOld> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish);
 
-    void addUserFish(@NotNull FishReport report, int userId);
+    void addUserFish(@NotNull FishReportOld report, int userId);
 
-    void updateUserFish(@NotNull FishReport report, int userId);
+    void updateUserFish(@NotNull FishReportOld report, int userId);
 
-    void writeFishReports(@NotNull UUID uuid, @NotNull List<FishReport> reports);
+    void writeFishReports(@NotNull UUID uuid, @NotNull List<FishReportOld> reports);
 
     boolean userHasFish(@NotNull Fish fish, @NotNull HumanEntity user);
 

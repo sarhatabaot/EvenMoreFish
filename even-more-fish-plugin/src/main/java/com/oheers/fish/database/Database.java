@@ -11,7 +11,7 @@ import com.oheers.fish.database.execute.ExecuteQuery;
 import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
-import com.oheers.fish.database.model.FishReport;
+import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.fishing.items.Fish;
@@ -352,10 +352,10 @@ public class Database implements DatabaseAPI {
 
     @Override
     public LocalDateTime getFirstCatchDateForPlayer(@NotNull Fish fish, @NotNull HumanEntity player) {
-        List<FishReport> reports = getReportsForFish(player.getUniqueId(), fish); // Need to use this here, as no method exists in UserReport
+        List<FishReportOld> reports = getReportsForFish(player.getUniqueId(), fish); // Need to use this here, as no method exists in UserReport
         LocalDateTime earliest = null;
-        for (FishReport report : reports) {
-            LocalDateTime catchTime = report.getLocalDateTime();
+        for (FishReportOld report : reports) {
+            LocalDateTime catchTime = report.getCatchTime();
             if (earliest == null || catchTime.isBefore(earliest)) {
                 earliest = catchTime;
             }
@@ -417,8 +417,8 @@ public class Database implements DatabaseAPI {
 
     @Override
     public int getAmountFishCaughtForPlayer(@NotNull Fish fish, @NotNull HumanEntity player) {
-        List<FishReport> reports = getReportsForFish(player.getUniqueId(), fish);
-        return reports.stream().mapToInt(FishReport::getNumCaught).sum();
+        List<FishReportOld> reports = getReportsForFish(player.getUniqueId(), fish);
+        return reports.stream().mapToInt(FishReportOld::getTimesCaught).sum();
     }
 
     @Override
@@ -460,12 +460,12 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public List<FishReport> getFishReportsForPlayer(@NotNull UUID uuid) {
+    public List<FishReportOld> getFishReportsForPlayer(@NotNull UUID uuid) {
         final int userId = getUserId(uuid);
 
-        return new ExecuteQuery<List<FishReport>>(connectionFactory, settings) {
+        return new ExecuteQuery<List<FishReportOld>>(connectionFactory, settings) {
             @Override
-            protected List<FishReport> onRunQuery(DSLContext dslContext) throws Exception {
+            protected List<FishReportOld> onRunQuery(DSLContext dslContext) throws Exception {
                 Result<Record> result = dslContext.select()
                         .from(Tables.FISH_LOG)
                         .where(Tables.FISH_LOG.USER_ID.eq(userId))
@@ -476,32 +476,32 @@ public class Database implements DatabaseAPI {
                 }
 
                 DatabaseUtil.writeDbVerbose("Read fish reports for (%s) from the database.".formatted(uuid));
-                List<FishReport> reports = new ArrayList<>();
+                List<FishReportOld> reports = new ArrayList<>();
                 for (Record recordResult : result) {
                     final String rarity = recordResult.getValue(Tables.FISH_LOG.RARITY);
                     final String fish = recordResult.getValue(Tables.FISH_LOG.FISH);
                     final float largestLength = recordResult.getValue(Tables.FISH_LOG.LARGEST_LENGTH);
                     final int quantity = recordResult.getValue(Tables.FISH_LOG.QUANTITY);
                     final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME); // convert to long, or maybe store as long?
-                    reports.add(new FishReport(rarity, fish, largestLength, quantity, firstCatchTime));
+                    reports.add(new FishReportOld(rarity, fish, largestLength, quantity, firstCatchTime));
                 }
                 return reports;
             }
 
             @Override
-            protected List<FishReport> empty() {
+            protected List<FishReportOld> empty() {
                 return List.of();
             }
         }.prepareAndRunQuery();
     }
 
     @Override
-    public List<FishReport> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish) {
+    public List<FishReportOld> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish) {
         final int userId = getUserId(uuid);
 
-        return new ExecuteQuery<List<FishReport>>(connectionFactory, settings) {
+        return new ExecuteQuery<List<FishReportOld>>(connectionFactory, settings) {
             @Override
-            protected List<FishReport> onRunQuery(DSLContext dslContext) throws Exception {
+            protected List<FishReportOld> onRunQuery(DSLContext dslContext) throws Exception {
                 Result<Record> result = dslContext.select()
                         .from(Tables.FISH_LOG)
                         .where(Tables.FISH_LOG.USER_ID.eq(userId)
@@ -514,27 +514,28 @@ public class Database implements DatabaseAPI {
                 }
 
                 DatabaseUtil.writeDbVerbose("Read fish reports for (%s) from the database.".formatted(uuid));
-                List<FishReport> reports = new ArrayList<>();
+                List<FishReportOld> reports = new ArrayList<>();
                 for (Record recordResult : result) {
                     final String rarity = recordResult.getValue(Tables.FISH_LOG.RARITY);
                     final String fish = recordResult.getValue(Tables.FISH_LOG.FISH);
                     final float largestLength = recordResult.getValue(Tables.FISH_LOG.LARGEST_LENGTH);
                     final int quantity = recordResult.getValue(Tables.FISH_LOG.QUANTITY);
-                    final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME); // convert to long, or maybe store as long?
-                    reports.add(new FishReport(rarity, fish, largestLength, quantity, firstCatchTime));
+                    final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME);
+                    reports.add(new FishReportOld(rarity, fish, largestLength, quantity, firstCatchTime));
                 }
                 return reports;
             }
 
             @Override
-            protected List<FishReport> empty() {
+            protected List<FishReportOld> empty() {
                 return List.of();
             }
         }.prepareAndRunQuery();
     }
 
+    //todo update fish stats + fish user stats
     @Override
-    public void addUserFish(@NotNull FishReport report, int userId) {
+    public void addUserFish(@NotNull FishReportOld report, int userId) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
@@ -542,8 +543,8 @@ public class Database implements DatabaseAPI {
                         .set(Tables.FISH_LOG.USER_ID, userId)
                         .set(Tables.FISH_LOG.RARITY, report.getRarity())
                         .set(Tables.FISH_LOG.FISH, report.getName())
-                        .set(Tables.FISH_LOG.QUANTITY, report.getNumCaught())
-                        .set(Tables.FISH_LOG.FIRST_CATCH_TIME, report.getLocalDateTime()) //convert to bytes
+                        .set(Tables.FISH_LOG.QUANTITY, report.getTimesCaught())
+                        .set(Tables.FISH_LOG.CATCH_TIME, report.getCatchTime()) //convert to bytes
                         .set(Tables.FISH_LOG.LARGEST_LENGTH, report.getLargestLength())
                         .execute();
             }
@@ -551,12 +552,12 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void updateUserFish(@NotNull FishReport report, int userId) {
+    public void updateUserFish(@NotNull FishReportOld report, int userId) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.update(Tables.FISH_LOG)
-                        .set(Tables.FISH_LOG.QUANTITY, report.getNumCaught())
+                        .set(Tables.FISH_LOG.QUANTITY, report.getTimesCaught())
                         .set(Tables.FISH_LOG.LARGEST_LENGTH, report.getLargestLength())
                         .where(Tables.FISH_LOG.USER_ID.eq(userId)
                                 .and(Tables.FISH_LOG.RARITY.eq(report.getRarity()))
@@ -568,9 +569,9 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void writeFishReports(@NotNull UUID uuid, @NotNull List<FishReport> reports) {
+    public void writeFishReports(@NotNull UUID uuid, @NotNull List<FishReportOld> reports) {
         int userID = getUserId(uuid);
-        for (FishReport report : reports) {
+        for (FishReportOld report : reports) {
             if (userHasFish(report.getRarity(), report.getName(), userID)) {
                 updateUserFish(report, userID);
             } else {

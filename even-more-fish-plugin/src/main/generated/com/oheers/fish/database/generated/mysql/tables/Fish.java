@@ -53,12 +53,12 @@ public class Fish extends TableImpl<FishRecord> {
     /**
      * The column <code>${table.prefix}fish.FISH_NAME</code>.
      */
-    public final TableField<FishRecord, String> FISH_NAME = createField(DSL.name("FISH_NAME"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<FishRecord, String> FISH_NAME = createField(DSL.name("FISH_NAME"), SQLDataType.VARCHAR(256).nullable(false), this, "");
 
     /**
      * The column <code>${table.prefix}fish.FISH_RARITY</code>.
      */
-    public final TableField<FishRecord, String> FISH_RARITY = createField(DSL.name("FISH_RARITY"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<FishRecord, String> FISH_RARITY = createField(DSL.name("FISH_RARITY"), SQLDataType.VARCHAR(256).nullable(false), this, "");
 
     /**
      * The column <code>${table.prefix}fish.FIRST_FISHER</code>.
@@ -79,6 +79,16 @@ public class Fish extends TableImpl<FishRecord> {
      * The column <code>${table.prefix}fish.LARGEST_FISHER</code>.
      */
     public final TableField<FishRecord, String> LARGEST_FISHER = createField(DSL.name("LARGEST_FISHER"), SQLDataType.VARCHAR(36).nullable(false), this, "");
+
+    /**
+     * The column <code>${table.prefix}fish.SHORTEST_LENGTH</code>.
+     */
+    public final TableField<FishRecord, Float> SHORTEST_LENGTH = createField(DSL.name("SHORTEST_LENGTH"), SQLDataType.REAL.nullable(false), this, "");
+
+    /**
+     * The column <code>${table.prefix}fish.SHORTEST_FISHER</code>.
+     */
+    public final TableField<FishRecord, String> SHORTEST_FISHER = createField(DSL.name("SHORTEST_FISHER"), SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
      * The column <code>${table.prefix}fish.FIRST_CATCH_TIME</code>.

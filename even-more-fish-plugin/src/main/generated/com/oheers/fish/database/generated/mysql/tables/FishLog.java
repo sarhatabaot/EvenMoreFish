@@ -64,27 +64,22 @@ public class FishLog extends TableImpl<FishLogRecord> {
     /**
      * The column <code>${table.prefix}fish_log.RARITY</code>.
      */
-    public final TableField<FishLogRecord, String> RARITY = createField(DSL.name("RARITY"), SQLDataType.VARCHAR(128).nullable(false), this, "");
+    public final TableField<FishLogRecord, String> RARITY = createField(DSL.name("RARITY"), SQLDataType.VARCHAR(256).nullable(false), this, "");
 
     /**
      * The column <code>${table.prefix}fish_log.FISH</code>.
      */
-    public final TableField<FishLogRecord, String> FISH = createField(DSL.name("FISH"), SQLDataType.VARCHAR(128).nullable(false), this, "");
+    public final TableField<FishLogRecord, String> FISH = createField(DSL.name("FISH"), SQLDataType.VARCHAR(256).nullable(false), this, "");
 
     /**
-     * The column <code>${table.prefix}fish_log.QUANTITY</code>.
+     * The column <code>${table.prefix}fish_log.FISH_LENGTH</code>.
      */
-    public final TableField<FishLogRecord, Integer> QUANTITY = createField(DSL.name("QUANTITY"), SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<FishLogRecord, Float> FISH_LENGTH = createField(DSL.name("FISH_LENGTH"), SQLDataType.REAL.nullable(false), this, "");
 
     /**
-     * The column <code>${table.prefix}fish_log.FIRST_CATCH_TIME</code>.
+     * The column <code>${table.prefix}fish_log.CATCH_TIME</code>.
      */
-    public final TableField<FishLogRecord, LocalDateTime> FIRST_CATCH_TIME = createField(DSL.name("FIRST_CATCH_TIME"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
-
-    /**
-     * The column <code>${table.prefix}fish_log.LARGEST_LENGTH</code>.
-     */
-    public final TableField<FishLogRecord, Float> LARGEST_LENGTH = createField(DSL.name("LARGEST_LENGTH"), SQLDataType.REAL.nullable(false), this, "");
+    public final TableField<FishLogRecord, LocalDateTime> CATCH_TIME = createField(DSL.name("CATCH_TIME"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     private FishLog(Name alias, Table<FishLogRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

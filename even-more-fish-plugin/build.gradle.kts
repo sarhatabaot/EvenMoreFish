@@ -236,7 +236,7 @@ tasks {
         version.set(libs.versions.jooq)
 
         val dialects = listOf("mysql")
-        val latestSchema = "V7_1__Create_Tables.sql"
+        val latestSchema = "V8_1__Create_Tables.sql"
         dialects.forEach { dialect ->
             val schemaPath = "src/main/resources/db/migrations/${dialect}/${latestSchema}"
             configureDialect(dialect, schemaPath)

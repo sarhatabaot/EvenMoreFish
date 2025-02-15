@@ -5,15 +5,12 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
-import com.oheers.fish.database.model.FishReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.gui.GUIUtils;
 import com.oheers.fish.gui.guis.EMFGUI;
-import com.oheers.fish.utils.ItemBuilder;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemUtils;
 import de.themoep.inventorygui.*;
@@ -23,15 +20,9 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jooq.impl.QOM;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Level;
 
 public class FishJournalGui implements EMFGUI {

@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.database.model.FishReport;
+import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.Bukkit;
@@ -20,7 +20,7 @@ public class DataManager {
     private static DataManager instance;
 
     private Cache<UUID, UserReport> userReportCache;
-    private Cache<UUID, List<FishReport>> fishReportCache;
+    private Cache<UUID, List<FishReportOld>> fishReportCache;
 
     private void setup() {
         Expiry<? super UUID, UserReport> userReportExpiry = new Expiry<>() {
@@ -42,19 +42,19 @@ public class DataManager {
 
         userReportCache = Caffeine.newBuilder().expireAfter(userReportExpiry).build();
 
-        Expiry<? super UUID, List<FishReport>> fishReportExpiry = new Expiry<>() {
+        Expiry<? super UUID, List<FishReportOld>> fishReportExpiry = new Expiry<>() {
             @Override
-            public long expireAfterCreate(@NotNull UUID uuid, @NotNull List<FishReport> fishReports, long l) {
+            public long expireAfterCreate(@NotNull UUID uuid, @NotNull List<FishReportOld> fishReports, long l) {
                 return getCacheDuration(uuid);
             }
 
             @Override
-            public long expireAfterUpdate(@NotNull UUID uuid, @NotNull List<FishReport> fishReports, long l, long l1) {
+            public long expireAfterUpdate(@NotNull UUID uuid, @NotNull List<FishReportOld> fishReports, long l, long l1) {
                 return getCacheDuration(uuid);
             }
 
             @Override
-            public long expireAfterRead(@NotNull UUID uuid, @NotNull List<FishReport> fishReports, long l, long l1) {
+            public long expireAfterRead(@NotNull UUID uuid, @NotNull List<FishReportOld> fishReports, long l, long l1) {
                 return getCacheDuration(uuid);
             }
         };
@@ -85,10 +85,10 @@ public class DataManager {
      * @return Long.MAX_VALUE if the user is online, 0 if not.
      */
     private long getCacheDuration(UUID uuid) {
-        if (Bukkit.getPlayer(uuid) != null) {
-            return Long.MAX_VALUE;
-        } else
+        if (Bukkit.getPlayer(uuid) == null)
             return 0;
+
+        return Long.MAX_VALUE;
     }
 
     /**
@@ -116,7 +116,7 @@ public class DataManager {
      * @param userReport  The user's relevant user report.
      * @param fishReports A list of fish reports relevant to the user.
      */
-    public void cacheUser(UUID uuid, UserReport userReport, List<FishReport> fishReports) {
+    public void cacheUser(UUID uuid, UserReport userReport, List<FishReportOld> fishReports) {
         userReportCache.put(uuid, userReport);
         fishReportCache.put(uuid, fishReports);
     }
@@ -139,7 +139,7 @@ public class DataManager {
      * @param uuid    The UUID of the user to have this list set to them in the cache.
      * @param reports An arraylist of fish reports to be set to the user.
      */
-    public void putFishReportsCache(@NotNull final UUID uuid, @NotNull final List<FishReport> reports) {
+    public void putFishReportsCache(@NotNull final UUID uuid, @NotNull final List<FishReportOld> reports) {
         fishReportCache.put(uuid, reports);
     }
 
@@ -170,7 +170,7 @@ public class DataManager {
      * @param uuid The UUID of the user to be queried.
      * @return A list of fish reports belonging to the user if they exist in cache, and null if not.
      */
-    public List<FishReport> getFishReportsIfExists(UUID uuid) {
+    public List<FishReportOld> getFishReportsIfExists(UUID uuid) {
         return fishReportCache.getIfPresent(uuid);
     }
 
@@ -184,7 +184,7 @@ public class DataManager {
     /**
      * @return A map of a list of fish reports against the relevant user.
      */
-    public ConcurrentMap<UUID, List<FishReport>> getAllFishReports() {
+    public ConcurrentMap<UUID, List<FishReportOld>> getAllFishReports() {
         return fishReportCache.asMap();
     }
 
@@ -205,9 +205,9 @@ public class DataManager {
     }
 
     public void saveFishReports() {
-        ConcurrentMap<UUID, List<FishReport>> allReports = DataManager.getInstance().getAllFishReports();
+        ConcurrentMap<UUID, List<FishReportOld>> allReports = DataManager.getInstance().getAllFishReports();
         EvenMoreFish.getInstance().getLogger().info("Saving " + allReports.size() + " fish reports.");
-        for (Map.Entry<UUID, List<FishReport>> entry : allReports.entrySet()) {
+        for (Map.Entry<UUID, List<FishReportOld>> entry : allReports.entrySet()) {
             EvenMoreFish.getInstance().getDatabase().writeFishReports(entry.getKey(), entry.getValue());
 
 
@@ -235,7 +235,7 @@ public class DataManager {
      * @param fish The fish object.
      */
     public void handleFishCatch(@NotNull final UUID uuid, @NotNull final Fish fish) {
-        List<FishReport> cachedReports = getCachedReportsOrReports(uuid, fish);
+        List<FishReportOld> cachedReports = getCachedReportsOrReports(uuid, fish);
         DataManager.getInstance().putFishReportsCache(uuid, cachedReports);
 
         UserReport report = DataManager.getInstance().getUserReportIfExists(uuid);
@@ -259,11 +259,11 @@ public class DataManager {
     }
 
 
-    private List<FishReport> getCachedReportsOrReports(final UUID uuid, final Fish fish) {
-        List<FishReport> cachedReports = DataManager.getInstance().getFishReportsIfExists(uuid);
+    private List<FishReportOld> getCachedReportsOrReports(final UUID uuid, final Fish fish) {
+        List<FishReportOld> cachedReports = DataManager.getInstance().getFishReportsIfExists(uuid);
         if (cachedReports == null) {
             return List.of(
-                    new FishReport(
+                    new FishReportOld(
                             fish.getRarity().getId(),
                             fish.getName(),
                             fish.getLength(),
@@ -273,7 +273,7 @@ public class DataManager {
             );
         }
 
-        for (FishReport report : cachedReports) {
+        for (FishReportOld report : cachedReports) {
             if (report.getRarity().equals(fish.getRarity().getId()) && report.getName().equals(fish.getName())) {
                 report.addFish(fish);
                 return cachedReports;
@@ -281,7 +281,7 @@ public class DataManager {
         }
 
         cachedReports.add(
-                new FishReport(
+                new FishReportOld(
                         fish.getRarity().getId(),
                         fish.getName(),
                         fish.getLength(),

@@ -5,7 +5,7 @@ import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
-import com.oheers.fish.database.model.FishReport;
+import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.UserReport;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,7 +32,7 @@ public class JoinChecker implements Listener {
 
 
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
-            List<FishReport> fishReports;
+            List<FishReportOld> fishReports;
 
 
             if (EvenMoreFish.getInstance().getDatabase().hasUserLog(userUUID)) {
@@ -100,7 +100,7 @@ public class JoinChecker implements Listener {
                 EvenMoreFish.getInstance().getDatabase().createUser(userUUID);
             }
 
-            List<FishReport> fishReports = DataManager.getInstance().getFishReportsIfExists(userUUID);
+            List<FishReportOld> fishReports = DataManager.getInstance().getFishReportsIfExists(userUUID);
             if (fishReports != null) {
                 EvenMoreFish.getInstance().getDatabase().writeFishReports(userUUID, fishReports);
             }

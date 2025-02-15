@@ -8,14 +8,17 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}competitions` (
    PRIMARY KEY (id)
 );
 
--- global stats for fish
+-- global stats for fish, -- per fish global stats todo not great since there may be multiple fish with same name and different rarity, maybe we just increment an integer?
+-- todo we could also create a composite key "rarity.name"
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
-   fish_name VARCHAR(100) NOT NULL,
-   fish_rarity VARCHAR(100) NOT NULL,
+   fish_name VARCHAR(256) NOT NULL,
+   fish_rarity VARCHAR(256) NOT NULL,
    first_fisher VARCHAR(36) NOT NULL,
    total_caught INTEGER NOT NULL,
    largest_fish REAL NOT NULL,
    largest_fisher VARCHAR(36) NOT NULL,
+   shortest_length REAL NOT NULL,
+   shortest_fisher VARCHAR(36) NOT NULL,
    first_catch_time TIMESTAMP NOT NULL,
    PRIMARY KEY (fish_name)
 );
@@ -36,21 +39,30 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
    PRIMARY KEY (id)
 );
 
--- per player stats for fish
+-- log every player catch
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish_log` (
    id INTEGER NOT NULL AUTO_INCREMENT,
    user_id INTEGER NOT NULL, -- user id
-   rarity VARCHAR(128) NOT NULL,
-   fish VARCHAR(128) NOT NULL,
-   quantity INTEGER NOT NULL,
-   first_catch_time TIMESTAMP NOT NULL,
-   largest_length REAL NOT NULL,
+   rarity VARCHAR(256) NOT NULL,
+   fish VARCHAR(256) NOT NULL,
+   fish_length REAL NOT NULL,
+   catch_time TIMESTAMP NOT NULL,
    CONSTRAINT FK_FishLog_User
    -- [jooq ignore start]
    FOREIGN KEY (user_id) REFERENCES `${table.prefix}users`(id),
    -- [jooq ignore stop]
    PRIMARY KEY (id)
 );
+
+-- per fish & user stats
+CREATE TABLE IF NOT EXISTS `${table.prefix}fish_user_stats` (
+    fish_key VARCHAR(513) NOT NULL, --max size for composite key
+    user_id INTEGER NOT NULL,
+    shortest_length REAL,
+    longest_length REAL,
+    quantity INTEGER,
+    PRIMARY KEY (fish_key)
+)
 
 CREATE TABLE IF NOT EXISTS `${table.prefix}transactions` (
   id VARCHAR(22) NOT NULL,
