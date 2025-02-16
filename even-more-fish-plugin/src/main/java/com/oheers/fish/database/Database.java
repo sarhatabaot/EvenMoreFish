@@ -12,7 +12,7 @@ import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
 import com.oheers.fish.database.model.FishReportOld;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.fishing.items.Fish;
 import org.apache.commons.lang.StringUtils;

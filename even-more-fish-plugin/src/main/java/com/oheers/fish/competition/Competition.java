@@ -13,7 +13,7 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
 import com.oheers.fish.database.DataManager;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
 import org.bukkit.Bukkit;

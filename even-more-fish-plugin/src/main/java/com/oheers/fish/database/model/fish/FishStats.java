@@ -1,4 +1,4 @@
-package com.oheers.fish.database.model;
+package com.oheers.fish.database.model.fish;
 
 
 import java.time.LocalDateTime;

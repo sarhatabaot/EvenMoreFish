@@ -1,4 +1,4 @@
-package com.oheers.fish.database.model;
+package com.oheers.fish.database.model.user;
 
 import java.util.UUID;
 
@@ -19,21 +19,6 @@ public class UserReport {
     private int fishSold;
     private double moneyEarned;
 
-    public UserReport(final int id, final int numFishCaught, final int competitionsWon, final int competitionsJoined,
-                      final String firstFish, final String recentFish, final String largestFish, final float totalFishLength,
-                      final float largestLength, final String uuid) {
-        this.id = id;
-        this.numFishCaught = numFishCaught;
-        this.competitionsWon = competitionsWon;
-        this.competitionsJoined = competitionsJoined;
-        this.firstFish = firstFish;
-        this.recentFish = recentFish;
-        this.largestFish = largestFish;
-        this.totalFishLength = totalFishLength;
-        this.largestLength = largestLength;
-        this.uuid = UUID.fromString(uuid);
-    }
-    
     public UserReport(final int id, final int numFishCaught, final int competitionsWon, final int competitionsJoined,
                       final String firstFish, final String recentFish, final String largestFish, final float totalFishLength,
                       final float largestLength, final String uuid, final int fishSold, final double moneyEarned) {

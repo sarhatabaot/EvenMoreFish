@@ -6,7 +6,7 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.FishReportOld;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.model.user.UserReport;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

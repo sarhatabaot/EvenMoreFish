@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.database.model.FishReportOld;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -2,7 +2,7 @@ package com.oheers.fish.database;
 
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.database.model.FishReportOld;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.entity.HumanEntity;
 import org.jetbrains.annotations.NotNull;
