@@ -1,6 +1,7 @@
 package com.oheers.fish.database.model.fish;
 
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 
 public class FishLog {
@@ -10,12 +11,18 @@ public class FishLog {
     private final LocalDateTime catchTime;
     private final float length;
 
-    public FishLog(int userId, String fishName, String rarity, LocalDateTime catchTime, float length) {
+    private final boolean inCompetition;
+    private final @Nullable String competitionId;
+
+
+    public FishLog(int userId, String fishName, String rarity, LocalDateTime catchTime, float length, boolean inCompetition, @Nullable String competitionId) {
         this.userId = userId;
         this.fishName = fishName;
         this.rarity = rarity;
         this.catchTime = catchTime;
         this.length = length;
+        this.inCompetition = inCompetition;
+        this.competitionId = competitionId;
     }
 
     @Override
@@ -26,6 +33,8 @@ public class FishLog {
                 ", rarity='" + rarity + '\'' +
                 ", catchTime=" + catchTime +
                 ", length=" + length +
+                ", inCompetition=" + inCompetition +
+                ", competitionId='" + competitionId + '\'' +
                 '}';
     }
 }
