@@ -1,11 +1,10 @@
-package com.oheers.fish.database.model;
+package com.oheers.fish.database.model.user;
 
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-public class FishUserStats {
-    private final UUID user;
+public class UserFIshStats {
+    private final int user;
     private final String fishName;
     private final String fishRarity;
 
@@ -15,7 +14,7 @@ public class FishUserStats {
 
     private final int quantity;
 
-    public FishUserStats(UUID user, String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, float longestLength, int quantity) {
+    public UserFIshStats(int user, String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, float longestLength, int quantity) {
         this.user = user;
         this.fishName = fishName;
         this.fishRarity = fishRarity;
@@ -25,7 +24,7 @@ public class FishUserStats {
         this.quantity = quantity;
     }
 
-    public UUID getUser() {
+    public int getUser() {
         return user;
     }
 
