@@ -1,7 +1,5 @@
 package com.oheers.fish.database.model;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +7,7 @@ import java.util.UUID;
 
 public class CompetitionReport {
 
-    private final String competitionconfigid;
+    private final String competitionConfigId;
     private final String winnerFish;
     private final UUID winneruuid;
     private final List<UUID> contestants = new ArrayList<>();
@@ -21,7 +19,7 @@ public class CompetitionReport {
 
 
     public CompetitionReport(String competitionConfigID, String winnerFish, String winnerUUIDString, float winnerScore, String contestants, LocalDateTime startTime, LocalDateTime endTime) {
-        this.competitionconfigid = competitionConfigID;
+        this.competitionConfigId = competitionConfigID;
         this.winnerFish = winnerFish;
         this.winneruuid = UUID.fromString(winnerUUIDString);
         this.winnerScore = winnerScore;
@@ -32,8 +30,8 @@ public class CompetitionReport {
         this.endTime = endTime;
     }
 
-    public String getCompetitionconfigid() {
-        return competitionconfigid;
+    public String getCompetitionConfigId() {
+        return competitionConfigId;
     }
 
     public String getWinnerFish() {
