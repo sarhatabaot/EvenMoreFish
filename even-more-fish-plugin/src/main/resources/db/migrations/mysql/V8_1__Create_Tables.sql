@@ -5,12 +5,15 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}competitions` (
    winner_fish VARCHAR(256) NOT NULL,
    winner_score REAL NOT NULL,
    contestants TEXT NOT NULL,
+   start_time TIMESTAMP NOT NULL,
+   end_time TIMESTAMP NOT NULL,
    PRIMARY KEY (id)
 );
 
 -- global stats for fish, -- per fish global stats todo not great since there may be multiple fish with same name and different rarity, maybe we just increment an integer?
 -- todo we could also create a composite key "rarity.name"
-CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
+-- this used to be the "fish" table
+CREATE TABLE IF NOT EXISTS `${table.prefix}fish_stats` (
    fish_name VARCHAR(256) NOT NULL,
    fish_rarity VARCHAR(256) NOT NULL,
    first_fisher VARCHAR(36) NOT NULL,
@@ -20,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    shortest_length REAL NOT NULL,
    shortest_fisher VARCHAR(36) NOT NULL,
    first_catch_time TIMESTAMP NOT NULL,
-   PRIMARY KEY (fish_name)
+   PRIMARY KEY (fish_name, fish_rarity) --todo update primary key, with migrations, we may need to copy the tabnle
 );
 
 CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
@@ -43,10 +46,11 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish_log` (
    id INTEGER NOT NULL AUTO_INCREMENT,
    user_id INTEGER NOT NULL, -- user id
-   rarity VARCHAR(256) NOT NULL,
-   fish VARCHAR(256) NOT NULL,
+   fish_rarity VARCHAR(256) NOT NULL,
+   fish_name VARCHAR(256) NOT NULL,
    fish_length REAL NOT NULL,
    catch_time TIMESTAMP NOT NULL,
+   competition_id VARCHAR(256), -- can be null
    CONSTRAINT FK_FishLog_User
    -- [jooq ignore start]
    FOREIGN KEY (user_id) REFERENCES `${table.prefix}users`(id),
@@ -55,13 +59,14 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish_log` (
 );
 
 -- per fish & user stats
-CREATE TABLE IF NOT EXISTS `${table.prefix}fish_user_stats` (
-    fish_key VARCHAR(513) NOT NULL, --max size for composite key
+CREATE TABLE IF NOT EXISTS `${table.prefix}user_fish_stats` (
+    fish_name VARCHAR(256) NOT NULL,
+    fish_rarity VARCHAR(256) NOT NULL,
     user_id INTEGER NOT NULL,
     shortest_length REAL,
     longest_length REAL,
     quantity INTEGER,
-    PRIMARY KEY (fish_key)
+    PRIMARY KEY (fish_name, fish_rarity)
 )
 
 CREATE TABLE IF NOT EXISTS `${table.prefix}transactions` (

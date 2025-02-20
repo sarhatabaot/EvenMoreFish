@@ -3,7 +3,7 @@ package com.oheers.fish.database.model.user;
 
 import java.time.LocalDateTime;
 
-public class UserFIshStats {
+public class UserFishStats {
     private final int user;
     private final String fishName;
     private final String fishRarity;
@@ -14,7 +14,7 @@ public class UserFIshStats {
 
     private final int quantity;
 
-    public UserFIshStats(int user, String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, float longestLength, int quantity) {
+    public UserFishStats(int user, String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, float longestLength, int quantity) {
         this.user = user;
         this.fishName = fishName;
         this.fishRarity = fishRarity;

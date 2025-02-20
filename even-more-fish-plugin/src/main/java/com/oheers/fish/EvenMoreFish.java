@@ -64,7 +64,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import uk.firedev.vanishchecker.VanishChecker;
+//import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
 import java.util.*;
@@ -689,7 +689,8 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     public List<Player> getVisibleOnlinePlayers() {
-        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
+        return new ArrayList<>(Bukkit.getOnlinePlayers());
+//        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
     }
 
     // FISH TOGGLE METHODS

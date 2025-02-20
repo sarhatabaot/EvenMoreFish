@@ -2,23 +2,27 @@ package com.oheers.fish.database.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CompetitionReport {
 
-    private final String competitionConfigID;
+    private final String competitionconfigid;
     private final String winnerFish;
-    private final UUID winnerUUID;
+    private final UUID winneruuid;
     private final List<UUID> contestants = new ArrayList<>();
 
     private final float winnerScore;
 
-    public CompetitionReport(@NotNull final String competitionConfigID, @NotNull final String winnerUUIDString,
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
+
+    public CompetitionReport(@NotNull final String competitionconfigid, @NotNull final String winnerUUIDString,
                              @NotNull final String winnerFish, final float winnerScore, @NotNull final String contestants) {
-        this.competitionConfigID = competitionConfigID;
-        this.winnerUUID = UUID.fromString(winnerUUIDString);
+        this.competitionconfigid = competitionconfigid;
+        this.winneruuid = UUID.fromString(winnerUUIDString);
         this.winnerFish = winnerFish;
         this.winnerScore = winnerScore;
         for (String contestant : contestants.split(",")) {
@@ -26,16 +30,28 @@ public class CompetitionReport {
         }
     }
 
-    public String getCompetitionConfigID() {
-        return competitionConfigID;
+    public CompetitionReport(String competitionConfigID, String winnerFish, String winnerUUIDString, float winnerScore, String contestants, LocalDateTime startTime, LocalDateTime endTime) {
+        this.competitionconfigid = competitionConfigID;
+        this.winnerFish = winnerFish;
+        this.winneruuid = UUID.fromString(winnerUUIDString);
+        this.winnerScore = winnerScore;
+        for (String contestant : contestants.split(",")) {
+            this.contestants.add(UUID.fromString(contestant));
+        }
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public String getCompetitionconfigid() {
+        return competitionconfigid;
     }
 
     public String getWinnerFish() {
         return winnerFish;
     }
 
-    public UUID getWinnerUUID() {
-        return winnerUUID;
+    public UUID getWinneruuid() {
+        return winneruuid;
     }
 
     public List<UUID> getContestants() {

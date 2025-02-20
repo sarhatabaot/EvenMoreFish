@@ -5,10 +5,10 @@ import java.util.UUID;
 public class UserReport {
 
     private final int id;
+    private final UUID uuid;
     private String firstFish;
     private String recentFish;
     private String largestFish;
-    private final UUID uuid;
     private int numFishCaught;
     private int competitionsWon;
     private int competitionsJoined;
