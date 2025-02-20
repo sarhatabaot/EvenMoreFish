@@ -19,16 +19,6 @@ public class CompetitionReport {
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
 
-    public CompetitionReport(@NotNull final String competitionconfigid, @NotNull final String winnerUUIDString,
-                             @NotNull final String winnerFish, final float winnerScore, @NotNull final String contestants) {
-        this.competitionconfigid = competitionconfigid;
-        this.winneruuid = UUID.fromString(winnerUUIDString);
-        this.winnerFish = winnerFish;
-        this.winnerScore = winnerScore;
-        for (String contestant : contestants.split(",")) {
-            this.contestants.add(UUID.fromString(contestant));
-        }
-    }
 
     public CompetitionReport(String competitionConfigID, String winnerFish, String winnerUUIDString, float winnerScore, String contestants, LocalDateTime startTime, LocalDateTime endTime) {
         this.competitionconfigid = competitionConfigID;
@@ -60,5 +50,13 @@ public class CompetitionReport {
 
     public float getWinnerScore() {
         return winnerScore;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 }
