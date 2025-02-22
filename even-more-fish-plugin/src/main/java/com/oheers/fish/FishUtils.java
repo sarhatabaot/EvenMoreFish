@@ -547,6 +547,21 @@ public class FishUtils {
         return true;
     }
 
+    public static @Nullable ItemStack getCustomItem(@NotNull String materialString) {
+        if (!materialString.contains(":")) {
+            return null;
+        }
+        try {
+            final String[] split = materialString.split(":", 2);
+            final String prefix = split[0];
+            final String id = split[1];
+            EvenMoreFish.debug("GET ITEM for Addon(%s) Id(%s)".formatted(prefix, id));
+            return EvenMoreFish.getInstance().getAddonManager().getItemStack(prefix, id);
+        } catch (ArrayIndexOutOfBoundsException | NoPrefixException exception) {
+            return null;
+        }
+    }
+
     /**
      * Gets an ItemStack from a string. If the string contains a colon, it is assumed to be an addon string.
      * @param materialString The string to parse.
@@ -555,15 +570,7 @@ public class FishUtils {
     public static @Nullable ItemStack getItem(@NotNull final String materialString) {
         // Colon assumes an addon item
         if (materialString.contains(":")) {
-            final String[] split = materialString.split(":", 2);
-            final String prefix = split[0];
-            final String id = split[1];
-            EvenMoreFish.debug("GET ITEM for Addon(%s) Id(%s)".formatted(prefix, id));
-            try {
-                return EvenMoreFish.getInstance().getAddonManager().getItemStack(prefix, id);
-            } catch (NoPrefixException exception) {
-                return null;
-            }
+            return getCustomItem(materialString);
         }
 
         Material material = ItemUtils.getMaterial(materialString);
