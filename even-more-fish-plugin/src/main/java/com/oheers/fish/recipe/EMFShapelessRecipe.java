@@ -1,4 +1,4 @@
-package com.oheers.fish.fishing.rods.recipe;
+package com.oheers.fish.recipe;
 
 import com.oheers.fish.EvenMoreFish;
 import org.bukkit.NamespacedKey;
