@@ -11,17 +11,15 @@ public class FishLog {
     private final LocalDateTime catchTime;
     private final float length;
 
-    private final boolean inCompetition;
     private final @Nullable String competitionId;
 
 
-    public FishLog(int userId, String fishName, String fishRarity, LocalDateTime catchTime, float length, boolean inCompetition, @Nullable String competitionId) {
+    public FishLog(int userId, String fishName, String fishRarity, LocalDateTime catchTime, float length, @Nullable String competitionId) {
         this.userId = userId;
         this.fishName = fishName;
         this.fishRarity = fishRarity;
         this.catchTime = catchTime;
         this.length = length;
-        this.inCompetition = inCompetition;
         this.competitionId = competitionId;
     }
 
@@ -33,7 +31,6 @@ public class FishLog {
                 ", rarity='" + fishRarity + '\'' +
                 ", catchTime=" + catchTime +
                 ", length=" + length +
-                ", inCompetition=" + inCompetition +
                 ", competitionId='" + competitionId + '\'' +
                 '}';
     }
