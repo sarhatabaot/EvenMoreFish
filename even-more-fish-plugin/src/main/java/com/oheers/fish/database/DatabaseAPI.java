@@ -59,8 +59,10 @@ public interface DatabaseAPI {
     void updateLargestFish(@NotNull Fish fish, @NotNull UUID uuid);
 
     // Fish report methods
+    @Deprecated
     List<FishReportOld> getFishReportsForPlayer(@NotNull UUID uuid);
 
+    @Deprecated
     List<FishReportOld> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish);
 
     void addUserFish(@NotNull FishReportOld report, int userId);
@@ -96,6 +98,7 @@ public interface DatabaseAPI {
     void createUserFishStats(final UserFishStats userFishStats);
 
     FishLog getFishLog(final int userId, final String fishName, final String fishRarity, final LocalDateTime time);
+    //todo add getFishLog with time range
     Set<FishLog> getFishLogEntries(final int userId, final String fishName, final String fishRarity);
     void setFishLogEntry(final FishLog fishLogEntry);
 

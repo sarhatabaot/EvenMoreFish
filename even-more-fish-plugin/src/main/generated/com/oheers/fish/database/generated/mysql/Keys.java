@@ -7,15 +7,15 @@ package com.oheers.fish.database.generated.mysql;
 import com.oheers.fish.database.generated.mysql.tables.Competitions;
 import com.oheers.fish.database.generated.mysql.tables.Fish;
 import com.oheers.fish.database.generated.mysql.tables.FishLog;
-import com.oheers.fish.database.generated.mysql.tables.FishUserStats;
 import com.oheers.fish.database.generated.mysql.tables.Transactions;
+import com.oheers.fish.database.generated.mysql.tables.UserFishStats;
 import com.oheers.fish.database.generated.mysql.tables.Users;
 import com.oheers.fish.database.generated.mysql.tables.UsersSales;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
 import com.oheers.fish.database.generated.mysql.tables.records.FishLogRecord;
 import com.oheers.fish.database.generated.mysql.tables.records.FishRecord;
-import com.oheers.fish.database.generated.mysql.tables.records.FishUserStatsRecord;
 import com.oheers.fish.database.generated.mysql.tables.records.TransactionsRecord;
+import com.oheers.fish.database.generated.mysql.tables.records.UserFishStatsRecord;
 import com.oheers.fish.database.generated.mysql.tables.records.UsersRecord;
 import com.oheers.fish.database.generated.mysql.tables.records.UsersSalesRecord;
 
@@ -37,10 +37,10 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<CompetitionsRecord> CONSTRAINT_9 = Internal.createUniqueKey(Competitions.COMPETITIONS, DSL.name("CONSTRAINT_9"), new TableField[] { Competitions.COMPETITIONS.ID }, true);
-    public static final UniqueKey<FishRecord> CONSTRAINT_E = Internal.createUniqueKey(Fish.FISH, DSL.name("CONSTRAINT_E"), new TableField[] { Fish.FISH.FISH_NAME }, true);
+    public static final UniqueKey<FishRecord> CONSTRAINT_E = Internal.createUniqueKey(Fish.FISH, DSL.name("CONSTRAINT_E"), new TableField[] { Fish.FISH.FISH_NAME, Fish.FISH.FISH_RARITY }, true);
     public static final UniqueKey<FishLogRecord> FK_FISHLOG_USER = Internal.createUniqueKey(FishLog.FISH_LOG, DSL.name("FK_FISHLOG_USER"), new TableField[] { FishLog.FISH_LOG.ID }, true);
-    public static final UniqueKey<FishUserStatsRecord> CONSTRAINT_C = Internal.createUniqueKey(FishUserStats.FISH_USER_STATS, DSL.name("CONSTRAINT_C"), new TableField[] { FishUserStats.FISH_USER_STATS.FISH_KEY }, true);
     public static final UniqueKey<TransactionsRecord> FK_TRANSACTIONS_USER = Internal.createUniqueKey(Transactions.TRANSACTIONS, DSL.name("FK_TRANSACTIONS_USER"), new TableField[] { Transactions.TRANSACTIONS.ID }, true);
+    public static final UniqueKey<UserFishStatsRecord> CONSTRAINT_A7 = Internal.createUniqueKey(UserFishStats.USER_FISH_STATS, DSL.name("CONSTRAINT_A7"), new TableField[] { UserFishStats.USER_FISH_STATS.FISH_NAME, UserFishStats.USER_FISH_STATS.FISH_RARITY }, true);
     public static final UniqueKey<UsersRecord> CONSTRAINT_A = Internal.createUniqueKey(Users.USERS, DSL.name("CONSTRAINT_A"), new TableField[] { Users.USERS.ID }, true);
     public static final UniqueKey<UsersSalesRecord> FK_USERSSALES_TRANSACTION = Internal.createUniqueKey(UsersSales.USERS_SALES, DSL.name("FK_USERSSALES_TRANSACTION"), new TableField[] { UsersSales.USERS_SALES.ID }, true);
 }

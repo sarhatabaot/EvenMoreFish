@@ -12,6 +12,7 @@ import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
 import com.oheers.fish.database.model.FishReportOld;
+import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.fishing.items.Fish;
@@ -478,8 +479,8 @@ public class Database implements DatabaseAPI {
                 DatabaseUtil.writeDbVerbose("Read fish reports for (%s) from the database.".formatted(uuid));
                 List<FishReportOld> reports = new ArrayList<>();
                 for (Record recordResult : result) {
-                    final String rarity = recordResult.getValue(Tables.FISH_LOG.RARITY);
-                    final String fish = recordResult.getValue(Tables.FISH_LOG.FISH);
+                    final String rarity = recordResult.getValue(Tables.FISH_LOG.FISH_RARITY);
+                    final String fish = recordResult.getValue(Tables.FISH_LOG.FISH_NAME);
                     final float largestLength = recordResult.getValue(Tables.FISH_LOG.LARGEST_LENGTH);
                     final int quantity = recordResult.getValue(Tables.FISH_LOG.QUANTITY);
                     final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME); // convert to long, or maybe store as long?
@@ -533,7 +534,6 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
-    //todo update fish stats + fish user stats
     @Override
     public void addUserFish(@NotNull FishReportOld report, int userId) {
         new ExecuteUpdate(connectionFactory, settings) {
@@ -622,6 +622,7 @@ public class Database implements DatabaseAPI {
                             .set(Tables.COMPETITIONS.CONTESTANTS, prepareContestantsString(leaderboard.getEntries()))
                             .execute();
                 }
+                //add start and end times
 
                 return common.set(Tables.COMPETITIONS.WINNER_UUID, "None")
                         .set(Tables.COMPETITIONS.WINNER_FISH, "None")
@@ -670,6 +671,37 @@ public class Database implements DatabaseAPI {
                         .execute();
             }
         }.executeUpdate();
+    }
+
+    //todo should be cached and fetched only when a player asks for it?
+    @Override
+    public FishLog getFishLog(int userId, String fishName, String fishRarity, LocalDateTime time) {
+        return new ExecuteQuery<FishLog>(connectionFactory, settings) {
+
+            @Override
+            protected FishLog onRunQuery(DSLContext dslContext) throws Exception {
+                Record result =  dslContext.select()
+                        .from(Tables.FISH_LOG)
+                        .where(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.USER_ID.eq(userId)
+                                .and(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.FISH_NAME.eq(fishName))
+                                .and(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.FISH_RARITY.eq(fishName))
+                                .and(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.CATCH_TIME.eq(time))
+                        ).fetchOne();
+
+                if (result == null)
+                    return empty();
+
+
+                final float length = result.getValue(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.FISH_LENGTH);
+                final String competitionId = result.getValue(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.COMPETITION_ID);
+                return new FishLog(userId, fishName, fishRarity, time, length, competitionId);
+            }
+
+            @Override
+            protected FishLog empty() {
+                return null;
+            }
+        }.prepareAndRunQuery();
     }
 
     public void shutdown() {

@@ -7,8 +7,8 @@ package com.oheers.fish.database.generated.mysql;
 import com.oheers.fish.database.generated.mysql.tables.Competitions;
 import com.oheers.fish.database.generated.mysql.tables.Fish;
 import com.oheers.fish.database.generated.mysql.tables.FishLog;
-import com.oheers.fish.database.generated.mysql.tables.FishUserStats;
 import com.oheers.fish.database.generated.mysql.tables.Transactions;
+import com.oheers.fish.database.generated.mysql.tables.UserFishStats;
 import com.oheers.fish.database.generated.mysql.tables.Users;
 import com.oheers.fish.database.generated.mysql.tables.UsersSales;
 
@@ -35,14 +35,14 @@ public class Tables {
     public static final FishLog FISH_LOG = FishLog.FISH_LOG;
 
     /**
-     * The table <code>${table.prefix}fish_user_stats</code>.
-     */
-    public static final FishUserStats FISH_USER_STATS = FishUserStats.FISH_USER_STATS;
-
-    /**
      * The table <code>${table.prefix}transactions</code>.
      */
     public static final Transactions TRANSACTIONS = Transactions.TRANSACTIONS;
+
+    /**
+     * The table <code>${table.prefix}user_fish_stats</code>.
+     */
+    public static final UserFishStats USER_FISH_STATS = UserFishStats.USER_FISH_STATS;
 
     /**
      * The table <code>${table.prefix}users</code>.

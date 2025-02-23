@@ -63,8 +63,8 @@ This design doc is a helpful tool for us to track the changes needed to be made 
 
 ## To Do
 
-1. [ ] Finish base models
-2. [ ] Set up base migrations (Create Tables first)
+1. [*] Finish base models
+2. [*] Set up base migrations (Create Tables first)
 3. [ ] Create admin commands to easily view this info. Can use the "admin database".
 4. [ ] Update the gui impl to reflect these changes.
 5. [ ] Write migrations for 7.1 -> 8.1

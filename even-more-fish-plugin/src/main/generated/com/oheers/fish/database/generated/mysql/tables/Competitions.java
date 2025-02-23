@@ -8,6 +8,7 @@ import com.oheers.fish.database.generated.mysql.DefaultSchema;
 import com.oheers.fish.database.generated.mysql.Keys;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.jooq.Condition;
@@ -79,6 +80,16 @@ public class Competitions extends TableImpl<CompetitionsRecord> {
      * The column <code>${table.prefix}competitions.CONTESTANTS</code>.
      */
     public final TableField<CompetitionsRecord, String> CONTESTANTS = createField(DSL.name("CONTESTANTS"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>${table.prefix}competitions.START_TIME</code>.
+     */
+    public final TableField<CompetitionsRecord, LocalDateTime> START_TIME = createField(DSL.name("START_TIME"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
+
+    /**
+     * The column <code>${table.prefix}competitions.END_TIME</code>.
+     */
+    public final TableField<CompetitionsRecord, LocalDateTime> END_TIME = createField(DSL.name("END_TIME"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     private Competitions(Name alias, Table<CompetitionsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

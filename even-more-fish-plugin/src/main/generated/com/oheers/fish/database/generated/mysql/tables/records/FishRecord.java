@@ -8,7 +8,7 @@ import com.oheers.fish.database.generated.mysql.tables.Fish;
 
 import java.time.LocalDateTime;
 
-import org.jooq.Record1;
+import org.jooq.Record2;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -151,8 +151,8 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<String> key() {
-        return (Record1) super.key();
+    public Record2<String, String> key() {
+        return (Record2) super.key();
     }
 
     // -------------------------------------------------------------------------

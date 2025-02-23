@@ -49,30 +49,30 @@ public class FishLogRecord extends UpdatableRecordImpl<FishLogRecord> {
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.RARITY</code>.
+     * Setter for <code>${table.prefix}fish_log.FISH_RARITY</code>.
      */
-    public void setRarity(String value) {
+    public void setFishRarity(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.RARITY</code>.
+     * Getter for <code>${table.prefix}fish_log.FISH_RARITY</code>.
      */
-    public String getRarity() {
+    public String getFishRarity() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.FISH</code>.
+     * Setter for <code>${table.prefix}fish_log.FISH_NAME</code>.
      */
-    public void setFish(String value) {
+    public void setFishName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.FISH</code>.
+     * Getter for <code>${table.prefix}fish_log.FISH_NAME</code>.
      */
-    public String getFish() {
+    public String getFishName() {
         return (String) get(3);
     }
 
@@ -104,6 +104,20 @@ public class FishLogRecord extends UpdatableRecordImpl<FishLogRecord> {
         return (LocalDateTime) get(5);
     }
 
+    /**
+     * Setter for <code>${table.prefix}fish_log.COMPETITION_ID</code>.
+     */
+    public void setCompetitionId(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}fish_log.COMPETITION_ID</code>.
+     */
+    public String getCompetitionId() {
+        return (String) get(6);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -127,15 +141,16 @@ public class FishLogRecord extends UpdatableRecordImpl<FishLogRecord> {
     /**
      * Create a detached, initialised FishLogRecord
      */
-    public FishLogRecord(Integer id, Integer userId, String rarity, String fish, Float fishLength, LocalDateTime catchTime) {
+    public FishLogRecord(Integer id, Integer userId, String fishRarity, String fishName, Float fishLength, LocalDateTime catchTime, String competitionId) {
         super(FishLog.FISH_LOG);
 
         setId(id);
         setUserId(userId);
-        setRarity(rarity);
-        setFish(fish);
+        setFishRarity(fishRarity);
+        setFishName(fishName);
         setFishLength(fishLength);
         setCatchTime(catchTime);
+        setCompetitionId(competitionId);
         resetChangedOnNotNull();
     }
 }

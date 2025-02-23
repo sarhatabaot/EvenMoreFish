@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}competitions` (
 -- global stats for fish, -- per fish global stats todo not great since there may be multiple fish with same name and different rarity, maybe we just increment an integer?
 -- todo we could also create a composite key "rarity.name"
 -- this used to be the "fish" table
-CREATE TABLE IF NOT EXISTS `${table.prefix}fish_stats` (
+CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    fish_name VARCHAR(256) NOT NULL,
    fish_rarity VARCHAR(256) NOT NULL,
    first_fisher VARCHAR(36) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish_stats` (
    first_catch_time TIMESTAMP NOT NULL,
    PRIMARY KEY (fish_name, fish_rarity) --todo update primary key, with migrations, we may need to copy the tabnle
 );
-
+-- user reports (stats)
 CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
    id INTEGER NOT NULL AUTO_INCREMENT, -- user_id
    uuid VARCHAR(128) NOT NULL,
