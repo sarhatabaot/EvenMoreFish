@@ -3,6 +3,8 @@ package com.oheers.fish;
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.api.addons.exceptions.IncorrectAssignedMaterialException;
+import com.oheers.fish.api.addons.exceptions.NoPrefixException;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.config.MainConfig;
@@ -11,6 +13,7 @@ import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.utils.ItemUtils;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -33,6 +36,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jooq.impl.QOM;
 
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
@@ -562,4 +566,39 @@ public class FishUtils {
         item.setItemMeta(checked);
         return true;
     }
+
+    public static @Nullable ItemStack getCustomItem(@NotNull String materialString) {
+        if (!materialString.contains(":")) {
+            return null;
+        }
+        try {
+            final String[] split = materialString.split(":", 2);
+            final String prefix = split[0];
+            final String id = split[1];
+            EvenMoreFish.debug("GET ITEM for Addon(%s) Id(%s)".formatted(prefix, id));
+            return EvenMoreFish.getInstance().getAddonManager().getItemStack(prefix, id);
+        } catch (ArrayIndexOutOfBoundsException | NoPrefixException exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets an ItemStack from a string. If the string contains a colon, it is assumed to be an addon string.
+     * @param materialString The string to parse.
+     * @return The ItemStack, or null if the material is invalid.
+     */
+    public static @Nullable ItemStack getItem(@NotNull final String materialString) {
+        // Colon assumes an addon item
+        if (materialString.contains(":")) {
+            return getCustomItem(materialString);
+        }
+
+        Material material = ItemUtils.getMaterial(materialString);
+        if (material == null) {
+            return null;
+        }
+
+        return new ItemStack(material);
+    }
+
 }

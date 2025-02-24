@@ -363,7 +363,7 @@ public class ItemFactory {
 
         try {
             return getItem(materialId);
-        } catch (NoPrefixException | IncorrectAssignedMaterialException e) {
+        } catch (IncorrectAssignedMaterialException e) {
             rawMaterial = true;
             EvenMoreFish.getInstance().getLogger().warning(e::getMessage);
             return new ItemStack(Material.COD);
@@ -526,23 +526,12 @@ public class ItemFactory {
         return checkItem(materialID);
     }
 
-    public ItemStack getItem(final @NotNull String materialString) throws IncorrectAssignedMaterialException, NoPrefixException {
-        if (materialString.contains(":")) {
-            //assume this is an addon string
-            final String[] split = materialString.split(":", 2);
-            final String prefix = split[0];
-            final String id = split[1];
-            EvenMoreFish.debug("GET ITEM for Addon(%s) Id(%s)".formatted(prefix, id));
-            return EvenMoreFish.getInstance().getAddonManager().getItemStack(prefix, id);
-        }
-
-
-        Material material = Material.matchMaterial(materialString);
-        if (material == null) {
+    public ItemStack getItem(final @NotNull String materialString) throws IncorrectAssignedMaterialException {
+        ItemStack item = FishUtils.getItem(materialString);
+        if (item == null) {
             throw new IncorrectAssignedMaterialException(configurationFile.getNameAsString() + configLocation, materialString);
         }
-
-        return new ItemStack(material);
+        return item;
     }
 
     /**
