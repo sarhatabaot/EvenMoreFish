@@ -36,9 +36,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jooq.impl.QOM;
-
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.function.Consumer;
@@ -46,7 +45,6 @@ import java.util.stream.Stream;
 
 
 public class FishUtils {
-    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.0");
 
     private FishUtils() {
         throw new UnsupportedOperationException();
@@ -579,6 +577,32 @@ public class FishUtils {
         }
 
         return new ItemStack(material);
+    }
+
+    /**
+     * Sorts a double value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The double value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded double value with the provided amount of decimal places.
+     */
+    public static double roundDouble(final double value, int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .doubleValue();
+    }
+
+    /**
+     * Sorts a float value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The float value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded float value with the provided amount of decimal places.
+     */
+    public static float roundFloat(final float value, int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .floatValue();
     }
 
 }
