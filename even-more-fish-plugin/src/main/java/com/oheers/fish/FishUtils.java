@@ -600,9 +600,9 @@ public class FishUtils {
      * @param value The double value to be formatted.
      * @return The formatted double
      */
-    public static String formatDouble(final double value) {
+    public static String formatDouble(@NotNull final String formatStr, final double value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
-        DecimalFormat format = new DecimalFormat(ConfigMessage.SELL_PRICE_FORMAT.getMessage().getLegacyMessage(), symbols);
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return format.format(value);
     }
 
@@ -625,9 +625,9 @@ public class FishUtils {
      * @param value The float value to be formatted.
      * @return The formatted float
      */
-    public static String formatFloat(final float value) {
+    public static String formatFloat(@NotNull final String formatStr, final float value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
-        DecimalFormat format = new DecimalFormat(ConfigMessage.SELL_PRICE_FORMAT.getMessage().getLegacyMessage(), symbols);
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return format.format(value);
     }
 

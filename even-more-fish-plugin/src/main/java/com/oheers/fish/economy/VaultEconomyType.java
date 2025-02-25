@@ -101,7 +101,7 @@ public class VaultEconomyType implements EconomyType {
             message.setVariable("{amount}", String.valueOf(worth));
             return message.getLegacyMessage();
         }
-        return FishUtils.formatDouble(worth);
+        return FishUtils.formatDouble(ConfigMessage.SELL_PRICE_FORMAT.getMessage().getLegacyMessage(), worth);
     }
 
 }
