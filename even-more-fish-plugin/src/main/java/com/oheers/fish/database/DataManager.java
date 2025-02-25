@@ -3,12 +3,15 @@ package com.oheers.fish.database;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.database.model.FishReportOld;
+import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -20,6 +23,27 @@ public class DataManager {
     private static DataManager instance;
 
     private Cache<UUID, UserReport> userReportCache;
+    private final LoadingCache<UUID, UserFishStats> userFishStats = Caffeine.newBuilder()
+            .expireAfter(new Expiry<UUID, UserFishStats>() {
+                @Override
+                public long expireAfterCreate(UUID uuid, UserFishStats userFishStats, long l) {
+                    return getCacheDuration(uuid);
+                }
+
+                @Override
+                public long expireAfterUpdate(UUID uuid, UserFishStats userFishStats, long l, @NonNegative long l1) {
+                    return getCacheDuration(uuid);
+                }
+
+                @Override
+                public long expireAfterRead(UUID uuid, UserFishStats userFishStats, long l, @NonNegative long l1) {
+                    return getCacheDuration(uuid);
+                }
+            })
+            .build(uuid -> {
+                return EvenMoreFish.getInstance().getDatabase().getUserFishStats(uuid);;
+            });
+    // user fish stats
     private Cache<UUID, List<FishReportOld>> fishReportCache;
 
     private void setup() {
@@ -118,7 +142,7 @@ public class DataManager {
      */
     public void cacheUser(UUID uuid, UserReport userReport, List<FishReportOld> fishReports) {
         userReportCache.put(uuid, userReport);
-        fishReportCache.put(uuid, fishReports);
+        fishReportCache.put(uuid, fishReports); //we probably don't need to cache these, maybe just to update periodically?
     }
 
     /**
@@ -240,22 +264,24 @@ public class DataManager {
 
         UserReport report = DataManager.getInstance().getUserReportIfExists(uuid);
 
-        if (report != null) {
-            String fishID = fish.getRarity().getId() + ":" + fish.getName();
-
-            report.setRecentFish(fishID);
-            report.incrementFishCaught(1);
-            report.incrementTotalLength(fish.getLength());
-            if (report.getFirstFish().equals("None")) {
-                report.setFirstFish(fishID);
-            }
-            if (fish.getLength() > report.getLargestLength()) {
-                report.setLargestFish(fishID);
-                report.setLargestLength(fish.getLength());
-            }
-
-            DataManager.getInstance().putUserReportCache(uuid, report);
+        if (report == null) {
+            return;
         }
+
+        String fishID = fish.getRarity().getId() + ":" + fish.getName();
+
+        report.setRecentFish(fishID);
+        report.incrementFishCaught(1);
+        report.incrementTotalLength(fish.getLength());
+        if (report.getFirstFish().equals("None")) {
+            report.setFirstFish(fishID);
+        }
+        if (fish.getLength() > report.getLargestLength()) {
+            report.setLargestFish(fishID);
+            report.setLargestLength(fish.getLength());
+        }
+
+        DataManager.getInstance().putUserReportCache(uuid, report);
     }
 
 
