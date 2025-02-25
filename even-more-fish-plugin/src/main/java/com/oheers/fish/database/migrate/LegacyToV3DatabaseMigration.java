@@ -174,7 +174,7 @@ public class LegacyToV3DatabaseMigration {
                 }
 
                 UUID playerUUID = UUID.fromString(file.getName().substring(0, file.getName().lastIndexOf(".")));
-                database.createUser(playerUUID);
+                database.createEmptyUserReport(playerUUID);
                 translateFishReportsV2(playerUUID, reports);
                 
                 AbstractMessage migratedMSG = EvenMoreFish.getAdapter().createMessage("Migrated " + reports.size() + " fish for: " + playerUUID);

@@ -139,6 +139,35 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
+    public boolean hasFishLog(UUID uuid) {
+        if (!hasUser(uuid))
+            return false;
+
+        final int userId = getUserId(uuid);
+        return hasFishLog(userId);
+    }
+
+    public boolean hasFishLog(int userId) {
+        if (userId == 0) {
+            return false;
+        }
+
+        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
+            @Override
+            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
+                return dslContext.fetchExists(Tables.FISH_LOG
+                                .where(Tables.FISH_LOG.USER_ID.eq(userId))
+                );
+            }
+
+            @Override
+            protected Boolean empty() {
+                return false;
+            }
+        }.prepareAndRunQuery();
+    }
+
+    @Deprecated //use hasFishLog instead
     @Override
     public boolean hasUserLog(@NotNull UUID uuid) {
         if (!hasUser(uuid)) {
@@ -168,7 +197,7 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void createUser(@NotNull UUID uuid) {
+    public void createEmptyUserReport(@NotNull UUID uuid) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
@@ -211,7 +240,7 @@ public class Database implements DatabaseAPI {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 int rowsUpdated = dslContext.update(Tables.USERS)
-                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish())
+                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish()) 
                         .set(Tables.USERS.LAST_FISH, report.getRecentFish())
                         .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
                         .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
@@ -387,7 +416,7 @@ public class Database implements DatabaseAPI {
     public float getLargestFishSizeForPlayer(@NotNull Fish fish, @NotNull HumanEntity player) {
         UUID uuid = player.getUniqueId();
         if (!hasUser(uuid)) {
-            createUser(uuid);
+            createEmptyUserReport(uuid);
         }
         UserReport report = readUserReport(player.getUniqueId());
         return report.getLargestLength();

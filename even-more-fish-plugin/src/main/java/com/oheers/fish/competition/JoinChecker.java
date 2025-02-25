@@ -48,7 +48,7 @@ public class JoinChecker implements Listener {
 
             userReport = EvenMoreFish.getInstance().getDatabase().readUserReport(userUUID);
             if (userReport == null) {
-                EvenMoreFish.getInstance().getDatabase().createUser(userUUID);
+                EvenMoreFish.getInstance().getDatabase().createEmptyUserReport(userUUID);
                 userReport = EvenMoreFish.getInstance().getDatabase().readUserReport(userUUID);
             }
 
@@ -97,7 +97,7 @@ public class JoinChecker implements Listener {
             UUID userUUID = event.getPlayer().getUniqueId();
 
             if (!EvenMoreFish.getInstance().getDatabase().hasUser(userUUID)) {
-                EvenMoreFish.getInstance().getDatabase().createUser(userUUID);
+                EvenMoreFish.getInstance().getDatabase().createEmptyUserReport(userUUID);
             }
 
             List<FishReportOld> fishReports = DataManager.getInstance().getFishReportsIfExists(userUUID);

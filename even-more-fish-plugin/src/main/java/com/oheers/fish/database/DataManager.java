@@ -212,7 +212,7 @@ public class DataManager {
 
 
             if (!EvenMoreFish.getInstance().getDatabase().hasUser(entry.getKey())) {
-                EvenMoreFish.getInstance().getDatabase().createUser(entry.getKey());
+                EvenMoreFish.getInstance().getDatabase().createEmptyUserReport(entry.getKey());
             }
 
         }

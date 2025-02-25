@@ -26,7 +26,7 @@ public interface DatabaseAPI {
 
     boolean hasUserLog(@NotNull UUID uuid);
 
-    void createUser(@NotNull UUID uuid);
+    void createEmptyUserReport(@NotNull UUID uuid);
 
     int getUserId(@NotNull UUID uuid);
 
