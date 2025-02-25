@@ -101,10 +101,7 @@ public class VaultEconomyType implements EconomyType {
             message.setVariable("{amount}", String.valueOf(worth));
             return message.getLegacyMessage();
         }
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
-        DecimalFormat format = new DecimalFormat(ConfigMessage.SELL_PRICE_FORMAT.getMessage().getLegacyMessage(), symbols);
-        double roundedWorth = FishUtils.roundDouble(worth, 1);
-        return format.format(roundedWorth);
+        return FishUtils.formatDouble(worth);
     }
 
 }
