@@ -309,7 +309,7 @@ public class Database implements DatabaseAPI {
                         .set(Tables.FISH.FISH_RARITY, fish.getRarity().getId())
                         .set(Tables.FISH.FIRST_FISHER, uuid.toString())
                         .set(Tables.FISH.TOTAL_CAUGHT, 1)
-                        .set(Tables.FISH.LARGEST_FISH, (float) FishUtils.roundDouble(fish.getLength(), 1))
+                        .set(Tables.FISH.LARGEST_FISH, fish.getLength())
                         .set(Tables.FISH.FIRST_FISHER, uuid.toString())
                         .set(Tables.FISH.LARGEST_FISHER, uuid.toString())
                         .set(Tables.FISH.FIRST_CATCH_TIME, LocalDateTime.now())
@@ -357,7 +357,7 @@ public class Database implements DatabaseAPI {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.update(Tables.FISH)
-                        .set(Tables.FISH.LARGEST_FISH, (float) FishUtils.roundDouble(fish.getLength(), 1)) // TODO use decimal format
+                        .set(Tables.FISH.LARGEST_FISH, fish.getLength()) // TODO use decimal format
                         .set(Tables.FISH.LARGEST_FISHER, uuid.toString())
                         .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId()).and(Tables.FISH.FISH_NAME.eq(fish.getName())))
                         .execute();
