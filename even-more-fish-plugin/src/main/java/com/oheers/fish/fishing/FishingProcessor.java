@@ -99,10 +99,12 @@ public class FishingProcessor implements Listener {
         final Player player = event.getEntity().getKiller();
         if (player == null) { return; }
 
-        if (event.getEntity() instanceof org.bukkit.entity.Fish) {
-            if (!isCustomFishAllowed(player)) {
-                return;
-            }
+        if (!(event.getEntity() instanceof org.bukkit.entity.Fish)) {
+            return;
+        }
+
+        if (!isCustomFishAllowed(player)) {
+            return;
         }
 
         if (MainConfig.getInstance().requireFishingPermission()) {
@@ -116,17 +118,13 @@ public class FishingProcessor implements Listener {
             return;
         }
 
-        for (ItemStack drop : event.getDrops()) {
-            if (!(drop instanceof Item nonCustom)) {
-                return;
-            }
-        }
-
-        event.getDrops().removeAll(event.getDrops());
+        event.getDrops().clear();
         if (MainConfig.getInstance().giveStraightToInventory() && isSpaceForNewFish(player.getInventory())) {
+            System.out.println("Getting to inventory" + fish);
             FishUtils.giveItem(fish, player);
         } else {
             // replaces the fishing item with a custom evenmorefish fish.
+            System.out.println("fish:" + fish);
             if (!fish.getType().isAir()) {
                 event.getDrops().add(fish);
             }
