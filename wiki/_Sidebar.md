@@ -7,12 +7,13 @@ Welcome to the EvenMoreFish Wiki.
 ### Configuration
 * [Economy](https://github.com/Oheers/EvenMoreFish/wiki/Economy)
 * [Competition Types](https://github.com/Oheers/EvenMoreFish/wiki/Competition-Types)
-* [Competitions.yml](https://github.com/Oheers/EvenMoreFish/wiki/competitions.yml)
-* [Fish.yml](https://github.com/Oheers/EvenMoreFish/wiki/Fish.yml)
+* [Competition Configs](https://github.com/Oheers/EvenMoreFish/wiki/Competition-Configs)
 * [Rarities](https://github.com/Oheers/EvenMoreFish/wiki/Rarities)
 * [Messages.yml](https://github.com/Oheers/EvenMoreFish/wiki/Messages.yml)
+* [GUI Action Types](https://github.com/Oheers/EvenMoreFish/wiki/GUI-Actions)
 * [Requirements](https://github.com/Oheers/EvenMoreFish/wiki/Requirements)
-  * [Biome Sets](https://github.com/Oheers/EvenMoreFish/wiki/Biome-Sets)
+* [Biome Sets](https://github.com/Oheers/EvenMoreFish/wiki/Biome-Sets)
+* [Database](https://github.com/Oheers/EvenMoreFish/wiki/Database-Config)
 ### Additional Features
 * [Reward Types](https://github.com/Oheers/EvenMoreFish/wiki/Reward-Types)
 * [Addons](https://github.com/Oheers/EvenMoreFish/wiki/Addons)
@@ -21,6 +22,7 @@ Welcome to the EvenMoreFish Wiki.
 * [Discord](https://discord.gg/Hb9cj3tNbb)
 ### Developers & API 
 * [Developers & API](https://github.com/Oheers/EvenMoreFish/wiki/Developers)
+* [Database](https://github.com/Oheers/EvenMoreFish/wiki/Database-API)
 * [NBT](https://github.com/Oheers/EvenMoreFish/wiki/NBT)
 * [Creating Addons](https://github.com/Oheers/EvenMoreFish/wiki/Create-Addons)
 * [Creating Reward Types](https://github.com/Oheers/EvenMoreFish/wiki/Create-Reward-Types)

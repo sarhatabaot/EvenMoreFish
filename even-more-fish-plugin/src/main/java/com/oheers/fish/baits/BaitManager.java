@@ -2,27 +2,24 @@ package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.BaitFile;
-import com.oheers.fish.fishing.items.Fish;
-import com.oheers.fish.fishing.items.FishManager;
-import com.oheers.fish.fishing.items.Rarity;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class BaitManager {
     
     private static BaitManager instance;
 
-    private final Map<String, Bait> baitMap;
+    private final TreeMap<String, Bait> baitMap;
     private boolean loaded;
     
     private BaitManager() {
-        baitMap = new HashMap<>();
+        baitMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     }
     
     public static BaitManager getInstance() {
@@ -70,7 +67,7 @@ public class BaitManager {
         if (baitName == null) {
             return null;
         }
-        return baitMap.get(baitName.toUpperCase());
+        return baitMap.get(baitName);
     }
 
     public @Nullable Bait getBait(@Nullable ItemStack itemStack) {
@@ -97,46 +94,13 @@ public class BaitManager {
         if (section == null) {
             return;
         }
-
         for (String baitName : section.getRoutesAsStrings(false)) {
-            Bait bait = new Bait(baitName);
-
-            List<String> rarityList = getBaitConfiguration().getStringList("baits." + baitName + ".rarities");
-
-            if (!rarityList.isEmpty()) {
-                for (String rarityName : rarityList) {
-                    Rarity rarity = FishManager.getInstance().getRarity(rarityName);
-                    if (rarity == null) {
-                        EvenMoreFish.getInstance().getLogger().severe(rarityName + " is not a valid rarity. It was not added to the " + baitName + " bait.");
-                        continue;
-                    }
-                    bait.addRarity(rarity);
-                }
+            Section baitSection = section.getSection(baitName);
+            if (baitSection == null) {
+                continue;
             }
-
-            Section fishSection = getBaitConfiguration().getSection("baits." + baitName + ".fish");
-
-            if (fishSection != null) {
-                for (String rarityString : fishSection.getRoutesAsStrings(false)) {
-                    Rarity rarity = FishManager.getInstance().getRarity(rarityString);
-
-                    if (rarity == null) {
-                        EvenMoreFish.getInstance().getLogger().severe(rarityString + " is not a loaded rarity value. It was not added to the " + baitName + " bait.");
-                    } else {
-                        List<String> fishNames = getBaitConfiguration().getStringList("baits." + baitName + ".fish." + rarityString);
-                        for (String fishName : fishNames) {
-                            Fish fish = FishManager.getInstance().getFish(rarity, fishName);
-                            if (fish == null) {
-                                EvenMoreFish.getInstance().getLogger().severe(fishName + " could not be found in the " + rarity.getValue() + " config. It was not added to the " + baitName + " bait.");
-                                continue;
-                            }
-                            bait.addFish(fish);
-                        }
-                    }
-                }
-            }
-
-            baitMap.put(baitName.toUpperCase(), bait);
+            Bait bait = new Bait(baitSection);
+            baitMap.put(baitName, bait);
         }
     }
     

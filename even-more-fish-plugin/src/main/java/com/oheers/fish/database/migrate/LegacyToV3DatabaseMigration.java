@@ -3,34 +3,32 @@ package com.oheers.fish.database.migrate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.config.messages.Message;
+import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.messages.PrefixType;
-import com.oheers.fish.database.DatabaseUtil;
-import com.oheers.fish.database.DatabaseV3;
-import com.oheers.fish.database.connection.ConnectionFactory;
+import com.oheers.fish.database.Database;
+import com.oheers.fish.database.connection.MigrationManager;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.impl.DSL;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 
 public class LegacyToV3DatabaseMigration {
-    private final DatabaseV3 database;
-    private final ConnectionFactory connectionFactory;
+    private final Database database;
+    private final MigrationManager migrationManager;
     
-    public LegacyToV3DatabaseMigration(final DatabaseV3 database, final ConnectionFactory connectionFactory) {
+    public LegacyToV3DatabaseMigration(final Database database, final MigrationManager migrationManager) {
         this.database = database;
-        this.connectionFactory = connectionFactory;
+        this.migrationManager = migrationManager;
     }
     
     /**
@@ -38,21 +36,17 @@ public class LegacyToV3DatabaseMigration {
      * format for all the tables and to have a more descriptive name for this stuff.
      */
     private void translateFishDataV2() {
-        if (database.queryTableExistence("${table.prefix}fish")) {
+        if (migrationManager.queryTableExistence("${table.prefix}fish")) {
             return;
         }
         
-        if (database.queryTableExistence("Fish2")) {
-            database.executeStatement(c -> {
-                try (PreparedStatement preparedStatement = c.prepareStatement(DatabaseUtil.parseSqlString("ALTER TABLE Fish2 RENAME TO ${table.prefix}fish;", c))) {
-                    preparedStatement.execute();
-                } catch (SQLException e) {
-                    EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-                }
-            });
+        if (migrationManager.queryTableExistence("Fish2")) {
+            database.executeStatement(c -> c.alterTable("Fish2")
+                    .renameTo("${table.prefix}fish")
+                    .execute());
             return;
         }
-        connectionFactory.legacyInitVersion();
+        migrationManager.legacyInitVersion();
     }
     
     /**
@@ -85,20 +79,22 @@ public class LegacyToV3DatabaseMigration {
             }
             
             totalFish += report.getNumCaught();
-            database.executeStatement(c -> {
-                String emfFishLogSQL = "INSERT INTO ${table.prefix}fish_log (id, rarity, fish, quantity, first_catch_time, largest_length) VALUES (?,?,?,?,?,?)";
-                try (PreparedStatement prep = c.prepareStatement(DatabaseUtil.parseSqlString(emfFishLogSQL, c))) {
-                    prep.setInt(1, database.getUserID(uuid));
-                    prep.setString(2, report.getRarity());
-                    prep.setString(3, report.getName());
-                    prep.setInt(4, report.getNumCaught());
-                    prep.setLong(5, report.getTimeEpoch());
-                    prep.setFloat(6, report.getLargestLength());
-                    prep.executeUpdate();
-                } catch (SQLException exception) {
-                    EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, "Could not add " + uuid + " in the table: Users.", exception);
-                }
-            });
+            var fishLog = DSL.table(MainConfig.getInstance().getPrefix() + "fish_log");
+            var id = DSL.field("id", Integer.class);
+            var rarity = DSL.field("rarity", String.class);
+            var fish = DSL.field("fish", String.class);
+            var quantity = DSL.field("quantity", Integer.class);
+            var fishCatchTime = DSL.field("first_catch_time", Long.class);
+            var largestLength = DSL.field("largest_length", Float.class);
+
+            database.executeStatement(c -> c.insertInto(fishLog)
+                    .set(id, database.getUserId(uuid))
+                    .set(rarity, report.getRarity())
+                    .set(fish, report.getName())
+                    .set(quantity, report.getNumCaught())
+                    .set(fishCatchTime, report.getTimeEpoch())
+                    .set(largestLength, report.getLargestLength())
+                    .execute());
             // starts a field for the new fish for the user that's been fished for the first time
             
         }
@@ -107,65 +103,65 @@ public class LegacyToV3DatabaseMigration {
     }
     
     private void createFieldForFishFirstTimeFished(final UUID uuid, final String firstFishID, final String largestFishID, int totalFish, float largestSize) {
-        String emfUsersSQL = "UPDATE ${table.prefix}users SET first_fish = ?, largest_fish = ?, num_fish_caught = ?, largest_length = ? WHERE uuid = ?;";
+        var usersTable = DSL.table(MainConfig.getInstance().getPrefix() + "users");
+        var firstFishField = DSL.field("first_fish", String.class);
+        var largestFishField = DSL.field("largest_fish", String.class);
+        var totalFishField = DSL.field("num_fish_caught", Integer.class);
+        var largestLengthField = DSL.field("largest_length", Float.class);
+        var uuidField = DSL.field("uuid", String.class);
+
         // starts a field for the new fish that's been fished for the first time
-        database.executeStatement(c -> {
-            try (PreparedStatement prep = c.prepareStatement(DatabaseUtil.parseSqlString(emfUsersSQL,c))) {
-                prep.setString(1, firstFishID);
-                prep.setString(2, largestFishID);
-                prep.setInt(3, totalFish);
-                prep.setFloat(4, largestSize);
-                prep.setString(5, uuid.toString());
-                
-                prep.executeUpdate();
-            } catch (SQLException exception) {
-                EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, "Could not add " + uuid + " in the table: emf_users.", exception);
-            }
-        });
+        database.executeStatement(c -> c.update(usersTable)
+                .set(firstFishField,firstFishID)
+                .set(largestFishField, largestFishID)
+                .set(totalFishField, totalFish)
+                .set(largestLengthField, largestSize)
+                .where(uuidField.eq(uuid.toString()))
+                .execute());
     }
     
     /**
      * Converts a V2 database system to a V3 database system. The server must not crash during this process as this may
-     * lead to data loss, but honestly I'm not 100% sure on that one. Data is read from the /data/ folder and is
+     * lead to data loss, but honestly, I'm not 100% sure on that one. Data is read from the /data/ folder and is
      * inserted into the new database system then the /data/ folder is renamed to /data-old/.
      *
      * @param initiator The person who started the migration.
      *
      */
     public void migrate(CommandSender initiator) {
-        if (!database.usingVersionV2()) {
-            Message msg = new Message("EvenMoreFish is already using the latest V3 database engine.");
-            msg.usePrefix(PrefixType.ERROR);
-            msg.broadcast(initiator);
+        if (!migrationManager.usingV2()) {
+            AbstractMessage msg = EvenMoreFish.getAdapter().createMessage("EvenMoreFish is already using the latest V3 database engine.");
+            msg.prependMessage(PrefixType.ERROR.getPrefix());
+            msg.send(initiator);
             return;
         }
         
         EvenMoreFish.getInstance().getLogger().info(() -> initiator.getName() + " has begun the migration to EMF database V3 from V2.");
-        Message msg = new Message("Beginning conversion to V3 database engine.");
-        msg.usePrefix(PrefixType.ADMIN);
-        msg.broadcast(initiator);
+        AbstractMessage msg = EvenMoreFish.getAdapter().createMessage("Beginning conversion to V3 database engine.");
+        msg.prependMessage(PrefixType.ADMIN.getPrefix());
+        msg.send(initiator);
         
-        File oldDataFolder = new File(JavaPlugin.getProvidingPlugin(DatabaseV3.class).getDataFolder() + "/data/");
-        File dataFolder = new File(JavaPlugin.getProvidingPlugin(DatabaseV3.class).getDataFolder() + "/data-archived/");
+        File oldDataFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "data");
+        File dataFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "data-archived");
         
         if (oldDataFolder.renameTo(dataFolder)) {
-            Message message = new Message("Archived /data/ folder.");
-            message.usePrefix(PrefixType.ADMIN);
-            message.broadcast(initiator);
+            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("Archived /data/ folder.");
+            message.prependMessage(PrefixType.ADMIN.getPrefix());
+            message.send(initiator);
         } else {
-            Message message = new Message("Failed to archive /data/ folder. Cancelling migration. [No further information]");
-            message.usePrefix(PrefixType.ADMIN);
-            message.broadcast(initiator);
+            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("Failed to archive /data/ folder. Cancelling migration. [No further information]");
+            message.prependMessage(PrefixType.ADMIN.getPrefix());
+            message.send(initiator);
             return;
         }
         
-        Message fishReportMSG = new Message("Beginning FishReport migrations. This may take a while.");
-        fishReportMSG.usePrefix(PrefixType.ADMIN);
-        fishReportMSG.broadcast(initiator);
+        AbstractMessage fishReportMSG = EvenMoreFish.getAdapter().createMessage("Beginning FishReport migrations. This may take a while.");
+        fishReportMSG.prependMessage(PrefixType.ADMIN.getPrefix());
+        fishReportMSG.send(initiator);
         
         try {
             translateFishDataV2();
-            this.connectionFactory.legacyFlywayBaseline();
+            this.migrationManager.legacyFlywayBaseline();
             
             for (File file : Objects.requireNonNull(dataFolder.listFiles())) {
                 Type fishReportList = new TypeToken<List<LegacyFishReport>>() {
@@ -181,15 +177,15 @@ public class LegacyToV3DatabaseMigration {
                 database.createUser(playerUUID);
                 translateFishReportsV2(playerUUID, reports);
                 
-                Message migratedMSG = new Message("Migrated " + reports.size() + " fish for: " + playerUUID);
-                migratedMSG.usePrefix(PrefixType.ADMIN);
-                migratedMSG.broadcast(initiator);
+                AbstractMessage migratedMSG = EvenMoreFish.getAdapter().createMessage("Migrated " + reports.size() + " fish for: " + playerUUID);
+                migratedMSG.prependMessage(PrefixType.ADMIN.getPrefix());
+                migratedMSG.send(initiator);
             }
             
         } catch (NullPointerException | FileNotFoundException exception) {
-            Message message = new Message("Fatal error whilst upgrading to V3 database engine.");
-            message.usePrefix(PrefixType.ERROR);
-            message.broadcast(initiator);
+            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("Fatal error whilst upgrading to V3 database engine.");
+            message.prependMessage(PrefixType.ERROR.getPrefix());
+            message.send(initiator);
             
             EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, "Critical SQL/interruption error whilst upgrading to v3 engine.", exception);
         } catch (IOException e) {
@@ -197,17 +193,16 @@ public class LegacyToV3DatabaseMigration {
             throw new RuntimeException(e);
         }
         
-        Message migratedMSG = new Message("Migration completed. Your database is now using the V3 database engine: to complete the migration, it is recommended to restart your server.");
-        migratedMSG.usePrefix(PrefixType.ERROR);
-        migratedMSG.broadcast(initiator);
+        AbstractMessage migratedMSG = EvenMoreFish.getAdapter().createMessage("Migration completed. Your database is now using the V3 database engine: to complete the migration, it is recommended to restart your server.");
+        migratedMSG.prependMessage(PrefixType.ADMIN.getPrefix());
+        migratedMSG.send(initiator);
         
-        Message thankyou = new Message("Now that migration is complete, you will be able to use functionality in upcoming" +
+        AbstractMessage thankyou = EvenMoreFish.getAdapter().createMessage("Now that migration is complete, you will be able to use functionality in upcoming" +
             " updates such as quests, deliveries and a fish log. - Oheers");
-        thankyou.usePrefix(PrefixType.ERROR);
-        thankyou.broadcast(initiator);
+        thankyou.prependMessage(PrefixType.ERROR.getPrefix());
+        thankyou.send(initiator);
 
-        database.setUsingV2(false);
         //Run the rest of the migrations, and ensure it's properly setup.
-        connectionFactory.flyway5toLatest();
+        migrationManager.migrateFromV5ToLatest();
     }
 }

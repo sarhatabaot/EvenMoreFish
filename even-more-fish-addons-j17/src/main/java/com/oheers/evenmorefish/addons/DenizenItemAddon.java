@@ -6,6 +6,7 @@ import com.oheers.fish.api.addons.ItemAddon;
 import org.bukkit.inventory.ItemStack;
 
 public class DenizenItemAddon extends ItemAddon {
+
     @Override
     public String getPrefix() {
         return "denizen";
@@ -19,6 +20,11 @@ public class DenizenItemAddon extends ItemAddon {
     @Override
     public String getAuthor() {
         return "FireML";
+    }
+
+    @Override
+    public String getVersion() {
+        return "1.0.0";
     }
 
     @Override

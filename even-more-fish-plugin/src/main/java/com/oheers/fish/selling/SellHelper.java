@@ -1,12 +1,12 @@
 package com.oheers.fish.selling;
 
 import com.devskiller.friendly_id.FriendlyId;
-import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Message;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.utils.nbt.NbtKeys;
@@ -37,6 +37,10 @@ public class SellHelper {
         if (!(humanEntity instanceof Player player)) {
             return;
         }
+        if (!Economy.getInstance().isEnabled()) {
+            ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
+            return;
+        }
         gui.getElements().forEach(element -> {
             if (!(element instanceof GuiStorageElement storageElement)) {
                 return;
@@ -51,6 +55,14 @@ public class SellHelper {
     }
 
     public boolean sellFish() {
+
+        Economy economy = Economy.getInstance();
+
+        if (!economy.isEnabled()) {
+            ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
+            return false;
+        }
+
         List<SoldFish> soldFish = getTotalSoldFish();
         double totalWorth = getTotalWorth(soldFish);
         double sellPrice = Math.floor(totalWorth * 10) / 10;
@@ -67,10 +79,7 @@ public class SellHelper {
             }
         }
 
-        Economy economy = Economy.getInstance();
-        if (economy.isEnabled()) {
-            economy.deposit(this.player, totalWorth, true);
-        }
+        economy.deposit(this.player, totalWorth, true);
 
         if (!(inventory instanceof PlayerInventory)) {
             FishUtils.giveItems(Arrays.stream(inventory.getStorageContents()).filter(Objects::nonNull).toArray(ItemStack[]::new), this.player);
@@ -78,19 +87,20 @@ public class SellHelper {
 
         // sending the sell message to the player
 
-        Message message = new Message(ConfigMessage.FISH_SALE);
-        if (!economy.isEnabled()) {
-            message.setSellPrice("0");
-        } else {
-            message.setSellPrice(economy.getWorthFormat(sellPrice, true));
-        }
+        AbstractMessage message = ConfigMessage.FISH_SALE.getMessage();
+        message.setSellPrice(economy.getWorthFormat(sellPrice, true));
         message.setAmount(Integer.toString(fishCount));
         message.setPlayer(this.player);
-        message.broadcast(player);
+        message.send(player);
 
         this.player.playSound(this.player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.06f);
 
-        if (MainConfig.getInstance().databaseEnabled()) logSoldFish(player.getUniqueId(), soldFish);
+        if (MainConfig.getInstance().databaseEnabled()) {
+            // TODO temporary fix until database PR is merged.
+            try {
+                logSoldFish(player.getUniqueId(), soldFish);
+            } catch (Exception exception) { /* Ignored */ }
+        }
         return totalWorth != 0.0;
 
     }
@@ -149,13 +159,13 @@ public class SellHelper {
     }
 
     private void logSoldFish(final UUID uuid, @NotNull List<SoldFish> soldFish) {
-        int userId = EvenMoreFish.getInstance().getDatabaseV3().getUserID(uuid);
+        int userId = EvenMoreFish.getInstance().getDatabase().getUserId(uuid);
         final String transactionId = FriendlyId.createFriendlyId();
         final Timestamp timestamp = Timestamp.from(Instant.now());
 
-        EvenMoreFish.getInstance().getDatabaseV3().createTransaction(transactionId, userId, timestamp);
+        EvenMoreFish.getInstance().getDatabase().createTransaction(transactionId, userId, timestamp);
         for(final SoldFish fish: soldFish) {
-            EvenMoreFish.getInstance().getDatabaseV3().createSale(transactionId, fish.getName(),fish.getRarity(), fish.getAmount(),fish.getLength(), fish.getTotalValue());
+            EvenMoreFish.getInstance().getDatabase().createSale(transactionId, fish.getName(),fish.getRarity(), fish.getAmount(),fish.getLength(), fish.getTotalValue());
         }
 
         double moneyEarned = getTotalWorth(soldFish);

@@ -1,13 +1,13 @@
 package com.oheers.fish;
 
-import co.aikar.commands.ConditionFailedException;
-import co.aikar.commands.InvalidCommandArgument;
-import co.aikar.commands.PaperCommandManager;
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
+import com.oheers.fish.adapter.PaperAdapter;
+import com.oheers.fish.adapter.SpigotAdapter;
 import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
+import com.oheers.fish.api.adapter.PlatformAdapter;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementManager;
@@ -15,27 +15,26 @@ import com.oheers.fish.api.reward.RewardManager;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
-import com.oheers.fish.commands.EMFCommand;
+import com.oheers.fish.commands.MainCommand;
 import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.competition.rewardtypes.*;
 import com.oheers.fish.competition.rewardtypes.external.*;
-import com.oheers.fish.config.*;
+import com.oheers.fish.config.BaitFile;
+import com.oheers.fish.config.GUIConfig;
+import com.oheers.fish.config.GUIFillerConfig;
+import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Message;
-import com.oheers.fish.config.messages.Messages;
+import com.oheers.fish.config.messages.MessageConfig;
 import com.oheers.fish.database.DataManager;
-import com.oheers.fish.database.DatabaseV3;
-import com.oheers.fish.database.FishReport;
-import com.oheers.fish.database.UserReport;
+import com.oheers.fish.database.Database;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
 import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
 import com.oheers.fish.events.*;
 import com.oheers.fish.fishing.FishingProcessor;
-import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.requirements.*;
@@ -45,8 +44,11 @@ import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.permission.Permission;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
@@ -60,35 +62,32 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
+public class EvenMoreFish extends EMFPlugin {
+
     private final Random random = new Random();
 
     private Permission permission = null;
-    private Map<Integer, Set<String>> fish = new HashMap<>();
     private ItemStack customNBTRod;
     private boolean checkingEatEvent;
     private boolean checkingIntEvent;
     // Do some fish in some rarities have the comp-check-exempt: true.
     private boolean raritiesCompCheckExempt = false;
-    private Competition active;
     private CompetitionQueue competitionQueue;
     private Logger logger;
     private PluginManager pluginManager;
-    private int metric_fishCaught = 0;
-    private int metric_baitsUsed = 0;
-    private int metric_baitsApplied = 0;
+    private int metricFishCaught = 0;
+    private int metricBaitsUsed = 0;
+    private int metricBaitsApplied = 0;
+    private boolean firstLoad = false;
 
     // this is for pre-deciding a rarity and running particles if it will be chosen
     // it's a work-in-progress solution and probably won't stick.
@@ -101,14 +100,16 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
     private boolean usingPlayerPoints;
     private boolean usingGriefPrevention;
 
-    private DatabaseV3 databaseV3;
+    private Database database;
     private HeadDatabaseAPI HDBapi;
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
+    private static PlatformAdapter platformAdapter;
     private EMFAPI api;
 
     private AddonManager addonManager;
+    private Map<String, String> commandUsages = new HashMap<>();
 
     public static EvenMoreFish getInstance() {
         return instance;
@@ -120,12 +121,13 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         return addonManager;
     }
 
-    /**
-     * @deprecated Use {@link FishManager#getRarityMap()} instead. This method will be removed in EMF 1.8
-     */
-    @Deprecated(forRemoval = true)
-    public Map<Rarity, List<Fish>> getFishCollection() {
-        return FishManager.getInstance().getRarityMap();
+    @Override
+    public void onLoad() {
+        CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
+                .shouldHookPaperReload(true)
+                .usePluginNamespace()
+                .missingExecutorImplementationMessage("You are not able to use this command!");
+        CommandAPI.onLoad(config);
     }
 
     @Override
@@ -135,10 +137,19 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
 
+        // This should only ever be done once.
+        EMFPlugin.setInstance(this);
+
+        CommandAPI.onEnable();
+
+        // If EMF folder does not exist, this is the first load.
+        firstLoad = !getDataFolder().exists();
+
         instance = this;
         scheduler = UniversalScheduler.getScheduler(this);
-        this.api = new EMFAPI();
+        platformAdapter = loadAdapter();
 
+        this.api = new EMFAPI();
 
         decidedRarities = new HashMap<>();
 
@@ -149,20 +160,14 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
         usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
 
-        getConfig().options().copyDefaults();
-        saveDefaultConfig();
-
         new MainConfig();
-        new Messages();
+        new MessageConfig();
 
         saveAdditionalDefaultAddons();
         this.addonManager = new AddonManager(this);
         this.addonManager.load();
 
-        new FishFile();
-        new RaritiesFile();
         new BaitFile();
-        new CompetitionConfig();
 
         new GUIConfig();
         new GUIFillerConfig();
@@ -197,7 +202,7 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         getScheduler().runTaskAsynchronously(() -> isUpdateAvailable = checkUpdate());
 
         listeners();
-        loadCommandManager();
+        registerCommands();
 
         if (!MainConfig.getInstance().debugSession()) {
             metrics();
@@ -206,25 +211,16 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         AutoRunner.init();
 
         if (MainConfig.getInstance().databaseEnabled()) {
-
             DataManager.init();
 
-            databaseV3 = new DatabaseV3(this);
-            //load user reports into cache
-            getScheduler().runTaskAsynchronously(() -> {
-                for (Player player : getServer().getOnlinePlayers()) {
-                    UserReport playerReport = databaseV3.readUserReport(player.getUniqueId());
-                    if (playerReport == null) {
-                        EvenMoreFish.getInstance().getLogger().warning("Could not read report for player (" + player.getUniqueId() + ")");
-                        continue;
-                    }
-                    DataManager.getInstance().putUserReportCache(player.getUniqueId(), playerReport);
-                }
-            });
-
+            database = new Database();
+            DataManager.getInstance().loadUserReportsIntoCache();
         }
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");
+
+        // Set this to false as the plugin is now loaded.
+        firstLoad = false;
     }
 
     @Override
@@ -235,19 +231,22 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
             return;
         }
 
+        CommandAPI.onDisable();
+
         terminateGUIS();
         // Don't use the scheduler here because it will throw errors on disable
         saveUserData(false);
 
         // Ends the current competition in case the plugin is being disabled when the server will continue running
-        if (Competition.isActive()) {
+        Competition active = Competition.getCurrentlyActive();
+        if (active != null) {
             active.end(false);
         }
 
         RewardManager.getInstance().unload();
 
         if (MainConfig.getInstance().databaseEnabled()) {
-            databaseV3.shutdown();
+            database.shutdown();
         }
 
         FishManager.getInstance().unload();
@@ -283,7 +282,13 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     public static void debug(final Level level, final String message) {
         if (MainConfig.getInstance().debugSession()) {
-            getInstance().getLogger().log(level, () -> message);
+            getInstance().getLogger().log(level, () -> "DEBUG %s".formatted(message));
+        }
+    }
+
+    public static void dbVerbose(final String message) {
+        if (MainConfig.getInstance().doDBVerbose()) {
+            getInstance().getLogger().info("DB-VERBOSE %s".formatted(message));
         }
     }
 
@@ -339,114 +344,31 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         Metrics metrics = new Metrics(this, 11054);
 
         metrics.addCustomChart(new SingleLineChart("fish_caught", () -> {
-            int returning = metric_fishCaught;
-            metric_fishCaught = 0;
+            int returning = metricFishCaught;
+            metricFishCaught = 0;
             return returning;
         }));
 
         metrics.addCustomChart(new SingleLineChart("baits_applied", () -> {
-            int returning = metric_baitsApplied;
-            metric_baitsApplied = 0;
+            int returning = metricBaitsApplied;
+            metricBaitsApplied = 0;
             return returning;
         }));
 
         metrics.addCustomChart(new SingleLineChart("baits_used", () -> {
-            int returning = metric_baitsUsed;
-            metric_baitsUsed = 0;
+            int returning = metricBaitsUsed;
+            metricBaitsUsed = 0;
             return returning;
         }));
 
         metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
+
+        metrics.addCustomChart(new SimplePie("paper-adapter", () -> (platformAdapter instanceof PaperAdapter) ? "true" : "false"));
     }
 
-    private void loadCommandManager() {
-        PaperCommandManager manager = new PaperCommandManager(this);
-
-        // Brigadier should stay disabled until ACF updates their implementation.
-        //manager.enableUnstableAPI("brigadier");
-        manager.enableUnstableAPI("help");
-
-        StringBuilder main = new StringBuilder(MainConfig.getInstance().getMainCommandName());
-        List<String> aliases = MainConfig.getInstance().getMainCommandAliases();
-        if (!aliases.isEmpty()) {
-            aliases.forEach(alias -> main.append("|").append(alias));
-        }
-        manager.getCommandReplacements().addReplacement("main", main.toString());
-        manager.getCommandReplacements().addReplacement("duration", String.valueOf(MainConfig.getInstance().getCompetitionDuration() * 60));
-        //desc_admin_<command>_<id>
-        manager.getCommandReplacements().addReplacements(
-                "desc_admin_bait", new Message(ConfigMessage.HELP_ADMIN_BAIT).getRawMessage(),
-                "desc_admin_competition", new Message(ConfigMessage.HELP_ADMIN_COMPETITION).getRawMessage(),
-                "desc_admin_clearbaits", new Message(ConfigMessage.HELP_ADMIN_CLEARBAITS).getRawMessage(),
-                "desc_admin_fish", new Message(ConfigMessage.HELP_ADMIN_FISH).getRawMessage(),
-                "desc_admin_nbtrod", new Message(ConfigMessage.HELP_ADMIN_NBTROD).getRawMessage(),
-                "desc_admin_reload", new Message(ConfigMessage.HELP_ADMIN_RELOAD).getRawMessage(),
-                "desc_admin_version", new Message(ConfigMessage.HELP_ADMIN_VERSION).getRawMessage(),
-                "desc_admin_migrate", new Message(ConfigMessage.HELP_ADMIN_MIGRATE).getRawMessage(),
-                "desc_admin_rewardtypes", new Message(ConfigMessage.HELP_ADMIN_REWARDTYPES).getRawMessage(),
-                "desc_admin_addons", new Message(ConfigMessage.HELP_ADMIN_ADDONS).getRawMessage(),
-
-                "desc_list_fish", new Message(ConfigMessage.HELP_LIST_FISH).getRawMessage(),
-                "desc_list_rarities", new Message(ConfigMessage.HELP_LIST_RARITIES).getRawMessage(),
-
-                "desc_competition_start", new Message(ConfigMessage.HELP_COMPETITION_START).getRawMessage(),
-                "desc_competition_end", new Message(ConfigMessage.HELP_COMPETITION_END).getRawMessage(),
-
-                "desc_general_top", new Message(ConfigMessage.HELP_GENERAL_TOP).getRawMessage(),
-                "desc_general_help", new Message(ConfigMessage.HELP_GENERAL_HELP).getRawMessage(),
-                "desc_general_shop", new Message(ConfigMessage.HELP_GENERAL_SHOP).getRawMessage(),
-                "desc_general_toggle", new Message(ConfigMessage.HELP_GENERAL_TOGGLE).getRawMessage(),
-                "desc_general_gui", new Message(ConfigMessage.HELP_GENERAL_GUI).getRawMessage(),
-                "desc_general_admin", new Message(ConfigMessage.HELP_GENERAL_ADMIN).getRawMessage(),
-                "desc_general_next", new Message(ConfigMessage.HELP_GENERAL_NEXT).getRawMessage(),
-                "desc_general_sellall", new Message(ConfigMessage.HELP_GENERAL_SELLALL).getRawMessage(),
-                "desc_general_applybaits", new Message(ConfigMessage.HELP_GENERAL_APPLYBAITS).getRawMessage()
-        );
-
-
-        manager.getCommandConditions().addCondition(Integer.class, "limits", (c, exec, value) -> {
-            if (value == null) {
-                return;
-            }
-            if (c.hasConfig("min") && c.getConfigValue("min", 0) > value) {
-                throw new ConditionFailedException("Min value must be " + c.getConfigValue("min", 0));
-            }
-
-            if (c.hasConfig("max") && c.getConfigValue("max", 0) < value) {
-                throw new ConditionFailedException("Max value must be " + c.getConfigValue("max", 0));
-            }
-        });
-        manager.getCommandContexts().registerContext(Rarity.class, c -> {
-            final String rarityId = c.popFirstArg().replace("\"", "");
-            Rarity rarity = FishManager.getInstance().getRarity(rarityId);
-            if (rarity == null) {
-                throw new InvalidCommandArgument("No such rarity: " + rarityId);
-            }
-            return rarity;
-        });
-        manager.getCommandContexts().registerContext(Fish.class, c -> {
-            final Rarity rarity = (Rarity) c.getResolvedArg(Rarity.class);
-            final String fishId = c.popFirstArg();
-            Fish fish = FishManager.getInstance().getFish(rarity, fishId);
-            if (fish == null) {
-                fish = FishManager.getInstance().getFish(rarity, fishId.replace("_", " "));
-            }
-            if (fish == null) {
-                throw new InvalidCommandArgument("No such fish: " + fishId);
-            }
-            return fish;
-        });
-        manager.getCommandCompletions().registerCompletion("baits", c -> BaitManager.getInstance().getBaitMap().keySet().stream().map(s -> s.replace(" ", "_")).toList());
-        manager.getCommandCompletions().registerCompletion("rarities", c -> FishManager.getInstance().getRarityMap().keySet().stream().map(Rarity::getValue).toList());
-        manager.getCommandCompletions().registerCompletion("fish", c -> {
-            final Rarity rarity = c.getContextValue(Rarity.class);
-            return FishManager.getInstance().getRarityMap().get(rarity).stream().map(f -> f.getName().replace(" ", "_")).collect(Collectors.toList());
-        });
-
-        manager.registerCommand(new EMFCommand());
-        manager.registerCommand(new AdminCommand());
+    public Map<String, String> getCommandUsages() {
+        return commandUsages;
     }
-
 
     private boolean setupPermissions() {
         if (!usingVault) {
@@ -473,8 +395,8 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
                 return;
             }
 
-            saveFishReports();
-            saveUserReports();
+            DataManager.getInstance().saveFishReports();
+            DataManager.getInstance().saveUserReports();
 
             DataManager.getInstance().uncacheAll();
         };
@@ -485,56 +407,44 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         }
     }
 
-    private void saveFishReports() {
-        ConcurrentMap<UUID, List<FishReport>> allReports = DataManager.getInstance().getAllFishReports();
-        logger.info("Saving " + allReports.size() + " fish reports.");
-        for (Map.Entry<UUID, List<FishReport>> entry : allReports.entrySet()) {
-            databaseV3.writeFishReports(entry.getKey(), entry.getValue());
-
-
-            if (!databaseV3.hasUser(entry.getKey())) {
-                databaseV3.createUser(entry.getKey());
-            }
-
-        }
-    }
-
-    private void saveUserReports() {
-        logger.info("Saving " + DataManager.getInstance().getAllUserReports().size() + " user reports.");
-        for (UserReport report : DataManager.getInstance().getAllUserReports()) {
-            databaseV3.writeUserReport(report.getUUID(), report);
-        }
-    }
 
     public ItemStack createCustomNBTRod() {
-        ItemFactory itemFactory = new ItemFactory("nbt-rod-item");
+        ItemFactory itemFactory = new ItemFactory("nbt-rod-item", MainConfig.getInstance().getConfig());
         itemFactory.enableDefaultChecks();
         itemFactory.setItemDisplayNameCheck(true);
         itemFactory.setItemLoreCheck(true);
 
         ItemStack customRod = itemFactory.createItem(null, 0);
-        NBT.modify(customRod,nbt -> {
+
+        setCustomNBTRod(customRod);
+
+        return customRod;
+    }
+
+    /**
+     * Allows external plugins to set their own items as an EMF NBT-rod.
+     * @param item The item to set as an EMF NBT-rod.
+     */
+    public void setCustomNBTRod(@NotNull ItemStack item) {
+        NBT.modify(item, nbt -> {
             nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND).setBoolean(NbtKeys.EMF_ROD_NBT, true);
         });
-        return customRod;
     }
 
     public void reload(@Nullable CommandSender sender) {
 
-        terminateGUIS();
+        // If EMF folder does not exist, assume first load again.
+        firstLoad = !getDataFolder().exists();
 
-        fish.clear();
+        terminateGUIS();
 
         reloadConfig();
         saveDefaultConfig();
 
         MainConfig.getInstance().reload();
-        Messages.getInstance().reload();
-        CompetitionConfig.getInstance().reload();
+        MessageConfig.getInstance().reload();
         GUIConfig.getInstance().reload();
         GUIFillerConfig.getInstance().reload();
-        FishFile.getInstance().reload();
-        RaritiesFile.getInstance().reload();
         BaitFile.getInstance().reload();
 
         FishManager.getInstance().reload();
@@ -552,27 +462,29 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         competitionQueue.load();
 
         if (sender != null) {
-            new Message(ConfigMessage.RELOAD_SUCCESS).broadcast(sender);
+            ConfigMessage.RELOAD_SUCCESS.getMessage().send(sender);
         }
 
+        firstLoad = false;
+
+    }
+
+    private void registerCommands() {
+        new MainCommand().getCommand().register(this);
+
+        // Shortcut command for /emf admin
+        if (MainConfig.getInstance().isAdminShortcutCommandEnabled()) {
+            new AdminCommand(
+                    MainConfig.getInstance().getAdminShortcutCommandName()
+            ).getCommand().register(this);
+        }
     }
 
     // Checks for updates, surprisingly
     private boolean checkUpdate() {
-
-        String[] spigotVersion = new UpdateChecker(this, 91310).getVersion().split("\\.");
-        String[] serverVersion = getDescription().getVersion().split("\\.");
-
-        for (int i = 0; i < serverVersion.length; i++) {
-            if (i < spigotVersion.length) {
-                if (Integer.parseInt(spigotVersion[i]) > Integer.parseInt(serverVersion[i])) {
-                    return true;
-                }
-            } else {
-                return false;
-            }
-        }
-        return false;
+        ComparableVersion spigotVersion = new ComparableVersion(new UpdateChecker(this, 91310).getVersion());
+        ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
+        return spigotVersion.compareTo(serverVersion) > 0;
     }
 
     private void checkPapi() {
@@ -588,10 +500,6 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     public Permission getPermission() {
         return permission;
-    }
-
-    public Map<Integer, Set<String>> getFish() {
-        return fish;
     }
 
     public ItemStack getCustomNBTRod() {
@@ -622,14 +530,6 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         this.raritiesCompCheckExempt = bool;
     }
 
-    public Competition getActiveCompetition() {
-        return active;
-    }
-
-    public void setActiveCompetition(Competition competition) {
-        this.active = competition;
-    }
-
     public CompetitionQueue getCompetitionQueue() {
         return competitionQueue;
     }
@@ -639,27 +539,27 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
     }
 
     public int getMetricFishCaught() {
-        return metric_fishCaught;
+        return metricFishCaught;
     }
 
     public void incrementMetricFishCaught(int value) {
-        this.metric_fishCaught = (metric_fishCaught + value);
+        this.metricFishCaught = (metricFishCaught + value);
     }
 
     public int getMetricBaitsUsed() {
-        return metric_baitsUsed;
+        return metricBaitsUsed;
     }
 
     public void incrementMetricBaitsUsed(int value) {
-        this.metric_baitsUsed = (metric_baitsUsed + value);
+        this.metricBaitsUsed = (metricBaitsUsed + value);
     }
 
     public int getMetricBaitsApplied() {
-        return metric_baitsApplied;
+        return metricBaitsApplied;
     }
 
     public void incrementMetricBaitsApplied(int value) {
-        this.metric_baitsApplied = (metric_baitsApplied + value);
+        this.metricBaitsApplied = (metricBaitsApplied + value);
     }
 
     public Map<UUID, Rarity> getDecidedRarities() {
@@ -690,8 +590,8 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
 
     public boolean isUsingGriefPrevention() {return usingGriefPrevention;}
 
-    public DatabaseV3 getDatabaseV3() {
-        return databaseV3;
+    public Database getDatabase() {
+        return database;
     }
 
     public HeadDatabaseAPI getHDBapi() {
@@ -800,11 +700,11 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         // If it is enabled, disable it
         if (isCustomFishing(player)) {
             pdc.set(key, PersistentDataType.STRING, "false");
-            new Message(ConfigMessage.TOGGLE_OFF).broadcast(player);
-        // If it is disabled, enable it
+            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
+            // If it is disabled, enable it
         } else {
             pdc.set(key, PersistentDataType.STRING, "true");
-            new Message(ConfigMessage.TOGGLE_ON).broadcast(player);
+            ConfigMessage.TOGGLE_ON.getMessage().send(player);
         }
     }
 
@@ -813,6 +713,28 @@ public class EvenMoreFish extends JavaPlugin implements EMFPlugin {
         NamespacedKey key = new NamespacedKey(this, "fish-enabled");
         String toggleValue = pdc.getOrDefault(key, PersistentDataType.STRING, "true");
         return toggleValue.equals("true");
+    }
+
+    private static PlatformAdapter loadAdapter() {
+        // Class names taken from PaperLib's initialize method
+        if (FishUtils.classExists(("com.destroystokyo.paper.PaperConfig"))) {
+            return new PaperAdapter();
+        } else if (FishUtils.classExists("io.papermc.paper.configuration.Configuration")) {
+            return new PaperAdapter();
+        }
+        return new SpigotAdapter();
+    }
+
+    public static @NotNull PlatformAdapter getAdapter() {
+        if (platformAdapter == null) {
+            instance.getLogger().warning("No PlatformAdapter found! Defaulting to SpigotAdapter.");
+            platformAdapter = new SpigotAdapter();
+        }
+        return platformAdapter;
+    }
+
+    public boolean isFirstLoad() {
+        return firstLoad;
     }
 
 }

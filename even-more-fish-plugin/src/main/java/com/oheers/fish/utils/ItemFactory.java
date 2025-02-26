@@ -2,15 +2,12 @@ package com.oheers.fish.utils;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.addons.exceptions.IncorrectAssignedMaterialException;
 import com.oheers.fish.api.addons.exceptions.NoPrefixException;
-import com.oheers.fish.config.BaitFile;
-import com.oheers.fish.config.FishFile;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.Message;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NbtApiException;
-import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,11 +15,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,25 +46,24 @@ public class ItemFactory {
 
     /**
      * Creates an instance of ItemFactory based on the provided Section
-     * @param configLocation The location of the item config
+     *
+     * @param configLocation    The location of the item config
      * @param configurationFile The config to check
      */
     public ItemFactory(@Nullable String configLocation, @NotNull Section configurationFile) {
-        if (configLocation != null) {
-            this.configLocation = configLocation + ".";
-        } else {
-            this.configLocation = "";
-        }
+        this.configLocation = initializeConfigLocation(configLocation);
         this.configurationFile = configurationFile;
         this.rawMaterial = false;
         this.product = getType(null);
     }
 
-    public ItemFactory(@NotNull String configLocation) {
-        this.configLocation = configLocation + ".";
-        this.configurationFile = getConfiguration();
-        this.rawMaterial = false;
-        this.product = getType(null);
+    @Contract(pure = true)
+    private @NotNull String initializeConfigLocation(@Nullable String configLocation) {
+        if (configLocation == null || configLocation.isBlank()) {
+            return "";
+        }
+
+        return configLocation + ".";
     }
 
     /**
@@ -80,6 +76,14 @@ public class ItemFactory {
         return createItem(player, randomIndex, null);
     }
 
+    private void applyItemRandomType(OfflinePlayer player, int randomIndex) {
+        if (randomIndex == -1) {
+            this.product = getType(player);
+        } else {
+            this.product = setType(randomIndex);
+        }
+    }
+
     /**
      * Returns the item created, this is literally everything: NBT data, material, lore blah blah blah.
      * Optionally provide a map of variables to parse in the display and lore.
@@ -88,19 +92,34 @@ public class ItemFactory {
      * @throws NullPointerException The type has not been enabled, therefore the ItemStack was never set in the first place.
      */
     public ItemStack createItem(OfflinePlayer player, int randomIndex, @Nullable Map<String, String> replacements) {
-        if (rawMaterial) return this.product;
+        if (rawMaterial) {
+            return this.product;
+        }
         if (itemRandom && player != null) {
-            if (randomIndex == -1) this.product = getType(player);
-            else this.product = setType(randomIndex);
+            applyItemRandomType(player, randomIndex);
         }
 
-        if (itemModelDataCheck) applyModelData();
-        if (itemDamageCheck) applyDamage();
-        if (itemDisplayNameCheck) applyDisplayName(replacements);
-        if (itemDyeCheck) applyDyeColour();
-        if (itemGlowCheck) applyGlow();
-        if (itemLoreCheck) applyLore(replacements);
-        if (itemPotionMetaCheck) applyPotionMeta();
+        if (itemModelDataCheck) {
+            applyModelData();
+        }
+        if (itemDamageCheck) {
+            applyDamage();
+        }
+        if (itemDisplayNameCheck) {
+            applyDisplayName(replacements);
+        }
+        if (itemDyeCheck) {
+            applyDyeColour();
+        }
+        if (itemGlowCheck) {
+            applyGlow();
+        }
+        if (itemLoreCheck) {
+            applyLore(replacements);
+        }
+        if (itemPotionMetaCheck) {
+            applyPotionMeta();
+        }
 
         applyFlags();
 
@@ -116,39 +135,62 @@ public class ItemFactory {
     public ItemStack getType(OfflinePlayer player) {
 
         ItemStack raw = checkRaw();
-        if (raw != null) return raw;
+        if (raw != null) {
+            return raw;
+        }
 
-        ItemStack material = checkMaterial();
-        if (material != null) return material;
+        ItemStack material = checkMaterial(); //custom addon
+        if (material != null) {
+            return material;
+        }
 
         ItemStack rawMaterial = checkRawMaterial();
-        if (rawMaterial != null) return rawMaterial;
+        if (rawMaterial != null) {
+            return rawMaterial;
+        }
 
         ItemStack oneMaterial = checkRandomMaterial(-1);
-        if (oneMaterial != null) return oneMaterial;
+        if (oneMaterial != null) {
+            return oneMaterial;
+        }
 
         ItemStack oneHeadDB = checkRandomHeadDB(-1);
-        if (oneHeadDB != null) return oneHeadDB;
+        if (oneHeadDB != null) {
+            return oneHeadDB;
+        }
 
         ItemStack oneHead64 = checkRandomHead64(-1);
-        if (oneHead64 != null) return oneHead64;
+        if (oneHead64 != null) {
+            return oneHead64;
+        }
 
         ItemStack oneHeadUUID = checkRandomHeadUUID(-1);
-        if (oneHeadUUID != null) return oneHeadUUID;
+        if (oneHeadUUID != null) {
+            return oneHeadUUID;
+        }
 
         ItemStack oneOwnHead = checkOwnHead(player);
-        if (oneOwnHead != null) return oneOwnHead;
+        if (oneOwnHead != null) {
+            return oneOwnHead;
+        }
 
         ItemStack headDB = checkHeadDB();
-        if (headDB != null) return headDB;
+        if (headDB != null) {
+            return headDB;
+        }
 
         ItemStack head64 = checkHead64();
-        if (head64 != null) return head64;
+        if (head64 != null) {
+            return head64;
+        }
 
         ItemStack headUUID = checkHeadUUID();
-        if (headUUID != null) return headUUID;
+        if (headUUID != null) {
+            return headUUID;
+        }
 
         // The fish has no item type specified
+        EvenMoreFish.debug("GET TYPE: No item type specified, config location (%s)".formatted(configLocation + configurationFile.getNameAsString()));
         return new ItemStack(Material.COD);
 
     }
@@ -162,16 +204,24 @@ public class ItemFactory {
      */
     public ItemStack setType(int randomIndex) {
         ItemStack oneHeadDB = checkRandomHeadDB(randomIndex);
-        if (oneHeadDB != null) return oneHeadDB;
+        if (oneHeadDB != null) {
+            return oneHeadDB;
+        }
 
         ItemStack oneMaterial = checkRandomMaterial(randomIndex);
-        if (oneMaterial != null) return oneMaterial;
+        if (oneMaterial != null) {
+            return oneMaterial;
+        }
 
         ItemStack oneHead64 = checkRandomHead64(randomIndex);
-        if (oneHead64 != null) return oneHead64;
+        if (oneHead64 != null) {
+            return oneHead64;
+        }
 
         ItemStack oneHeadUUID = checkRandomHeadUUID(randomIndex);
-        if (oneHeadUUID != null) return oneHeadUUID;
+        if (oneHeadUUID != null) {
+            return oneHeadUUID;
+        }
 
         return new ItemStack(Material.COD);
     }
@@ -215,7 +265,9 @@ public class ItemFactory {
      */
     private @Nullable ItemStack checkHeadDB() {
         // The fish has item: headdb selected
-        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) return null;
+        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) {
+            return null;
+        }
 
         int headID = this.configurationFile.getInt(configLocation + "item.headdb", -1);
         if (headID != -1) {
@@ -255,38 +307,51 @@ public class ItemFactory {
      * @return Null if the setting doesn't exist, the item in ItemStack form if it does.
      */
     private ItemStack checkMaterial() {
-        // The fish has item: material selected
-        String mValue = this.configurationFile.getString(configLocation + "item.material");
-        if (mValue == null) {
-            return null;
-        }
-
-        Material material = Material.getMaterial(mValue.toUpperCase());
-        if (material == null) {
-            ItemStack customItemStack = checkMaterial(mValue);
-            if (customItemStack != null) { return customItemStack; }
-            EvenMoreFish.getInstance().getLogger().severe(() -> String.format("%s has an incorrect assigned material: %s", configLocation, mValue));
-            material = Material.COD;
-        }
-
-        return new ItemStack(material);
+        return checkMaterialWithPath("item.material");
     }
 
+    private ItemStack checkMaterialWithPath(@Nullable final String path) {
+        return checkMaterial(this.configurationFile.getString(configLocation + path));
+    }
+
+    /**
+     * Checks and retrieves an {@link ItemStack} based on the provided material value.
+     * <p>
+     * This method performs the following steps:
+     * 1. Validates the input material value (`mValue`).
+     * If it is null or blank, logs a debug message and returns null.
+     * 2. Attempts to resolve the material value as a standard {@link Material} enum value.
+     *    - If successful, returns a new {@link ItemStack} of the resolved material.
+     * 3. If the material value is not a standard material, attempts to resolve it as a custom item using the {@link #checkItem(String)} method.
+     *    - If a custom item is found, returns the corresponding {@link ItemStack}.
+     * 4. If the material value cannot be resolved as either a standard material or a custom item, logs an error and returns a default {@link ItemStack} of {@link Material#COD}.
+     *
+     * @param mValue The material value to check. This can be a standard material name (e.g., "STONE") or a custom item identifier.
+     *               If null or blank, the method will return null.
+     * @return An {@link ItemStack} representing the resolved material or custom item. Returns null if the input value is null or blank.
+     *         If the material value cannot be resolved, returns a default {@link ItemStack} of {@link Material#COD}.
+     *
+     * @see Material
+     * @see ItemStack
+     */
     private ItemStack checkMaterial(String mValue) {
-        if (mValue == null) {
+        if (mValue == null || mValue.isBlank()) {
+            EvenMoreFish.debug("MATERIAL CHECK: Config Location (%s, %s), empty string".formatted(configLocation + "item.material", configurationFile.getNameAsString()));
             return null;
         }
 
         Material material = Material.getMaterial(mValue.toUpperCase());
-        if (material == null) {
-            ItemStack customItemStack = checkItem(mValue);
-            if (customItemStack != null) {
-                return customItemStack;
-            }
-            material = Material.COD;
+        if (material != null) {
+            return new ItemStack(material);
         }
 
-        return new ItemStack(material);
+        ItemStack customItemStack = checkItem(mValue);
+        if (customItemStack != null) {
+            return customItemStack;
+        }
+
+        EvenMoreFish.getInstance().getLogger().severe(() -> String.format("%s has an incorrect assigned material: %s", configurationFile.getNameAsString() + configLocation, mValue));
+        return new ItemStack(Material.COD);
     }
 
     private ItemStack checkItem(final String materialId) {
@@ -298,7 +363,7 @@ public class ItemFactory {
 
         try {
             return getItem(materialId);
-        } catch (NoPrefixException | IncorrectAssignedMaterialException e) {
+        } catch (IncorrectAssignedMaterialException e) {
             rawMaterial = true;
             EvenMoreFish.getInstance().getLogger().warning(e::getMessage);
             return new ItemStack(Material.COD);
@@ -312,35 +377,35 @@ public class ItemFactory {
      * @return Null if the setting doesn't exist, a random ItemStack representation from a list of materials if it does.
      */
     private ItemStack checkRandomMaterial(int randomIndex) {
-
         List<String> lValues = this.configurationFile.getStringList(configLocation + "item.materials");
-        if (!lValues.isEmpty()) {
-
-            final Random rand = EvenMoreFish.getInstance().getRandom();
-
-            if (randomIndex == -1 || randomIndex + 1 > lValues.size()) {
-                randomIndex = rand.nextInt(lValues.size());
-                this.chosenRandomIndex = randomIndex;
-            }
-
-            ItemStack customItemStack = checkMaterial(lValues.get(randomIndex));
-            itemRandom = true;
-
-            if (customItemStack == null) {
-                EvenMoreFish.getInstance().getLogger().severe(configLocation + "'s has an incorrect material name in its materials list.");
-                for (String material : lValues) {
-                    ItemStack item = checkMaterial(material);
-                    if (item != null) {
-                        return item;
-                    }
-                }
-                return new ItemStack(Material.COD);
-            } else {
-                return customItemStack;
-            }
+        if (lValues.isEmpty()) {
+            return null;
         }
 
-        return null;
+
+        final Random rand = EvenMoreFish.getInstance().getRandom();
+
+        if (randomIndex == -1 || randomIndex + 1 > lValues.size()) {
+            randomIndex = rand.nextInt(lValues.size());
+            this.chosenRandomIndex = randomIndex;
+        }
+
+        ItemStack customItemStack = checkMaterial(lValues.get(randomIndex));
+        itemRandom = true;
+
+        if (customItemStack != null) {
+            return customItemStack;
+        }
+
+
+        EvenMoreFish.getInstance().getLogger().severe(configLocation + "'s has an incorrect material name in its materials list.");
+        for (String material : lValues) {
+            ItemStack item = checkMaterial(material);
+            if (item != null) {
+                return item;
+            }
+        }
+        return new ItemStack(Material.COD);
     }
 
     /**
@@ -373,25 +438,28 @@ public class ItemFactory {
 
     private ItemStack checkRandomHeadDB(int randomIndex) {
         // The fish has item: headdb selected
-        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) return null;
-
-        List<Integer> headIDs = this.configurationFile.getIntList(configLocation + "item.multiple-headdb");
-        if (!headIDs.isEmpty()) {
-            final Random rand = EvenMoreFish.getInstance().getRandom();
-
-            if (randomIndex == -1 || randomIndex + 1 > headIDs.size()) {
-                randomIndex = rand.nextInt(headIDs.size());
-            }
-
-            this.chosenRandomIndex = randomIndex;
-
-            int headID = headIDs.get(randomIndex);
-            itemRandom = true;
-
-            return EvenMoreFish.getInstance().getHDBapi().getItemHead(Integer.toString(headID));
+        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) {
+            return null;
         }
 
-        return null;
+        List<Integer> headIDs = this.configurationFile.getIntList(configLocation + "item.multiple-headdb");
+        if (headIDs.isEmpty()) {
+            return null;
+        }
+
+        final Random rand = EvenMoreFish.getInstance().getRandom();
+
+        if (randomIndex == -1 || randomIndex + 1 > headIDs.size()) {
+            randomIndex = rand.nextInt(headIDs.size());
+        }
+
+        this.chosenRandomIndex = randomIndex;
+
+        int headID = headIDs.get(randomIndex);
+        itemRandom = true;
+
+        return EvenMoreFish.getInstance().getHDBapi().getItemHead(Integer.toString(headID));
+
     }
 
     /**
@@ -402,27 +470,26 @@ public class ItemFactory {
      */
     private @Nullable ItemStack checkRandomHeadUUID(int randomIndex) {
         List<String> mhuValues = this.configurationFile.getStringList(configLocation + "item.multiple-head-uuid");
-        if (!mhuValues.isEmpty()) {
-
-            final Random rand = EvenMoreFish.getInstance().getRandom();
-
-            if (randomIndex == -1 || randomIndex + 1 > mhuValues.size()) {
-                randomIndex = rand.nextInt(mhuValues.size());
-                this.chosenRandomIndex = randomIndex;
-            }
-
-            String uuid = mhuValues.get(randomIndex);
-            itemRandom = true;
-
-            try {
-                return FishUtils.getSkullFromUUID(UUID.fromString(uuid));
-            } catch (IllegalArgumentException illegalArgumentException) {
-                EvenMoreFish.getInstance().getLogger().severe("Could not load uuid: " + uuid + " as a multiple-head-uuid option for the config location" + configLocation);
-                return new ItemStack(Material.COD);
-            }
+        if (mhuValues.isEmpty()) {
+            return null;
         }
 
-        return null;
+        final Random rand = EvenMoreFish.getInstance().getRandom();
+
+        if (randomIndex == -1 || randomIndex + 1 > mhuValues.size()) {
+            randomIndex = rand.nextInt(mhuValues.size());
+            this.chosenRandomIndex = randomIndex;
+        }
+
+        String uuid = mhuValues.get(randomIndex);
+        itemRandom = true;
+
+        try {
+            return FishUtils.getSkullFromUUID(UUID.fromString(uuid));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            EvenMoreFish.getInstance().getLogger().severe("Could not load uuid: " + uuid + " as a multiple-head-uuid option for the config location" + configLocation);
+            return new ItemStack(Material.COD);
+        }
     }
 
     /**
@@ -432,14 +499,16 @@ public class ItemFactory {
      * <p>
      * {@code @returns} A skull with the player's head.
      */
-    private ItemStack checkOwnHead(OfflinePlayer player) {
+    private @Nullable ItemStack checkOwnHead(OfflinePlayer player) {
         boolean ownHead = this.configurationFile.getBoolean(configLocation + "item.own-head");
         // Causes this to run each turn the create() is called.
-        itemRandom = ownHead;
+        this.itemRandom = ownHead;
 
-        if (ownHead && player != null) {
-            return FishUtils.getSkullFromUUID(player.getUniqueId());
-        } else return null;
+        if (!ownHead || player == null) {
+            return null;
+        }
+
+        return FishUtils.getSkullFromUUID(player.getUniqueId());
     }
 
     /**
@@ -450,29 +519,19 @@ public class ItemFactory {
      */
     private ItemStack checkRawMaterial() {
         String materialID = this.configurationFile.getString(configLocation + "item.raw-material");
-        if(materialID != null) {
+        if (materialID != null) {
             rawMaterial = true;
         }
 
         return checkItem(materialID);
     }
 
-    public ItemStack getItem(final @NotNull String materialString) throws IncorrectAssignedMaterialException, NoPrefixException {
-        if (materialString.contains(":")) {
-            //assume this is an addon string
-            final String[] split = materialString.split(":", 2);
-            final String prefix = split[0];
-            final String id = split[1];
-            return EvenMoreFish.getInstance().getAddonManager().getItemStack(prefix,id);
+    public ItemStack getItem(final @NotNull String materialString) throws IncorrectAssignedMaterialException {
+        ItemStack item = FishUtils.getItem(materialString);
+        if (item == null) {
+            throw new IncorrectAssignedMaterialException(configurationFile.getNameAsString() + configLocation, materialString);
         }
-
-
-        Material material = Material.matchMaterial(materialString);
-        if (material == null) {
-            throw new IncorrectAssignedMaterialException(configLocation, materialString);
-        }
-
-        return new ItemStack(material);
+        return item;
     }
 
     /**
@@ -494,19 +553,16 @@ public class ItemFactory {
         String dyeColour = this.configurationFile.getString(configLocation + "dye-colour");
 
         if (dyeColour != null) {
+            @NotNull Color colour;
             try {
-                LeatherArmorMeta meta = (LeatherArmorMeta) product.getItemMeta();
-
-                Color colour = Color.decode(dyeColour);
-
-                if (meta != null) {
-                    meta.setColor(org.bukkit.Color.fromRGB(colour.getRed(), colour.getGreen(), colour.getBlue()));
-                }
-
-                product.setItemMeta(meta);
-            } catch (ClassCastException exception) {
-                EvenMoreFish.getInstance().getLogger().severe("Could not fetch hex value: " + dyeColour + " from config location + " + configLocation + " Item is likely not a leather material.");
+                colour = Color.decode(dyeColour);
+            } catch (NumberFormatException exception) {
+                return;
             }
+            FishUtils.editMeta(
+                    product, LeatherArmorMeta.class,
+                    meta -> meta.setColor(org.bukkit.Color.fromRGB(colour.getRed(), colour.getGreen(), colour.getBlue()))
+            );
         }
     }
 
@@ -515,22 +571,19 @@ public class ItemFactory {
      * item if the config has random durability enabled.
      */
     public void applyDamage() {
-
-        ItemMeta meta = product.getItemMeta();
-        if (meta instanceof Damageable nonDamaged) {
-
-            int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
-            if (predefinedDamage >= 0 && predefinedDamage <= 100) {
-                nonDamaged.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
-            } else {
-                if (MainConfig.getInstance().doingRandomDurability()) {
-                    int max = product.getType().getMaxDurability();
-                    nonDamaged.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
+        FishUtils.editMeta(
+                product, Damageable.class, meta -> {
+                    int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
+                    if (predefinedDamage >= 0 && predefinedDamage <= 100) {
+                        meta.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
+                    } else {
+                        if (MainConfig.getInstance().doingRandomDurability()) {
+                            int max = product.getType().getMaxDurability();
+                            meta.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
+                        }
+                    }
                 }
-            }
-
-            product.setItemMeta((ItemMeta) nonDamaged);
-        }
+        );
     }
 
     /**
@@ -539,28 +592,23 @@ public class ItemFactory {
     private void applyModelData() {
         int value = this.configurationFile.getInt(configLocation + "item.custom-model-data");
         if (value != 0) {
-            ItemMeta meta = product.getItemMeta();
-
-            if (meta != null) {
-                meta.setCustomModelData(value);
-            }
-
-            product.setItemMeta(meta);
+            FishUtils.editMeta(product, meta -> meta.setCustomModelData(value));
         }
     }
 
     private void applyLore(@Nullable Map<String, String> replacements) {
         List<String> loreConfig = this.configurationFile.getStringList(configLocation + "lore");
-        if (loreConfig.isEmpty()) return;
+        if (loreConfig.isEmpty()) {
+            return;
+        }
 
-        ItemMeta meta = product.getItemMeta();
-        if (meta == null) return;
-
-        Message lore = new Message(loreConfig);
-        lore.setVariables(replacements);
-
-        meta.setLore(lore.getRawListMessage());
-        product.setItemMeta(meta);
+        FishUtils.editMeta(
+                product, meta -> {
+                    AbstractMessage lore = EvenMoreFish.getAdapter().createMessage(loreConfig);
+                    lore.setVariables(replacements);
+                    meta.setLore(lore.getLegacyListMessage());
+                }
+        );
     }
 
     /**
@@ -568,25 +616,19 @@ public class ItemFactory {
      * reason is.
      */
     private void applyDisplayName(@Nullable Map<String, String> replacements) {
-        String displayName = this.configurationFile.getString(configLocation + "item.displayname");
+        final String displayName = this.configurationFile.getString(configLocation + "item.displayname", this.displayName);
 
-        if (displayName == null && this.displayName != null) displayName = this.displayName;
-
-        if (displayName != null) {
-            ItemMeta meta = product.getItemMeta();
-
-            if (meta != null) {
-                if (displayName.isEmpty()) {
-                    meta.setDisplayName("");
-                } else {
-                    Message display = new Message(displayName);
-                    display.setVariables(replacements);
-                    meta.setDisplayName(display.getRawMessage());
+        FishUtils.editMeta(
+                product, meta -> {
+                    if (displayName == null || displayName.isEmpty()) {
+                        meta.setDisplayName("");
+                    } else {
+                        AbstractMessage display = EvenMoreFish.getAdapter().createMessage(displayName);
+                        display.setVariables(replacements);
+                        meta.setDisplayName(display.getLegacyMessage());
+                    }
                 }
-            }
-
-            product.setItemMeta(meta);
-        }
+        );
     }
 
     /**
@@ -597,8 +639,9 @@ public class ItemFactory {
     private void applyPotionMeta() {
         String potionSettings = this.configurationFile.getString(configLocation + "item.potion");
 
-        if (potionSettings == null) return;
-        if (!(product.getItemMeta() instanceof PotionMeta meta)) return;
+        if (potionSettings == null) {
+            return;
+        }
 
         String[] split = potionSettings.split(":");
         if (split.length != 3) {
@@ -606,15 +649,22 @@ public class ItemFactory {
         }
 
         try {
-            meta.addCustomEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(split[0])), Integer.parseInt(split[1]) * 20, Integer.parseInt(split[2]) - 1, false), true);
+            PotionEffect effect = new PotionEffect(
+                    Objects.requireNonNull(PotionEffectType.getByName(split[0])),
+                    Integer.parseInt(split[1]) * 20,
+                    Integer.parseInt(split[2]) - 1,
+                    false
+            );
+            FishUtils.editMeta(product, PotionMeta.class, meta -> meta.addCustomEffect(effect, true));
         } catch (NumberFormatException exception) {
-            EvenMoreFish.getInstance().getLogger().severe(configLocation + "item.potion: is formatted incorrectly in the fish.yml file. Use \"potion:duration:amplifier\", where duration & amplifier are integer values.");
+            EvenMoreFish.getInstance()
+                    .getLogger()
+                    .severe(configLocation + "item.potion: is formatted incorrectly in the fish.yml file. Use \"potion:duration:amplifier\", where duration & amplifier are integer values.");
         } catch (NullPointerException exception) {
-            EvenMoreFish.getInstance().getLogger().severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
+            EvenMoreFish.getInstance()
+                    .getLogger()
+                    .severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
         }
-
-        product.setItemMeta(meta);
-
     }
 
     /**
@@ -623,26 +673,16 @@ public class ItemFactory {
      * before they're added.
      */
     private void applyFlags() {
-        ItemMeta meta = product.getItemMeta();
-
-        if (meta != null) {
-            if (itemDyeCheck) meta.addItemFlags(ItemFlag.HIDE_DYE);
-            if (itemGlowCheck) meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            this.product.setItemMeta(meta);
-        }
-    }
-
-    private YamlDocument getConfiguration() {
-        if (this.configLocation.startsWith("fish.")) {
-            return FishFile.getInstance().getConfig();
-        } else if (this.configLocation.startsWith("baits.")) {
-            return BaitFile.getInstance().getConfig();
-        } else if (this.configLocation.startsWith("nbt-rod-item")) {
-            return MainConfig.getInstance().getConfig();
-        } else {
-            EvenMoreFish.getInstance().getLogger().severe("Could not fetch file configuration for: " + this.configLocation);
-            return null;
-        }
+        FishUtils.editMeta(
+                product, meta -> {
+                    if (itemDyeCheck) {
+                        meta.addItemFlags(ItemFlag.HIDE_DYE);
+                    }
+                    if (itemGlowCheck) {
+                        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    }
+                }
+        );
     }
 
     public void enableDefaultChecks() {

@@ -1,12 +1,12 @@
 package com.oheers.fish.competition;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Message;
 import com.oheers.fish.database.DataManager;
-import com.oheers.fish.database.FishReport;
-import com.oheers.fish.database.UserReport;
+import com.oheers.fish.database.model.FishReport;
+import com.oheers.fish.database.model.UserReport;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -35,22 +35,21 @@ public class JoinChecker implements Listener {
             List<FishReport> fishReports;
 
 
-            if (EvenMoreFish.getInstance().getDatabaseV3().hasUserLog(userUUID)) {
-                fishReports = EvenMoreFish.getInstance().getDatabaseV3().getFishReports(userUUID);
+            if (EvenMoreFish.getInstance().getDatabase().hasUserLog(userUUID)) {
+                fishReports = EvenMoreFish.getInstance().getDatabase().getFishReportsForPlayer(userUUID);
             } else {
                 fishReports = new ArrayList<>();
-                if (MainConfig.getInstance().doDBVerbose()) {
-                    EvenMoreFish.getInstance().getLogger().info(userName + " has joined for the first time, creating new data handle for them.");
-                }
+                //todo, bug here, if user joins, but doesn't participate in any comp, and then leaves, we get to this point again.
+                EvenMoreFish.dbVerbose(userName + " has joined for the first time, creating new data handle for them.");
             }
 
 
             UserReport userReport;
 
-            userReport = EvenMoreFish.getInstance().getDatabaseV3().readUserReport(userUUID);
+            userReport = EvenMoreFish.getInstance().getDatabase().readUserReport(userUUID);
             if (userReport == null) {
-                EvenMoreFish.getInstance().getDatabaseV3().createUser(userUUID);
-                userReport = EvenMoreFish.getInstance().getDatabaseV3().readUserReport(userUUID);
+                EvenMoreFish.getInstance().getDatabase().createUser(userUUID);
+                userReport = EvenMoreFish.getInstance().getDatabase().readUserReport(userUUID);
             }
 
             if (fishReports != null && userReport != null) {
@@ -67,13 +66,14 @@ public class JoinChecker implements Listener {
     // Gives the player the active fishing bar if there's a fishing event cracking off
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if (Competition.isActive()) {
-            EvenMoreFish.getInstance().getActiveCompetition().getStatusBar().addPlayer(event.getPlayer());
-            Message startMessage = EvenMoreFish.getInstance().getActiveCompetition().getStartMessage();
+        Competition activeComp = Competition.getCurrentlyActive();
+        if (activeComp != null) {
+            activeComp.getStatusBar().addPlayer(event.getPlayer());
+            AbstractMessage startMessage = activeComp.getStartMessage();
             if (startMessage != null) {
-                startMessage.setMessage(ConfigMessage.COMPETITION_JOIN);
+                startMessage.setMessage(ConfigMessage.COMPETITION_JOIN.getMessage());
+                EvenMoreFish.getScheduler().runTaskLater(() -> startMessage.send(event.getPlayer()), 20L * 3);
             }
-            EvenMoreFish.getScheduler().runTaskLater(() -> EvenMoreFish.getInstance().getActiveCompetition().getStartMessage().broadcast(event.getPlayer()), 20 * 3);
         }
 
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> databaseRegistration(event.getPlayer().getUniqueId(), event.getPlayer().getName()));
@@ -83,8 +83,9 @@ public class JoinChecker implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
 
-        if (Competition.isActive()) {
-            EvenMoreFish.getInstance().getActiveCompetition().getStatusBar().removePlayer(event.getPlayer());
+        Competition activeComp = Competition.getCurrentlyActive();
+        if (activeComp != null) {
+            activeComp.getStatusBar().removePlayer(event.getPlayer());
         }
 
         if (!MainConfig.getInstance().isDatabaseOnline()) {
@@ -95,18 +96,18 @@ public class JoinChecker implements Listener {
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
             UUID userUUID = event.getPlayer().getUniqueId();
 
-            if (!EvenMoreFish.getInstance().getDatabaseV3().hasUser(userUUID)) {
-                EvenMoreFish.getInstance().getDatabaseV3().createUser(userUUID);
+            if (!EvenMoreFish.getInstance().getDatabase().hasUser(userUUID)) {
+                EvenMoreFish.getInstance().getDatabase().createUser(userUUID);
             }
 
             List<FishReport> fishReports = DataManager.getInstance().getFishReportsIfExists(userUUID);
             if (fishReports != null) {
-                EvenMoreFish.getInstance().getDatabaseV3().writeFishReports(userUUID, fishReports);
+                EvenMoreFish.getInstance().getDatabase().writeFishReports(userUUID, fishReports);
             }
 
             UserReport userReport = DataManager.getInstance().getUserReportIfExists(userUUID);
             if (userReport != null) {
-                EvenMoreFish.getInstance().getDatabaseV3().writeUserReport(userUUID, userReport);
+                EvenMoreFish.getInstance().getDatabase().writeUserReport(userUUID, userReport);
             }
 
             DataManager.getInstance().uncacheUser(userUUID);

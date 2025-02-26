@@ -1,9 +1,9 @@
 package com.oheers.fish.gui.guis;
 
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
-import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
@@ -30,10 +30,8 @@ public class SellGUI implements EMFGUI {
     private final Player player;
     private final Inventory fishInventory;
     private MyScheduledTask task;
-    private final SellState sellState;
 
     public SellGUI(@NotNull Player player, @NotNull SellState sellState, @Nullable Inventory fishInventory) {
-        this.sellState = sellState;
         this.player = player;
         Section section;
         if (sellState == SellState.NORMAL) {

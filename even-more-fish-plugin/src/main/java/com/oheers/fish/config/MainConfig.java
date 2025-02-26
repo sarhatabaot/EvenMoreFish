@@ -18,6 +18,10 @@ public class MainConfig extends ConfigBase {
 
     private static MainConfig instance = null;
 
+    // Cache these so we don't have a mismatch after reload.
+    private String mainCommandName = null;
+    private List<String> mainCommandAliases = null;
+
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
@@ -32,18 +36,12 @@ public class MainConfig extends ConfigBase {
         return getConfig().getString("locale", "en");
     }
 
-    public int getCompetitionDuration() {
-        return getConfig().getInt("competitions.duration");
-    }
-
     public boolean doingRandomDurability() {
         return getConfig().getBoolean("random-durability", true);
     }
 
-
-
     public boolean isDatabaseOnline() {
-        return databaseEnabled() && !EvenMoreFish.getInstance().getDatabaseV3().usingVersionV2();
+        return databaseEnabled() && !EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2();
     }
 
     public boolean isCompetitionUnique() {
@@ -195,29 +193,26 @@ public class MainConfig extends ConfigBase {
 
     public int getNearbyPlayersRequirementRange() { return getConfig().getInt("requirements.nearby-players.range", 0); }
 
+    public boolean isAdminShortcutCommandEnabled() {
+        return getConfig().getBoolean("command.admin-shortcut.enabled", true);
+    }
+
+    public String getAdminShortcutCommandName() {
+        return getConfig().getString("command.admin-shortcut.name", "emfa");
+    }
+
     public String getMainCommandName() {
-        return getConfig().getString("command.main", "emf");
+        if (mainCommandName == null) {
+            mainCommandName = getConfig().getString("command.main", "emf");
+        }
+        return mainCommandName;
     }
 
     public List<String> getMainCommandAliases() {
-        return getConfig().getStringList("command.aliases");
-    }
-  
-    public String[] getSellGUILayout() {
-        List<String> layout = getConfig().getStringList("gui.layout");
-
-        // Return default layout if the config is empty
-        if (layout.isEmpty()) {
-            return new String[]{
-                    "iiiiiiiii",
-                    "iiiiiiiii",
-                    "iiiiiiiii",
-                    "fffsfafff"
-            };
+        if (mainCommandAliases == null) {
+            mainCommandAliases = getConfig().getStringList("command.aliases");
         }
-
-        // Convert the List<String> to a String[] and return
-        return layout.toArray(new String[0]);
+        return mainCommandAliases;
     }
 
     public boolean giveStraightToInventory() {
@@ -293,6 +288,13 @@ public class MainConfig extends ConfigBase {
         }
 
         save();
+    }
+
+    public boolean hasCredentials() {
+        return MainConfig.getInstance().getUsername() != null &&
+                MainConfig.getInstance().getPassword() != null &&
+                MainConfig.getInstance().getAddress() != null &&
+                MainConfig.getInstance().getDatabase() != null;
     }
 
 }
