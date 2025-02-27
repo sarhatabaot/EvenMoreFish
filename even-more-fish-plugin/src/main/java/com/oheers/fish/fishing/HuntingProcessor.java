@@ -20,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 public class HuntingProcessor extends Processor<EntityDeathEvent> {
 
     @Override
+    @EventHandler(priority = EventPriority.HIGHEST)
     protected void process(EntityDeathEvent event) {
 
         if (!(event.getEntity() instanceof org.bukkit.entity.Fish fishEntity)) {

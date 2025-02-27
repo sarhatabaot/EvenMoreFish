@@ -9,12 +9,15 @@ import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class FishingProcessor extends Processor<PlayerFishEvent> {
 
     @Override
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void process(PlayerFishEvent event) {
         if (!isCustomFishAllowed(event.getPlayer())) {
             return;

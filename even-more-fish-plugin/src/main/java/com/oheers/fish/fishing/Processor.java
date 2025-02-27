@@ -26,16 +26,17 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.framework.qual.InheritedAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Inherited;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Set;
 
 public abstract class Processor<E extends Event> implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
     protected abstract void process(E event);
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#.0");
