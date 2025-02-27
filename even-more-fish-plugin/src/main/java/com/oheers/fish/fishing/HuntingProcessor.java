@@ -21,8 +21,6 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
 
     @Override
     protected void process(EntityDeathEvent event) {
-        final Player player = event.getEntity().getKiller();
-        if (player == null) { return; }
 
         if (!(event.getEntity() instanceof org.bukkit.entity.Fish fishEntity)) {
             return;
@@ -30,6 +28,11 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
 
         // If spawner fish can't be hunted and the fish is from a spawner
         if (MainConfig.getInstance().isFishHuntIgnoreSpawnerFish() && EvenMoreFish.getAdapter().isSpawnerMob(fishEntity)) {
+            return;
+        }
+
+        final Player player = event.getEntity().getKiller();
+        if (player == null) {
             return;
         }
 
