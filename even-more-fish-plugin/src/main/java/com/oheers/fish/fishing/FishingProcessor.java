@@ -282,7 +282,7 @@ public class FishingProcessor implements Listener {
 
     // Checks if it should be giving the player the fish considering the fish-only-in-competition option in config.yml
     private boolean competitionOnlyCheck() {
-        if (MainConfig.getInstance().isCompetitionUnique()) {
+        if (MainConfig.getInstance().isFishCatchOnlyInCompetition()) {
             return Competition.isActive();
         } else {
             return true;
