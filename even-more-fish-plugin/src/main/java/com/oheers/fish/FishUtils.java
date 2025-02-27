@@ -36,9 +36,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jooq.impl.QOM;
-
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.function.Consumer;
@@ -46,7 +47,6 @@ import java.util.stream.Stream;
 
 
 public class FishUtils {
-    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.0");
 
     private FishUtils() {
         throw new UnsupportedOperationException();
@@ -265,65 +265,6 @@ public class FishUtils {
         }
 
         return whitelistedWorlds.contains(l.getWorld().getName());
-    }
-
-    public static @NotNull String translateColorCodes(String message) {
-        return EvenMoreFish.getAdapter().translateColorCodes(message);
-    }
-
-    //gets the item with a custom texture
-    public static @NotNull ItemStack getSkullFromBase64(String base64EncodedString) {
-        final ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-        UUID headUuid = UUID.randomUUID();
-        // 1.20.5+ handling
-        if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_20_R3)) {
-            NBT.modifyComponents(
-                    skull, nbt -> {
-                        ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                        profileNbt.setUUID("id", headUuid);
-                        ReadWriteNBT propertiesNbt = profileNbt.getCompoundList("properties").addCompound();
-                        // This key is required, so we set it to an empty string.
-                        propertiesNbt.setString("name", "textures");
-                        propertiesNbt.setString("value", base64EncodedString);
-                    }
-            );
-            // 1.20.4 and below handling
-        } else {
-            NBT.modify(
-                    skull, nbt -> {
-                        ReadWriteNBT skullOwnerCompound = nbt.getOrCreateCompound("SkullOwner");
-                        skullOwnerCompound.setUUID("Id", headUuid);
-                        skullOwnerCompound.getOrCreateCompound("Properties")
-                                .getCompoundList("textures")
-                                .addCompound()
-                                .setString("Value", base64EncodedString);
-                    }
-            );
-        }
-        return skull;
-    }
-
-    //gets the item with a custom uuid
-    public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
-        final ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-        // 1.20.5+ handling
-        if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_20_R3)) {
-            NBT.modifyComponents(
-                    skull, nbt -> {
-                        ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                        profileNbt.setUUID("id", uuid);
-                    }
-            );
-            // 1.20.4 and below handling
-        } else {
-            NBT.modify(
-                    skull, nbt -> {
-                        ReadWriteNBT skullOwnerCompound = nbt.getOrCreateCompound("SkullOwner");
-                        skullOwnerCompound.setUUID("Id", uuid);
-                    }
-            );
-        }
-        return skull;
     }
 
     public static @NotNull String timeFormat(long timeLeft) {
@@ -579,6 +520,70 @@ public class FishUtils {
         }
 
         return new ItemStack(material);
+    }
+
+    // The following methods have been delegated to the platform adapter.
+
+    public static @NotNull String translateColorCodes(String message) {
+        return EvenMoreFish.getAdapter().translateColorCodes(message);
+    }
+
+    public static @NotNull ItemStack getSkullFromBase64(String base64) {
+        return EvenMoreFish.getAdapter().getSkullFromBase64(base64);
+    }
+
+    public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
+        return EvenMoreFish.getAdapter().getSkullFromUUID(uuid);
+    }
+
+    /**
+     * Sorts a double value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The double value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded double value with the provided amount of decimal places.
+     */
+    public static double roundDouble(final double value, final int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .doubleValue();
+    }
+
+    /**
+     * Formats a double value by applying the configured decimal format.
+     *
+     * @param value The double value to be formatted.
+     * @return The formatted double
+     */
+    public static String formatDouble(@NotNull final String formatStr, final double value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
+        return format.format(value);
+    }
+
+    /**
+     * Sorts a float value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The float value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded float value with the provided amount of decimal places.
+     */
+    public static float roundFloat(final float value, int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .floatValue();
+    }
+
+    /**
+     * Formats a float value by applying the configured decimal format.
+     *
+     * @param value The float value to be formatted.
+     * @return The formatted float
+     */
+    public static String formatFloat(@NotNull final String formatStr, final float value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
+        return format.format(value);
     }
 
 }
