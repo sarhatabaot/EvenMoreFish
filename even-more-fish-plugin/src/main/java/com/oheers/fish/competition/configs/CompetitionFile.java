@@ -306,8 +306,8 @@ public class CompetitionFile extends ConfigBase {
     /**
      * @return Whether hunting is enabled.
      */
-    public boolean huntingEnabled() {
-        return getConfig().getBoolean("hunting-enabled", false);
+    public boolean isAllowHunting() {
+        return getConfig().getBoolean("allow-hunting", false);
     }
 
 }
