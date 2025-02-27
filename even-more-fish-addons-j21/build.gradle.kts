@@ -15,4 +15,9 @@ dependencies {
     compileOnly(project(":even-more-fish-api"))
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_21
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+}
