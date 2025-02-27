@@ -67,11 +67,14 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
 
     @Override
     protected boolean competitionOnlyCheck() {
-        if (MainConfig.getInstance().isFishHuntOnlyInCompetition()) {
-            return Competition.isActive();
-        } else {
+        if (!MainConfig.getInstance().isFishHuntOnlyInCompetition()) {
             return true;
         }
+        Competition active = Competition.getCurrentlyActive();
+        if (active == null) {
+            return false;
+        }
+        return active.getCompetitionFile().huntingEnabled();
     }
 
 }

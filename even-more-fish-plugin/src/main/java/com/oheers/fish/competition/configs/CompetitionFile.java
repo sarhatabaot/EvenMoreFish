@@ -303,4 +303,11 @@ public class CompetitionFile extends ConfigBase {
                 .toList();
     }
 
+    /**
+     * @return Whether hunting is enabled.
+     */
+    public boolean huntingEnabled() {
+        return getConfig().getBoolean("hunting-enabled", false);
+    }
+
 }
