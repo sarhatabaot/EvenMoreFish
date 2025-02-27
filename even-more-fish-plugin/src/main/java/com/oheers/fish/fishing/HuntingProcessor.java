@@ -74,7 +74,7 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
         if (active == null) {
             return false;
         }
-        return active.getCompetitionFile().huntingEnabled();
+        return active.getCompetitionFile().isAllowHunting();
     }
 
 }
