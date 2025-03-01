@@ -70,8 +70,8 @@ dependencyResolutionManagement {
             library("commandapi", "dev.jorel:commandapi-bukkit-shade:9.7.0")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
-            plugin("shadow", "com.gradleup.shadow").version("8.3.3")
-            plugin("bukkit-yml", "net.minecrell.plugin-yml.bukkit").version("0.6.0")
+            plugin("shadow", "com.gradleup.shadow").version("8.3.5")
+            plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.7.1")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
 

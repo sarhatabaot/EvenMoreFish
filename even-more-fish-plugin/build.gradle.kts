@@ -10,7 +10,7 @@ import java.util.*
 plugins {
     `java-library`
     `maven-publish`
-    alias(libs.plugins.bukkit.yml)
+    alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
