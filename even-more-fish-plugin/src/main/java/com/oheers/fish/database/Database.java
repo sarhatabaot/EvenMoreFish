@@ -796,7 +796,35 @@ public class Database implements DatabaseAPI {
 
     @Override
     public Set<FishLog> getFishLogEntries(int userId, String fishName, String fishRarity) {
-        return Set.of();
+        return new ExecuteQuery<Set<FishLog>>(connectionFactory, settings) {
+            @Override
+            protected Set<FishLog> onRunQuery(DSLContext dslContext) throws Exception {
+                Result<Record> result = dslContext.select()
+                        .from(Tables.FISH_LOG)
+                        .where(Tables.FISH_LOG.USER_ID.eq(userId))
+                        .and(Tables.FISH_LOG.FISH_NAME.eq(fishName))
+                        .and(Tables.FISH_LOG.FISH_RARITY.eq(fishName))
+                        .fetch();
+                if (result.isEmpty())
+                    return empty();
+
+                final Set<FishLog> fishLogs = new HashSet<>();
+                for (Record record: result) {
+                    final LocalDateTime catchTime = record.getValue(Tables.FISH_LOG.CATCH_TIME);
+                    final float length = record.getValue(Tables.FISH_LOG.FISH_LENGTH);
+                    final String competitionId = record.getValue(Tables.FISH_LOG.COMPETITION_ID);
+
+                    fishLogs.add(new FishLog(userId, fishName, fishRarity, catchTime, length, competitionId));
+                }
+                return fishLogs;
+            }
+
+            @Override
+            protected Set<FishLog> empty() {
+                //todo
+                return Set.of();
+            }
+        }.prepareAndRunQuery();
     }
 
     @Override
