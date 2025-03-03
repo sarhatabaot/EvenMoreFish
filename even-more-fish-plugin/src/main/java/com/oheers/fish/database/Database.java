@@ -13,6 +13,8 @@ import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
 import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.fish.FishLog;
+import com.oheers.fish.database.model.fish.FishStats;
+import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.fishing.items.Fish;
@@ -30,6 +32,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -711,18 +714,18 @@ public class Database implements DatabaseAPI {
             protected FishLog onRunQuery(DSLContext dslContext) throws Exception {
                 Record result =  dslContext.select()
                         .from(Tables.FISH_LOG)
-                        .where(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.USER_ID.eq(userId)
-                                .and(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.FISH_NAME.eq(fishName))
-                                .and(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.FISH_RARITY.eq(fishName))
-                                .and(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.CATCH_TIME.eq(time))
+                        .where(Tables.FISH_LOG.USER_ID.eq(userId)
+                                .and(Tables.FISH_LOG.FISH_NAME.eq(fishName))
+                                .and(Tables.FISH_LOG.FISH_RARITY.eq(fishName))
+                                .and(Tables.FISH_LOG.CATCH_TIME.eq(time))
                         ).fetchOne();
 
                 if (result == null)
                     return empty();
 
 
-                final float length = result.getValue(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.FISH_LENGTH);
-                final String competitionId = result.getValue(com.oheers.fish.database.generated.mysql.tables.FishLog.FISH_LOG.COMPETITION_ID);
+                final float length = result.getValue(Tables.FISH_LOG.FISH_LENGTH);
+                final String competitionId = result.getValue(Tables.FISH_LOG.COMPETITION_ID);
                 return new FishLog(userId, fishName, fishRarity, time, length, competitionId);
             }
 
@@ -753,5 +756,35 @@ public class Database implements DatabaseAPI {
             return "Disabled";
 
         return connectionFactory.getType();
+    }
+
+    @Override
+    public UserFishStats getUserFishStats(int userId, String fishName, String fishRarity) {
+        return null;
+    }
+
+    @Override
+    public void createUserFishStats(UserFishStats userFishStats) {
+
+    }
+
+    @Override
+    public Set<FishLog> getFishLogEntries(int userId, String fishName, String fishRarity) {
+        return Set.of();
+    }
+
+    @Override
+    public void setFishLogEntry(FishLog fishLogEntry) {
+
+    }
+
+    @Override
+    public FishStats getFishStats(String fishName, String fishRarity) {
+        return null;
+    }
+
+    @Override
+    public void setFishStats(FishStats fishStats) {
+
     }
 }
