@@ -30,10 +30,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -84,10 +81,13 @@ public class Database implements DatabaseAPI {
     }
 
     private @NotNull ConnectionFactory getConnectionFactory(final @NotNull String type) {
-        return switch(type) {
-            case "mysql": yield new MySqlConnectionFactory(); //todo check for credentials.
-            case "sqlite": yield new SqliteConnectionFactory();
-            default: yield new H2ConnectionFactory();
+        return switch (type) {
+            case "mysql":
+                yield new MySqlConnectionFactory(); //todo check for credentials.
+            case "sqlite":
+                yield new SqliteConnectionFactory();
+            default:
+                yield new H2ConnectionFactory();
         };
     }
 
@@ -107,7 +107,7 @@ public class Database implements DatabaseAPI {
                 )
         );
 
-        this.settings = DatabaseStrategyFactory.getStrategy(connectionFactory).applySettings(settings, tablePrefix,dbName);
+        this.settings = DatabaseStrategyFactory.getStrategy(connectionFactory).applySettings(settings, tablePrefix, dbName);
     }
 
     public void executeStatement(@NotNull Consumer<DSLContext> consumer) {
@@ -159,7 +159,7 @@ public class Database implements DatabaseAPI {
             @Override
             protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
                 return dslContext.fetchExists(Tables.FISH_LOG
-                                .where(Tables.FISH_LOG.USER_ID.eq(userId))
+                        .where(Tables.FISH_LOG.USER_ID.eq(userId))
                 );
             }
 
@@ -243,7 +243,7 @@ public class Database implements DatabaseAPI {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 int rowsUpdated = dslContext.update(Tables.USERS)
-                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish()) 
+                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish())
                         .set(Tables.USERS.LAST_FISH, report.getRecentFish())
                         .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
                         .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
@@ -370,10 +370,10 @@ public class Database implements DatabaseAPI {
             @Override
             protected String onRunQuery(DSLContext dslContext) {
                 return dslContext.select()
-                    .from(Tables.FISH)
-                    .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                        .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                    .fetchOne(Tables.FISH.FIRST_FISHER);
+                        .from(Tables.FISH)
+                        .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
+                                .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
+                        .fetchOne(Tables.FISH.FIRST_FISHER);
             }
 
             @Override
@@ -402,10 +402,10 @@ public class Database implements DatabaseAPI {
             @Override
             protected LocalDateTime onRunQuery(DSLContext dslContext) {
                 return dslContext.select()
-                    .from(Tables.FISH)
-                    .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                        .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                    .fetchOne(Tables.FISH.FIRST_CATCH_TIME);
+                        .from(Tables.FISH)
+                        .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
+                                .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
+                        .fetchOne(Tables.FISH.FIRST_CATCH_TIME);
             }
 
             @Override
@@ -460,10 +460,10 @@ public class Database implements DatabaseAPI {
             @Override
             protected Integer onRunQuery(DSLContext dslContext) {
                 Integer integer = dslContext.select()
-                    .from(Tables.FISH)
-                    .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                        .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                    .fetchOne(Tables.FISH.TOTAL_CAUGHT);
+                        .from(Tables.FISH)
+                        .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
+                                .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
+                        .fetchOne(Tables.FISH.TOTAL_CAUGHT);
                 if (integer == null) {
                     integer = 0;
                 }
@@ -712,7 +712,7 @@ public class Database implements DatabaseAPI {
 
             @Override
             protected FishLog onRunQuery(DSLContext dslContext) throws Exception {
-                Record result =  dslContext.select()
+                Record result = dslContext.select()
                         .from(Tables.FISH_LOG)
                         .where(Tables.FISH_LOG.USER_ID.eq(userId)
                                 .and(Tables.FISH_LOG.FISH_NAME.eq(fishName))
@@ -748,7 +748,7 @@ public class Database implements DatabaseAPI {
         if (!MainConfig.getInstance().databaseEnabled())
             return "Disabled";
 
-        return "V"+this.version;
+        return "V" + this.version;
     }
 
     public String getType() {
@@ -760,7 +760,32 @@ public class Database implements DatabaseAPI {
 
     @Override
     public UserFishStats getUserFishStats(int userId, String fishName, String fishRarity) {
-        return null;
+        return new ExecuteQuery<UserFishStats>(connectionFactory, settings) {
+            @Override
+            protected UserFishStats onRunQuery(DSLContext dslContext) throws Exception {
+                Optional<Record> record = dslContext.select()
+                        .from(Tables.USER_FISH_STATS)
+                        .where(Tables.USER_FISH_STATS.USER_ID.eq(userId)
+                                .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fishName)))
+                        .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(fishRarity))
+                        .fetchOptional();
+
+                if (record.isEmpty())
+                    return empty();
+
+                final LocalDateTime firstCatchTime = record.get().getValue(Tables.USER_FISH_STATS.FIRST_CATCH_TIME);
+                final float shortestLength = record.get().getValue(Tables.USER_FISH_STATS.SHORTEST_LENGTH);
+                final float longestLength = record.get().getValue(Tables.USER_FISH_STATS.LONGEST_LENGTH);
+                final int quantity = record.get().getValue(Tables.USER_FISH_STATS.QUANTITY);
+                return new UserFishStats(userId, fishName,fishRarity,firstCatchTime,shortestLength,longestLength,quantity);
+            }
+
+            @Override
+            protected UserFishStats empty() {
+                //todo
+                return null;
+            }
+        }.prepareAndRunQuery();
     }
 
     @Override

@@ -6,6 +6,8 @@ package com.oheers.fish.database.generated.mysql.tables.records;
 
 import com.oheers.fish.database.generated.mysql.tables.UserFishStats;
 
+import java.time.LocalDateTime;
+
 import org.jooq.Record2;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -61,45 +63,59 @@ public class UserFishStatsRecord extends UpdatableRecordImpl<UserFishStatsRecord
     }
 
     /**
+     * Setter for <code>${table.prefix}user_fish_stats.FIRST_CATCH_TIME</code>.
+     */
+    public void setFirstCatchTime(LocalDateTime value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}user_fish_stats.FIRST_CATCH_TIME</code>.
+     */
+    public LocalDateTime getFirstCatchTime() {
+        return (LocalDateTime) get(3);
+    }
+
+    /**
      * Setter for <code>${table.prefix}user_fish_stats.SHORTEST_LENGTH</code>.
      */
     public void setShortestLength(Float value) {
-        set(3, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>${table.prefix}user_fish_stats.SHORTEST_LENGTH</code>.
      */
     public Float getShortestLength() {
-        return (Float) get(3);
+        return (Float) get(4);
     }
 
     /**
      * Setter for <code>${table.prefix}user_fish_stats.LONGEST_LENGTH</code>.
      */
     public void setLongestLength(Float value) {
-        set(4, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>${table.prefix}user_fish_stats.LONGEST_LENGTH</code>.
      */
     public Float getLongestLength() {
-        return (Float) get(4);
+        return (Float) get(5);
     }
 
     /**
      * Setter for <code>${table.prefix}user_fish_stats.QUANTITY</code>.
      */
     public void setQuantity(Integer value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>${table.prefix}user_fish_stats.QUANTITY</code>.
      */
     public Integer getQuantity() {
-        return (Integer) get(5);
+        return (Integer) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -125,12 +141,13 @@ public class UserFishStatsRecord extends UpdatableRecordImpl<UserFishStatsRecord
     /**
      * Create a detached, initialised UserFishStatsRecord
      */
-    public UserFishStatsRecord(String fishName, String fishRarity, Integer userId, Float shortestLength, Float longestLength, Integer quantity) {
+    public UserFishStatsRecord(String fishName, String fishRarity, Integer userId, LocalDateTime firstCatchTime, Float shortestLength, Float longestLength, Integer quantity) {
         super(UserFishStats.USER_FISH_STATS);
 
         setFishName(fishName);
         setFishRarity(fishRarity);
         setUserId(userId);
+        setFirstCatchTime(firstCatchTime);
         setShortestLength(shortestLength);
         setLongestLength(longestLength);
         setQuantity(quantity);

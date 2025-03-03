@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}user_fish_stats` (
     fish_name VARCHAR(256) NOT NULL,
     fish_rarity VARCHAR(256) NOT NULL,
     user_id INTEGER NOT NULL,
+    first_catch_time TIMESTAMP NOT NULL,
     shortest_length REAL,
     longest_length REAL,
     quantity INTEGER,

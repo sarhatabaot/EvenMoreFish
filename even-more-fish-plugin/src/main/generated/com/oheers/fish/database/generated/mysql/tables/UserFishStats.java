@@ -8,6 +8,7 @@ import com.oheers.fish.database.generated.mysql.DefaultSchema;
 import com.oheers.fish.database.generated.mysql.Keys;
 import com.oheers.fish.database.generated.mysql.tables.records.UserFishStatsRecord;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.jooq.Condition;
@@ -63,6 +64,11 @@ public class UserFishStats extends TableImpl<UserFishStatsRecord> {
      * The column <code>${table.prefix}user_fish_stats.USER_ID</code>.
      */
     public final TableField<UserFishStatsRecord, Integer> USER_ID = createField(DSL.name("USER_ID"), SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>${table.prefix}user_fish_stats.FIRST_CATCH_TIME</code>.
+     */
+    public final TableField<UserFishStatsRecord, LocalDateTime> FIRST_CATCH_TIME = createField(DSL.name("FIRST_CATCH_TIME"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>${table.prefix}user_fish_stats.SHORTEST_LENGTH</code>.
