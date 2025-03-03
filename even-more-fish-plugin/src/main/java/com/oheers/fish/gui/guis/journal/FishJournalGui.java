@@ -6,6 +6,8 @@ import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.model.fish.FishStats;
+import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
@@ -96,20 +98,27 @@ public class FishJournalGui implements EMFGUI {
                 display.setVariable("{fishname}", fish.getDisplayName());
                 meta.setDisplayName(display.getLegacyMessage());
             }
+            /*
+            todo, 3 db calls here, userId should be 100% cached, it's a small thing
+            userfishstats & fishstats? need to think about it
+             */
+            final int userId = database.getUserId(viewer.getUniqueId());
+            final UserFishStats userFishStats = database.getUserFishStats(userId,fish.getName(), fish.getRarity().getId());
+            final FishStats fishStats = database.getFishStats(fish.getName(), fish.getRarity().getId());
 
             // Lore
-            LocalDateTime discover = database.getFirstCatchDateForPlayer(fish, viewer);
+            LocalDateTime discover = fishStats.getFirstCatchTime();
             String discoverStr = discover == null ? null : discover.format(DateTimeFormatter.ISO_DATE);
 
             AbstractMessage lore = EvenMoreFish.getAdapter().createMessage(
                 section.getStringList("fish-item.lore")
             );
-            lore.setVariable("{times-caught}", Integer.toString(database.getAmountFishCaughtForPlayer(fish, viewer)), "Unknown");
-            lore.setVariable("{largest-size}", database.getLargestFishSizeForPlayer(fish, viewer), "Unknown");
+            lore.setVariable("{times-caught}", Integer.toString(userFishStats.getQuantity()), "Unknown");
+            lore.setVariable("{largest-size}", userFishStats.getLongestLength(), "Unknown");
             lore.setVariable("{discover-date}", discoverStr, "Unknown");
-            lore.setVariable("{discoverer}", FishUtils.getPlayerName(database.getDiscoverer(fish)), "Unknown");
-            lore.setVariable("{server-largest}", database.getLargestFishSize(fish), "Unknown");
-            lore.setVariable("{server-caught}", database.getAmountFishCaught(fish), "Unknown");
+            lore.setVariable("{discoverer}", FishUtils.getPlayerName(fishStats.getDiscoverer()), "Unknown");
+            lore.setVariable("{server-largest}", fishStats.getLongestLength(), "Unknown");
+            lore.setVariable("{server-caught}", fishStats.getQuantity(), "Unknown");
             meta.setLore(lore.getLegacyListMessage());
         });
 

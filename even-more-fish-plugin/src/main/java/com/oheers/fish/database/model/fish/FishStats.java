@@ -9,16 +9,18 @@ public class FishStats {
     private final String fishRarity;
 
     private final LocalDateTime firstCatchTime;
+    private final UUID discoverer;
     private final float shortestLength;
     private final UUID shortestFisher;
     private final float longestLength;
     private final UUID longestFisher;
     private final int quantity;
 
-    public FishStats(String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, UUID shortestFisher, float longestLength, UUID longestFisher, int quantity) {
+    public FishStats(String fishName, String fishRarity, LocalDateTime firstCatchTime, UUID discoverer, float shortestLength, UUID shortestFisher, float longestLength, UUID longestFisher, int quantity) {
         this.fishName = fishName;
         this.fishRarity = fishRarity;
         this.firstCatchTime = firstCatchTime;
+        this.discoverer = discoverer;
         this.shortestLength = shortestLength;
         this.shortestFisher = shortestFisher;
         this.longestLength = longestLength;
@@ -58,12 +60,17 @@ public class FishStats {
         return quantity;
     }
 
+    public UUID getDiscoverer() {
+        return discoverer;
+    }
+
     @Override
     public String toString() {
         return "FishStats{" +
                 "fishName='" + fishName + '\'' +
                 ", fishRarity='" + fishRarity + '\'' +
                 ", firstCatchTime=" + firstCatchTime +
+                ", discoverer=" + discoverer +
                 ", shortestLength=" + shortestLength +
                 ", shortestFisher=" + shortestFisher +
                 ", longestLength=" + longestLength +

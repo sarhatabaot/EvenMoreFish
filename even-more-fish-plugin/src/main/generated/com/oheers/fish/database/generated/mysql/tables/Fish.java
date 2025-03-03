@@ -95,6 +95,11 @@ public class Fish extends TableImpl<FishRecord> {
      */
     public final TableField<FishRecord, LocalDateTime> FIRST_CATCH_TIME = createField(DSL.name("FIRST_CATCH_TIME"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
+    /**
+     * The column <code>${table.prefix}fish.DISCOVERER</code>.
+     */
+    public final TableField<FishRecord, String> DISCOVERER = createField(DSL.name("DISCOVERER"), SQLDataType.VARCHAR(128), this, "");
+
     private Fish(Name alias, Table<FishRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

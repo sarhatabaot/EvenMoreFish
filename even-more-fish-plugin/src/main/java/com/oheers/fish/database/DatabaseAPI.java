@@ -22,6 +22,7 @@ import java.util.UUID;
 public interface DatabaseAPI {
 
     // User-related methods
+    // Has User Report
     boolean hasUser(@NotNull UUID uuid);
 
     boolean hasUserLog(@NotNull UUID uuid);
@@ -42,20 +43,28 @@ public interface DatabaseAPI {
 
     void incrementFish(@NotNull Fish fish);
 
+    @Deprecated
     String getDiscoverer(@NotNull Fish fish);
 
+    @Deprecated
     LocalDateTime getFirstCatchDateForPlayer(@NotNull Fish fish, @NotNull HumanEntity player);
 
+    @Deprecated
     LocalDateTime getFirstCatchDate(@NotNull Fish fish);
 
+    @Deprecated
     float getLargestFishSizeForPlayer(@NotNull Fish fish, @NotNull HumanEntity player);
 
+    @Deprecated
     float getLargestFishSize(@NotNull Fish fish);
 
+    @Deprecated
     int getAmountFishCaughtForPlayer(@NotNull Fish fish, @NotNull HumanEntity player);
 
+    @Deprecated
     int getAmountFishCaught(@NotNull Fish fish);
 
+    @Deprecated
     void updateLargestFish(@NotNull Fish fish, @NotNull UUID uuid);
 
     // Fish report methods
@@ -104,7 +113,6 @@ public interface DatabaseAPI {
 
     FishStats getFishStats(final String fishName, final String fishRarity);
     void setFishStats(final FishStats fishStats);
-    //figure out a way to just update what's changed, without running an operation on the whole object
 
 }
 

@@ -146,6 +146,20 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
         return (LocalDateTime) get(8);
     }
 
+    /**
+     * Setter for <code>${table.prefix}fish.DISCOVERER</code>.
+     */
+    public void setDiscoverer(String value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}fish.DISCOVERER</code>.
+     */
+    public String getDiscoverer() {
+        return (String) get(9);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -169,7 +183,7 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
     /**
      * Create a detached, initialised FishRecord
      */
-    public FishRecord(String fishName, String fishRarity, String firstFisher, Integer totalCaught, Float largestFish, String largestFisher, Float shortestLength, String shortestFisher, LocalDateTime firstCatchTime) {
+    public FishRecord(String fishName, String fishRarity, String firstFisher, Integer totalCaught, Float largestFish, String largestFisher, Float shortestLength, String shortestFisher, LocalDateTime firstCatchTime, String discoverer) {
         super(Fish.FISH);
 
         setFishName(fishName);
@@ -181,6 +195,7 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
         setShortestLength(shortestLength);
         setShortestFisher(shortestFisher);
         setFirstCatchTime(firstCatchTime);
+        setDiscoverer(discoverer);
         resetChangedOnNotNull();
     }
 }

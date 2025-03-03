@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.database.model.FishReportOld;
+import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.Bukkit;
@@ -20,29 +21,28 @@ public class DataManager {
 
     private static DataManager instance;
 
-    private LoadingCache<UUID, UserReport> userReportCache;
+    private final LoadingCache<UUID, UserReport> userReportCache = Caffeine.newBuilder()
+            .expireAfter(new Expiry<UUID, UserReport>() {
+                @Override
+                public long expireAfterCreate(@NotNull UUID uuid, @NotNull UserReport userReport, long currentTime) {
+                    return getCacheDuration(uuid);
+                }
+
+                @Override
+                public long expireAfterUpdate(@NotNull UUID uuid, @NotNull UserReport userReport, long currentTime, @NonNegative long currentDuration) {
+                    return getCacheDuration(uuid);
+                }
+
+                @Override
+                public long expireAfterRead(@NotNull UUID uuid, @NotNull UserReport userReport, long currentTime, @NonNegative long currentDuration) {
+                    return getCacheDuration(uuid);
+                }
+            })
+            .build(uuid -> EvenMoreFish.getInstance().getDatabase().readUserReport(uuid));
+    private LoadingCache<UUID, UserFishStats> userFishStatsCache;
     private LoadingCache<UUID, List<FishReportOld>> fishReportCache;
 
     private void setup() {
-        userReportCache = Caffeine.newBuilder()
-                .expireAfter(new Expiry<UUID, UserReport>() {
-                    @Override
-                    public long expireAfterCreate(@NotNull UUID uuid, @NotNull UserReport userReport, long currentTime) {
-                        return getCacheDuration(uuid);
-                    }
-
-                    @Override
-                    public long expireAfterUpdate(@NotNull UUID uuid, @NotNull UserReport userReport, long currentTime, @NonNegative long currentDuration) {
-                        return getCacheDuration(uuid);
-                    }
-
-                    @Override
-                    public long expireAfterRead(@NotNull UUID uuid, @NotNull UserReport userReport, long currentTime, @NonNegative long currentDuration) {
-                        return getCacheDuration(uuid);
-                    }
-                })
-                .build(uuid -> EvenMoreFish.getInstance().getDatabase().readUserReport(uuid));
-
         fishReportCache = Caffeine.newBuilder()
                 .expireAfter(new Expiry<UUID, List<FishReportOld>>() {
                     @Override

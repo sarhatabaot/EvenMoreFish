@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    shortest_length REAL NOT NULL,
    shortest_fisher VARCHAR(36) NOT NULL,
    first_catch_time TIMESTAMP NOT NULL,
+   discoverer VARCHAR(128),
    PRIMARY KEY (fish_name, fish_rarity) --todo update primary key, with migrations, we may need to copy the tabnle
 );
 -- user reports (stats)

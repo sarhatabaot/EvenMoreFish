@@ -763,20 +763,20 @@ public class Database implements DatabaseAPI {
         return new ExecuteQuery<UserFishStats>(connectionFactory, settings) {
             @Override
             protected UserFishStats onRunQuery(DSLContext dslContext) throws Exception {
-                Optional<Record> record = dslContext.select()
+                Optional<Record> optionalRecord = dslContext.select()
                         .from(Tables.USER_FISH_STATS)
                         .where(Tables.USER_FISH_STATS.USER_ID.eq(userId)
                                 .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fishName)))
                         .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(fishRarity))
                         .fetchOptional();
 
-                if (record.isEmpty())
+                if (optionalRecord.isEmpty())
                     return empty();
 
-                final LocalDateTime firstCatchTime = record.get().getValue(Tables.USER_FISH_STATS.FIRST_CATCH_TIME);
-                final float shortestLength = record.get().getValue(Tables.USER_FISH_STATS.SHORTEST_LENGTH);
-                final float longestLength = record.get().getValue(Tables.USER_FISH_STATS.LONGEST_LENGTH);
-                final int quantity = record.get().getValue(Tables.USER_FISH_STATS.QUANTITY);
+                final LocalDateTime firstCatchTime = optionalRecord.get().getValue(Tables.USER_FISH_STATS.FIRST_CATCH_TIME);
+                final float shortestLength = optionalRecord.get().getValue(Tables.USER_FISH_STATS.SHORTEST_LENGTH);
+                final float longestLength = optionalRecord.get().getValue(Tables.USER_FISH_STATS.LONGEST_LENGTH);
+                final int quantity = optionalRecord.get().getValue(Tables.USER_FISH_STATS.QUANTITY);
                 return new UserFishStats(userId, fishName,fishRarity,firstCatchTime,shortestLength,longestLength,quantity);
             }
 
