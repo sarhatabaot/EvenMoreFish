@@ -311,7 +311,7 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public boolean hasFishData(@NotNull Fish fish) {
+    public boolean hasFishStats(@NotNull Fish fish) {
         return new ExecuteQuery<Boolean>(connectionFactory, settings) {
             @Override
             protected Boolean onRunQuery(DSLContext dslContext) throws Exception {

@@ -37,42 +37,11 @@ public interface DatabaseAPI {
     UserReport readUserReport(@NotNull UUID uuid);
 
     // Fish-related methods
-    boolean hasFishData(@NotNull Fish fish);
+    boolean hasFishStats(@NotNull Fish fish);
 
     void createFishData(@NotNull Fish fish, @NotNull UUID uuid);
 
     void incrementFish(@NotNull Fish fish);
-
-    @Deprecated
-    String getDiscoverer(@NotNull Fish fish);
-
-    @Deprecated
-    LocalDateTime getFirstCatchDateForPlayer(@NotNull Fish fish, @NotNull HumanEntity player);
-
-    @Deprecated
-    LocalDateTime getFirstCatchDate(@NotNull Fish fish);
-
-    @Deprecated
-    float getLargestFishSizeForPlayer(@NotNull Fish fish, @NotNull HumanEntity player);
-
-    @Deprecated
-    float getLargestFishSize(@NotNull Fish fish);
-
-    @Deprecated
-    int getAmountFishCaughtForPlayer(@NotNull Fish fish, @NotNull HumanEntity player);
-
-    @Deprecated
-    int getAmountFishCaught(@NotNull Fish fish);
-
-    @Deprecated
-    void updateLargestFish(@NotNull Fish fish, @NotNull UUID uuid);
-
-    // Fish report methods
-    @Deprecated
-    List<FishReportOld> getFishReportsForPlayer(@NotNull UUID uuid);
-
-    @Deprecated
-    List<FishReportOld> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish);
 
     void addUserFish(@NotNull FishReportOld report, int userId);
 
@@ -107,7 +76,6 @@ public interface DatabaseAPI {
     void createUserFishStats(final UserFishStats userFishStats);
 
     FishLog getFishLog(final int userId, final String fishName, final String fishRarity, final LocalDateTime time);
-    //todo add getFishLog with time range
     Set<FishLog> getFishLogEntries(final int userId, final String fishName, final String fishRarity);
     void setFishLogEntry(final FishLog fishLogEntry);
 
