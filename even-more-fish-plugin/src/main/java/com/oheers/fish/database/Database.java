@@ -790,6 +790,7 @@ public class Database implements DatabaseAPI {
 
     @Override
     public void createUserFishStats(UserFishStats userFishStats) {
+        //This should have exactly one record
 
     }
 
@@ -805,7 +806,33 @@ public class Database implements DatabaseAPI {
 
     @Override
     public FishStats getFishStats(String fishName, String fishRarity) {
-        return null;
+        return new ExecuteQuery<FishStats>(connectionFactory, settings) {
+            @Override
+            protected FishStats onRunQuery(DSLContext dslContext) throws Exception {
+                Optional<Record> record = dslContext.select()
+                        .from(Tables.FISH)
+                        .where(Tables.FISH.FISH_NAME.eq(fishName))
+                        .and(Tables.FISH.FISH_RARITY.eq(fishName))
+                        .fetchOptional();
+
+                if (record.isEmpty())
+                    return empty();
+
+                final LocalDateTime firstCatchTime = record.get().getValue(Tables.FISH.FIRST_CATCH_TIME);
+                final float shortestLength = record.get().getValue(Tables.FISH.SHORTEST_LENGTH);
+                final UUID shortestFisher = UUID.fromString(record.get().getValue(Tables.FISH.SHORTEST_FISHER));
+                final float longestLength = record.get().getValue(Tables.FISH.LARGEST_FISH);
+                final UUID longestFisher = UUID.fromString(record.get().getValue(Tables.FISH.LARGEST_FISHER));
+                final int quantity = record.get().getValue(Tables.FISH.TOTAL_CAUGHT);
+                return new FishStats(fishName, fishRarity, firstCatchTime, shortestLength,shortestFisher,longestLength,longestFisher,quantity);
+            }
+
+            @Override
+            protected FishStats empty() {
+                //todo
+                return null;
+            }
+        }.prepareAndRunQuery();
     }
 
     @Override
