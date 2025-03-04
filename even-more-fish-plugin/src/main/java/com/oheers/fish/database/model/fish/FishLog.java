@@ -23,6 +23,31 @@ public class FishLog {
         this.competitionId = competitionId;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public String getFishName() {
+        return fishName;
+    }
+
+    public String getFishRarity() {
+        return fishRarity;
+    }
+
+    public LocalDateTime getCatchTime() {
+        return catchTime;
+    }
+
+    public float getLength() {
+        return length;
+    }
+
+    @Nullable
+    public String getCompetitionId() {
+        return competitionId;
+    }
+
     @Override
     public String toString() {
         return "FishLog{" +

@@ -829,8 +829,21 @@ public class Database implements DatabaseAPI {
 
     @Override
     public void setFishLogEntry(FishLog fishLogEntry) {
-
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.FISH_LOG)
+                        .set(Tables.FISH_LOG.USER_ID, fishLogEntry.getUserId())
+                        .set(Tables.FISH_LOG.FISH_NAME, fishLogEntry.getFishName())
+                        .set(Tables.FISH_LOG.FISH_RARITY, fishLogEntry.getFishRarity())
+                        .set(Tables.FISH_LOG.FISH_LENGTH, fishLogEntry.getLength())
+                        .set(Tables.FISH_LOG.CATCH_TIME, fishLogEntry.getCatchTime())
+                        .set(Tables.FISH_LOG.COMPETITION_ID, fishLogEntry.getCompetitionId())
+                        .execute();
+            }
+        }.executeUpdate();
     }
+
 
     @Override
     public FishStats getFishStats(String fishName, String fishRarity) {
@@ -847,12 +860,13 @@ public class Database implements DatabaseAPI {
                     return empty();
 
                 final LocalDateTime firstCatchTime = record.get().getValue(Tables.FISH.FIRST_CATCH_TIME);
+                final UUID discoverer = UUID.fromString(record.get().get(Tables.FISH.DISCOVERER));
                 final float shortestLength = record.get().getValue(Tables.FISH.SHORTEST_LENGTH);
                 final UUID shortestFisher = UUID.fromString(record.get().getValue(Tables.FISH.SHORTEST_FISHER));
                 final float longestLength = record.get().getValue(Tables.FISH.LARGEST_FISH);
                 final UUID longestFisher = UUID.fromString(record.get().getValue(Tables.FISH.LARGEST_FISHER));
                 final int quantity = record.get().getValue(Tables.FISH.TOTAL_CAUGHT);
-                return new FishStats(fishName, fishRarity, firstCatchTime, shortestLength,shortestFisher,longestLength,longestFisher,quantity);
+                return new FishStats(fishName, fishRarity, firstCatchTime, discoverer, shortestLength,shortestFisher,longestLength,longestFisher,quantity);
             }
 
             @Override
@@ -865,6 +879,20 @@ public class Database implements DatabaseAPI {
 
     @Override
     public void setFishStats(FishStats fishStats) {
-
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.update(Tables.FISH)
+                        .set(Tables.FISH.FIRST_CATCH_TIME, fishStats.getFirstCatchTime())
+                        .set(Tables.FISH.DISCOVERER, fishStats.getDiscoverer().toString())
+                        .set(Tables.FISH.SHORTEST_LENGTH, fishStats.getShortestLength())
+                        .set(Tables.FISH.SHORTEST_FISHER, fishStats.getShortestFisher().toString())
+                        .set(Tables.FISH.LARGEST_FISH, fishStats.getLongestLength())
+                        .set(Tables.FISH.LARGEST_FISHER, fishStats.getLongestFisher().toString())
+                        .where(Tables.FISH.FISH_NAME.eq(fishStats.getFishName()))
+                        .and(Tables.FISH.FISH_RARITY.eq(fishStats.getFishRarity()))
+                        .execute();
+            }
+        }.executeUpdate();
     }
 }
