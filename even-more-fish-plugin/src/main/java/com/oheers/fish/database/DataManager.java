@@ -77,6 +77,10 @@ public class DataManager {
         fishReportCache.invalidateAll();
     }
 
+    public void cacheUser(final UUID uuid) {
+        userReportCache.refresh(uuid); //todo test not sur eif correct approach
+    }
+
     public boolean containsUser(UUID uuid) {
         return fishReportCache.get(uuid) != null;
     }

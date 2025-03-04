@@ -43,12 +43,6 @@ public interface DatabaseAPI {
 
     void incrementFish(@NotNull Fish fish);
 
-    void addUserFish(@NotNull FishReportOld report, int userId);
-
-    void updateUserFish(@NotNull FishReportOld report, int userId);
-
-    void writeFishReports(@NotNull UUID uuid, @NotNull List<FishReportOld> reports);
-
     boolean userHasFish(@NotNull Fish fish, @NotNull HumanEntity user);
     //user has caught this fish, so an entry in fish log report, or one in userfishstats
     boolean userHasFish(@NotNull String rarity, @NotNull String fish, int id);
