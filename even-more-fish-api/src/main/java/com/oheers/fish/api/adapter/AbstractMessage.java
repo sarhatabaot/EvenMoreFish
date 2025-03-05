@@ -217,7 +217,7 @@ public abstract class AbstractMessage {
         for (AbstractMessage message : messages) {
             newMessage.append(message.getRawMessage());
         }
-        this.message = newMessage.toString() + this.message;
+        this.message = newMessage + this.message;
     }
 
     /**

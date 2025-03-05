@@ -14,8 +14,8 @@ import java.util.logging.Level;
 
 public class CompetitionQueue {
 
-    Map<Integer, Competition> competitions;
-    TreeMap<String, CompetitionFile> fileMap;
+    private final Map<Integer, Competition> competitions;
+    private final TreeMap<String, CompetitionFile> fileMap;
 
     public CompetitionQueue() {
         competitions = new TreeMap<>();
@@ -23,6 +23,10 @@ public class CompetitionQueue {
 
         // Check for old file format and convert if it exists.
         new CompetitionConversions().performCheck();
+    }
+
+    public Map<Integer, Competition> getCompetitions() {
+        return Map.copyOf(competitions);
     }
 
     public void load() {
