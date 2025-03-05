@@ -119,7 +119,8 @@ public class FishManager {
         }
 
         if (allowedRarities.isEmpty()) {
-            EvenMoreFish.getInstance().getLogger().severe("There are no rarities for the user " + fisher.getName() + " to fish. They have received no fish.");
+            String fisherName = fisher == null ? "N/A" : fisher.getName();
+            EvenMoreFish.getInstance().getLogger().severe("There are no rarities for the user " + fisherName + " to fish. They have received no fish.");
             return null;
         }
 

@@ -26,7 +26,7 @@ public class Rarity extends ConfigBase {
 
     /**
      * Constructs a Rarity from its config file.
-     * @param section The file for this rarity.
+     * @param file The file for this rarity.
      */
     public Rarity(@NotNull File file) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
@@ -132,7 +132,7 @@ public class Rarity extends ConfigBase {
      * @return This rarity's list of loaded fish, but each fish is a clone of the original
      */
     public @NotNull List<Fish> getFishList() {
-        return fishList.stream().map(Fish::clone).toList();
+        return fishList.stream().map(Fish::createCopy).toList();
     }
 
     public @Nullable Fish getEditableFish(@NotNull String name) {
@@ -149,7 +149,7 @@ public class Rarity extends ConfigBase {
         if (fish == null) {
             return null;
         }
-        return fish.clone();
+        return fish.createCopy();
     }
 
     public double getWorthMultiplier() {

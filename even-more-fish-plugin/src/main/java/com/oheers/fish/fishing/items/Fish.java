@@ -30,12 +30,12 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public class Fish implements Cloneable {
+public class Fish {
 
     private final @NotNull Section section;
     private final String name;
     private final Rarity rarity;
-    private ItemFactory factory;
+    private final ItemFactory factory;
     private UUID fisherman;
     private Float length;
 
@@ -429,8 +429,7 @@ public class Fish implements Cloneable {
         this.silent = section.getBoolean("silent", false);
     }
 
-    @Override
-    public Fish clone() {
+    public Fish createCopy() {
         return create(rarity, section);
     }
 

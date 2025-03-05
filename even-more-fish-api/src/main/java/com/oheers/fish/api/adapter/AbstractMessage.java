@@ -217,7 +217,7 @@ public abstract class AbstractMessage {
         for (AbstractMessage message : messages) {
             newMessage.append(message.getRawMessage());
         }
-        this.message = newMessage.toString() + this.message;
+        this.message = newMessage + this.message;
     }
 
     /**
@@ -520,7 +520,7 @@ public abstract class AbstractMessage {
      * Sets the competition type, checking against the values for each type stored in messages.yml to replace the {type}
      * variable.
      *
-     * @param type The competition type.
+     * @param typeString The competition type.
      */
     public void setCompetitionType(@NotNull final String typeString) {
         setVariable("{type}", typeString);

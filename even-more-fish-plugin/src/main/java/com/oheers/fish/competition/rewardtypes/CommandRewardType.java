@@ -5,6 +5,7 @@ import com.oheers.fish.api.reward.RewardType;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -16,11 +17,12 @@ public class CommandRewardType implements RewardType {
         String inputCommand = value.replace("{player}", player.getName());
         if (EvenMoreFish.getInstance().isUsingPAPI()) inputCommand = PlaceholderAPI.setPlaceholders(player, inputCommand);
         if (hookLocation != null) {
+            final String worldName = hookLocation.getWorld() == null ? "N/A" : hookLocation.getWorld().getName();
             inputCommand = inputCommand
                     .replace("{x}", Double.toString(hookLocation.getX()))
                     .replace("{y}", Double.toString(hookLocation.getY()))
                     .replace("{z}", Double.toString(hookLocation.getZ()))
-                    .replace("{world}", hookLocation.getWorld().getName());
+                    .replace("{world}", worldName);
         }
 
         // running the command

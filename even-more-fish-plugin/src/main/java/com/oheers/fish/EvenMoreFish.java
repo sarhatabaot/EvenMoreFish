@@ -110,7 +110,6 @@ public class EvenMoreFish extends EMFPlugin {
     private EMFAPI api;
 
     private AddonManager addonManager;
-    private Map<String, String> commandUsages = new HashMap<>();
 
     public EvenMoreFish() {
         // Assigns the EMFPlugin instance for API usage.
@@ -365,10 +364,6 @@ public class EvenMoreFish extends EMFPlugin {
         metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
 
         metrics.addCustomChart(new SimplePie("paper-adapter", () -> (platformAdapter instanceof PaperAdapter) ? "true" : "false"));
-    }
-
-    public Map<String, String> getCommandUsages() {
-        return commandUsages;
     }
 
     private boolean setupPermissions() {
