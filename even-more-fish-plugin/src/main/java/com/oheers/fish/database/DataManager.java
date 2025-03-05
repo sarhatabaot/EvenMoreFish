@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.database.model.FishReportOld;
+import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
@@ -40,28 +41,16 @@ public class DataManager {
             })
             .build(uuid -> EvenMoreFish.getInstance().getDatabase().readUserReport(uuid));
     private LoadingCache<UUID, UserFishStats> userFishStatsCache;
+    private LoadingCache<String, FishStats> fishStatsCache = Caffeine.newBuilder()
+            .build(composite -> {
+                final String[] split = composite.split("\\.");
+                final String name = split[0];
+                final String rarity = split[1];
+
+                return EvenMoreFish.getInstance().getDatabase().getFishStats(name, rarity);
+            });
+    @Deprecated
     private LoadingCache<UUID, List<FishReportOld>> fishReportCache;
-
-    private void setup() {
-        fishReportCache = Caffeine.newBuilder()
-                .expireAfter(new Expiry<UUID, List<FishReportOld>>() {
-                    @Override
-                    public long expireAfterCreate(@NotNull UUID uuid, @NotNull List<FishReportOld> fishReports, long currentTime) {
-                        return getCacheDuration(uuid);
-                    }
-
-                    @Override
-                    public long expireAfterUpdate(@NotNull UUID uuid, @NotNull List<FishReportOld> fishReports, long currentTime, @NonNegative long currentDuration) {
-                        return getCacheDuration(uuid);
-                    }
-
-                    @Override
-                    public long expireAfterRead(@NotNull UUID uuid, @NotNull List<FishReportOld> fishReports, long currentTime, @NonNegative long currentDuration) {
-                        return getCacheDuration(uuid);
-                    }
-                })
-                .build(uuid -> EvenMoreFish.getInstance().getDatabase().readFishReports(uuid));
-    }
 
     private long getCacheDuration(UUID uuid) {
         return Bukkit.getPlayer(uuid) != null ? Long.MAX_VALUE : 0;
@@ -116,7 +105,6 @@ public class DataManager {
     public static void init() {
         if (instance == null) {
             instance = new DataManager();
-            instance.setup();
         }
     }
 
