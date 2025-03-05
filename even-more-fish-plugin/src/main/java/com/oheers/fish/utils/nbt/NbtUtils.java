@@ -42,7 +42,7 @@ public class NbtUtils {
                     if (compound == null) {
                         yield false;
                     }
-                    yield compound.hasTag(namespacedKey.toString())
+                    yield compound.hasTag(namespacedKey.toString());
                 }
                 yield false;
             }

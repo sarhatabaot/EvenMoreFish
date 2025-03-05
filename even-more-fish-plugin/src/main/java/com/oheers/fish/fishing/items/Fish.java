@@ -429,7 +429,7 @@ public class Fish {
         this.silent = section.getBoolean("silent", false);
     }
 
-    public Fish clone() {
+    public Fish createCopy() {
         return create(rarity, section);
     }
 
