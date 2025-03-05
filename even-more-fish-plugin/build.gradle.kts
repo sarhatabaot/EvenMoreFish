@@ -293,6 +293,7 @@ tasks {
     }
 }
 
+/*
 publishing {
     repositories { // Copied directly from CodeMC's docs
         maven {
@@ -320,6 +321,7 @@ publishing {
         }
     }
 }
+ */
 
 java {
     toolchain {
