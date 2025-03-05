@@ -17,6 +17,7 @@ import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
+import com.oheers.fish.database.Database;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
@@ -330,6 +331,14 @@ public class AdminCommand {
                     .mapToInt(rarity -> rarity.getFishList().size())
                     .sum();
 
+                String databaseEngine = "N/A";
+                String databaseType = "N/A";
+                final Database database = EvenMoreFish.getInstance().getDatabase();
+                if (database != null) {
+                    databaseEngine = database.getDatabaseVersion();
+                    databaseType = database.getType();
+                }
+
                 final String msgString =
                     """
                     {prefix} EvenMoreFish by Oheers {version}\s
@@ -353,8 +362,8 @@ public class AdminCommand {
                         .replace("{fish}", String.valueOf(fishCount))
                         .replace("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()))
                         .replace("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()))
-                        .replace("{engine}", EvenMoreFish.getInstance().getDatabase().getDatabaseVersion())
-                        .replace("{type}", EvenMoreFish.getInstance().getDatabase().getType());
+                        .replace("{engine}", databaseEngine)
+                        .replace("{type}", databaseType);
 
 
                 AbstractMessage msg = EvenMoreFish.getAdapter().createMessage(msgString);
