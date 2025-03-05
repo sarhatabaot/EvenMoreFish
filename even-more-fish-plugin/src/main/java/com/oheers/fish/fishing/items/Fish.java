@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public class Fish implements Cloneable {
+public class Fish {
 
     private final @NotNull Section section;
     private final String name;
@@ -429,7 +429,6 @@ public class Fish implements Cloneable {
         this.silent = section.getBoolean("silent", false);
     }
 
-    @Override
     public Fish clone() {
         return create(rarity, section);
     }
