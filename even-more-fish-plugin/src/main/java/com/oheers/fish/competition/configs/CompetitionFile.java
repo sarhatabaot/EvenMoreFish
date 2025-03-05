@@ -266,7 +266,7 @@ public class CompetitionFile extends ConfigBase {
         Bar bar = new Bar();
         bar.setShouldShow(shouldShowBossbar());
         bar.setColour(getBossbarColour());
-        bar.setPrefix(getBossbarPrefix().getLegacyMessage());
+        bar.setPrefix(getBossbarPrefix().getLegacyMessage(), getType());
         return bar;
     }
 
