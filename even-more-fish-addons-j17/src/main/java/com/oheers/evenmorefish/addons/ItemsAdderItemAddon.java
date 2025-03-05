@@ -11,8 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemsAdderItemAddon extends ItemAddon implements Listener {
 
-    private boolean itemsAdderLoaded = false;
-
     @Override
     public String getPrefix() {
         return "itemsadder";

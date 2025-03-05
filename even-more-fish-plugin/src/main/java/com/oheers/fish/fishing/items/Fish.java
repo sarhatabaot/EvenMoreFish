@@ -35,7 +35,7 @@ public class Fish implements Cloneable {
     private final @NotNull Section section;
     private final String name;
     private final Rarity rarity;
-    private ItemFactory factory;
+    private final ItemFactory factory;
     private UUID fisherman;
     private Float length;
 
