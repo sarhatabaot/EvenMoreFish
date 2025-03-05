@@ -10,6 +10,7 @@ import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.oheers.fish.utils.nbt.NbtVersion;
 import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -105,7 +106,10 @@ public class BaitListener implements Listener {
         if (nbtVersion == NbtVersion.LEGACY) {
             final String namespacedKey = NbtKeys.EMF_COMPOUND + ":" + NbtKeys.EMF_APPLIED_BAIT;
             NBT.modify(fishingRod,nbt -> {
-                nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES).removeKey(namespacedKey);
+                ReadWriteNBT compound = nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES);
+                if (compound != null) {
+                    compound.removeKey(namespacedKey);
+                }
             });
 
             if (NBT.get(fishingRod, nbt -> {
@@ -113,7 +117,10 @@ public class BaitListener implements Listener {
             })) {
                 NBT.modify(fishingRod, nbt -> {
                     nbt.removeKey(namespacedKey);
-                    nbt.getCompound("display").getStringList("Lore").clear();
+                    ReadWriteNBT compound = nbt.getCompound("display");
+                    if (compound != null) {
+                        compound.getStringList("Lore").clear();
+                    }
                 });
             }
         }
