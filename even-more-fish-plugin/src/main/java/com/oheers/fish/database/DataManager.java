@@ -40,7 +40,10 @@ public class DataManager {
                 }
             })
             .build(uuid -> EvenMoreFish.getInstance().getDatabase().readUserReport(uuid));
-    private LoadingCache<UUID, UserFishStats> userFishStatsCache;
+    //incorrect,
+    //maybe UUID > Map<CompositeKey, UserFishStats>
+    private LoadingCache<UUID, Map<CompositeFishRarityKey, UserFishStats>> userFishStatsCache;
+
     private LoadingCache<String, FishStats> fishStatsCache = Caffeine.newBuilder()
             .build(composite -> {
                 final String[] split = composite.split("\\.");
@@ -49,6 +52,7 @@ public class DataManager {
 
                 return EvenMoreFish.getInstance().getDatabase().getFishStats(name, rarity);
             });
+
     @Deprecated
     private LoadingCache<UUID, List<FishReportOld>> fishReportCache;
 
