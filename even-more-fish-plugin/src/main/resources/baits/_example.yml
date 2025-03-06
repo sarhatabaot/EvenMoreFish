@@ -12,10 +12,41 @@ disabled: false
 bait-theme: "&e"
 
 # When more than 1 types of baits are applied, how likely is it that this one should be used?
-application-weight: 10
+application-weight: 150
 
 # How likely should it be to find this bait when they're caught.
-catch-weight: 1
+catch-weight: 100
 
-# This is the boost rate for this bait.
-boost-rate:
+# How many of this bait can be applied to a rod at once?
+max-baits: 100
+
+# Controls whether this bait is infinite.
+infinite: false
+
+# This will disable the bait-use message to be send to the player. This is useful for baits that are infinite, but can be used for any bait.
+disable-use-alert: false
+
+# Item configuration follows the same format as fish
+item:
+  material: NAUTILUS_SHELL
+  displayname: "&7Example Bait"
+
+# This lists the fish that are attracted to this bait (make sure to specify the rarity and ensure there's no typos)
+fish:
+  Common:
+    - "Carp"
+    - "Bluefish"
+    - "Haddock"
+  Rare:
+    - "Sunfish"
+    - "Goldfish"
+    - "Nemo"
+
+# This specifies just the rarities, any fish in this rarity will be attracted to this bait.
+rarities:
+  - "Epic"
+  - "Legendary"
+
+# This is the bait's custom lore, this is added as the {lore} variable in the general bait lore (configured in messages.yml)
+lore:
+  - "&7Boosts Epic & Legendary fish."
