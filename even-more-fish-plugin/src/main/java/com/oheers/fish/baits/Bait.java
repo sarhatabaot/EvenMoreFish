@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.BaitFile;
+import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 public class Bait {
@@ -53,7 +55,7 @@ public class Bait {
         this.applicationWeight = section.getDouble("application-weight");
         this.catchWeight = section.getDouble("catch-weight");
 
-        this.boostRate = BaitFile.getInstance().getBoostRate();
+        this.boostRate = MainConfig.getInstance().getBaitBoostRate();
         this.maxApplications = section.getInt("max-baits", -1);
         this.displayName = section.getString("item.displayname");
         this.dropQuantity = section.getInt("drop-quantity", 1);
@@ -146,43 +148,36 @@ public class Bait {
      */
     private List<String> createBoostLore() {
 
-        List<String> lore = new ArrayList<>();
+        AbstractMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
 
-        for (String lineAddition : BaitFile.getInstance().getBaitLoreFormat()) {
-            if (lineAddition.equals("{boosts}")) {
-
-                if (!rarityList.isEmpty()) {
-                    AbstractMessage message;
-                    if (rarityList.size() > 1) {
-                        message = EvenMoreFish.getAdapter().createMessage(BaitFile.getInstance().getBoostRaritiesFormat());
-                    } else {
-                        message = EvenMoreFish.getAdapter().createMessage(BaitFile.getInstance().getBoostRarityFormat());
-                    }
-                    message.setAmount(Integer.toString(rarityList.size()));
-                    message.setBaitTheme(theme);
-                    lore.add(message.getLegacyMessage());
+        Supplier<AbstractMessage> boostsVariable = () -> {
+            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+            if (!rarityList.isEmpty()) {
+                if (rarityList.size() > 1) {
+                    message.appendMessage(ConfigMessage.BAIT_BOOSTS_RARITIES.getMessage());
+                } else {
+                    message.appendMessage(ConfigMessage.BAIT_BOOSTS_RARITY.getMessage());
                 }
-
-                if (!fishList.isEmpty()) {
-                    AbstractMessage message = EvenMoreFish.getAdapter().createMessage(BaitFile.getInstance().getBoostFishFormat());
-                    message.setAmount(Integer.toString(fishList.size()));
-                    message.setBaitTheme(theme);
-                    lore.add(message.getLegacyMessage());
-                }
-
-            } else if (lineAddition.equals("{lore}")) {
-                section.getStringList("lore").forEach(line -> {
-                    AbstractMessage message = EvenMoreFish.getAdapter().createMessage(line);
-                    lore.add(message.getLegacyMessage());
-                });
-            } else {
-                AbstractMessage message = EvenMoreFish.getAdapter().createMessage(lineAddition);
+                message.setAmount(Integer.toString(rarityList.size()));
                 message.setBaitTheme(theme);
-                lore.add(message.getLegacyMessage());
             }
-        }
 
-        return lore;
+            if (!fishList.isEmpty()) {
+                message.appendString("\n");
+                message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
+                message.setAmount(Integer.toString(fishList.size()));
+                message.setBaitTheme(theme);
+            }
+            return message;
+        };
+        lore.setVariable("{boosts}", boostsVariable.get());
+
+        Supplier<AbstractMessage> loreVariable = () -> EvenMoreFish.getAdapter().createMessage(section.getStringList("lore"));
+        lore.setVariable("{lore}", loreVariable.get());
+
+        lore.setBaitTheme(theme);
+
+        return lore.getLegacyListMessage();
     }
 
     public boolean isInfinite() {
@@ -217,9 +212,9 @@ public class Bait {
             // The bait has both rarities: and fish: set but the plugin chose a rarity with no boosted fish. This ensures
             // the method isn't given an empty list.
             if (!fishListRarities.contains(fishRarity)) {
-                fish = FishManager.getInstance().getFish(fishRarity, location, player, BaitFile.getInstance().getBoostRate(), fishRarity.getFishList(), true);
+                fish = FishManager.getInstance().getFish(fishRarity, location, player, MainConfig.getInstance().getBaitBoostRate(), fishRarity.getFishList(), true);
             } else {
-                fish = FishManager.getInstance().getFish(fishRarity, location, player, BaitFile.getInstance().getBoostRate(), getFish(), true);
+                fish = FishManager.getInstance().getFish(fishRarity, location, player, MainConfig.getInstance().getBaitBoostRate(), getFish(), true);
             }
 
             if (!getRarities().contains(fishRarity) && (fish == null || !getFish().contains(fish))) {

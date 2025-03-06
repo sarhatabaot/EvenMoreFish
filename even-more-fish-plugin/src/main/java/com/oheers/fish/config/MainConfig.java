@@ -309,4 +309,30 @@ public class MainConfig extends ConfigBase {
                 MainConfig.getInstance().getDatabase() != null;
     }
 
+    // Bait configs
+
+    public double getBaitBoostRate() {
+        return getConfig().getDouble("bait.boost", 1.5);
+    }
+
+    public boolean getBaitCompetitionDisable() {
+        return getConfig().getBoolean("bait.competition-disable", true);
+    }
+
+    public boolean getBaitAddToLore() {
+        return getConfig().getBoolean("bait.add-to-lore", true);
+    }
+
+    public double getBaitCatchPercentage() {
+        return getConfig().getDouble("bait.catch-percentage", 2.5);
+    }
+
+    public int getBaitsPerRod() {
+        return getConfig().getInt("bait.baits-per-rod", 7);
+    }
+
+    public boolean getBaitShowUnusedSlots() {
+        return getConfig().getBoolean("bait.show-unused-slots", true);
+    }
+
 }

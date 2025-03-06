@@ -95,8 +95,8 @@ public abstract class Processor<E extends Event> implements Listener {
             return null;
         }
 
-        if (BaitFile.getInstance().getBaitCatchPercentage() > 0
-            && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < BaitFile.getInstance().getBaitCatchPercentage()) {
+        double baitCatchPercentage = MainConfig.getInstance().getBaitCatchPercentage();
+        if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 AbstractMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
@@ -111,7 +111,7 @@ public abstract class Processor<E extends Event> implements Listener {
 
         Bait applyingBait = null;
 
-        if (BaitNBTManager.isBaitedRod(fishingRod) && (!BaitFile.getInstance().competitionsBlockBaits() || !Competition.isActive())) {
+        if (BaitNBTManager.isBaitedRod(fishingRod) && (!MainConfig.getInstance().getBaitCompetitionDisable() || !Competition.isActive())) {
             applyingBait = BaitNBTManager.randomBaitApplication(fishingRod);
         }
 

@@ -253,6 +253,41 @@ admin:
 # When an invalid rarity is provided for a command.
 rarity-invalid: "&rThat is not a valid rarity!"
 
+# Bait messages
+bait:
+  # How the lore should look ({baits} takes up multiple lines)
+  rod-lore:
+    - "&f"
+    - "&7Bait Slots: &e({current_baits}/{max_baits})"
+    - "&f"
+    - "{baits}"
+    - "&f"
+
+  # The default lore of the bait, changing this will not modify existing baits, but with an /emf admin reload, new baits
+  # given out will have this lore. Bait themes can be set as a colour or prefix and be used in this lore.
+  bait-lore:
+    - "&f"
+    - "{bait_theme}Increases the catch rates for:"
+    - "{boosts}"
+    - "{lore}"
+    - "&f"
+    - "&#dadadaDrop onto a fishing rod to apply,"
+    - "&#dadadaor hold &nSHIFT&#dadada to apply all."
+    - "&f"
+  # How the baits should look in each line of the {baits} variable above ^. {baits} respects the display name setting,
+  # the &e is there for baits without a display name set.
+  baits: "&6► {amount} {bait}"
+
+  # These are listed in the {boosts} variable above in bait-lore
+  # boost-rarity/rarities: shown when the bait only impacts 1 rarity or when it impacts multiple rarities.
+  # boost-fish: shown when the bait impacts some fish individually.
+  boosts-rarity: "{bait_theme}► &f1 {bait_theme}Rarity"
+  boosts-rarities: "{bait_theme}► &f{amount} {bait_theme}Rarities"
+  boosts-fish: "{bait_theme}► &f{amount} {bait_theme}Fish"
+
+  # This is added to the lore in place of a bait if show-unused-slots is enabled in the general section.
+  unused-slot: "&7► ? &oAvailable Slot"
+
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
 config-version: 26
