@@ -274,6 +274,7 @@ bait:
     - "&#dadadaDrop onto a fishing rod to apply,"
     - "&#dadadaor hold &nSHIFT&#dadada to apply all."
     - "&f"
+
   # How the baits should look in each line of the {baits} variable above ^. {baits} respects the display name setting,
   # the &e is there for baits without a display name set.
   baits: "&6► {amount} {bait}"

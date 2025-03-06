@@ -2,6 +2,8 @@ package com.oheers.fish.baits.configs;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.ConfigBase;
+import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.config.messages.MessageConfig;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +23,10 @@ public class BaitConversions {
             baitsDir.mkdirs();
         }
         ConfigBase config = new ConfigBase(baitFile, EvenMoreFish.getInstance(), false);
+
+        handleConfigYml(config);
+        handleMessagesYml(config);
+
         Section baitSection = config.getConfig().getSection("baits");
         if (baitSection == null) {
             finalizeConversion(config);
@@ -63,6 +69,36 @@ public class BaitConversions {
         config.set("id", id);
         config.set("disabled", false);
         configBase.save();
+    }
+
+    private void handleMessagesYml(@NotNull ConfigBase config) {
+        YamlDocument messages = MessageConfig.getInstance().getConfig();
+        YamlDocument baitConfig = config.getConfig();
+        Section baitSection = baitConfig.getSection("format");
+        if (baitSection == null) {
+            return;
+        }
+        Section messagesSection = messages.getSection("bait");
+        if (messagesSection == null) {
+            messagesSection = messages.createSection("bait");
+        }
+        messagesSection.setAll(baitSection.getRouteMappedValues(true));
+        MessageConfig.getInstance().save();
+    }
+
+    private void handleConfigYml(@NotNull ConfigBase config) {
+        YamlDocument mainConfig = MainConfig.getInstance().getConfig();
+        YamlDocument baitConfig = config.getConfig();
+        Section baitSection = baitConfig.getSection("general");
+        if (baitSection == null) {
+            return;
+        }
+        Section mainSection = mainConfig.getSection("bait");
+        if (mainSection == null) {
+            mainSection = mainConfig.createSection("bait");
+        }
+        mainSection.setAll(baitSection.getRouteMappedValues(true));
+        MainConfig.getInstance().save();
     }
 
 }
