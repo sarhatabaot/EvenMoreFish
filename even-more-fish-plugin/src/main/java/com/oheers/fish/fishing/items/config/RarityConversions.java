@@ -61,6 +61,7 @@ public class RarityConversions {
         YamlDocument config = configBase.getConfig();
         config.setAll(section.getRouteMappedValues(true));
         config.set("id", id);
+        config.set("disabled", false);
         configBase.save();
     }
 

@@ -68,6 +68,7 @@ public class CompetitionConversions {
         YamlDocument config = configBase.getConfig();
         config.setAll(section.getRouteMappedValues(true));
         config.set("id", id);
+        config.set("disabled", false);
 
         applyGeneralSection(config, general, leaderboard, rewards);
 

@@ -225,7 +225,29 @@ public enum ConfigMessage {
             "&e» (Left-click) sell the fish.",
             "&7» (Right-click) cancel."
     ), PrefixType.NONE, false, false, "sell-gui-lore"),
-    RARITY_INVALID("&rThat is not a valid rarity!", PrefixType.ERROR, false, true, "rarity-invalid");
+    RARITY_INVALID("&rThat is not a valid rarity!", PrefixType.ERROR, false, true, "rarity-invalid"),
+    BAIT_ROD_LORE(List.of(
+        "&f",
+        "&7Bait Slots: &e({current_baits}/{max_baits})",
+        "&f",
+        "{baits}",
+        "&f"
+    ), PrefixType.NONE, false, false, "bait.rod-lore"),
+    BAIT_BAIT_LORE(List.of(
+        "&f",
+        "{bait_theme}Increases the catch rates for:",
+        "{boosts}",
+        "{lore}",
+        "&f",
+        "&#dadadaDrop onto a fishing rod to apply,",
+        "&#dadadaor hold &nSHIFT&#dadada to apply all.",
+        "&f"
+    ), PrefixType.NONE, false, false, "bait.bait-lore"),
+    BAIT_BAITS("&6► {amount} {bait}", PrefixType.NONE, false, false, "bait.baits"),
+    BAIT_BOOSTS_RARITY("{bait_theme}► &f1 {bait_theme}Rarity", PrefixType.NONE, false, false, "bait.boosts-rarity"),
+    BAIT_BOOSTS_RARITIES("{bait_theme}► &f{amount} {bait_theme}Rarities", PrefixType.NONE, false, false, "bait.boosts-rarities"),
+    BAIT_BOOSTS_FISH("{bait_theme}► &f{amount} {bait_theme}Fish", PrefixType.NONE, false, false, "bait.boosts-fish"),
+    BAIT_UNUSED_SLOT("&7► ? &oAvailable Slot", PrefixType.NONE, false, false, "bait.unused-slot");
 
     private final String id;
     private final boolean canSilent, canHidePrefix;
@@ -318,12 +340,13 @@ public enum ConfigMessage {
             }
         } else {
             String line = getString(getNormal(), getId());
-
-            if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                message.appendString(line.substring(10));
-            } else {
-                message.appendMessage(getPrefixType().getPrefix());
-                message.appendString(line);
+            if (line != null) {
+                if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
+                    message.appendString(line.substring(10));
+                } else {
+                    message.appendMessage(getPrefixType().getPrefix());
+                    message.appendString(line);
+                }
             }
         }
         message.setCanSilent(this.canSilent);

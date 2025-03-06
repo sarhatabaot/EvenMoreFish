@@ -9,7 +9,6 @@ import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
-import com.oheers.fish.config.BaitFile;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
@@ -21,16 +20,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.framework.qual.InheritedAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.Inherited;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Set;
@@ -95,13 +90,13 @@ public abstract class Processor<E extends Event> implements Listener {
             return null;
         }
 
-        if (BaitFile.getInstance().getBaitCatchPercentage() > 0
-            && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < BaitFile.getInstance().getBaitCatchPercentage()) {
+        double baitCatchPercentage = MainConfig.getInstance().getBaitCatchPercentage();
+        if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 AbstractMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
                 message.setBaitTheme(caughtBait.getTheme());
-                message.setBait(caughtBait.getName());
+                message.setBait(caughtBait.getId());
                 message.setPlayer(player);
                 message.send(player);
 
@@ -111,7 +106,7 @@ public abstract class Processor<E extends Event> implements Listener {
 
         Bait applyingBait = null;
 
-        if (BaitNBTManager.isBaitedRod(fishingRod) && (!BaitFile.getInstance().competitionsBlockBaits() || !Competition.isActive())) {
+        if (BaitNBTManager.isBaitedRod(fishingRod) && (!MainConfig.getInstance().getBaitCompetitionDisable() || !Competition.isActive())) {
             applyingBait = BaitNBTManager.randomBaitApplication(fishingRod);
         }
 
