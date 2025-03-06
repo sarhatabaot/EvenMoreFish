@@ -1,7 +1,6 @@
 package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.config.BaitFile;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.inventory.ItemStack;
@@ -77,12 +76,6 @@ public class BaitManager {
         return getBait(BaitNBTManager.getBaitName(itemStack));
     }
 
-    // Getters for config files
-
-    public YamlDocument getBaitConfiguration() {
-        return BaitFile.getInstance().getConfig();
-    }
-
     // Loading things
 
     private void logLoadedItems() {
@@ -90,6 +83,8 @@ public class BaitManager {
     }
 
     private void loadBaits() {
+        // TODO load
+        /*
         Section section = getBaitConfiguration().getSection("baits");
         if (section == null) {
             return;
@@ -102,6 +97,7 @@ public class BaitManager {
             Bait bait = new Bait(baitSection);
             baitMap.put(baitName, bait);
         }
+         */
     }
     
 }

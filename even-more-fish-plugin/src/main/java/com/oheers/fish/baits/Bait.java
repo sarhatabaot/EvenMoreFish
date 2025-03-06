@@ -3,7 +3,6 @@ package com.oheers.fish.baits;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.adapter.AbstractMessage;
-import com.oheers.fish.config.BaitFile;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.MaxBaitReachedException;

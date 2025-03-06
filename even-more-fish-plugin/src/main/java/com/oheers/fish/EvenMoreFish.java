@@ -22,7 +22,6 @@ import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.competition.rewardtypes.*;
 import com.oheers.fish.competition.rewardtypes.external.*;
-import com.oheers.fish.config.BaitFile;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
@@ -168,8 +167,6 @@ public class EvenMoreFish extends EMFPlugin {
         saveAdditionalDefaultAddons();
         this.addonManager = new AddonManager(this);
         this.addonManager.load();
-
-        new BaitFile();
 
         new GUIConfig();
         new GUIFillerConfig();
@@ -442,7 +439,6 @@ public class EvenMoreFish extends EMFPlugin {
         MessageConfig.getInstance().reload();
         GUIConfig.getInstance().reload();
         GUIFillerConfig.getInstance().reload();
-        BaitFile.getInstance().reload();
 
         FishManager.getInstance().reload();
         BaitManager.getInstance().reload();
