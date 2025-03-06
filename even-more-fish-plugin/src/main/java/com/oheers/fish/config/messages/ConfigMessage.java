@@ -340,12 +340,13 @@ public enum ConfigMessage {
             }
         } else {
             String line = getString(getNormal(), getId());
-
-            if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                message.appendString(line.substring(10));
-            } else {
-                message.appendMessage(getPrefixType().getPrefix());
-                message.appendString(line);
+            if (line != null) {
+                if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
+                    message.appendString(line.substring(10));
+                } else {
+                    message.appendMessage(getPrefixType().getPrefix());
+                    message.appendString(line);
+                }
             }
         }
         message.setCanSilent(this.canSilent);
