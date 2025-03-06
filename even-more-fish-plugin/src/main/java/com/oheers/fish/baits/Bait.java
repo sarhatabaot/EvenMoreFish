@@ -150,6 +150,10 @@ public class Bait extends ConfigBase {
         return lore.getLegacyListMessage();
     }
 
+    public boolean isDisabled() {
+        return getConfig().getBoolean("disabled", false);
+    }
+
     public boolean isInfinite() {
         return getConfig().getBoolean("infinite", false);
     }
