@@ -79,7 +79,7 @@ public class BaitListener implements Listener {
             result = exception.getRecoveryResult();
             AbstractMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
             message.setBaitTheme(bait.getTheme());
-            message.setBait(bait.getName());
+            message.setBait(bait.getId());
             message.send(event.getWhoClicked());
         }
 

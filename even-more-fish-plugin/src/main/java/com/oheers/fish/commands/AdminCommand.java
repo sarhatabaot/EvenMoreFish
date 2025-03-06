@@ -240,7 +240,7 @@ public class AdminCommand {
                     FishUtils.giveItems(List.of(baitItem), target);
                     AbstractMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
                     message.setPlayer(target);
-                    message.setBait(bait.getName());
+                    message.setBait(bait.getId());
                     message.send(sender);
                 });
     }

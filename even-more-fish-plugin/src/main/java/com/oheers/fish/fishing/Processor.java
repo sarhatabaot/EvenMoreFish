@@ -96,7 +96,7 @@ public abstract class Processor<E extends Event> implements Listener {
             if (caughtBait != null) {
                 AbstractMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
                 message.setBaitTheme(caughtBait.getTheme());
-                message.setBait(caughtBait.getName());
+                message.setBait(caughtBait.getId());
                 message.setPlayer(player);
                 message.send(player);
 

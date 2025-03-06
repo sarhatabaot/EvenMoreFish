@@ -124,7 +124,7 @@ public class BaitNBTManager {
             } catch (IndexOutOfBoundsException exception) {
                 EvenMoreFish.getInstance()
                         .getLogger()
-                        .severe("Failed to apply bait: " + bait.getName() + " to a user's fishing rod. This is likely caused by a change in format in the baits.yml config.");
+                        .severe("Failed to apply bait: " + bait.getId() + " to a user's fishing rod. This is likely caused by a change in format in the baits.yml config.");
                 return null;
             }
 
@@ -133,7 +133,7 @@ public class BaitNBTManager {
             boolean foundBait = false;
 
             for (String baitName : baitList) {
-                if (baitName.split(":")[0].equals(bait.getName())) {
+                if (baitName.split(":")[0].equals(bait.getId())) {
                     if (bait.isInfinite()) {
                         combined.append(baitName.split(":")[0]).append(":∞,");
                     } else {
@@ -167,10 +167,10 @@ public class BaitNBTManager {
 
                 if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
                     cursorModifier.set(-bait.getMaxApplications());
-                    combined.append(bait.getName()).append(":").append(bait.getMaxApplications());
+                    combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
                     maxBait.set(true);
                 } else {
-                    combined.append(bait.getName()).append(":").append(quantity);
+                    combined.append(bait.getId()).append(":").append(quantity);
                     cursorModifier.set(-quantity);
                 }
             } else {
@@ -190,12 +190,12 @@ public class BaitNBTManager {
             NBT.modify(item, nbt -> {
                 ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
                 if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
-                    combined.append(bait.getName()).append(":").append(bait.getMaxApplications());
+                    combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
                     compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
                     cursorModifier.set(-bait.getMaxApplications());
                     maxBait.set(true);
                 } else {
-                    combined.append(bait.getName()).append(":").append(quantity);
+                    combined.append(bait.getId()).append(":").append(quantity);
                     compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
                     cursorModifier.set(-quantity);
                 }

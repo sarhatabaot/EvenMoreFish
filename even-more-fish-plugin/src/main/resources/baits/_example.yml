@@ -26,6 +26,9 @@ infinite: false
 # This will disable the bait-use message to be send to the player. This is useful for baits that are infinite, but can be used for any bait.
 disable-use-alert: false
 
+# The amount of this bait to drop when it is acquired
+drop-quantity: 1
+
 # Item configuration follows the same format as fish
 item:
   material: NAUTILUS_SHELL
