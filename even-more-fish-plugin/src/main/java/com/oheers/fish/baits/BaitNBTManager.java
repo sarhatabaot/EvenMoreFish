@@ -376,7 +376,7 @@ public class BaitNBTManager {
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
                 message.appendString("\n");
-                message.appendMessage(baitFormat);
+                message.appendString(baitFormat.getLegacyMessage());
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
