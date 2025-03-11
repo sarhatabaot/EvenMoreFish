@@ -162,6 +162,7 @@ public abstract class AbstractMessage {
      */
     public void appendMessage(@NotNull AbstractMessage message) {
         appendString(message.getRawMessage());
+        this.liveVariables.putAll(message.liveVariables);
     }
 
     /**
@@ -177,11 +178,10 @@ public abstract class AbstractMessage {
      * @param messages The messages to append
      */
     public void appendMessageList(@NotNull List<AbstractMessage> messages) {
-        StringBuilder newMessage = new StringBuilder(this.message);
-        for (AbstractMessage message : messages) {
-            newMessage.append(message.getRawMessage());
-        }
-        this.message = newMessage.toString();
+        messages.forEach(message -> {
+            appendString("\n");
+            appendMessage(message);
+        });
     }
 
     /**
@@ -198,6 +198,7 @@ public abstract class AbstractMessage {
      */
     public void prependMessage(@NotNull AbstractMessage message) {
         prependString(message.getRawMessage());
+        this.liveVariables.putAll(message.liveVariables);
     }
 
     /**
@@ -213,11 +214,10 @@ public abstract class AbstractMessage {
      * @param messages The messages to prepend
      */
     public void prependMessageList(@NotNull List<AbstractMessage> messages) {
-        StringBuilder newMessage = new StringBuilder();
-        for (AbstractMessage message : messages) {
-            newMessage.append(message.getRawMessage());
-        }
-        this.message = newMessage + this.message;
+        messages.forEach(message -> {
+            prependMessage(message);
+            prependString("\n");
+        });
     }
 
     /**
