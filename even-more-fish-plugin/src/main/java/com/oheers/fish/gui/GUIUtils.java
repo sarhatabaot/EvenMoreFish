@@ -266,7 +266,7 @@ public class GUIUtils {
             if (gui != null) {
                 gui.doRescue();
             }
-            new BaitsGUI(click.getWhoClicked()).open();
+            new BaitsGui(click.getWhoClicked()).open();
         });
         // Add page actions so third party plugins cannot register their own.
         newActionMap.put("first-page", (gui, click) -> {});

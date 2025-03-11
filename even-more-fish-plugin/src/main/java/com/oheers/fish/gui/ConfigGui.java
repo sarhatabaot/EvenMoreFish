@@ -11,15 +11,14 @@ import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -34,9 +33,10 @@ public class ConfigGui {
     private InventoryGui.CloseAction closeAction = null;
 
     // TODO Bring the action map to this class when we switch to Triumph
-    public ConfigGui(@Nullable Section config, @NotNull Player player) {
+    public ConfigGui(@Nullable Section config, @NotNull HumanEntity player) {
         this.config = config;
-        this.player = player;
+        // HumanEntity's only subclass is Player, so this is a safe cast
+        this.player = (Player) player;
     }
 
     public void addReplacement(@NotNull String variable, @NotNull String replacement) {
