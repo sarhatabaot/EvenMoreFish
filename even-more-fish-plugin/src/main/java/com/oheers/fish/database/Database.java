@@ -493,42 +493,6 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public List<FishReportOld> getFishReportsForPlayer(@NotNull UUID uuid) {
-        final int userId = getUserId(uuid);
-
-        return new ExecuteQuery<List<FishReportOld>>(connectionFactory, settings) {
-            @Override
-            protected List<FishReportOld> onRunQuery(DSLContext dslContext) throws Exception {
-                Result<Record> result = dslContext.select()
-                        .from(Tables.FISH_LOG)
-                        .where(Tables.FISH_LOG.USER_ID.eq(userId))
-                        .fetch();
-
-                if (result.isEmpty()) {
-                    return empty();
-                }
-
-                DatabaseUtil.writeDbVerbose("Read fish reports for (%s) from the database.".formatted(uuid));
-                List<FishReportOld> reports = new ArrayList<>();
-                for (Record recordResult : result) {
-                    final String rarity = recordResult.getValue(Tables.FISH_LOG.FISH_RARITY);
-                    final String fish = recordResult.getValue(Tables.FISH_LOG.FISH_NAME);
-                    final float largestLength = recordResult.getValue(Tables.FISH_LOG.LARGEST_LENGTH);
-                    final int quantity = recordResult.getValue(Tables.FISH_LOG.QUANTITY);
-                    final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME); // convert to long, or maybe store as long?
-                    reports.add(new FishReportOld(rarity, fish, largestLength, quantity, firstCatchTime));
-                }
-                return reports;
-            }
-
-            @Override
-            protected List<FishReportOld> empty() {
-                return List.of();
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
     public List<FishReportOld> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish) {
         final int userId = getUserId(uuid);
 

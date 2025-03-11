@@ -31,6 +31,8 @@ public class JoinChecker implements Listener {
         }
 
 
+        //cache user reports
+
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
             List<FishReportOld> fishReports;
 
@@ -91,6 +93,8 @@ public class JoinChecker implements Listener {
         if (!MainConfig.getInstance().isDatabaseOnline()) {
             return;
         }
+
+        //save non critical data
 
 
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
