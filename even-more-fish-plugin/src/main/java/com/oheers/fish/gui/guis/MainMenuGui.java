@@ -12,6 +12,7 @@ public class MainMenuGui extends ConfigGui {
             GUIConfig.getInstance().getConfig().getSection("main-menu"),
             viewer
         );
+        createGui();
     }
 
 }
