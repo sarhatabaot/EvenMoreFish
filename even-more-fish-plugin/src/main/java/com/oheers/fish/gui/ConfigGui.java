@@ -153,6 +153,9 @@ public class ConfigGui {
                 return;
             }
             Inventory inv = storageElement.getStorage();
+            if (inv.isEmpty()) {
+                return;
+            }
             FishUtils.giveItems(inv.getStorageContents(), player);
             inv.clear();
         });
