@@ -35,7 +35,7 @@ public class SellGui extends ConfigGui {
 
         setCloseAction(close -> {
             if (MainConfig.getInstance().sellOverDrop()) {
-                new SellHelper(this.fishInventory, player).sellFish();
+                new SellHelper(this.fishInventory, this.player).sellFish();
             }
             doRescue();
             return false;
