@@ -200,7 +200,7 @@ public class GUIUtils {
             if (gui != null) {
                 gui.doRescue();
             }
-            new MainMenuGUI(click.getWhoClicked()).open();
+            new MainMenuGui(click.getWhoClicked()).open();
         });
         // Toggling custom fish should redraw the GUI and leave it at that
         newActionMap.put("fish-toggle", (gui, click) -> {

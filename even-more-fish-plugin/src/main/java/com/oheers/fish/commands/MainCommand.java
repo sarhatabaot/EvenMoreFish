@@ -9,7 +9,7 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.PrefixType;
 import com.oheers.fish.gui.guis.ApplyBaitsGui;
-import com.oheers.fish.gui.guis.MainMenuGUI;
+import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.permissions.UserPerms;
@@ -82,7 +82,7 @@ public class MainCommand {
         return new CommandAPICommand("gui")
                 .withPermission(UserPerms.GUI)
                 .executesPlayer(info -> {
-                    new MainMenuGUI(info.sender()).open();
+                    new MainMenuGui(info.sender()).open();
                 });
     }
 
