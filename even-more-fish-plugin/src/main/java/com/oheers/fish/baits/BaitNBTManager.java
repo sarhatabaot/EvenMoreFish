@@ -375,6 +375,7 @@ public class BaitNBTManager {
                     baitFormat.setAmount("N/A");
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
+                message.appendString("\n");
                 message.appendMessage(baitFormat);
             }
 
