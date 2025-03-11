@@ -101,7 +101,7 @@ public class ConfigGui {
         ItemStack item = new ItemStack(filler);
         FishUtils.editMeta(item, meta -> meta.setDisplayName(""));
         gui.setFiller(item);
-        gui.addElements(GUIFillerConfig.getInstance().getDefaultFillerElements());
+        gui.addElements(GUIFillerConfig.getInstance().getDefaultFillerItems(this));
     }
 
     private void loadItems(@NotNull InventoryGui gui, @NotNull Section config) {

@@ -82,108 +82,11 @@ public class GUIUtils {
         );
     }
 
-    public static GuiPageElement[] getPageElements() {
-        return new GuiPageElement[]{
-                getFirstPageButton(),
-                getPreviousPageButton(),
-                getNextPageButton(),
-                getLastPageButton()
-        };
-    }
-
     public static ItemStack createItemStack(@NotNull String materialName, @NotNull Material defaultMaterial, @NotNull String display, @NotNull List<String> lore) {
         return new ItemBuilder(materialName, defaultMaterial)
                 .withDisplay(display)
                 .withLore(lore)
                 .build();
-    }
-
-    public static InventoryGui createGUI(@Nullable Section section) {
-        if (section == null) {
-            return new InventoryGui(
-                    EvenMoreFish.getInstance(),
-                    EvenMoreFish.getAdapter().createMessage("&cBroken GUI! Please tell an admin!").getLegacyMessage(),
-                    new String[0]
-            );
-        }
-        return new InventoryGui(
-                EvenMoreFish.getInstance(),
-                EvenMoreFish.getAdapter().createMessage(section.getString("title", "EvenMoreFish Inventory")).getLegacyMessage(),
-                section.getStringList("layout").toArray(new String[0])
-        );
-    }
-
-    public static ItemStack getFillerItem(@Nullable String materialName, @NotNull Material defaultMaterial) {
-        Material material = ItemUtils.getMaterial(materialName, defaultMaterial);
-        ItemStack stack = new ItemStack(material);
-        FishUtils.editMeta(stack, meta -> meta.setDisplayName(""));
-        return stack;
-    }
-
-    public static GuiElement getElement(@Nullable String configLocation, @NotNull Section section, @Nullable EMFGUI gui, @Nullable Supplier<Map<String, String>> replacementSupplier) {
-        // Get Character
-        char character = FishUtils.getCharFromString(section.getString("character", "#"), '#');
-
-        Map<ClickType, String> clickTypeStringMap = new HashMap<>();
-        if (section.isSection("click-action")) {
-            clickTypeStringMap.put(ClickType.LEFT, section.getString("click-action.left", "none"));
-            clickTypeStringMap.put(ClickType.RIGHT, section.getString("click-action.right", "none"));
-        } else {
-            clickTypeStringMap.put(ClickType.LEFT, section.getString("click-action", "none"));
-        }
-        List<String> commands = section.getStringList("click-commands");
-
-        ItemFactory factory = new ItemFactory(configLocation, section);
-        factory.enableAllChecks();
-        // Get ItemStack
-        ItemStack item;
-        if (replacementSupplier == null) {
-            item = factory.createItem(null, -1, null);
-        } else {
-            item = factory.createItem(null, -1, replacementSupplier.get());
-        }
-
-        Section actionSection = section.getSection("click-action");
-        if (actionSection != null) {
-            return new StaticGuiElement(character, item, click -> {
-                BiConsumer<ConfigGui, GuiElement.Click> action = switch (click.getType()) {
-                    case LEFT -> getActionMap().get(actionSection.getString("left", ""));
-                    case RIGHT -> getActionMap().get(actionSection.getString("right", ""));
-                    case MIDDLE -> getActionMap().get(actionSection.getString("middle", ""));
-                    case DROP -> getActionMap().get(actionSection.getString("drop", ""));
-                    default -> null;
-                };
-                if (action != null) {
-                    action.accept(null, click);
-                }
-                return true;
-            });
-        } else {
-            return new StaticGuiElement(character, item);
-        }
-    }
-
-
-    private static boolean eitherClickTypeMatchesString(@NotNull Map<ClickType, String> map, @NotNull String matcher) {
-        boolean matches = true;
-        for (String string : map.values()) {
-            if (!string.equalsIgnoreCase(matcher)) {
-                matches = false;
-                break;
-            }
-        }
-        return matches;
-    }
-
-    public static List<GuiElement> getElements(@NotNull Section section, @Nullable EMFGUI gui, @Nullable Supplier<Map<String, String>> replacementSupplier) {
-        return section.getRoutesAsStrings(false)
-                .stream()
-                .map(section::getSection)
-                .filter(Objects::nonNull)
-                // Exclude non-item config sections, if there are any
-                .filter(loopSection -> loopSection.getRoutesAsStrings(false).contains("item"))
-                .map(loopSection -> GUIUtils.getElement(null, loopSection, gui, replacementSupplier))
-                .collect(Collectors.toList());
     }
 
     public static Map<String, BiConsumer<ConfigGui, GuiElement.Click>> getActionMap() {
