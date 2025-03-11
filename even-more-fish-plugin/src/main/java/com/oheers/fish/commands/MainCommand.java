@@ -10,7 +10,7 @@ import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.PrefixType;
 import com.oheers.fish.gui.guis.ApplyBaitsGUI;
 import com.oheers.fish.gui.guis.MainMenuGUI;
-import com.oheers.fish.gui.guis.SellGUI;
+import com.oheers.fish.gui.guis.SellGui;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.permissions.UserPerms;
 import com.oheers.fish.selling.SellHelper;
@@ -146,14 +146,14 @@ public class MainCommand {
                         return;
                     }
                     if (sender == player) {
-                        new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
+                        new SellGui(player, SellGui.SellState.NORMAL, null).open();
                         return;
                     }
                     if (!sender.hasPermission(AdminPerms.ADMIN)) {
                         ConfigMessage.NO_PERMISSION.getMessage().send(sender);
                         return;
                     }
-                    new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
+                    new SellGui(player, SellGui.SellState.NORMAL, null).open();
                     AbstractMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
                     message.setPlayer(player);
                     message.send(sender);
