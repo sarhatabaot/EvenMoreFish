@@ -18,6 +18,10 @@ public class MainConfig extends ConfigBase {
 
     private static MainConfig instance = null;
 
+    // Cache these so we don't have a mismatch after reload.
+    private String mainCommandName = null;
+    private List<String> mainCommandAliases = null;
+
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
@@ -32,16 +36,24 @@ public class MainConfig extends ConfigBase {
         return getConfig().getString("locale", "en");
     }
 
-    public int getCompetitionDuration() {
-        return getConfig().getInt("competitions.duration");
-    }
-
     public boolean doingRandomDurability() {
         return getConfig().getBoolean("random-durability", true);
     }
 
     public boolean isDatabaseOnline() {
-        return databaseEnabled() && !EvenMoreFish.getInstance().getDatabaseV3().usingVersionV2();
+        return databaseEnabled() && !EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2();
+    }
+
+    public boolean isFishCatchOnlyInCompetition() {
+        return getConfig().getBoolean("fishing.catch-only-in-competition", false);
+    }
+
+    public boolean isFishHuntOnlyInCompetition() {
+        return getConfig().getBoolean("fishing.hunt-only-in-competition", true);
+    }
+
+    public boolean isFishHuntIgnoreSpawnerFish() {
+        return getConfig().getBoolean("fishing.hunt-ignore-spawner-fish", true);
     }
 
     public boolean isCompetitionUnique() {
@@ -185,12 +197,26 @@ public class MainConfig extends ConfigBase {
 
     public int getNearbyPlayersRequirementRange() { return getConfig().getInt("requirements.nearby-players.range", 0); }
 
+    public boolean isAdminShortcutCommandEnabled() {
+        return getConfig().getBoolean("command.admin-shortcut.enabled", true);
+    }
+
+    public String getAdminShortcutCommandName() {
+        return getConfig().getString("command.admin-shortcut.name", "emfa");
+    }
+
     public String getMainCommandName() {
-        return getConfig().getString("command.main", "emf");
+        if (mainCommandName == null) {
+            mainCommandName = getConfig().getString("command.main", "emf");
+        }
+        return mainCommandName;
     }
 
     public List<String> getMainCommandAliases() {
-        return getConfig().getStringList("command.aliases");
+        if (mainCommandAliases == null) {
+            mainCommandAliases = getConfig().getStringList("command.aliases");
+        }
+        return mainCommandAliases;
     }
 
     public boolean giveStraightToInventory() {
@@ -265,7 +291,48 @@ public class MainConfig extends ConfigBase {
             }
         }
 
+        // Updated fishing section - Requires the section to exist first.
+        String oldFishUniqueKey = "fish-only-in-competition";
+        if (yamlDocument.contains(oldFishUniqueKey)) {
+            boolean fishOnlyInCompetition = yamlDocument.getBoolean(oldFishUniqueKey, false);
+            yamlDocument.set("fishing.catch-only-in-competition", fishOnlyInCompetition);
+            yamlDocument.remove(oldFishUniqueKey);
+        }
+
         save();
+    }
+
+    public boolean hasCredentials() {
+        return MainConfig.getInstance().getUsername() != null &&
+                MainConfig.getInstance().getPassword() != null &&
+                MainConfig.getInstance().getAddress() != null &&
+                MainConfig.getInstance().getDatabase() != null;
+    }
+
+    // Bait configs
+
+    public double getBaitBoostRate() {
+        return getConfig().getDouble("bait.boost", 1.5);
+    }
+
+    public boolean getBaitCompetitionDisable() {
+        return getConfig().getBoolean("bait.competition-disable", true);
+    }
+
+    public boolean getBaitAddToLore() {
+        return getConfig().getBoolean("bait.add-to-lore", true);
+    }
+
+    public double getBaitCatchPercentage() {
+        return getConfig().getDouble("bait.catch-percentage", 2.5);
+    }
+
+    public int getBaitsPerRod() {
+        return getConfig().getInt("bait.baits-per-rod", 7);
+    }
+
+    public boolean getBaitShowUnusedSlots() {
+        return getConfig().getBoolean("bait.show-unused-slots", true);
     }
 
 }

@@ -10,6 +10,7 @@ import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.oheers.fish.utils.nbt.NbtVersion;
 import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,7 +25,10 @@ public class BaitListener implements Listener {
 
     @EventHandler
     public void onClickEvent(InventoryClickEvent event) {
-        if (event.getCurrentItem() == null || event.getCursor() == null) {
+        ItemStack potentialFishingRod = event.getCurrentItem();
+        ItemStack cursor = event.getCursor();
+
+        if (potentialFishingRod == null || cursor == null) {
             return;
         }
 
@@ -32,11 +36,9 @@ public class BaitListener implements Listener {
             return;
         }
 
-        ItemStack potentialFishingRod = event.getCurrentItem();
-        ItemStack cursor = event.getCursor();
-
-        if (potentialFishingRod.getType() != Material.FISHING_ROD)
+        if (potentialFishingRod.getType() != Material.FISHING_ROD) {
             return;
+        }
 
         if (!BaitNBTManager.isBaitObject(cursor)) {
             return;
@@ -77,13 +79,13 @@ public class BaitListener implements Listener {
             result = exception.getRecoveryResult();
             AbstractMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
             message.setBaitTheme(bait.getTheme());
-            message.setBait(bait.getName());
+            message.setBait(bait.getId());
             message.send(event.getWhoClicked());
         }
 
-        if (result == null || result.getFishingRod() == null)
+        if (result == null || result.getFishingRod() == null) {
             return;
-
+        }
 
         event.setCancelled(true);
         event.setCurrentItem(result.getFishingRod());
@@ -104,7 +106,10 @@ public class BaitListener implements Listener {
         if (nbtVersion == NbtVersion.LEGACY) {
             final String namespacedKey = NbtKeys.EMF_COMPOUND + ":" + NbtKeys.EMF_APPLIED_BAIT;
             NBT.modify(fishingRod,nbt -> {
-                nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES).removeKey(namespacedKey);
+                ReadWriteNBT compound = nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES);
+                if (compound != null) {
+                    compound.removeKey(namespacedKey);
+                }
             });
 
             if (NBT.get(fishingRod, nbt -> {
@@ -112,7 +117,10 @@ public class BaitListener implements Listener {
             })) {
                 NBT.modify(fishingRod, nbt -> {
                     nbt.removeKey(namespacedKey);
-                    nbt.getCompound("display").getStringList("Lore").clear();
+                    ReadWriteNBT compound = nbt.getCompound("display");
+                    if (compound != null) {
+                        compound.getStringList("Lore").clear();
+                    }
                 });
             }
         }

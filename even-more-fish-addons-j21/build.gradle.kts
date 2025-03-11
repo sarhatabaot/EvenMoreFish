@@ -4,12 +4,17 @@ plugins {
 
 
 repositories {
-    maven("https://repo.nexomc.com/snapshots/")
+    maven("https://repo.nexomc.com/releases/")
+    maven("https://repo.oraxen.com/releases/")
+    maven("https://repo.momirealms.net/releases/")
 }
 
 dependencies {
     compileOnly(libs.spigot.api)
     compileOnly(libs.nexo)
+    compileOnly(libs.oraxen)
+    compileOnly(libs.bundles.craftengine)
+    compileOnly(libs.commons.lang3)
     compileOnly(project(":even-more-fish-api"))
 }
 

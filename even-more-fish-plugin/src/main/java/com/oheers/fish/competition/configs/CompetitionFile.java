@@ -153,7 +153,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The number of fish needed for SPECIFIC_* competition types.
      */
     public int getNumberNeeded() {
-        return Math.max(1, getConfig().getInt("number-needed"));
+        return Math.max(1, getConfig().getInt("number-needed", 1));
     }
 
     /**
@@ -174,7 +174,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The colours to show for each winning position, if the {pos_colour} variable is used.
      */
     public @NotNull List<String> getPositionColours() {
-        return getConfig().getStringList("leaderboard.position-colours", List.of("&6", "&e", "&7", "&7", "&8"));
+        return getConfig().getStringList("leaderboard.position-colours", List.of("&6", "&e", "&7", "&7", "&#888888"));
     }
 
     public @NotNull List<Long> getAlertTimes() {
@@ -266,7 +266,7 @@ public class CompetitionFile extends ConfigBase {
         Bar bar = new Bar();
         bar.setShouldShow(shouldShowBossbar());
         bar.setColour(getBossbarColour());
-        bar.setPrefix(getBossbarPrefix().getLegacyMessage());
+        bar.setPrefix(getBossbarPrefix().getLegacyMessage(), getType());
         return bar;
     }
 
@@ -274,7 +274,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The amount of players required for this competition to start.
      */
     public int getPlayersNeeded() {
-        return Math.max(1, getConfig().getInt("minimum-players"));
+        return Math.max(1, getConfig().getInt("minimum-players", 5));
     }
 
     /**
@@ -301,6 +301,13 @@ public class CompetitionFile extends ConfigBase {
                 .map(Bukkit::getWorld)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    /**
+     * @return Whether hunting is enabled.
+     */
+    public boolean isAllowHunting() {
+        return getConfig().getBoolean("allow-hunting", false);
     }
 
 }

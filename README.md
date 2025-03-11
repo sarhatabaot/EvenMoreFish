@@ -18,6 +18,15 @@ If you encounter any issues with the plugin, please do the following before repo
 
 ---
 
+## 📦 Download 📦
+
+There are three sources for the plugin:
+- [Modrinth](https://modrinth.com/plugin/evenmorefish)
+- [Spigot](https://www.spigotmc.org/resources/evenmorefish-%E2%96%AA-extensive-fishing-plugin-%E2%96%AA.91310/) (Less Frequent Updates)
+- [Jenkins](https://ci.codemc.io/job/Oheers/job/EvenMoreFish/) (Bleeding edge, potentially unstable)
+
+---
+
 ## ⭐ Features ⭐
 
 * ### Custom item support
@@ -65,7 +74,7 @@ Contributions of any size will be massively appreciated, and help support the pl
 ### Translating
 
 To contribute to translations, please create a pull request with a new messages.yml file e.g. `messages_sv.yml`
-or `messages.fr.yml`
+or `messages_fr.yml`
 
 Cheers, Oheers 
 

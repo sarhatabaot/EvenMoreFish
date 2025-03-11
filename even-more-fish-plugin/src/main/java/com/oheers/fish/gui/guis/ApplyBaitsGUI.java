@@ -81,7 +81,7 @@ public class ApplyBaitsGUI implements EMFGUI {
             if (bait == null) {
                 continue;
             }
-            if (ignoredBaits.contains(bait.getName())) {
+            if (ignoredBaits.contains(bait.getId())) {
                 continue;
             }
             ApplicationResult result;
@@ -94,10 +94,10 @@ public class ApplyBaitsGUI implements EMFGUI {
             } catch (MaxBaitReachedException exception) {
                 AbstractMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
                 message.setBaitTheme(bait.getTheme());
-                message.setBait(bait.getName());
+                message.setBait(bait.getId());
                 message.send(this.player);
                 // We should now start to ignore this bait.
-                ignoredBaits.add(bait.getName());
+                ignoredBaits.add(bait.getId());
                 continue;
             // When the rod cannot contain any more baits.
             } catch (MaxBaitsReachedException exception) {

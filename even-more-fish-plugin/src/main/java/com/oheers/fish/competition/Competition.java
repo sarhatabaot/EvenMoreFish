@@ -11,14 +11,14 @@ import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.Messages;
+import com.oheers.fish.config.messages.MessageConfig;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,7 +70,7 @@ public class Competition {
     }
 
     public void setMaxDuration(int duration) {
-        this.maxDuration = duration  * 60L;
+        this.maxDuration = duration * 60L;
     }
 
     public static boolean isActive() {
@@ -152,7 +152,7 @@ public class Competition {
                 if (MainConfig.getInstance().databaseEnabled()) {
                     Competition competitionRef = this;
                     EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
-                        EvenMoreFish.getInstance().getDatabaseV3().createCompetitionReport(competitionRef);
+                        EvenMoreFish.getInstance().getDatabase().createCompetitionReport(competitionRef);
                         leaderboard.clear();
                     });
                 } else {
@@ -236,8 +236,8 @@ public class Competition {
      * @return A boolean, true = do it in actionbar.
      */
     public boolean isDoingFirstPlaceActionBar() {
-        boolean doActionBarMessage = Messages.getInstance().getConfig().getBoolean("action-bar-message");
-        boolean isSupportedActionBarType = Messages.getInstance().getConfig().getStringList("action-bar-types").isEmpty() || Messages.getInstance()
+        boolean doActionBarMessage = MessageConfig.getInstance().getConfig().getBoolean("action-bar-message");
+        boolean isSupportedActionBarType = MessageConfig.getInstance().getConfig().getStringList("action-bar-types").isEmpty() || MessageConfig.getInstance()
                 .getConfig()
                 .getStringList("action-bar-types")
                 .contains(getCompetitionType().toString());
@@ -257,15 +257,7 @@ public class Competition {
         }
     }
 
-    private void setPositionColour(int place, AbstractMessage message) {
-        switch (place) {
-            case 0 -> message.setPositionColour("&c» &r");
-            case 1 -> message.setPositionColour("&c_ &r");
-            case 2 -> message.setPositionColour("&c&ko &r");
-        }
-    }
-
-    public void sendConsoleLeaderboard(ConsoleCommandSender console) {
+    public void sendConsoleLeaderboard(CommandSender console) {
         if (!isActive()) {
             ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(console);
             return;
@@ -322,21 +314,22 @@ public class Competition {
             entries = List.of();
         }
 
+        int maxCount = MessageConfig.getInstance().getLeaderboardCount();
+
         StringBuilder builder = new StringBuilder();
         int pos = 0;
 
         for (CompetitionEntry entry : entries) {
             pos++;
+            // If we're out of colours or the max count is reached, break the loop
+            if (pos > competitionColours.size() || pos > maxCount) {
+                break;
+            }
             AbstractMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
             message.setPlayer(Bukkit.getOfflinePlayer(entry.getPlayer()));
             message.setPosition(Integer.toString(pos));
 
-            if (pos > competitionColours.size()) {
-                int s = EvenMoreFish.getInstance().getRandom().nextInt(3);
-                setPositionColour(s, message);
-            } else {
-                message.setPositionColour(competitionColours.get(pos - 1));
-            }
+            message.setPositionColour(competitionColours.get(pos - 1));
 
             if (isConsole) {
                 message = competitionType.getStrategy().getSingleConsoleLeaderboardMessage(message, entry);

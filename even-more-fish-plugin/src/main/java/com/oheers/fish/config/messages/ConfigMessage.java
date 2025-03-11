@@ -121,6 +121,7 @@ public enum ConfigMessage {
     HELP_ADMIN_MIGRATE("[noPrefix]Migrate the database from Legacy (V2) to V3", PrefixType.ADMIN, false, true, "help-admin.migrate"),
     HELP_ADMIN_REWARDTYPES("[noPrefix]Display all registered reward types", PrefixType.ADMIN, false, true, "help-admin.rewardtypes"),
     HELP_ADMIN_ADDONS("[noPrefix]Show all registered addons", PrefixType.ADMIN, false, true, "help-admin.addons"),
+    HELP_ADMIN_RAWITEM("[noPrefix]Displays the item in your main hand as raw NBT.", PrefixType.ADMIN, false, true, "help-admin.rawitem"),
     HELP_LIST_FISH("[noPrefix]Display all fish in a specific rarity.", PrefixType.ADMIN, false, true, "help-list.fish"),
     HELP_LIST_RARITIES("[noPrefix]Display all rarities.", PrefixType.ADMIN, false, true, "help-list.rarities"),
     HELP_COMPETITION_START("[noPrefix]Starts a competition of a specified duration", PrefixType.ADMIN, false, true, "help-competition.start"),
@@ -165,7 +166,7 @@ public enum ConfigMessage {
     PLACEHOLDER_FISH_MOST_FORMAT("{amount} fish", PrefixType.NONE, true, false, "emf-most-fish-format"),
     PLACEHOLDER_NO_COMPETITION_RUNNING("No competition running right now.", PrefixType.NONE, true, false, "no-competition-running"),
     PLACEHOLDER_NO_COMPETITION_RUNNING_FISH("No competition running right now.", PrefixType.NONE, true, false, "no-competition-running-fish"),
-    PLACEHOLDER_NO_COMPETITION_RUNNING_SIZE("No competition running right now.", PrefixType.NONE, true, false, "no-competition-running"),
+    PLACEHOLDER_NO_COMPETITION_RUNNING_SIZE("No competition running right now.", PrefixType.NONE, true, false, "no-competition-running-size"),
 
     PLACEHOLDER_NO_PLAYER_IN_PLACE("Start fishing to take this place", PrefixType.NONE, true, false, "no-player-in-place"),
     PLACEHOLDER_NO_FISH_IN_PLACE("Start fishing to take this place", PrefixType.NONE, true, false, "no-fish-in-place"),
@@ -223,7 +224,30 @@ public enum ConfigMessage {
             "",
             "&e» (Left-click) sell the fish.",
             "&7» (Right-click) cancel."
-    ), PrefixType.NONE, false, false, "sell-gui-lore");
+    ), PrefixType.NONE, false, false, "sell-gui-lore"),
+    RARITY_INVALID("&rThat is not a valid rarity!", PrefixType.ERROR, false, true, "rarity-invalid"),
+    BAIT_ROD_LORE(List.of(
+        "&f",
+        "&7Bait Slots: &e({current_baits}/{max_baits})",
+        "&f",
+        "{baits}",
+        "&f"
+    ), PrefixType.NONE, false, false, "bait.rod-lore"),
+    BAIT_BAIT_LORE(List.of(
+        "&f",
+        "{bait_theme}Increases the catch rates for:",
+        "{boosts}",
+        "{lore}",
+        "&f",
+        "&#dadadaDrop onto a fishing rod to apply,",
+        "&#dadadaor hold &nSHIFT&#dadada to apply all.",
+        "&f"
+    ), PrefixType.NONE, false, false, "bait.bait-lore"),
+    BAIT_BAITS("&6► {amount} {bait}", PrefixType.NONE, false, false, "bait.baits"),
+    BAIT_BOOSTS_RARITY("{bait_theme}► &f1 {bait_theme}Rarity", PrefixType.NONE, false, false, "bait.boosts-rarity"),
+    BAIT_BOOSTS_RARITIES("{bait_theme}► &f{amount} {bait_theme}Rarities", PrefixType.NONE, false, false, "bait.boosts-rarities"),
+    BAIT_BOOSTS_FISH("{bait_theme}► &f{amount} {bait_theme}Fish", PrefixType.NONE, false, false, "bait.boosts-fish"),
+    BAIT_UNUSED_SLOT("&7► ? &oAvailable Slot", PrefixType.NONE, false, false, "bait.unused-slot");
 
     private final String id;
     private final boolean canSilent, canHidePrefix;
@@ -291,7 +315,7 @@ public enum ConfigMessage {
     }
 
     public boolean isListForm() {
-        return !Messages.getInstance().getConfig().getStringList(getId()).isEmpty();
+        return !MessageConfig.getInstance().getConfig().getStringList(getId()).isEmpty();
     }
 
     public PrefixType getPrefixType() {
@@ -316,12 +340,13 @@ public enum ConfigMessage {
             }
         } else {
             String line = getString(getNormal(), getId());
-
-            if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                message.appendString(line.substring(10));
-            } else {
-                message.appendMessage(getPrefixType().getPrefix());
-                message.appendString(line);
+            if (line != null) {
+                if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
+                    message.appendString(line.substring(10));
+                } else {
+                    message.appendMessage(getPrefixType().getPrefix());
+                    message.appendString(line);
+                }
             }
         }
         message.setCanSilent(this.canSilent);
@@ -335,7 +360,7 @@ public enum ConfigMessage {
      * @return The string from config that matches the value of id.
      */
     private String getString(String normal, String id) {
-        Messages messageConfig = Messages.getInstance();
+        MessageConfig messageConfig = MessageConfig.getInstance();
         String string = messageConfig.getConfig().getString(id, null);
         if (string == null) {
             EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Attempting to insert the default value.");
@@ -355,7 +380,7 @@ public enum ConfigMessage {
      * @return The string list from config that matches the value of id.
      */
     private List<String> getStringList(List<String> normal, String id) {
-        Messages messageConfig = Messages.getInstance();
+        MessageConfig messageConfig = MessageConfig.getInstance();
         List<String> list = messageConfig.getConfig().getStringList(id);
         if (list.isEmpty()) {
             EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Attempting to insert the default value.");

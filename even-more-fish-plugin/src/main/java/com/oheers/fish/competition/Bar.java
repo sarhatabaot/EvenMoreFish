@@ -40,15 +40,10 @@ public class Bar {
             progress = 1.0D;
         }
         bar.setProgress(progress);
-
     }
 
     public void setPrefix(String prefix, CompetitionType type) {
         this.prefix = prefix.replace("{type}", type.getBarPrefix());
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 
     public void setColour(BarColor colour) {

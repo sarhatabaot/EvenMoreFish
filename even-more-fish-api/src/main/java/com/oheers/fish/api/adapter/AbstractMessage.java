@@ -130,6 +130,18 @@ public abstract class AbstractMessage {
     }
 
     /**
+     * @return The formatted message as a plain text string. All formatting will be removed.
+     */
+    public abstract String getPlainTextMessage();
+
+    /**
+     * @return The formatted message as a plain text string list. All formatting will be removed.
+     */
+    public @NotNull List<String> getPlainTextListMessage() {
+        return Arrays.asList(getPlainTextMessage().split("\n"));
+    }
+
+    /**
      * Formats PlaceholderAPI placeholders.
      * <p>
      * This is abstract because the MiniMessage impl will need to handle this manually.
@@ -205,7 +217,7 @@ public abstract class AbstractMessage {
         for (AbstractMessage message : messages) {
             newMessage.append(message.getRawMessage());
         }
-        this.message = newMessage.toString() + this.message;
+        this.message = newMessage + this.message;
     }
 
     /**
@@ -261,12 +273,27 @@ public abstract class AbstractMessage {
     }
 
     /**
+     * Adds a variable to be formatted when {@link #formatVariables()} is called.
+     * @param variable The variable.
+     * @param replacement The replacement for the variable.
+     */
+    public void setVariable(@NotNull final String variable, @NotNull final AbstractMessage replacement) {
+        this.liveVariables.put(variable, replacement.getRawMessage());
+    }
+
+    /**
      * Adds a map of variables to be formatted when {@link #formatVariables()} is called.
      * @param variableMap The map of variables and their replacements.
      */
-    public void setVariables(@Nullable Map<String, String> variableMap) {
+    public void setVariables(@Nullable Map<String, ?> variableMap) {
         if (variableMap == null) { return; }
-        this.liveVariables.putAll(variableMap);
+        variableMap.forEach((variable, obj) -> {
+            if (obj instanceof AbstractMessage abstractMessage) {
+                setVariable(variable, abstractMessage);
+            } else {
+                setVariable(variable, obj.toString());
+            }
+        });
     }
 
     // Variable Shortcuts
@@ -493,7 +520,7 @@ public abstract class AbstractMessage {
      * Sets the competition type, checking against the values for each type stored in messages.yml to replace the {type}
      * variable.
      *
-     * @param type The competition type.
+     * @param typeString The competition type.
      */
     public void setCompetitionType(@NotNull final String typeString) {
         setVariable("{type}", typeString);

@@ -47,6 +47,6 @@ As explained in the rarities.yml above the setting, each fish's rarity will have
 
 A fair amount of people believe weights are the same as percentages, **this is false**: All weights work relative to each other, so if `Fish A` has a weight of 6 and `Fish B` has a weight of 12, `Fish B` will be twice as likely to be caught as `Fish A`. If the weights of all other fish in this rarity aside from `Fish B` (remember, this has weight of 12) add up to 12 too, then `Fish B` will be pulled 50% of the time, but if all other fish in the rarity added to 1,000 for example then `Fish B` would be pretty rare to catch. To calculate the weight of `Fish A` we'll assume that all the fish in the same rarity as `Fish A` adds up to 600, the weight of `Fish A` divided by the total weight in that rarity is 6 / 600, so 1%.
 
-## How do i use ItemsAdder items?
+## How do I use items from other plugins?
 
 See https://github.com/Oheers/EvenMoreFish/wiki/Addons

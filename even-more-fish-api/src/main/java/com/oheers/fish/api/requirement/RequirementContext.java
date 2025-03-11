@@ -6,13 +6,15 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
+
 public class RequirementContext {
 
-    World world;
-    Location location;
-    Player player;
-    YamlDocument config;
-    String configPath;
+    private WeakReference<World> worldRef;
+    private Location location;
+    private Player player;
+    private YamlDocument config;
+    private String configPath;
 
     /**
      * Provides data about the current server to the requirement checker, for example it passes through the current
@@ -20,7 +22,7 @@ public class RequirementContext {
      * can be checked or the regions or y-level can be checked.
      */
     public RequirementContext(@Nullable World world, @Nullable Location location, @Nullable Player player, @Nullable YamlDocument config, @Nullable String configPath) {
-        this.world = world;
+        this.worldRef = new WeakReference<>(world);
         this.location = location;
         this.player = player;
         this.config = config;
@@ -28,11 +30,11 @@ public class RequirementContext {
     }
 
     public @Nullable World getWorld() {
-        return world;
+        return worldRef.get();
     }
 
     public void setWorld(World world) {
-        this.world = world;
+        this.worldRef = new WeakReference<>(world);
     }
 
     public @Nullable Location getLocation() {
@@ -63,7 +65,7 @@ public class RequirementContext {
      */
     public void setLocation(Location location) {
         this.location = location;
-        this.world = location.getWorld();
+        this.worldRef = new WeakReference<>(location.getWorld());
     }
 
     public @Nullable Player getPlayer() {
@@ -73,4 +75,5 @@ public class RequirementContext {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
 }

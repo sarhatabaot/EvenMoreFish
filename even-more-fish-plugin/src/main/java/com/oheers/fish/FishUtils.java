@@ -3,6 +3,8 @@ package com.oheers.fish;
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.api.addons.exceptions.IncorrectAssignedMaterialException;
+import com.oheers.fish.api.addons.exceptions.NoPrefixException;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.config.MainConfig;
@@ -11,6 +13,7 @@ import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.utils.ItemUtils;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -22,22 +25,32 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Skull;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 
 public class FishUtils {
+
+    private FishUtils() {
+        throw new UnsupportedOperationException();
+    }
 
     // checks for the "emf-fish-name" nbt tag, to determine if this ItemStack is a fish or not.
     public static boolean isFish(ItemStack item) {
@@ -56,7 +69,7 @@ public class FishUtils {
         return NbtUtils.hasKey(skull, NbtKeys.EMF_FISH_NAME);
     }
 
-    public static Fish getFish(ItemStack item) {
+    public static @Nullable Fish getFish(ItemStack item) {
         // all appropriate null checks can be safely assumed to have passed to get to a point where we're running this method.
 
         String nameString = NbtUtils.getString(item, NbtKeys.EMF_FISH_NAME);
@@ -66,7 +79,7 @@ public class FishUtils {
         Integer randomIndex = NbtUtils.getInteger(item, NbtKeys.EMF_FISH_RANDOM_INDEX);
 
         if (nameString == null || rarityString == null) {
-            return null; //throw new InvalidFishException("NBT Error");
+            return null;
         }
 
 
@@ -78,31 +91,25 @@ public class FishUtils {
         }
 
         // setting the correct length so it's an exact replica.
-        Fish loadedFish = rarity.getFish(nameString);
-        Fish finalFish;
-        try {
-            // Ignore NPE warning here, it is caught in the catch block.
-            finalFish = loadedFish.clone();
-        } catch (NullPointerException | CloneNotSupportedException exception) {
-            EvenMoreFish.getInstance().getLogger().severe("Could not create fish from an ItemStack with rarity " + rarityString + " and name " + nameString + ". You may have" +
-                    "deleted the fish since this fish was caught.");
+        Fish fish = rarity.getFish(nameString);
+        if (fish == null) {
             return null;
         }
         if (randomIndex != null) {
-            finalFish.getFactory().setType(randomIndex);
+            fish.getFactory().setType(randomIndex);
         }
-        finalFish.setLength(lengthFloat);
+        fish.setLength(lengthFloat);
         if (playerString != null) {
             try {
-                finalFish.setFisherman(UUID.fromString(playerString));
+                fish.setFisherman(UUID.fromString(playerString));
             } catch (IllegalArgumentException exception) {
-                finalFish.setFisherman(null);
+                fish.setFisherman(null);
             }
         }
-        return finalFish;
+        return fish;
     }
 
-    public static Fish getFish(Skull skull, Player fisher) throws InvalidFishException {
+    public static @Nullable Fish getFish(Skull skull, Player fisher) throws InvalidFishException {
         // all appropriate null checks can be safely assumed to have passed to get to a point where we're running this method.
         final String nameString = NBT.getPersistentData(skull, nbt -> nbt.getString(NbtUtils.getNamespacedKey(NbtKeys.EMF_FISH_NAME).toString()));
         final String playerString = NBT.getPersistentData(skull, nbt -> nbt.getString(NbtUtils.getNamespacedKey(NbtKeys.EMF_FISH_PLAYER).toString()));
@@ -122,41 +129,47 @@ public class FishUtils {
         }
 
         // setting the correct length and randomIndex, so it's an exact replica.
-        Fish loadedFish = rarity.getFish(nameString);
-        Fish finalFish;
-        try {
-            finalFish = loadedFish.clone();
-        } catch (NullPointerException | CloneNotSupportedException exception) {
+        Fish fish = rarity.getFish(nameString);
+        if (fish == null) {
             return null;
         }
-        finalFish.setLength(lengthFloat);
+        fish.setLength(lengthFloat);
         if (randomIndex != null) {
-            finalFish.getFactory().setType(randomIndex);
+            fish.getFactory().setType(randomIndex);
         }
         if (playerString != null) {
             try {
-                finalFish.setFisherman(UUID.fromString(playerString));
+                fish.setFisherman(UUID.fromString(playerString));
             } catch (IllegalArgumentException exception) {
-                finalFish.setFisherman(null);
+                fish.setFisherman(null);
             }
         } else {
-            finalFish.setFisherman(fisher.getUniqueId());
+            fish.setFisherman(fisher.getUniqueId());
         }
 
-        return finalFish;
+        return fish;
     }
 
     public static void giveItems(List<ItemStack> items, Player player) {
-        if (items.isEmpty()) {
-            return;
+        if (items == null || items.isEmpty()) {
+            return; // Early return if the list is null or empty
         }
-        // Remove null items
-        items = items.stream().filter(Objects::nonNull).toList();
+
+        // Remove null items and avoid modifying the original list
+        List<ItemStack> filteredItems = items.stream()
+                .filter(Objects::nonNull)
+                .toList();
+
+        // Play item pickup sound
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.5f);
-        player.getInventory().addItem(items.toArray(new ItemStack[0]))
-                .values()
-                .forEach(item -> player.getWorld().dropItem(player.getLocation(), item));
+
+        // Add items to the player's inventory
+        Map<Integer, ItemStack> leftoverItems = player.getInventory().addItem(filteredItems.toArray(new ItemStack[0]));
+
+        // Drop any leftover items in the world
+        leftoverItems.values().forEach(item -> player.getWorld().dropItem(player.getLocation(), item));
     }
+
 
     public static void giveItems(ItemStack[] items, Player player) {
         giveItems(Arrays.asList(items), player);
@@ -166,61 +179,78 @@ public class FishUtils {
         giveItems(List.of(item), player);
     }
 
-    public static boolean checkRegion(Location l, List<String> whitelistedRegions) {
-        // if the user has defined a region whitelist
+    public static boolean checkRegion(Location location, List<String> whitelistedRegions) {
+        // If no whitelist is defined, allow all regions
         if (whitelistedRegions.isEmpty()) {
             return true;
         }
 
+        // Check WorldGuard
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
-            // Creates a query for whether the player is stood in a protected region defined by the user
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionQuery query = container.createQuery();
-            ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(l));
+            ApplicableRegionSet regions = query.getApplicableRegions(BukkitAdapter.adapt(location));
 
-            // runs the query
-            for (ProtectedRegion pr : set) {
-                if (whitelistedRegions.contains(pr.getId())) {
-                    return true;
+            for (ProtectedRegion region : regions) {
+                if (whitelistedRegions.contains(region.getId())) {
+                    return true; // Return true if a region matches the whitelist
                 }
             }
-            return false;
-        } else if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {
-            Region r = RedProtect.get().getAPI().getRegion(l);
-            // if the hook is in any RedProtect region
-            if (r != null) {
-                // if the hook is in a whitelisted region
-                return whitelistedRegions.contains(r.getName());
-            }
-            return false;
-        } else {
-            // the user has defined a region whitelist but doesn't have a region plugin.
-            EvenMoreFish.getInstance().getLogger().warning("Please install WorldGuard or RedProtect to use allowed-regions.");
-            return true;
+
+            return false; // No match found in WorldGuard regions
         }
+
+        // Check RedProtect
+        if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {
+            Region region = RedProtect.get().getAPI().getRegion(location);
+            if (region != null) {
+                return whitelistedRegions.contains(region.getName()); // Check if the region is whitelisted
+            }
+            return false; // No region found in RedProtect
+        }
+
+        // If no supported region plugins are found
+        EvenMoreFish.getInstance().getLogger().warning("Please install WorldGuard or RedProtect to use allowed-regions.");
+        return true; // Allow by default if no region plugin is present
     }
 
-    public static String getRegionName(Location location) {
-        if (MainConfig.getInstance().isRegionBoostsEnabled()) {
-            Plugin worldGuard = EvenMoreFish.getInstance().getServer().getPluginManager().getPlugin("WorldGuard");
-            if (worldGuard != null && worldGuard.isEnabled()) {
-                RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-                RegionQuery query = container.createQuery();
-                ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(location));
-                for (ProtectedRegion region : set) {
-                    return region.getId(); // Return the first region found
-                }
-            } else if (EvenMoreFish.getInstance().getServer().getPluginManager().isPluginEnabled("RedProtect")) {
-                Region region = RedProtect.get().getAPI().getRegion(location);
-                if (region != null) {
-                    return region.getName();
-                }
-            } else {
-                EvenMoreFish.getInstance().getLogger().warning("Please install WorldGuard or RedProtect to use region-boosts.");
-            }
+
+    public static @Nullable String getRegionName(Location location) {
+        if (!MainConfig.getInstance().isRegionBoostsEnabled()) {
+            EvenMoreFish.debug("Region boosts are disabled.");
+            return null;
         }
-        return null; // Return null if no region is found or no region plugin is enabled
+
+        EvenMoreFish plugin = EvenMoreFish.getInstance();
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
+
+        Plugin worldGuard = pluginManager.getPlugin("WorldGuard");
+        if (worldGuard != null && worldGuard.isEnabled()) {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            ApplicableRegionSet set = container.createQuery().getApplicableRegions(BukkitAdapter.adapt(location));
+
+            if (set.getRegions().isEmpty()) {
+                EvenMoreFish.debug("Could not find any regions with WorldGuard");
+                return null;
+            }
+
+            return set.iterator().next().getId(); // Return the first region found
+        }
+
+        if (pluginManager.isPluginEnabled("RedProtect")) {
+            Region region = RedProtect.get().getAPI().getRegion(location);
+            if (region == null) {
+                EvenMoreFish.debug("Could not find any regions with RedProtect");
+                return null;
+            }
+
+            return region.getName();
+        }
+
+        plugin.getLogger().warning("Please install WorldGuard or RedProtect to use region-boosts.");
+        return null;
     }
+
 
     public static boolean checkWorld(Location l) {
         // if the user has defined a world whitelist
@@ -232,63 +262,12 @@ public class FishUtils {
         List<String> whitelistedWorlds = MainConfig.getInstance().getAllowedWorlds();
         if (l.getWorld() == null) {
             return false;
-        } else {
-            return whitelistedWorlds.contains(l.getWorld().getName());
         }
+
+        return whitelistedWorlds.contains(l.getWorld().getName());
     }
 
-    public static String translateColorCodes(String message) {
-        return EvenMoreFish.getAdapter().translateColorCodes(message);
-    }
-
-    //gets the item with a custom texture
-    public static ItemStack getSkullFromBase64(String base64EncodedString) {
-        final ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-        UUID headUuid = UUID.randomUUID();
-        // 1.20.5+ handling
-        if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_20_R3)) {
-            NBT.modifyComponents(skull, nbt -> {
-                ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                profileNbt.setUUID("id", headUuid);
-                ReadWriteNBT propertiesNbt = profileNbt.getCompoundList("properties").addCompound();
-                // This key is required, so we set it to an empty string.
-                propertiesNbt.setString("name", "textures");
-                propertiesNbt.setString("value", base64EncodedString);
-            });
-        // 1.20.4 and below handling
-        } else {
-            NBT.modify(skull, nbt -> {
-                ReadWriteNBT skullOwnerCompound = nbt.getOrCreateCompound("SkullOwner");
-                skullOwnerCompound.setUUID("Id", headUuid);
-                skullOwnerCompound.getOrCreateCompound("Properties")
-                        .getCompoundList("textures")
-                        .addCompound()
-                        .setString("Value", base64EncodedString);
-            });
-        }
-        return skull;
-    }
-
-    //gets the item with a custom uuid
-    public static ItemStack getSkullFromUUID(UUID uuid) {
-        final ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-        // 1.20.5+ handling
-        if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_20_R3)) {
-            NBT.modifyComponents(skull, nbt -> {
-                ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                profileNbt.setUUID("id", uuid);
-            });
-            // 1.20.4 and below handling
-        } else {
-            NBT.modify(skull, nbt -> {
-                ReadWriteNBT skullOwnerCompound = nbt.getOrCreateCompound("SkullOwner");
-                skullOwnerCompound.setUUID("Id", uuid);
-            });
-        }
-        return skull;
-    }
-
-    public static String timeFormat(long timeLeft) {
+    public static @NotNull String timeFormat(long timeLeft) {
         String returning = "";
         long hours = timeLeft / 3600;
         long minutes = (timeLeft % 3600) / 60;
@@ -316,7 +295,7 @@ public class FishUtils {
         return returning.trim();
     }
 
-    public static String timeRaw(long timeLeft) {
+    public static @NotNull String timeRaw(long timeLeft) {
         String returning = "";
         long hours = timeLeft / 3600;
 
@@ -334,31 +313,48 @@ public class FishUtils {
     }
 
     public static void broadcastFishMessage(AbstractMessage message, Player referencePlayer, boolean actionBar) {
-
         String formatted = message.getLegacyMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
         if (formatted.isEmpty() || activeComp == null) {
+            EvenMoreFish.debug("Formatted (Empty Message) " + formatted.isEmpty());
+            EvenMoreFish.debug("Active Comp is null? " + (activeComp == null));
             return;
         }
 
-        CompetitionFile activeCompetitionFile = activeComp.getCompetitionFile();
-
-        int rangeSquared = activeCompetitionFile.getBroadcastRange(); // 10 blocks squared
-
-        Collection<? extends Player> validPlayers = Bukkit.getOnlinePlayers();
-
-        if (rangeSquared > -1) {
-            validPlayers = validPlayers.stream()
-                    .filter(player -> isWithinRange(referencePlayer, player, rangeSquared))
-                    .toList();
-        }
+        List<? extends Player> validPlayers = getValidPlayers(referencePlayer, activeComp);
+        List<String> playerNames = validPlayers.stream().map(Player::getName).toList();
+        EvenMoreFish.debug("Valid players: " + StringUtils.join(playerNames, ","));
 
         if (actionBar) {
             validPlayers.forEach(message::sendActionBar);
         } else {
             validPlayers.forEach(message::send);
         }
+    }
+
+    private static @NotNull List<? extends Player> getValidPlayers(@NotNull Player referencePlayer, @NotNull Competition activeComp) {
+        CompetitionFile activeCompetitionFile = activeComp.getCompetitionFile();
+
+        // Get the list of online players once and store in a variable.
+        Stream<? extends Player> validPlayers = Bukkit.getOnlinePlayers().stream();
+
+        // Combine checks for fishing rod and broadcast range, to avoid unnecessary filtering.
+        if (activeCompetitionFile.shouldBroadcastOnlyRods() || activeCompetitionFile.getBroadcastRange() > -1) {
+            validPlayers = validPlayers.filter(player -> {
+                boolean isRodHolder = !activeCompetitionFile.shouldBroadcastOnlyRods() || isHoldingMaterial(player, Material.FISHING_ROD);
+                boolean isInRange = activeCompetitionFile.getBroadcastRange() <= -1 || isWithinRange(referencePlayer, player, activeCompetitionFile.getBroadcastRange());
+                return isRodHolder && isInRange;
+            });
+        }
+
+        return validPlayers.toList();
+    }
+
+
+    public static boolean isHoldingMaterial(@NotNull Player player, @NotNull Material material) {
+        return player.getInventory().getItemInMainHand().getType().equals(material)
+                || player.getInventory().getItemInOffHand().getType().equals(material);
     }
 
     private static boolean isWithinRange(Player player1, Player player2, int rangeSquared) {
@@ -382,7 +378,8 @@ public class FishUtils {
 
     /**
      * Gets the first Character from a given String
-     * @param string The String to use.
+     *
+     * @param string      The String to use.
      * @param defaultChar The default character to use if an exception is thrown.
      * @return The first Character from the String
      */
@@ -394,7 +391,7 @@ public class FishUtils {
         }
     }
 
-    public static Biome getBiome(@NotNull String keyString) {
+    public static @Nullable Biome getBiome(@NotNull String keyString) {
         // Force lowercase
         keyString = keyString.toLowerCase();
         // If no namespace, assume minecraft
@@ -416,25 +413,38 @@ public class FishUtils {
         return biome;
     }
 
-    // TODO cleanup
+    /**
+     * Calculates the total weight of a list of fish, applying a boost to specific fish if applicable.
+     *
+     * @param fishList    The list of fish to process.
+     * @param boostRate   The boost multiplier for certain fish. If set to -1, only boosted fish are considered.
+     * @param boostedFish The list of fish that should receive the boost. Can be null if no boost is applied.
+     * @return The total calculated weight.
+     */
     public static double getTotalWeight(List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
         double totalWeight = 0;
+        boolean applyBoost = boostRate != -1 && boostedFish != null;
 
         for (Fish fish : fishList) {
-            // when boostRate is -1, we need to guarantee a fish, so the fishList has already been moderated to only contain
-            // boosted fish. The other 2 check that the plugin wants the bait calculations too.
-            if (boostRate != -1 && boostedFish != null && boostedFish.contains(fish)) {
+            // When boostRate is -1, we need to guarantee a fish, so fishList has already been filtered
+            // to only contain boosted fish. Otherwise, check if the fish should receive a boost.
+            boolean isBoosted = applyBoost && boostedFish.contains(fish);
 
-                if (fish.getWeight() == 0.0d) totalWeight += (1 * boostRate);
-                else
-                    totalWeight += fish.getWeight() * boostRate;
+            // If the fish has no weight, assign a default weight of 1.
+            double weight = fish.getWeight();
+            double baseWeight = (weight == 0.0d) ? 1 : weight;
+
+            // Apply the boost if applicable.
+            if (isBoosted) {
+                totalWeight += baseWeight * boostRate;
             } else {
-                if (fish.getWeight() == 0.0d) totalWeight += 1;
-                else totalWeight += fish.getWeight();
+                totalWeight += baseWeight;
             }
         }
+
         return totalWeight;
     }
+
 
     public static @Nullable DayOfWeek getDay(@NotNull String day) {
         try {
@@ -462,20 +472,118 @@ public class FishUtils {
     }
 
     // #editMeta methods. These can be safely replaced with Paper's API once we drop Spigot.
-
     public static boolean editMeta(@NotNull ItemStack item, @NotNull Consumer<ItemMeta> consumer) {
         return editMeta(item, ItemMeta.class, consumer);
     }
 
     public static <M extends ItemMeta> boolean editMeta(@NotNull ItemStack item, @NotNull Class<M> metaClass, @NotNull Consumer<M> consumer) {
         ItemMeta meta = item.getItemMeta();
-        if (metaClass.isInstance(meta)) {
-            M checked = metaClass.cast(meta);
-            consumer.accept(checked);
-            item.setItemMeta(checked);
-            return true;
+        if (!metaClass.isInstance(meta)) {
+            return false;
         }
-        return false;
+
+        M checked = metaClass.cast(meta);
+        consumer.accept(checked);
+        item.setItemMeta(checked);
+        return true;
+    }
+
+    public static @Nullable ItemStack getCustomItem(@NotNull String materialString) {
+        if (!materialString.contains(":")) {
+            return null;
+        }
+        try {
+            final String[] split = materialString.split(":", 2);
+            final String prefix = split[0];
+            final String id = split[1];
+            EvenMoreFish.debug("GET ITEM for Addon(%s) Id(%s)".formatted(prefix, id));
+            return EvenMoreFish.getInstance().getAddonManager().getItemStack(prefix, id);
+        } catch (ArrayIndexOutOfBoundsException | NoPrefixException exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets an ItemStack from a string. If the string contains a colon, it is assumed to be an addon string.
+     * @param materialString The string to parse.
+     * @return The ItemStack, or null if the material is invalid.
+     */
+    public static @Nullable ItemStack getItem(@NotNull final String materialString) {
+        // Colon assumes an addon item
+        if (materialString.contains(":")) {
+            return getCustomItem(materialString);
+        }
+
+        Material material = ItemUtils.getMaterial(materialString);
+        if (material == null) {
+            return null;
+        }
+
+        return new ItemStack(material);
+    }
+
+    // The following methods have been delegated to the platform adapter.
+
+    public static @NotNull String translateColorCodes(String message) {
+        return EvenMoreFish.getAdapter().translateColorCodes(message);
+    }
+
+    public static @NotNull ItemStack getSkullFromBase64(String base64) {
+        return EvenMoreFish.getAdapter().getSkullFromBase64(base64);
+    }
+
+    public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
+        return EvenMoreFish.getAdapter().getSkullFromUUID(uuid);
+    }
+
+    /**
+     * Sorts a double value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The double value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded double value with the provided amount of decimal places.
+     */
+    public static double roundDouble(final double value, final int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .doubleValue();
+    }
+
+    /**
+     * Formats a double value by applying the configured decimal format.
+     *
+     * @param value The double value to be formatted.
+     * @return The formatted double
+     */
+    public static String formatDouble(@NotNull final String formatStr, final double value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
+        return format.format(value);
+    }
+
+    /**
+     * Sorts a float value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The float value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded float value with the provided amount of decimal places.
+     */
+    public static float roundFloat(final float value, int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .floatValue();
+    }
+
+    /**
+     * Formats a float value by applying the configured decimal format.
+     *
+     * @param value The float value to be formatted.
+     * @return The formatted float
+     */
+    public static String formatFloat(@NotNull final String formatStr, final float value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
+        return format.format(value);
     }
 
 }

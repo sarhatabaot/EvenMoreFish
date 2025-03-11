@@ -26,7 +26,7 @@ public class Rarity extends ConfigBase {
 
     /**
      * Constructs a Rarity from its config file.
-     * @param section The file for this rarity.
+     * @param file The file for this rarity.
      */
     public Rarity(@NotNull File file) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
@@ -121,17 +121,35 @@ public class Rarity extends ConfigBase {
         return false;
     }
 
-    public @NotNull List<Fish> getFishList() {
+    /**
+     * @return This rarity's original list of loaded fish
+     */
+    public @NotNull List<Fish> getOriginalFishList() {
         return fishList;
     }
 
-    public @Nullable Fish getFish(@NotNull String name) {
+    /**
+     * @return This rarity's list of loaded fish, but each fish is a clone of the original
+     */
+    public @NotNull List<Fish> getFishList() {
+        return fishList.stream().map(Fish::createCopy).toList();
+    }
+
+    public @Nullable Fish getEditableFish(@NotNull String name) {
         for (Fish fish : fishList) {
             if (fish.getName().equalsIgnoreCase(name)) {
                 return fish;
             }
         }
         return null;
+    }
+
+    public @Nullable Fish getFish(@NotNull String name) {
+        Fish fish = getEditableFish(name);
+        if (fish == null) {
+            return null;
+        }
+        return fish.createCopy();
     }
 
     public double getWorthMultiplier() {
@@ -162,7 +180,7 @@ public class Rarity extends ConfigBase {
                 fishSection = rootFishSection.createSection(fishStr);
             }
             try {
-                fishList.add(new Fish(this, fishSection));
+                fishList.add(Fish.createOrThrow(this, fishSection));
             } catch (InvalidFishException exception) {
                 EvenMoreFish.getInstance().getLogger().log(Level.WARNING, exception.getMessage(), exception);
             }

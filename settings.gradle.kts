@@ -2,6 +2,7 @@ rootProject.name = "even-more-fish"
 
 include(":even-more-fish-api")
 include(":even-more-fish-addons-j17")
+include(":even-more-fish-database-extras")
 include(":even-more-fish-addons-j21")
 include(":even-more-fish-plugin")
 include(":even-more-fish-paper")
@@ -39,8 +40,13 @@ dependencyResolutionManagement {
             library("itemsadder-api", "com.github.LoneDev6:API-ItemsAdder:3.6.1")
             library("nbt-api", "de.tr7zw:item-nbt-api:2.14.1")
             library("denizen-api", "com.denizenscript:denizen:1.3.1-SNAPSHOT")
-            library("oraxen", "io.th0rgal:oraxen:1.173.0") // We must use 1.173.0 as later versions require Java 21
-            library("nexo", "com.nexomc:nexo:0.9.0-dev.9")
+            library("oraxen", "io.th0rgal:oraxen:1.188.0")
+            library("nexo", "com.nexomc:nexo:1.0.0")
+
+            version("craftengine", "0.0.25")
+            library("craftengine-core", "net.momirealms", "craft-engine-core").versionRef("craftengine")
+            library("craftengine-bukkit", "net.momirealms", "craft-engine-bukkit").versionRef("craftengine")
+            bundle("craftengine", listOf("craftengine-core", "craftengine-bukkit"))
 
             library("ecoitems-api", "com.willfp:EcoItems:5.6.1")
             library("ecoitems-libreforge", "com.willfp:libreforge:4.21.1")
@@ -51,9 +57,8 @@ dependencyResolutionManagement {
             library("commons-codec", "commons-codec:commons-codec:1.17.0")
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
             library("annotations", "org.jetbrains:annotations:24.1.0")
-            library("maven-artifact", "org.apache.maven:maven-artifact:3.9.9")
 
-            version("flyway", "10.17.0")
+            version("flyway", "11.2.0")
             library("flyway-core", "org.flywaydb","flyway-core").versionRef("flyway")
             library("flyway-mysql", "org.flywaydb","flyway-mysql").versionRef("flyway")
             bundle("flyway", listOf("flyway-core", "flyway-mysql"))
@@ -67,16 +72,28 @@ dependencyResolutionManagement {
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.4")
 
-            library("acf", "co.aikar:acf-paper:0.5.1-SNAPSHOT")
+            library("commandapi", "dev.jorel:commandapi-bukkit-shade:9.7.0")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
-            plugin("shadow", "com.gradleup.shadow").version("8.3.3")
-            plugin("bukkit-yml", "net.minecrell.plugin-yml.bukkit").version("0.6.0")
+            plugin("shadow", "com.gradleup.shadow").version("8.3.5")
+            plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.7.1")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
 
             plugin("grgit", "org.ajoberstar.grgit").version("5.2.2")
 
+            version("jooq", "3.19.18")
+            library("jooq", "org.jooq","jooq").versionRef("jooq")
+            library("jooq-codegen", "org.jooq", "jooq-codegen").versionRef("jooq")
+            library("jooq-meta", "org.jooq", "jooq-meta").versionRef("jooq")
+            library("jooq-meta-extensions","org.jooq","jooq-meta-extensions").versionRef("jooq")
+            plugin("jooq", "nu.studer.jooq").version("9.0")
+
+            library("connectors-mysql", "com.mysql:mysql-connector-j:9.1.0")
+            library("connectors-sqlite", "org.xerial:sqlite-jdbc:3.47.1.0")
+            library("connectors-h2", "com.h2database:h2:2.3.232")
+
+            library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-2")
         }
     }
 }

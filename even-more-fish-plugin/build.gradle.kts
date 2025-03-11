@@ -1,19 +1,23 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import nu.studer.gradle.jooq.JooqExtension
+import org.jooq.meta.jaxb.Property
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+
 plugins {
     `java-library`
     `maven-publish`
-    alias(libs.plugins.bukkit.yml)
+    alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
+    alias(libs.plugins.jooq)
 }
 
 group = "com.oheers.evenmorefish"
-version = "2.0.0"
+version = "2.0.0-SNAPSHOT"
 
 description = "A fishing extension bringing an exciting new experience to fishing."
 
@@ -70,9 +74,7 @@ dependencies {
         exclude("com.sk89q.worldguard", "worldguard-bukkit")
     }
     compileOnly(libs.aura.skills)
-    compileOnly(libs.aurelium.skills) {
-        exclude(libs.acf.get().group, libs.acf.get().name)
-    }
+    compileOnly(libs.aurelium.skills)
 
     compileOnly(libs.griefprevention)
     compileOnly(libs.mcmmo) {
@@ -84,12 +86,11 @@ dependencies {
     implementation(libs.nbt.api)
     implementation(libs.bstats)
     implementation(libs.universalscheduler)
-    implementation(libs.acf)
+    implementation(libs.commandapi)
     implementation(libs.inventorygui)
     implementation(libs.vanishchecker)
     implementation(libs.boostedyaml)
 
-    library(libs.maven.artifact)
     library(libs.friendlyid)
     library(libs.flyway.core)
     library(libs.flyway.mysql)
@@ -98,6 +99,17 @@ dependencies {
     library(libs.commons.lang3)
     library(libs.commons.codec)
     library(libs.json.simple)
+
+    library(libs.jooq)
+    library(libs.jooq.codegen)
+    library(libs.jooq.meta)
+    library(libs.connectors.h2)
+
+    library(libs.maven.artifact)
+
+    jooqGenerator(project(":even-more-fish-database-extras"))
+    jooqGenerator(libs.jooq.meta.extensions)
+    jooqGenerator(libs.connectors.mysql)
 }
 
 bukkit {
@@ -123,18 +135,12 @@ bukkit {
         "Denizen",
         "EcoItems",
         "Oraxen",
+        "Nexo",
         "HeadDatabase",
         "GriefPrevention"
     )
     loadBefore = listOf("AntiAC")
     apiVersion = "1.18"
-
-    commands {
-        register("evenmorefish") {
-            usage = "/<command> [name]"
-            aliases = listOf("emf")
-        }
-    }
 
     permissions {
         register("emf.*") {
@@ -202,14 +208,37 @@ bukkit {
 
     }
 }
+sourceSets {
+    main {
+        java.srcDirs.add(File("src/main/generated"))
+    }
+}
+tasks.named("compileJava") {
+    dependsOn(":even-more-fish-plugin:generateMysqlJooq")
+}
 
 tasks {
     build {
-        dependsOn(shadowJar)
+        dependsOn(
+            shadowJar
+        )
 
         doLast {
             val file = project.layout.buildDirectory.file("libs/even-more-fish-plugin-${version}.jar").get()
             file.asFile.delete()
+        }
+
+
+    }
+
+    jooq {
+        version.set(libs.versions.jooq)
+
+        val dialects = listOf("mysql")
+        val latestSchema = "V7_1__Create_Tables.sql"
+        dialects.forEach { dialect ->
+            val schemaPath = "src/main/resources/db/migrations/${dialect}/${latestSchema}"
+            configureDialect(dialect, schemaPath)
         }
     }
 
@@ -236,6 +265,7 @@ tasks {
             attributes["Specification-Version"] = project.version
             attributes["Implementation-Title"] = grgit.branch.current().name
             attributes["Implementation-Version"] = buildNumberOrDate
+            attributes["Database-Baseline-Version"] = "7.0"
         }
 
         minimize {
@@ -250,12 +280,10 @@ tasks {
         relocate("de.tr7zw.changeme.nbtapi", "com.oheers.fish.utils.nbtapi")
         relocate("org.bstats", "com.oheers.fish.libs.bstats")
         relocate("com.github.Anon8281.universalScheduler", "com.oheers.fish.libs.universalScheduler")
-        relocate("co.aikar.commands", "com.oheers.fish.libs.acf")
-        relocate("co.aikar.locales", "com.oheers.fish.libs.locales")
         relocate("de.themoep.inventorygui", "com.oheers.fish.libs.inventorygui")
         relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
         relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
-
+        relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
     }
 
     compileJava {
@@ -265,10 +293,48 @@ tasks {
     }
 }
 
+/*
+publishing {
+    repositories { // Copied directly from CodeMC's docs
+        maven {
+            url = uri("https://repo.codemc.io/repository/Oheers/")
+
+            val mavenUsername = System.getenv("JENKINS_USERNAME")
+            val mavenPassword = System.getenv("JENKINS_PASSWORD")
+
+            if (mavenUsername != null && mavenPassword != null) {
+                credentials {
+                    username = mavenUsername
+                    password = mavenPassword
+                }
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("plugin") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            // Publish the fat jar so all relocated dependencies are available
+            from(components["shadow"])
+        }
+    }
+}
+ */
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
         vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir("src/main/generated")
+        }
     }
 }
 
@@ -288,4 +354,31 @@ fun getBuildNumberOrDate(): String? {
 
     return time
 }
+
+fun JooqExtension.configureDialect(dialect: String, latestSchema: String) {
+    configurations {
+        create(dialect) {
+            generateSchemaSourceOnCompilation.set(false)
+            jooqConfiguration.apply {
+                jdbc = null
+                generator.apply {
+                    //https://www.jooq.org/doc/latest/manual/sql-building/dsl-context/custom-settings/settings-parser/
+                    strategy.name = "com.oheers.fish.database.extras.PrefixNamingStrategy"
+                    database.apply {
+                        name = "org.jooq.meta.extensions.ddl.DDLDatabase"
+                        properties.add(Property().withKey("scripts").withValue(latestSchema))
+                        properties.add(Property().withKey("dialect").withValue(dialect.uppercase()))
+                        properties.add(Property().withKey("sort").withValue("flyway"))
+                        properties.add(Property().withKey("unqualifiedSchema").withValue("none"))
+                    }
+                    target.apply {
+                        packageName = "com.oheers.fish.database.generated.${dialect}"
+                        directory = "src/main/generated/"
+                    }
+                }
+            }
+        }
+    }
+}
+
 
