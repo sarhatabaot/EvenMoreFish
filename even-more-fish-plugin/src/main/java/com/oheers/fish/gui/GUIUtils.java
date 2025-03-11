@@ -3,10 +3,7 @@ package com.oheers.fish.gui;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.GUIConfig;
-import com.oheers.fish.gui.guis.BaitsGUI;
-import com.oheers.fish.gui.guis.EMFGUI;
-import com.oheers.fish.gui.guis.MainMenuGUI;
-import com.oheers.fish.gui.guis.SellGUI;
+import com.oheers.fish.gui.guis.*;
 import com.oheers.fish.selling.SellHelper;
 import com.oheers.fish.utils.ItemBuilder;
 import com.oheers.fish.utils.ItemFactory;
@@ -19,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,12 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GUIUtils {
-
-    private static Map<String, GuiElement.Action> externalActionMap;
 
     public static GuiPageElement getFirstPageButton() {
         YamlDocument config = GUIConfig.getInstance().getConfig();
@@ -148,30 +143,23 @@ public class GUIUtils {
             item = factory.createItem(null, -1, replacementSupplier.get());
         }
 
-        // Create the element
-        if (eitherClickTypeMatchesString(clickTypeStringMap, "next-page")) {
-            return new GuiPageElement(character, item, GuiPageElement.PageAction.NEXT);
-        } else if (eitherClickTypeMatchesString(clickTypeStringMap, "first-page")) {
-            return new GuiPageElement(character, item, GuiPageElement.PageAction.FIRST);
-        } else if (eitherClickTypeMatchesString(clickTypeStringMap, "previous-page")) {
-            return new GuiPageElement(character, item, GuiPageElement.PageAction.PREVIOUS);
-        } else if (eitherClickTypeMatchesString(clickTypeStringMap, "last-page")) {
-            return new GuiPageElement(character, item, GuiPageElement.PageAction.LAST);
-        } else {
-            return new DynamicGuiElement(character, (viewer) -> {
-                GuiElement.Action left = getActionMap(gui).get(clickTypeStringMap.get(ClickType.LEFT));
-                GuiElement.Action right = getActionMap(gui).get(clickTypeStringMap.get(ClickType.RIGHT));
-                return new StaticGuiElement(character, item, click -> {
-                    HumanEntity sender = click.getWhoClicked();
-                    commands.forEach(command -> Bukkit.dispatchCommand(sender, command));
-                    if (click.getType().equals(ClickType.LEFT) && left != null) {
-                        return left.onClick(click);
-                    } else if (click.getType().equals(ClickType.RIGHT) && right != null) {
-                        return right.onClick(click);
-                    }
-                    return true;
-                });
+        Section actionSection = section.getSection("click-action");
+        if (actionSection != null) {
+            return new StaticGuiElement(character, item, click -> {
+                BiConsumer<ConfigGui, GuiElement.Click> action = switch (click.getType()) {
+                    case LEFT -> getActionMap().get(actionSection.getString("left", ""));
+                    case RIGHT -> getActionMap().get(actionSection.getString("right", ""));
+                    case MIDDLE -> getActionMap().get(actionSection.getString("middle", ""));
+                    case DROP -> getActionMap().get(actionSection.getString("drop", ""));
+                    default -> null;
+                };
+                if (action != null) {
+                    action.accept(null, click);
+                }
+                return true;
             });
+        } else {
+            return new StaticGuiElement(character, item);
         }
     }
 
@@ -198,45 +186,31 @@ public class GUIUtils {
                 .collect(Collectors.toList());
     }
 
-    public static boolean addAction(@NotNull String actionKey, @NotNull GuiElement.Action action) {
-        if (externalActionMap == null) {
-            externalActionMap = new HashMap<>();
-        }
-        if (externalActionMap.containsKey(actionKey)) {
-            return false;
-        }
-        externalActionMap.put(actionKey, action);
-        return true;
-    }
-
-    public static Map<String, GuiElement.Action> getActionMap(@Nullable EMFGUI gui) {
-        Map<String, GuiElement.Action> newActionMap = new HashMap<>();
+    public static Map<String, BiConsumer<ConfigGui, GuiElement.Click>> getActionMap() {
+        Map<String, BiConsumer<ConfigGui, GuiElement.Click>> newActionMap = new HashMap<>();
         // Exiting the main menu should close the GUI
-        newActionMap.put("full-exit", click -> {
+        newActionMap.put("full-exit", (gui, click) -> {
             if (gui != null) {
                 gui.doRescue();
             }
             click.getGui().close();
-            return true;
         });
         // Exiting a sub-menu should open the main menu
-        newActionMap.put("open-main-menu", click -> {
+        newActionMap.put("open-main-menu", (gui, click) -> {
             if (gui != null) {
                 gui.doRescue();
             }
             new MainMenuGUI(click.getWhoClicked()).open();
-            return true;
         });
         // Toggling custom fish should redraw the GUI and leave it at that
-        newActionMap.put("fish-toggle", click -> {
+        newActionMap.put("fish-toggle", (gui, click) -> {
             if (click.getWhoClicked() instanceof Player player) {
                 EvenMoreFish.getInstance().performFishToggle(player);
             }
             click.getGui().draw();
-            return true;
         });
         // The shop action should just open the shop menu
-        newActionMap.put("open-shop", click -> {
+        newActionMap.put("open-shop", (gui, click) -> {
 
             if (gui != null) {
                 gui.doRescue();
@@ -245,77 +219,64 @@ public class GUIUtils {
             HumanEntity humanEntity = click.getWhoClicked();
 
             if (!(humanEntity instanceof Player player)) {
-                return true;
+                return;
             }
-            new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
-            return true;
+            new SellGui(player, SellGui.SellState.NORMAL, null).open();
         });
-        newActionMap.put("show-command-help", click -> {
+        newActionMap.put("show-command-help", (gui, click) -> {
             Bukkit.dispatchCommand(click.getWhoClicked(), "emf help");
-            return true;
         });
-        newActionMap.put("sell-inventory", click -> {
+        newActionMap.put("sell-inventory", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();
             if (!(humanEntity instanceof Player player)) {
-                return true;
+                return;
             }
-            if (gui instanceof SellGUI sellGUI) {
-                new SellGUI(player, SellGUI.SellState.CONFIRM, sellGUI.getFishInventory()).open();
-                return true;
+            if (gui instanceof SellGui sellGUI) {
+                new SellGui(player, SellGui.SellState.CONFIRM, sellGUI.getFishInventory()).open();
+                return;
             }
             new SellHelper(click.getWhoClicked().getInventory(), player).sellFish();
             click.getGui().close();
-            return true;
         });
-        newActionMap.put("sell-shop", click -> {
+        newActionMap.put("sell-shop", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();
-            if (gui instanceof SellGUI sellGUI && humanEntity instanceof Player player) {
-                new SellGUI(player, SellGUI.SellState.CONFIRM, sellGUI.getFishInventory()).open();
-                return true;
+            if (gui instanceof SellGui sellGUI && humanEntity instanceof Player player) {
+                new SellGui(player, SellGui.SellState.CONFIRM, sellGUI.getFishInventory()).open();
+                return;
             }
             SellHelper.sellInventoryGui(click.getGui(), click.getWhoClicked());
             click.getGui().close();
-            return true;
         });
-        newActionMap.put("sell-inventory-confirm", click -> {
+        newActionMap.put("sell-inventory-confirm", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();
             if (!(humanEntity instanceof Player player)) {
-                return true;
+                return;
             }
             new SellHelper(click.getWhoClicked().getInventory(), player).sellFish();
             if (gui != null) {
                 gui.doRescue();
             }
             click.getGui().close();
-            return true;
         });
-        newActionMap.put("sell-shop-confirm", click -> {
+        newActionMap.put("sell-shop-confirm", (gui, click) -> {
             SellHelper.sellInventoryGui(click.getGui(), click.getWhoClicked());
             click.getGui().close();
-            return true;
         });
-        newActionMap.put("open-baits-menu", click -> {
+        newActionMap.put("open-baits-menu", (gui, click) -> {
             if (gui != null) {
                 gui.doRescue();
             }
             new BaitsGUI(click.getWhoClicked()).open();
-            return true;
         });
         // Add page actions so third party plugins cannot register their own.
-        newActionMap.put("first-page", click -> true);
-        newActionMap.put("previous-page", click -> true);
-        newActionMap.put("next-page", click -> true);
-        newActionMap.put("last-page", click -> true);
-        if (externalActionMap != null) {
-            newActionMap.putAll(externalActionMap);
-        }
-        return newActionMap;
-    }
+        newActionMap.put("first-page", (gui, click) -> {});
+        newActionMap.put("previous-page", (gui, click) -> {});
+        newActionMap.put("next-page", (gui, click) -> {});
+        newActionMap.put("last-page", (gui, click) -> {});
 
-    // Returns all items from the provided inventory to the player.
-    public static void doRescue(@NotNull Inventory inventory, @NotNull Player player) {
-        FishUtils.giveItems(inventory.getContents(), player);
-        inventory.clear();
+
+
+        return newActionMap;
     }
 
 }
