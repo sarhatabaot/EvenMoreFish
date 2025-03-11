@@ -112,6 +112,12 @@ public class ConfigGui {
             }
             addGuiItem(gui, itemSection);
         });
+        gui.addElements(
+            GUIUtils.getFirstPageButton(),
+            GUIUtils.getPreviousPageButton(),
+            GUIUtils.getNextPageButton(),
+            GUIUtils.getLastPageButton()
+        );
     }
 
     protected void addGuiItem(@NotNull InventoryGui gui, @NotNull Section itemSection) {
@@ -142,8 +148,14 @@ public class ConfigGui {
             });
             gui.addElement(actionElement);
         } else {
-            StaticGuiElement nonActionElement = new StaticGuiElement(character, item);
-            gui.addElement(nonActionElement);
+            StaticGuiElement element = new StaticGuiElement(character, item, click -> {
+                BiConsumer<ConfigGui, GuiElement.Click> action = actions.get(itemSection.getString("click-action", ""));
+                if (action != null) {
+                    action.accept(this, click);
+                }
+                return true;
+            });
+            gui.addElement(element);
         }
     }
 

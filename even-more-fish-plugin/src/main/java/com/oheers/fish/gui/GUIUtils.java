@@ -211,7 +211,6 @@ public class GUIUtils {
         });
         // The shop action should just open the shop menu
         newActionMap.put("open-shop", (gui, click) -> {
-
             if (gui != null) {
                 gui.doRescue();
             }
