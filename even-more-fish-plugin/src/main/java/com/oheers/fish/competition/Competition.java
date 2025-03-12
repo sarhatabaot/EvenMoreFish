@@ -292,7 +292,7 @@ public class Competition {
         }
 
         List<String> competitionColours = competitionFile.getPositionColours();
-        List<CompetitionEntry> entries = getSortedEntries(leaderboard.getEntries());
+        List<CompetitionEntry> entries = leaderboard.getEntries();
 
         String leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, false, player.getUniqueId());
         player.sendMessage(leaderboardMessage);
@@ -300,13 +300,6 @@ public class Competition {
         AbstractMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
         message.setAmount(Integer.toString(leaderboard.getSize()));
         message.send(player);
-    }
-
-    public @NotNull List<CompetitionEntry> getSortedEntries(List<CompetitionEntry> entries) {
-        if (competitionType == CompetitionType.SHORTEST_FISH) {
-            entries.sort(Comparator.comparingDouble(entry -> entry.getFish().getLength()));
-        }
-        return entries;
     }
 
     private @NotNull String buildLeaderboardMessage(List<CompetitionEntry> entries, List<String> competitionColours, boolean isConsole, UUID playerUuid) {
