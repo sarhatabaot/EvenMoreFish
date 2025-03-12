@@ -12,6 +12,7 @@ import com.oheers.fish.utils.ItemFactory;
 import de.tr7zw.changeme.nbtapi.NBT;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -317,7 +318,7 @@ public class Fish {
      *
      * @return A lore to be used by fetching data from the old messages.yml set-up.
      */
-    private List<String> getFishLore() {
+    private List<Component> getFishLore() {
         List<String> loreOverride = section.getStringList("lore-override");
         EMFMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
@@ -353,12 +354,13 @@ public class Fish {
 
         newLoreLine.setRarity(this.rarity.getLorePrep());
 
-        List<String> newLore = newLoreLine.getLegacyListMessage();
-        if (getFishermanPlayer() != null && EvenMoreFish.getInstance().isUsingPAPI()) {
-            return newLore.stream().map(l -> PlaceholderAPI.setPlaceholders(getFishermanPlayer(), l)).collect(Collectors.toList());
+        OfflinePlayer fisherman = getFishermanPlayer();
+        if (fisherman != null) {
+            newLoreLine.setPlayer(fisherman);
+            newLoreLine.formatPlaceholderAPI();
         }
 
-        return newLore;
+        return newLoreLine.getComponentListMessage();
     }
 
     public void checkDisplayName() {
