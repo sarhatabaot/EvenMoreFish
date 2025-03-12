@@ -134,6 +134,10 @@ public class EMFMessage {
         return legacySerializer.deserialize(getLegacyMessage());
     }
 
+    public @NotNull List<? extends Component> getComponentListMessage() {
+        return getLegacyListMessage().stream().map(legacySerializer::deserialize).toList();
+    }
+
     public @NotNull String getLegacyMessage() {
         formatVariables();
         formatPlaceholderAPI();
