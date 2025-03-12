@@ -1,7 +1,8 @@
-package com.oheers.fish.config.messages;
+package com.oheers.fish.messages;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.config.MessageConfig;
 
 public enum PrefixType {
 

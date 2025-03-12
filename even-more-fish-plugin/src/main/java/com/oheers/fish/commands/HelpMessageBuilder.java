@@ -2,12 +2,11 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class HelpMessageBuilder {

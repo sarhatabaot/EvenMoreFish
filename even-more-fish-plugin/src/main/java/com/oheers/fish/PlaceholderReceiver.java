@@ -3,7 +3,7 @@ package com.oheers.fish;
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionType;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;

@@ -5,15 +5,13 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.economy.EconomyType;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.logging.Level;
 
 public class VaultEconomyType implements EconomyType {

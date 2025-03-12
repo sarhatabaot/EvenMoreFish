@@ -1,6 +1,6 @@
 package com.oheers.fish;
 
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.permissions.AdminPerms;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

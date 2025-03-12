@@ -9,7 +9,7 @@ import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.baits.BaitNBTManager;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.gui.GUIUtils;

@@ -1,9 +1,8 @@
-package com.oheers.fish.config.messages;
+package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.adapter.AbstractMessage;
-import com.oheers.fish.config.ConfigBase;
-import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.messages.PrefixType;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
 public class MessageConfig extends ConfigBase {

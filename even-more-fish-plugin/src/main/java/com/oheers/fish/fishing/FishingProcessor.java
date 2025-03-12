@@ -3,7 +3,7 @@ package com.oheers.fish.fishing;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.permissions.UserPerms;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;

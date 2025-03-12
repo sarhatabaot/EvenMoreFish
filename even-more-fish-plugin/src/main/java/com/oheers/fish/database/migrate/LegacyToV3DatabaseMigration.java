@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.api.adapter.AbstractMessage;
-import com.oheers.fish.config.messages.PrefixType;
+import com.oheers.fish.messages.PrefixType;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.connection.MigrationManager;
 import org.bukkit.command.CommandSender;
