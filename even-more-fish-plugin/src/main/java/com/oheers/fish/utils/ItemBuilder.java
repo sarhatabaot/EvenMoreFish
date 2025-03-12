@@ -1,6 +1,5 @@
 package com.oheers.fish.utils;
 
-import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.Material;

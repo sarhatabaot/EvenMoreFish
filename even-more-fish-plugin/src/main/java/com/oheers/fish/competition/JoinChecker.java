@@ -1,12 +1,12 @@
 package com.oheers.fish.competition;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.FishReport;
 import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

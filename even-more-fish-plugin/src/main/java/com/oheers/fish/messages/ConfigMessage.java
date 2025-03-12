@@ -1,7 +1,6 @@
 package com.oheers.fish.messages;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.config.MessageConfig;
 
 import java.util.Arrays;
