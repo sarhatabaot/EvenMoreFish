@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// TODO still uses deprecated methods
 public class Bait extends ConfigBase {
 
     private static final Logger logger = EvenMoreFish.getInstance().getLogger();
