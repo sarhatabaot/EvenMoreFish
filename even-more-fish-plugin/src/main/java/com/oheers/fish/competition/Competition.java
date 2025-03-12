@@ -328,16 +328,12 @@ public class Competition {
             AbstractMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
             message.setPlayer(Bukkit.getOfflinePlayer(entry.getPlayer()));
             message.setPosition(Integer.toString(pos));
-
             message.setPositionColour(competitionColours.get(pos - 1));
 
             if (isConsole) {
                 message = competitionType.getStrategy().getSingleConsoleLeaderboardMessage(message, entry);
             } else {
                 message = competitionType.getStrategy().getSinglePlayerLeaderboard(message, entry);
-                if (entry.getPlayer().equals(playerUuid)) {
-                    message.setPositionColour("&f"); // Customize player-specific logic here if needed
-                }
             }
 
             builder.append(message.getLegacyMessage()).append("\n");
