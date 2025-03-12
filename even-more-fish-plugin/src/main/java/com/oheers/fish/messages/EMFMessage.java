@@ -2,6 +2,7 @@ package com.oheers.fish.messages;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -131,13 +132,26 @@ public class EMFMessage {
     }
 
     public @NotNull Component getComponentMessage() {
-        return legacySerializer.deserialize(getLegacyMessage());
+        Component component = legacySerializer.deserialize(getLegacyMessage());
+        return removeDefaultItalics(component);
     }
 
     public @NotNull List<Component> getComponentListMessage() {
         return getLegacyListMessage().stream()
-            .map(legacy -> (Component) legacySerializer.deserialize(legacy))
+            .map(legacy -> {
+                Component component = legacySerializer.deserialize(legacy);
+                return removeDefaultItalics(component);
+            })
             .toList();
+    }
+
+    private @NotNull Component removeDefaultItalics(@NotNull Component component) {
+        TextDecoration decoration = TextDecoration.ITALIC;
+        TextDecoration.State oldState = component.decoration(decoration);
+        if (oldState == TextDecoration.State.NOT_SET) {
+            return component.decoration(decoration, TextDecoration.State.FALSE);
+        }
+        return component;
     }
 
     public @NotNull String getLegacyMessage() {
