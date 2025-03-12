@@ -235,12 +235,12 @@ public class Competition {
      *
      * @return A boolean, true = do it in actionbar.
      */
-    public boolean isDoingFirstPlaceActionBar() {
+    public static boolean isDoingFirstPlaceActionBar() {
         boolean doActionBarMessage = MessageConfig.getInstance().getConfig().getBoolean("action-bar-message");
-        boolean isSupportedActionBarType = MessageConfig.getInstance().getConfig().getStringList("action-bar-types").isEmpty() || MessageConfig.getInstance()
-                .getConfig()
-                .getStringList("action-bar-types")
-                .contains(getCompetitionType().toString());
+        List<String> supportedTypes = MessageConfig.getInstance()
+            .getConfig()
+            .getStringList("action-bar-types");
+        boolean isSupportedActionBarType = active != null && supportedTypes.contains(active.competitionType.toString());
         return doActionBarMessage && isSupportedActionBarType;
     }
 

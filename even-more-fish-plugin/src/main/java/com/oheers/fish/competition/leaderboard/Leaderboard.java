@@ -2,6 +2,7 @@ package com.oheers.fish.competition.leaderboard;
 
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.config.messages.ConfigMessage;
@@ -75,7 +76,11 @@ public class Leaderboard implements LeaderboardHandler {
         message.setFishCaught(newFish.getName());
         message.setRarity(newFish.getRarity().getDisplayName());
 
-        message.broadcast();
+        if (Competition.isDoingFirstPlaceActionBar()) {
+            message.broadcastActionBar();
+        } else {
+            message.broadcast();
+        }
     }
 
     @Override
