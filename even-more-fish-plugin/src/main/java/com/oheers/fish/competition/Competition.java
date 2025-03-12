@@ -268,7 +268,7 @@ public class Competition {
         }
 
         List<String> competitionColours = competitionFile.getPositionColours();
-        List<CompetitionEntry> entries = getSortedEntries(leaderboard.getEntries());
+        List<CompetitionEntry> entries = leaderboard.getEntries();
 
         String leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, true, null);
         console.sendMessage(leaderboardMessage);
@@ -364,7 +364,7 @@ public class Competition {
         boolean databaseEnabled = MainConfig.getInstance().databaseEnabled();
         int rewardPlace = 1;
 
-        List<CompetitionEntry> entries = getSortedEntries(leaderboard.getEntries());
+        List<CompetitionEntry> entries = leaderboard.getEntries();
 
         if (databaseEnabled && !entries.isEmpty()) {
             handleDatabaseUpdates(entries.get(0), true); // Top entry
