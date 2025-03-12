@@ -15,6 +15,7 @@ import com.oheers.fish.utils.ItemUtils;
 import de.themoep.inventorygui.*;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -122,7 +123,7 @@ public class GUIUtils {
     public static ItemStack getFillerItem(@Nullable String materialName, @NotNull Material defaultMaterial) {
         Material material = ItemUtils.getMaterial(materialName, defaultMaterial);
         ItemStack stack = new ItemStack(material);
-        FishUtils.editMeta(stack, meta -> meta.setDisplayName(""));
+        FishUtils.editMeta(stack, meta -> meta.displayName(Component.empty()));
         return stack;
     }
 

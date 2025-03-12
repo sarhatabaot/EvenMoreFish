@@ -153,9 +153,9 @@ public class Fish {
         if (fishMeta != null) {
             NBT.modify(fish, nbt -> {
                 nbt.modifyMeta((readOnlyNbt, meta) -> {
-                    meta.setDisplayName(FishUtils.translateColorCodes(getDisplayName()));
+                    meta.displayName(EMFMessage.fromString(getDisplayName()).getComponentMessage());
                     if (!section.getBoolean("disable-lore", false)) {
-                        meta.setLore(getFishLore());
+                        meta.lore(getFishLore());
                     }
                     meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);

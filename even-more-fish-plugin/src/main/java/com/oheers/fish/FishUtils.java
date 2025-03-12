@@ -591,10 +591,8 @@ public class FishUtils {
         return format.format(value);
     }
 
-    // TODO deprecated, remove
-    @Deprecated
     public static String translateColorCodes(@NotNull String string) {
-        return ChatColor.translateAlternateColorCodes('&', string);
+        return EMFMessage.fromString(string).getLegacyMessage();
     }
 
 }

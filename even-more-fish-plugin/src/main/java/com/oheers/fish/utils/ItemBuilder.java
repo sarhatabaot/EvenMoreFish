@@ -68,10 +68,10 @@ public class ItemBuilder {
         ItemStack stack = new ItemStack(this.material);
         FishUtils.editMeta(stack, meta -> {
             if (this.display != null) {
-                meta.setDisplayName(EMFMessage.fromString(this.display).getLegacyMessage());
+                meta.displayName(EMFMessage.fromString(this.display).getComponentMessage());
             }
             if (!this.lore.isEmpty()) {
-                meta.setLore(EMFMessage.fromStringList(this.lore).getLegacyListMessage());
+                meta.lore(EMFMessage.fromStringList(this.lore).getComponentListMessage());
             }
         });
         if (this.glowing) {

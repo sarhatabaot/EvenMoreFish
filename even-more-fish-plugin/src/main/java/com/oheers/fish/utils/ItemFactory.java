@@ -607,7 +607,7 @@ public class ItemFactory {
                 product, meta -> {
                     EMFMessage lore = EMFMessage.fromStringList(loreConfig);
                     lore.setVariables(replacements);
-                    meta.setLore(lore.getLegacyListMessage());
+                    meta.lore(lore.getComponentListMessage());
                 }
         );
     }
@@ -626,7 +626,7 @@ public class ItemFactory {
                     } else {
                         EMFMessage display = EMFMessage.fromString(displayName);
                         display.setVariables(replacements);
-                        meta.setDisplayName(display.getLegacyMessage());
+                        meta.displayName(display.getComponentMessage());
                     }
                 }
         );
