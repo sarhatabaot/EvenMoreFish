@@ -49,7 +49,7 @@ public class SpigotMessage extends AbstractMessage {
 
         String originalMessage = getRawMessage();
 
-        if (target instanceof Player player) {
+        if (perPlayer && target instanceof Player player) {
             setPlayer(player);
         }
 
@@ -66,7 +66,7 @@ public class SpigotMessage extends AbstractMessage {
 
         String originalMessage = getRawMessage();
 
-        if (target instanceof Player player) {
+        if (perPlayer && target instanceof Player player) {
             setPlayer(player);
         }
 

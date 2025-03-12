@@ -16,6 +16,7 @@ public abstract class AbstractMessage {
     private String message;
     private boolean canSilent = false;
     private OfflinePlayer relevantPlayer;
+    protected boolean perPlayer = true;
 
     protected AbstractMessage(@NotNull final String message, @NotNull PlatformAdapter platformAdapter) {
         this.message = formatColours(message);
@@ -58,6 +59,10 @@ public abstract class AbstractMessage {
             String replacement = formatColours(entry.getValue());
             this.message = this.message.replace(variable, replacement);
         }
+    }
+
+    public void setPerPlayer(boolean perPlayer) {
+        this.perPlayer = perPlayer;
     }
 
     /**

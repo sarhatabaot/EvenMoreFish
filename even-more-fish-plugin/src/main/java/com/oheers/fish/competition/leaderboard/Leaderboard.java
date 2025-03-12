@@ -1,8 +1,15 @@
 package com.oheers.fish.competition.leaderboard;
 
+import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.CompetitionType;
+import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.fishing.items.Fish;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
+import org.jooq.impl.QOM;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,14 +38,44 @@ public class Leaderboard implements LeaderboardHandler {
     }
 
     @Override
-    public void addEntry(UUID player, Fish fish) {
+    public void addEntry(@NotNull UUID player, @NotNull Fish fish) {
         CompetitionEntry entry = new CompetitionEntry(player, fish, type);
-        entries.add(entry);
+        addEntry(entry);
     }
 
     @Override
-    public void addEntry(CompetitionEntry entry) {
+    public void addEntry(@NotNull CompetitionEntry entry) {
+        CompetitionEntry initialTopEntry = getTopEntry();
+
         entries.add(entry);
+
+        CompetitionEntry newTopEntry = getTopEntry();
+
+        // Check for a new first place
+        if (initialTopEntry == null || newTopEntry == null) {
+            return;
+        }
+
+        UUID initialPlayer = initialTopEntry.getPlayer();
+        UUID newPlayer = newTopEntry.getPlayer();
+
+        if (newPlayer.equals(initialPlayer)) {
+            return;
+        }
+
+        Fish newFish = newTopEntry.getFish();
+
+        AbstractMessage message = ConfigMessage.NEW_FIRST_PLACE_NOTIFICATION.getMessage();
+
+        message.setPerPlayer(false);
+
+        message.setPlayer(Bukkit.getOfflinePlayer(newPlayer));
+        message.setLength(Float.toString(newFish.getLength()));
+        message.setRarityColour(newFish.getRarity().getColour());
+        message.setFishCaught(newFish.getName());
+        message.setRarity(newFish.getRarity().getDisplayName());
+
+        message.broadcast();
     }
 
     @Override
