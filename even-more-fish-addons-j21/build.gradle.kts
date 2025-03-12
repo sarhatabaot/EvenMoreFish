@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.spigot.api)
+    compileOnly(libs.paper.api)
     compileOnly(libs.nexo)
     compileOnly(libs.oraxen)
     compileOnly(libs.bundles.craftengine)

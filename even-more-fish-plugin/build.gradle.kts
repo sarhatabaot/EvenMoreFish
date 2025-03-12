@@ -24,7 +24,7 @@ description = "A fishing extension bringing an exciting new experience to fishin
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // Adventure Snapshots
-    maven("https://hub.spigotmc.org/nexus/content/groups/public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://github.com/deanveloper/SkullCreator/raw/mvn-repo/")
     maven("https://jitpack.io")
     maven("https://maven.enginehub.org/repo/")
@@ -47,7 +47,7 @@ dependencies {
     api(project(":even-more-fish-api"))
     implementation(project(":even-more-fish-paper"))
 
-    compileOnly(libs.spigot.api)
+    compileOnly(libs.paper.api)
     compileOnly(libs.vault.api)
     compileOnly(libs.placeholder.api)
 

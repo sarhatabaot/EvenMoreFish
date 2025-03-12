@@ -2,6 +2,8 @@ package com.oheers.fish;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.addons.exceptions.NoPrefixException;
 import com.oheers.fish.competition.Competition;
@@ -29,6 +31,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -519,18 +522,23 @@ public class FishUtils {
         return new ItemStack(material);
     }
 
-    // The following methods have been delegated to the platform adapter.
-
-    public static @NotNull String translateColorCodes(String message) {
-        return EvenMoreFish.getAdapter().translateColorCodes(message);
-    }
-
     public static @NotNull ItemStack getSkullFromBase64(String base64) {
-        return EvenMoreFish.getAdapter().getSkullFromBase64(base64);
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        skull.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), "EMFSkull");
+            profile.setProperty(new ProfileProperty("textures", base64));
+            meta.setPlayerProfile(profile);
+        });
+        return skull;
     }
 
     public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
-        return EvenMoreFish.getAdapter().getSkullFromUUID(uuid);
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        skull.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(uuid, "EMFSkull");
+            meta.setPlayerProfile(profile);
+        });
+        return skull;
     }
 
     /**
@@ -581,6 +589,12 @@ public class FishUtils {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return format.format(value);
+    }
+
+    // TODO deprecated, remove
+    @Deprecated
+    public static String translateColorCodes(@NotNull String string) {
+        return ChatColor.translateAlternateColorCodes('&', string);
     }
 
 }

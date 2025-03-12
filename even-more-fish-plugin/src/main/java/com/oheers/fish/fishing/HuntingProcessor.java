@@ -22,7 +22,7 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
         }
 
         // If spawner fish can't be hunted and the fish is from a spawner
-        if (MainConfig.getInstance().isFishHuntIgnoreSpawnerFish() && EvenMoreFish.getAdapter().isSpawnerMob(fishEntity)) {
+        if (MainConfig.getInstance().isFishHuntIgnoreSpawnerFish() && fishEntity.fromMobSpawner()) {
             return;
         }
 
