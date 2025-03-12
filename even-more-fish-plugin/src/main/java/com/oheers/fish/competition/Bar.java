@@ -1,7 +1,7 @@
 package com.oheers.fish.competition;
 
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
 import org.bukkit.Bukkit;
@@ -51,7 +51,7 @@ public class Bar {
     }
 
     public void setTitle(long timeLeft) {
-        AbstractMessage layoutMessage = ConfigMessage.BAR_LAYOUT.getMessage();
+        EMFMessage layoutMessage = ConfigMessage.BAR_LAYOUT.getMessage();
         layoutMessage.setVariable("{prefix}", prefix);
         layoutMessage.setVariable("{time-formatted}", FishUtils.translateColorCodes(FishUtils.timeFormat(timeLeft)));
         layoutMessage.setVariable("{remaining}", ConfigMessage.BAR_REMAINING.getMessage().getLegacyMessage());

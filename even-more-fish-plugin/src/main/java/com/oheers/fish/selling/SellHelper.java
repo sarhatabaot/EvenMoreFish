@@ -3,7 +3,7 @@ package com.oheers.fish.selling;
 import com.devskiller.friendly_id.FriendlyId;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
@@ -86,7 +86,7 @@ public class SellHelper {
 
         // sending the sell message to the player
 
-        AbstractMessage message = ConfigMessage.FISH_SALE.getMessage();
+        EMFMessage message = ConfigMessage.FISH_SALE.getMessage();
         message.setSellPrice(economy.getWorthFormat(totalWorth, true));
         message.setAmount(Integer.toString(fishCount));
         message.setPlayer(this.player);

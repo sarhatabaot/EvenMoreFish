@@ -1,7 +1,7 @@
 package com.oheers.fish.messages;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.config.MessageConfig;
 
 import java.util.Arrays;
@@ -258,7 +258,7 @@ public enum ConfigMessage {
 
     /**
      * This is the config enum for a value in the messages.yml file. It does not store the actual data but references
-     * where to look in the file for the data. This must be passed through an AbstractMessage object before it can be sent to
+     * where to look in the file for the data. This must be passed through an EMFMessage object before it can be sent to
      * players. In there, it is possible to add variable options, and it will be colour formatted too.
      *
      * @param id            The id in messages.yml for the ConfigMessage.
@@ -277,7 +277,7 @@ public enum ConfigMessage {
 
     /**
      * This is the config enum for a list value in the messages.yml file. It does not store the actual data but references
-     * where to look in the file for the data. This must be passed through an AbstractMessage object before it can be sent to
+     * where to look in the file for the data. This must be passed through an EMFMessage object before it can be sent to
      * players. In there, it is possible to add variable options, and it will be colour formatted too. It also must be
      * a list within the file.
      *
@@ -323,8 +323,8 @@ public enum ConfigMessage {
         return prefixType;
     }
 
-    public AbstractMessage getMessage() {
-        AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+    public EMFMessage getMessage() {
+        EMFMessage message = EMFMessage.empty();
         if (isListForm()) {
             List<String> list = getStringList(getNormalList(), getId());
             for (String line : list) {

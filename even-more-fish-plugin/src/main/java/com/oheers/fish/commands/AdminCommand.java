@@ -3,7 +3,7 @@ package com.oheers.fish.commands;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.addons.AddonManager;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.api.addons.Addon;
 import com.oheers.fish.api.reward.RewardManager;
 import com.oheers.fish.baits.Bait;
@@ -121,7 +121,7 @@ public class AdminCommand {
 
                     FishUtils.giveItem(fishItem, target);
 
-                    AbstractMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
                     message.setPlayer(target);
                     message.setFishCaught(fish.getName());
                     message.send(sender);
@@ -203,7 +203,7 @@ public class AdminCommand {
                     }
 
                     FishUtils.giveItems(Collections.singletonList(EvenMoreFish.getInstance().getCustomNBTRod()), player);
-                    AbstractMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
+                    EMFMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
                     giveMessage.setPlayer(player);
                     giveMessage.send(sender);
                 }));
@@ -238,7 +238,7 @@ public class AdminCommand {
                     ItemStack baitItem = bait.create(target);
                     baitItem.setAmount(quantity);
                     FishUtils.giveItems(List.of(baitItem), target);
-                    AbstractMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
                     message.setPlayer(target);
                     message.setBait(bait.getId());
                     message.send(sender);
@@ -283,7 +283,7 @@ public class AdminCommand {
                         FishUtils.editMeta(fishingRod, meta -> meta.setLore(BaitNBTManager.deleteOldLore(fishingRod)));
                     }
 
-                    AbstractMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
+                    EMFMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
                     message.setAmount(Integer.toString(totalDeleted));
                     message.send(player);
                 }));
@@ -316,7 +316,7 @@ public class AdminCommand {
                         messageList.add(String.format(messageFormat, prefix, addonManager.isLoading(prefix), entry.getValue().getVersion()));
                     }
 
-                    EvenMoreFish.getAdapter().createMessage(StringUtils.join(messageList, "\n")).send(info.sender());
+                    EMFMessage.fromString(StringUtils.join(messageList, "\n")).send(info.sender());
                 });
     }
 
@@ -366,7 +366,7 @@ public class AdminCommand {
                         .replace("{type}", databaseType);
 
 
-                AbstractMessage msg = EvenMoreFish.getAdapter().createMessage(msgString);
+                EMFMessage msg = EMFMessage.fromString(msgString);
                 msg.send(info.sender());
             });
     }
@@ -412,9 +412,8 @@ public class AdminCommand {
         return new CommandAPICommand("migrate")
                 .executes(info -> {
                     if (!MainConfig.getInstance().databaseEnabled()) {
-                        EvenMoreFish.getAdapter()
-                                .createMessage("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
-                                .send(info.sender());
+                        EMFMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
+                            .send(info.sender());
                         return;
                     }
                     EvenMoreFish.getScheduler().runTaskAsynchronously(() -> EvenMoreFish.getInstance().getDatabase().getMigrationManager().migrateLegacy(info.sender()));

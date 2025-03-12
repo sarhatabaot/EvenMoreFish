@@ -1,58 +1,196 @@
-package com.oheers.fish.api.adapter;
+package com.oheers.fish.messages;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public abstract class AbstractMessage {
+public class EMFMessage {
 
-    private Boolean papiEnabled = null;
-    private final PlatformAdapter platformAdapter;
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
+    private static final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
+        .hexColors()
+        .useUnusualXRepeatedCharacterHexFormat()
+        .build();
+    private static final MiniMessage miniMessage = MiniMessage.builder().strict(true).build();
+    
     private final Map<String, String> liveVariables = new LinkedHashMap<>();
+    
     private String message;
     private boolean canSilent = false;
     private OfflinePlayer relevantPlayer;
 
-    protected AbstractMessage(@NotNull final String message, @NotNull PlatformAdapter platformAdapter) {
-        this.message = formatColours(message);
-        this.platformAdapter = platformAdapter;
+    private EMFMessage(@NotNull String message) {
+        this.message = message;
     }
 
-    protected AbstractMessage(@NotNull final List<String> messageList, @NotNull PlatformAdapter platformAdapter) {
-        this.message = String.join("\n", messageList.stream().map(this::formatColours).toList());
-        this.platformAdapter = platformAdapter;
+    public static EMFMessage empty() {
+        return new EMFMessage("");
+    }
+
+    public static EMFMessage of(@NotNull Component component) {
+        return new EMFMessage(legacySerializer.serialize(component));
+    }
+
+    public static EMFMessage ofList(@NotNull List<Component> components) {
+        List<String> strings = components.stream().map(legacySerializer::serialize).toList();
+        return new EMFMessage(String.join("\n", strings));
+    }
+
+    public static EMFMessage fromString(@NotNull String string) {
+        return new EMFMessage(formatColours(string));
+    }
+
+    public static EMFMessage fromStringList(@NotNull List<String> strings) {
+        strings = strings.stream().map(EMFMessage::formatColours).toList();
+        return new EMFMessage(String.join("\n", strings));
+    }
+
+    private static String formatColours(@NotNull String message) {
+        // Replace all Section symbols with Ampersands so
+        // MiniMessage doesn't explode.
+        message = message.replace(ChatColor.COLOR_CHAR, '&');
+
+        try {
+            // Parse MiniMessage
+            Component component = miniMessage.deserialize(message);
+            // Get legacy color codes from MiniMessage
+            message = legacySerializer.serialize(component);
+        } catch (ParsingException exception) { /* Ignore. If MiniMessage throws an exception, we'll only use legacy colors. */ }
+
+        char COLOR_CHAR = '§';
+        Matcher matcher = HEX_PATTERN.matcher(message);
+        StringBuilder buffer = new StringBuilder(message.length() + 4 * 8);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+                + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+                + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+                + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+            );
+        }
+        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+    }
+
+    public void send(@NotNull CommandSender target) {
+        if (getRawMessage().isEmpty() || silentCheck()) {
+            return;
+        }
+
+        String originalMessage = getRawMessage();
+
+        if (target instanceof Player player) {
+            setPlayer(player);
+        }
+
+        target.sendMessage(getComponentMessage());
+
+        setMessage(originalMessage);
+    }
+
+    public void sendActionBar(@NotNull CommandSender target) {
+        if (getRawMessage().isEmpty() || silentCheck()) {
+            return;
+        }
+
+        String originalMessage = getRawMessage();
+
+        if (target instanceof Player player) {
+            setPlayer(player);
+        }
+
+        target.sendActionBar(getComponentMessage());
+
+        setMessage(originalMessage);
+    }
+
+    /**
+     * @return The stored String in its raw form, with no colors or variables applied.
+     */
+    public @NotNull String getRawMessage() {
+        return this.message;
+    }
+
+    /**
+     * @return The stored String in its raw list form, with no colors or variables applied.
+     */
+    public @NotNull List<String> getRawListMessage() {
+        return Arrays.asList(this.message.split("\n"));
+    }
+
+    public @NotNull Component getComponentMessage() {
+        return legacySerializer.deserialize(getLegacyMessage());
+    }
+
+    public @NotNull String getLegacyMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
+
+        return formatColours(getRawMessage());
+    }
+
+    public @NotNull List<String> getLegacyListMessage() {
+        return Arrays.asList(getLegacyMessage().split("\n"));
+    }
+
+    public String getPlainTextMessage() {
+        return ChatColor.stripColor(getLegacyMessage());
+    }
+
+    /**
+     * @return The formatted message as a plain text string list. All formatting will be removed.
+     */
+    public @NotNull List<String> getPlainTextListMessage() {
+        return Arrays.asList(getPlainTextMessage().split("\n"));
+    }
+
+    public void formatPlaceholderAPI() {
+        if (!isPAPIEnabled()) {
+            return;
+        }
+        String message = getRawMessage();
+        Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(message);
+        while (matcher.find()) {
+            // Find matched String
+            String matched = matcher.group();
+            // Convert to Legacy Component and into a MiniMessage String
+            String parsed = formatColours(PlaceholderAPI.setPlaceholders(getRelevantPlayer(), matched));
+            // Escape matched String so we don't have issues
+            String safeMatched = Matcher.quoteReplacement(matched);
+            // Replace all instances of the matched String with the parsed placeholder.
+            message = message.replaceAll(safeMatched, parsed);
+        }
+        setMessage(message);
     }
 
     public void setMessage(@NotNull String message) {
         this.message = formatColours(message);
     }
 
-    public void setMessage(@NotNull AbstractMessage message) {
-        this.message = message.getRawMessage();
+    public void setMessage(@NotNull EMFMessage message) {
+        this.message = message.message;
     }
 
-    protected boolean isPAPIEnabled() {
-        if (papiEnabled == null) {
-            papiEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
-        }
-        return papiEnabled;
+    private boolean isPAPIEnabled() {
+        return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
     }
-
-    /**
-     * Converts colors to the format this impl requires.
-     * @param message The message to process
-     * @return The processed message.
-     */
-    public abstract String formatColours(@NotNull String message);
 
     /**
      * Formats all variables in {@link #liveVariables}
      */
-    protected void formatVariables() {
+    private void formatVariables() {
         for (Map.Entry<String, String> entry : liveVariables.entrySet()) {
             String variable = entry.getKey();
             String replacement = formatColours(entry.getValue());
@@ -67,12 +205,6 @@ public abstract class AbstractMessage {
         send(Bukkit.getConsoleSender());
         Bukkit.getOnlinePlayers().forEach(this::send);
     }
-
-    /**
-     * Sends this message to the provided target.
-     * @param target The target of this message.
-     */
-    public abstract void send(@NotNull CommandSender target);
 
     /**
      * Sends this message to the provided list of targets.
@@ -90,63 +222,12 @@ public abstract class AbstractMessage {
     }
 
     /**
-     * Sends this message to the provided target as an action bar.
-     * @param target The target of this message.
-     */
-    public abstract void sendActionBar(@NotNull CommandSender target);
-
-    /**
      * Sends this message to the provided list of targets as an action bar.
      * @param targets The targets of this message.
      */
     public void sendActionBar(@NotNull List<CommandSender> targets) {
         targets.forEach(this::sendActionBar);
     }
-
-    /**
-     * @return The stored String in its raw form, with no colors or variables applied.
-     */
-    public @NotNull String getRawMessage() {
-        return this.message;
-    }
-
-    /**
-     * @return The stored String in its raw list form, with no colors or variables applied.
-     */
-    public @NotNull List<String> getRawListMessage() {
-        return Arrays.asList(this.message.split("\n"));
-    }
-
-    /**
-     * @return The formatted message as a legacy string, both colors and variables will be formatted.
-     */
-    public abstract String getLegacyMessage();
-
-    /**
-     * @return The formatted message as a legacy string list, both colors and variables will be formatted.
-     */
-    public @NotNull List<String> getLegacyListMessage() {
-        return Arrays.asList(getLegacyMessage().split("\n"));
-    }
-
-    /**
-     * @return The formatted message as a plain text string. All formatting will be removed.
-     */
-    public abstract String getPlainTextMessage();
-
-    /**
-     * @return The formatted message as a plain text string list. All formatting will be removed.
-     */
-    public @NotNull List<String> getPlainTextListMessage() {
-        return Arrays.asList(getPlainTextMessage().split("\n"));
-    }
-
-    /**
-     * Formats PlaceholderAPI placeholders.
-     * <p>
-     * This is abstract because the MiniMessage impl will need to handle this manually.
-     */
-    public abstract void formatPlaceholderAPI();
 
     /**
      * Adds the provided string to the end of this message.
@@ -160,7 +241,7 @@ public abstract class AbstractMessage {
      * Adds the provided message to the end of this message.
      * @param message The message to append
      */
-    public void appendMessage(@NotNull AbstractMessage message) {
+    public void appendMessage(@NotNull EMFMessage message) {
         appendString(message.getRawMessage());
     }
 
@@ -169,16 +250,16 @@ public abstract class AbstractMessage {
      * @param messages The strings to append
      */
     public void appendStringList(@NotNull List<String> messages) {
-        this.message = this.message + String.join("\n", messages.stream().map(this::formatColours).toList());
+        this.message = this.message + String.join("\n", messages.stream().map(EMFMessage::formatColours).toList());
     }
 
     /**
      * Adds the provided messages to the end of this message.
      * @param messages The messages to append
      */
-    public void appendMessageList(@NotNull List<AbstractMessage> messages) {
+    public void appendMessageList(@NotNull List<EMFMessage> messages) {
         StringBuilder newMessage = new StringBuilder(this.message);
-        for (AbstractMessage message : messages) {
+        for (EMFMessage message : messages) {
             newMessage.append(message.getRawMessage());
         }
         this.message = newMessage.toString();
@@ -196,7 +277,7 @@ public abstract class AbstractMessage {
      * Adds the provided message to the start of this message.
      * @param message The message to prepend
      */
-    public void prependMessage(@NotNull AbstractMessage message) {
+    public void prependMessage(@NotNull EMFMessage message) {
         prependString(message.getRawMessage());
     }
 
@@ -205,16 +286,16 @@ public abstract class AbstractMessage {
      * @param messages The strings to prepend
      */
     public void prependStringList(@NotNull List<String> messages) {
-        this.message = String.join("\n", messages.stream().map(this::formatColours).toList()) + this.message;
+        this.message = String.join("\n", messages.stream().map(EMFMessage::formatColours).toList()) + this.message;
     }
 
     /**
      * Adds the provided messages to the start of this message.
      * @param messages The messages to prepend
      */
-    public void prependMessageList(@NotNull List<AbstractMessage> messages) {
+    public void prependMessageList(@NotNull List<EMFMessage> messages) {
         StringBuilder newMessage = new StringBuilder();
-        for (AbstractMessage message : messages) {
+        for (EMFMessage message : messages) {
             newMessage.append(message.getRawMessage());
         }
         this.message = newMessage + this.message;
@@ -257,13 +338,6 @@ public abstract class AbstractMessage {
     }
 
     /**
-     * @return The PlatformAdapter that created this message instance.
-     */
-    public @NotNull PlatformAdapter getPlatformAdapter() {
-        return this.platformAdapter;
-    }
-
-    /**
      * Adds a variable to be formatted when {@link #formatVariables()} is called.
      * @param variable The variable.
      * @param replacement The replacement for the variable.
@@ -277,7 +351,7 @@ public abstract class AbstractMessage {
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
-    public void setVariable(@NotNull final String variable, @NotNull final AbstractMessage replacement) {
+    public void setVariable(@NotNull final String variable, @NotNull final EMFMessage replacement) {
         this.liveVariables.put(variable, replacement.getRawMessage());
     }
 
@@ -286,17 +360,17 @@ public abstract class AbstractMessage {
      * @param variableMap The map of variables and their replacements.
      */
     public void setVariables(@Nullable Map<String, ?> variableMap) {
-        if (variableMap == null) { return; }
+        if (variableMap == null || variableMap.isEmpty()) {
+            return;
+        }
         variableMap.forEach((variable, obj) -> {
-            if (obj instanceof AbstractMessage abstractMessage) {
-                setVariable(variable, abstractMessage);
+            if (obj instanceof EMFMessage emfMessage) {
+                setVariable(variable, emfMessage);
             } else {
                 setVariable(variable, obj.toString());
             }
         });
     }
-
-    // Variable Shortcuts
 
     /**
      * The colour used by the fish's rarity to apply a clean format for the fish, to replace the {rarity_colour} variable.
@@ -415,7 +489,6 @@ public abstract class AbstractMessage {
     public void setBaitTheme(@NotNull final String baitTheme) {
         setVariable("{bait_theme}", baitTheme);
     }
-
 
     /**
      * Defines how many days should replace the {days} variable.
@@ -543,5 +616,4 @@ public abstract class AbstractMessage {
     public void setMaxBaits(String maxBaits) {
         setVariable("{max_baits}", maxBaits);
     }
-
 }

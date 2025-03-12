@@ -2,11 +2,9 @@ package com.oheers.fish;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
-import com.oheers.fish.adapter.PaperAdapter;
 import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
-import com.oheers.fish.api.adapter.PlatformAdapter;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementManager;
@@ -106,7 +104,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
-    private static final PlatformAdapter platformAdapter = new PaperAdapter();
     private EMFAPI api;
 
     private AddonManager addonManager;
@@ -366,7 +363,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
 
-        metrics.addCustomChart(new SimplePie("paper-adapter", () -> (platformAdapter instanceof PaperAdapter) ? "true" : "false"));
+        metrics.addCustomChart(new SimplePie("paper-adapter", () -> "true"));
     }
 
     private boolean setupPermissions() {
@@ -722,10 +719,6 @@ public class EvenMoreFish extends EMFPlugin {
         // Class names taken from PaperLib's initialize method
         return classExists("com.destroystokyo.paper.PaperConfig")
             || classExists("io.papermc.paper.configuration.Configuration");
-    }
-
-    public static @NotNull PlatformAdapter getAdapter() {
-        return platformAdapter;
     }
 
     public boolean isFirstLoad() {

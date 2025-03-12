@@ -1,7 +1,7 @@
 package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.commands.arguments.ArgumentHelper;
 import com.oheers.fish.competition.Competition;
@@ -56,7 +56,7 @@ public class MainCommand {
         return new CommandAPICommand("next")
                 .withPermission(UserPerms.NEXT)
                 .executes(info -> {
-                    AbstractMessage message = Competition.getNextCompetitionMessage();
+                    EMFMessage message = Competition.getNextCompetitionMessage();
                     message.prependMessage(PrefixType.DEFAULT.getPrefix());
                     message.send(info.sender());
                 });
@@ -154,7 +154,7 @@ public class MainCommand {
                         return;
                     }
                     new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
-                    AbstractMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
                     message.setPlayer(player);
                     message.send(sender);
                 });

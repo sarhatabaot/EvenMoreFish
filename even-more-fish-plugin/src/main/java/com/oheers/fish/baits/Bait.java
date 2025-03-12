@@ -2,7 +2,7 @@ package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
@@ -118,10 +118,10 @@ public class Bait extends ConfigBase {
      */
     private List<String> createBoostLore() {
 
-        AbstractMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
+        EMFMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
 
-        Supplier<AbstractMessage> boostsVariable = () -> {
-            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+        Supplier<EMFMessage> boostsVariable = () -> {
+            EMFMessage message = EMFMessage.empty();
             List<Rarity> rarityList = getRarities();
             if (!rarityList.isEmpty()) {
                 if (rarityList.size() > 1) {
@@ -142,7 +142,7 @@ public class Bait extends ConfigBase {
         };
         lore.setVariable("{boosts}", boostsVariable.get());
 
-        Supplier<AbstractMessage> loreVariable = () -> EvenMoreFish.getAdapter().createMessage(getConfig().getStringList("lore"));
+        Supplier<EMFMessage> loreVariable = () -> EMFMessage.fromStringList(getConfig().getStringList("lore"));
         lore.setVariable("{lore}", loreVariable.get());
 
         lore.setBaitTheme(getTheme());
@@ -243,7 +243,7 @@ public class Bait extends ConfigBase {
             return;
         }
 
-        AbstractMessage message = ConfigMessage.BAIT_USED.getMessage();
+        EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
         message.setBait(id);
         message.setBaitTheme(getTheme());
         message.send(player);

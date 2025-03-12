@@ -2,7 +2,7 @@ package com.oheers.fish.economy;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.api.economy.EconomyType;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
@@ -95,7 +95,7 @@ public class VaultEconomyType implements EconomyType {
         double worth = prepareValue(totalWorth, applyMultiplier);
         String display = MainConfig.getInstance().getEconomyDisplay(this);
         if (display != null) {
-            AbstractMessage message = EvenMoreFish.getAdapter().createMessage(display);
+            EMFMessage message = EMFMessage.fromString(display);
             message.setVariable("{amount}", String.valueOf(worth));
             return message.getLegacyMessage();
         }

@@ -1,7 +1,7 @@
 package com.oheers.fish.messages;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.config.MessageConfig;
 
 public enum PrefixType {
@@ -30,11 +30,11 @@ public enum PrefixType {
      *
      * @return The unformatted prefix, unless the type is NONE.
      */
-    public AbstractMessage getPrefix() {
+    public EMFMessage getPrefix() {
         if (id == null) {
-            return EvenMoreFish.getAdapter().createMessage("");
+            return EMFMessage.empty();
         } else {
-            AbstractMessage message = EvenMoreFish.getAdapter().createMessage(MessageConfig.getInstance().getConfig().getString(id, normal));
+            EMFMessage message = EMFMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
             message.appendString("&r");
             return message;
         }

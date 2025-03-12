@@ -2,7 +2,7 @@ package com.oheers.fish.fishing.items;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.messages.ConfigMessage;
@@ -319,9 +319,9 @@ public class Fish {
      */
     private List<String> getFishLore() {
         List<String> loreOverride = section.getStringList("lore-override");
-        AbstractMessage newLoreLine;
+        EMFMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
-            newLoreLine = EvenMoreFish.getAdapter().createMessage(loreOverride);
+            newLoreLine = EMFMessage.fromStringList(loreOverride);
         } else {
             newLoreLine = ConfigMessage.FISH_LORE.getMessage();
         }

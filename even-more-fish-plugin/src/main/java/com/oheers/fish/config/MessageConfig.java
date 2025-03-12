@@ -1,7 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.messages.PrefixType;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
@@ -19,7 +19,7 @@ public class MessageConfig extends ConfigBase {
     }
 
     public String getSTDPrefix() {
-        AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+        EMFMessage message = EMFMessage.empty();
         message.prependMessage(PrefixType.DEFAULT.getPrefix());
         message.appendString("&r");
         return message.getLegacyMessage();

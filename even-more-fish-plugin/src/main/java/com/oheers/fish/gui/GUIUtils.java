@@ -7,6 +7,7 @@ import com.oheers.fish.gui.guis.BaitsGUI;
 import com.oheers.fish.gui.guis.EMFGUI;
 import com.oheers.fish.gui.guis.MainMenuGUI;
 import com.oheers.fish.gui.guis.SellGUI;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.selling.SellHelper;
 import com.oheers.fish.utils.ItemBuilder;
 import com.oheers.fish.utils.ItemFactory;
@@ -107,13 +108,13 @@ public class GUIUtils {
         if (section == null) {
             return new InventoryGui(
                     EvenMoreFish.getInstance(),
-                    EvenMoreFish.getAdapter().createMessage("&cBroken GUI! Please tell an admin!").getLegacyMessage(),
+                    EMFMessage.fromString("&cBroken GUI! Please tell an admin!").getLegacyMessage(),
                     new String[0]
             );
         }
         return new InventoryGui(
                 EvenMoreFish.getInstance(),
-                EvenMoreFish.getAdapter().createMessage(section.getString("title", "EvenMoreFish Inventory")).getLegacyMessage(),
+                EMFMessage.fromString(section.getString("title", "EvenMoreFish Inventory")).getLegacyMessage(),
                 section.getStringList("layout").toArray(new String[0])
         );
     }

@@ -5,7 +5,7 @@ import com.gmail.nossr50.util.player.UserManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.EMFFishEvent;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
@@ -94,7 +94,7 @@ public abstract class Processor<E extends Event> implements Listener {
         if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
-                AbstractMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
+                EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
                 message.setBaitTheme(caughtBait.getTheme());
                 message.setBait(caughtBait.getId());
                 message.setPlayer(player);
@@ -136,7 +136,7 @@ public abstract class Processor<E extends Event> implements Listener {
             String length = decimalFormat.format(fish.getLength());
             String rarity = FishUtils.translateColorCodes(fish.getRarity().getId());
 
-            AbstractMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
+            EMFMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
             message.setPlayer(player);
             message.setRarityColour(fish.getRarity().getColour());
             message.setRarity(rarity);

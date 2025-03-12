@@ -5,7 +5,6 @@ include(":even-more-fish-addons-j17")
 include(":even-more-fish-database-extras")
 include(":even-more-fish-addons-j21")
 include(":even-more-fish-plugin")
-include(":even-more-fish-paper")
 
 dependencyResolutionManagement {
     versionCatalogs {

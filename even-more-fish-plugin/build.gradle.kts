@@ -45,7 +45,6 @@ repositories {
 
 dependencies {
     api(project(":even-more-fish-api"))
-    implementation(project(":even-more-fish-paper"))
 
     compileOnly(libs.paper.api)
     compileOnly(libs.vault.api)
