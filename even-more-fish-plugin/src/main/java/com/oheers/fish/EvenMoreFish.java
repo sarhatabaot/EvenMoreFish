@@ -3,7 +3,6 @@ package com.oheers.fish;
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.oheers.fish.adapter.PaperAdapter;
-import com.oheers.fish.adapter.SpigotAdapter;
 import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
@@ -71,6 +70,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.oheers.fish.FishUtils.classExists;
+
 public class EvenMoreFish extends EMFPlugin {
 
     private final Random random = new Random();
@@ -105,7 +106,7 @@ public class EvenMoreFish extends EMFPlugin {
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
-    private static PlatformAdapter platformAdapter;
+    private static final PlatformAdapter platformAdapter = new PaperAdapter();
     private EMFAPI api;
 
     private AddonManager addonManager;
@@ -128,6 +129,12 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onLoad() {
+        // Don't load if the server is not using Paper.
+        if (!isPaper()) {
+            throw new RuntimeException(
+                "Spigot detected! EvenMoreFish no longer runs on Spigot, please update to Paper instead. https://papermc.io/downloads/paper"
+            );
+        }
         CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
                 .shouldHookPaperReload(true)
                 .usePluginNamespace()
@@ -148,7 +155,6 @@ public class EvenMoreFish extends EMFPlugin {
         firstLoad = !getDataFolder().exists();
 
         scheduler = UniversalScheduler.getScheduler(this);
-        platformAdapter = loadAdapter();
 
         this.api = new EMFAPI();
 
@@ -708,21 +714,17 @@ public class EvenMoreFish extends EMFPlugin {
         return toggleValue.equals("true");
     }
 
-    private static PlatformAdapter loadAdapter() {
+    /**
+     * Check if the server is Paper
+     * @return Whether the server is running Paper
+     */
+    private boolean isPaper() {
         // Class names taken from PaperLib's initialize method
-        if (FishUtils.classExists(("com.destroystokyo.paper.PaperConfig"))) {
-            return new PaperAdapter();
-        } else if (FishUtils.classExists("io.papermc.paper.configuration.Configuration")) {
-            return new PaperAdapter();
-        }
-        return new SpigotAdapter();
+        return classExists("com.destroystokyo.paper.PaperConfig")
+            || classExists("io.papermc.paper.configuration.Configuration");
     }
 
     public static @NotNull PlatformAdapter getAdapter() {
-        if (platformAdapter == null) {
-            instance.getLogger().warning("No PlatformAdapter found! Defaulting to SpigotAdapter.");
-            platformAdapter = new SpigotAdapter();
-        }
         return platformAdapter;
     }
 
