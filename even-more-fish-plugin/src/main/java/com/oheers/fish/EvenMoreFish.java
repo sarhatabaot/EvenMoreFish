@@ -120,7 +120,9 @@ public class EvenMoreFish extends EMFPlugin {
         return instance;
     }
 
-    public static TaskScheduler getScheduler() {return scheduler;}
+    public static TaskScheduler getScheduler() {
+        return scheduler;
+    }
 
     public AddonManager getAddonManager() {
         return addonManager;
@@ -202,7 +204,7 @@ public class EvenMoreFish extends EMFPlugin {
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
 
-        // async check for updates on the spigot page
+        // async check for updates on the modrinth page
         getScheduler().runTaskAsynchronously(() -> isUpdateAvailable = checkUpdate());
 
         listeners();

@@ -229,7 +229,7 @@ admin:
   nbt-not-required: "&rAltere \"require-nbt-rod\" para true para usar esse recurso."
 
   # Quando há uma atualização do Spigot disponível, não traduza a URL, caso contrário, ela não direcionará para a página correta.
-  update-available: "&rHá uma atualização disponível: https://www.spigotmc.org/resources/evenmorefish.91310/updates"
+  update-available: "&rHá uma atualização disponível: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # Quando o plugin é recarregado
   reload: "&rPlugin recarregado com sucesso."
   # Ao verificar a lista de RewardTypes. A lista real é adicionada ao final desta mensagem.

@@ -243,8 +243,8 @@ admin:
   # When the command /emf admin nbt-rod is run but require-rod-nbt is false in the config.yml file.
   nbt-not-required: "&rChange \"require-nbt-rod\" to true in order to use this feature."
 
-  # When there's a spigot update available, don't translate the URL otherwise it won't direct to the correct page.
-  update-available: "&rThere is an update available: https://www.spigotmc.org/resources/evenmorefish.91310/updates"
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: "&rThere is an update available: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # When the plugin is reloaded
   reload: "&rSuccessfully reloaded the plugin."
   # When checking the list of RewardTypes. The actual list is added to the end of this message.

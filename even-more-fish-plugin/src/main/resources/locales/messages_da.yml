@@ -191,8 +191,8 @@ admin:
   # When an invalid competition type is tried to be started
   competition-type-invalid: "&rDette er ikke en konkurrence type, tilgængelige typer: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
 
-  # When there's a spigot update available, don't translate the URL otherwise it won't direct to the correct page.
-  update-available: "&rDer er en opdatering tilgængelig: https://www.spigotmc.org/resources/evenmorefish.91310/updates"
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: "&rDer er en opdatering tilgængelig: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # When the plugin is reloaded
   reload: "&rGenindlæste tilføjelsen korrekt."
 

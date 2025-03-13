@@ -165,8 +165,8 @@ admin:
   competition-already-running: "&rĐang có cuộc thi khác đang khởi động."
   #When an invalid competition type is tried to be started
   competition-type-invalid: "&rĐó không phải xếp hạng cuộc thi đúng, các xếp hạng có sẵn: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
-  #When there's a spigot update available, don't translate the URL otherwise it won't direct to the correct page.
-  update-available: "&rĐã có cập nhật mới tại https://www.spigotmc.org/resources/evenmorefish.91310/updates"
+  #When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: "&rĐã có cập nhật mới tại https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   #When the plugin is reloaded
   reload: "&rĐã tải lại plugin hoàn tất."
 

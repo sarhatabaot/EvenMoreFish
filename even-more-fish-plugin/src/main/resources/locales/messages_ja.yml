@@ -192,8 +192,8 @@ admin:
   # When an invalid competition type is tried to be started
   competition-type-invalid: "&rそれは釣り大会の種類ではありません。 有効な種類： MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
 
-  # When there's a spigot update available, don't translate the URL otherwise it won't direct to the correct page.
-  update-available: "&r利用可能なアップデートがあります: https://www.spigotmc.org/resources/evenmorefish.91310/updates"
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: "&r利用可能なアップデートがあります: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # When the plugin is reloaded
   reload: "&rプラグインのリロードが完了しました。"
 

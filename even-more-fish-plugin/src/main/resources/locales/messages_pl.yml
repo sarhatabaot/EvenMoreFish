@@ -192,8 +192,8 @@ admin:
   # When an invalid competition type is tried to be started
   competition-type-invalid: "&rBłędny typ zawodów, dostępne opcje: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
 
-  # When there's a spigot update available, don't translate the URL otherwise it won't direct to the correct page.
-  update-available: "&rDostępna jest nowa wersja: https://www.spigotmc.org/resources/evenmorefish.91310/updates"
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: "&rDostępna jest nowa wersja: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # When the plugin is reloaded
   reload: "&rPlugin przeładowany poprawnie."
 
