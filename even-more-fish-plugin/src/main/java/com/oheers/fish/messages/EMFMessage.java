@@ -115,11 +115,13 @@ public class EMFMessage {
     public @NotNull Component getComponentMessage() {
         formatVariables();
         formatPlaceholderAPI();
-        Component component = MINIMESSAGE.deserialize(this.message);
+        Component component = MINIMESSAGE.deserialize(getRawMessage());
         return removeDefaultItalics(component);
     }
 
     public @NotNull List<Component> getComponentListMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
         return getRawListMessage().stream()
             .map(raw -> {
                 Component component = MINIMESSAGE.deserialize(raw);
