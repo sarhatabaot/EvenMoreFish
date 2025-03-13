@@ -139,7 +139,7 @@ public class EMFMessage {
         formatVariables();
         formatPlaceholderAPI();
 
-        return formatColours(getRawMessage());
+        return LEGACY_SERIALIZER.serialize(getComponentMessage());
     }
 
     public @NotNull List<String> getLegacyListMessage() {
