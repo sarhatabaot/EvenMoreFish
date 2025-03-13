@@ -1,6 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFMessage;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
@@ -209,9 +210,8 @@ public class ConfigBase {
             .postProcessor(component -> component)
             .build();
 
-        // If the message already contains tags, don't do anything
-        String tagsStripped = miniMessageSerializer.stripTags(message);
-        if (!tagsStripped.equals(message)) {
+        // If the message isn't legacy, don't do anything
+        if (!FishUtils.isLegacyString(message)) {
             return message;
         }
 

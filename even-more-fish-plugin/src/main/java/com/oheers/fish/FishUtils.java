@@ -574,4 +574,13 @@ public class FishUtils {
         return format.format(value);
     }
 
+    /**
+     * Checks if a provided String is a legacy string by stripping MiniMessage tags and seeing if the String is the same.
+     * @return Whether this String is using legacy color codes.
+     */
+    public static boolean isLegacyString(@NotNull String string) {
+        String stripped = EMFMessage.MINIMESSAGE.stripTags(string);
+        return string.equals(stripped);
+    }
+
 }

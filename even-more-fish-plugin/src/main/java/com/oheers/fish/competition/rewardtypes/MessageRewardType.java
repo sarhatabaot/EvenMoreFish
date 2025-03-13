@@ -1,6 +1,7 @@
 package com.oheers.fish.competition.rewardtypes;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.messages.EMFMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -15,13 +16,10 @@ public class MessageRewardType implements RewardType {
 
     @Override
     public void doReward(@NotNull Player player, @NotNull String key, @NotNull String value, Location hookLocation) {
-        String tagsStripped = EMFMessage.MINIMESSAGE.stripTags(value);
-        // If the message does not contain MiniMessage tags
-        if (tagsStripped.equals(value)) {
+        if (FishUtils.isLegacyString(value)) {
             player.sendMessage(
                 legacyAmpersandSerializer.deserialize(value)
             );
-        // If the message does contain MiniMessage tags
         } else {
             player.sendMessage(
                 EMFMessage.MINIMESSAGE.deserialize(value)
