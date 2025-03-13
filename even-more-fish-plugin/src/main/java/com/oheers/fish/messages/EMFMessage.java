@@ -354,17 +354,13 @@ public class EMFMessage {
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
-    public void setVariable(@NotNull final String variable, @NotNull final String replacement) {
-        this.liveVariables.put(variable, replacement);
-    }
-
-    /**
-     * Adds a variable to be formatted when {@link #formatVariables()} is called.
-     * @param variable The variable.
-     * @param replacement The replacement for the variable.
-     */
-    public void setVariable(@NotNull final String variable, @NotNull final EMFMessage replacement) {
-        this.liveVariables.put(variable, replacement.getRawMessage());
+    public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
+        if (replacement instanceof EMFMessage emfMessage) {
+            emfMessage.formatVariables();
+            this.liveVariables.put(variable, emfMessage.getRawMessage());
+        } else {
+            this.liveVariables.put(variable, String.valueOf(replacement));
+        }
     }
 
     /**
@@ -389,7 +385,7 @@ public class EMFMessage {
      *
      * @param colour The &_ code for the colour.
      */
-    public void setRarityColour(@NotNull final String colour) {
+    public void setRarityColour(@NotNull final Object colour) {
         setVariable("{rarity_colour}", colour);
     }
 
@@ -408,7 +404,7 @@ public class EMFMessage {
      *
      * @param length The length of the fish.
      */
-    public void setLength(@NotNull final String length) {
+    public void setLength(@NotNull final Object length) {
         setVariable("{length}", length);
     }
 
@@ -417,7 +413,7 @@ public class EMFMessage {
      *
      * @param rarity The fish's rarity.
      */
-    public void setRarity(@NotNull final String rarity) {
+    public void setRarity(@NotNull final Object rarity) {
         setVariable("{rarity}", rarity);
     }
 
@@ -426,7 +422,7 @@ public class EMFMessage {
      *
      * @param fish The fish's name.
      */
-    public void setFishCaught(@NotNull final String fish) {
+    public void setFishCaught(@NotNull final Object fish) {
         setVariable("{fish}", fish);
     }
 
@@ -435,7 +431,7 @@ public class EMFMessage {
      *
      * @param sellPrice The sell price of the fish.
      */
-    public void setSellPrice(@NotNull final String sellPrice) {
+    public void setSellPrice(@NotNull final Object sellPrice) {
         setVariable("{sell-price}", sellPrice);
     }
 
@@ -444,7 +440,7 @@ public class EMFMessage {
      *
      * @param amount The amount of x.
      */
-    public void setAmount(@NotNull final String amount) {
+    public void setAmount(@NotNull final Object amount) {
         setVariable("{amount}", amount);
     }
 
@@ -453,7 +449,7 @@ public class EMFMessage {
      *
      * @param position The position.
      */
-    public void setPosition(@NotNull final String position) {
+    public void setPosition(@NotNull final Object position) {
         setVariable("{position}", position);
     }
 
@@ -462,7 +458,7 @@ public class EMFMessage {
      *
      * @param positionColour The position.
      */
-    public void setPositionColour(@NotNull final String positionColour) {
+    public void setPositionColour(@NotNull final Object positionColour) {
         setVariable("{pos_colour}", positionColour);
     }
 
@@ -471,7 +467,7 @@ public class EMFMessage {
      *
      * @param timeFormatted The formatted time.
      */
-    public void setTimeFormatted(@NotNull final String timeFormatted) {
+    public void setTimeFormatted(@NotNull final Object timeFormatted) {
         setVariable("{time_formatted}", timeFormatted);
     }
 
@@ -480,7 +476,7 @@ public class EMFMessage {
      *
      * @param timeRaw The raw time.
      */
-    public void setTimeRaw(@NotNull final String timeRaw) {
+    public void setTimeRaw(@NotNull final Object timeRaw) {
         setVariable("{time_raw}", timeRaw);
     }
 
@@ -489,7 +485,7 @@ public class EMFMessage {
      *
      * @param bait The name of the bait.
      */
-    public void setBait(@NotNull final String bait) {
+    public void setBait(@NotNull final Object bait) {
         setVariable("{bait}", bait);
     }
 
@@ -498,7 +494,7 @@ public class EMFMessage {
      *
      * @param baitTheme The bait colour theme.
      */
-    public void setBaitTheme(@NotNull final String baitTheme) {
+    public void setBaitTheme(@NotNull final Object baitTheme) {
         setVariable("{bait_theme}", baitTheme);
     }
 
@@ -507,7 +503,7 @@ public class EMFMessage {
      *
      * @param days The number of days.
      */
-    public void setDays(@NotNull final String days) {
+    public void setDays(@NotNull final Object days) {
         setVariable("{days}", days);
     }
 
@@ -516,7 +512,7 @@ public class EMFMessage {
      *
      * @param hours The number of hours.
      */
-    public void setHours(@NotNull final String hours) {
+    public void setHours(@NotNull final Object hours) {
         setVariable("{hours}", hours);
     }
 
@@ -525,7 +521,7 @@ public class EMFMessage {
      *
      * @param minutes The number of minutes.
      */
-    public void setMinutes(@NotNull final String minutes) {
+    public void setMinutes(@NotNull final Object minutes) {
         setVariable("{minutes}", minutes);
     }
 
@@ -534,7 +530,7 @@ public class EMFMessage {
      *
      * @param toggleMSG The applicable toggle msg.
      */
-    public void setToggleMSG(@NotNull final String toggleMSG) {
+    public void setToggleMSG(@NotNull final Object toggleMSG) {
         setVariable("{toggle_msg}", toggleMSG);
     }
 
@@ -543,7 +539,7 @@ public class EMFMessage {
      *
      * @param toggleIcon The applicable toggle material.
      */
-    public void setToggleIcon(@NotNull final String toggleIcon) {
+    public void setToggleIcon(@NotNull final Object toggleIcon) {
         setVariable("{toggle_icon}", toggleIcon);
     }
 
@@ -552,7 +548,7 @@ public class EMFMessage {
      *
      * @param day The day number.
      */
-    public void setDay(@NotNull final String day) {
+    public void setDay(@NotNull final Object day) {
         setVariable("{day}", day);
     }
 
@@ -561,7 +557,7 @@ public class EMFMessage {
      *
      * @param name The name of the fish or user
      */
-    public void setName(@NotNull final String name) {
+    public void setName(@NotNull final Object name) {
         setVariable("{name}", name);
     }
 
@@ -570,7 +566,7 @@ public class EMFMessage {
      *
      * @param numCaught The number of fish caught.
      */
-    public void setNumCaught(@NotNull final String numCaught) {
+    public void setNumCaught(@NotNull final Object numCaught) {
         setVariable("{num_caught}", numCaught);
     }
 
@@ -579,7 +575,7 @@ public class EMFMessage {
      *
      * @param largestSize The largest size of the fish.
      */
-    public void setLargestSize(@NotNull final String largestSize) {
+    public void setLargestSize(@NotNull final Object largestSize) {
         setVariable("{largest_size}", largestSize);
     }
 
@@ -588,7 +584,7 @@ public class EMFMessage {
      *
      * @param firstCaught The first fish caught.
      */
-    public void setFirstCaught(@NotNull final String firstCaught) {
+    public void setFirstCaught(@NotNull final Object firstCaught) {
         setVariable("{first_caught}", firstCaught);
     }
 
@@ -597,7 +593,7 @@ public class EMFMessage {
      *
      * @param timeRemaining The time remaining.
      */
-    public void setTimeRemaining(@NotNull final String timeRemaining) {
+    public void setTimeRemaining(@NotNull final Object timeRemaining) {
         setVariable("{time_remaining}", timeRemaining);
     }
 
@@ -607,7 +603,7 @@ public class EMFMessage {
      *
      * @param typeString The competition type.
      */
-    public void setCompetitionType(@NotNull final String typeString) {
+    public void setCompetitionType(@NotNull final Object typeString) {
         setVariable("{type}", typeString);
     }
 
@@ -616,7 +612,7 @@ public class EMFMessage {
      *
      * @param currentBaits The amount of baits.
      */
-    public void setCurrentBaits(String currentBaits) {
+    public void setCurrentBaits(@NotNull final Object currentBaits) {
         setVariable("{current_baits}", currentBaits);
     }
 
@@ -625,7 +621,8 @@ public class EMFMessage {
      *
      * @param maxBaits The max amount of baits.
      */
-    public void setMaxBaits(String maxBaits) {
+    public void setMaxBaits(@NotNull final Object maxBaits) {
         setVariable("{max_baits}", maxBaits);
     }
+
 }

@@ -267,32 +267,36 @@ public class FishUtils {
         return whitelistedWorlds.contains(l.getWorld().getName());
     }
 
-    public static @NotNull String timeFormat(long timeLeft) {
-        String returning = "";
+    public static @NotNull EMFMessage timeFormat(long timeLeft) {
         long hours = timeLeft / 3600;
         long minutes = (timeLeft % 3600) / 60;
         long seconds = timeLeft % 60;
 
+        EMFMessage formatted = EMFMessage.empty();
+
         if (hours > 0) {
             EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
-            returning += message.getLegacyMessage() + " ";
+            formatted.appendMessage(message);
+            formatted.appendString(" ");
         }
 
         if (minutes > 0) {
             EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
-            returning += message.getLegacyMessage() + " ";
+            formatted.appendMessage(message);
+            formatted.appendString(" ");
         }
 
         // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
             EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
-            returning += message.getLegacyMessage() + " ";
+            formatted.appendMessage(message);
+            formatted.appendString(" ");
         }
 
-        return returning.trim();
+        return formatted;
     }
 
     public static @NotNull String timeRaw(long timeLeft) {
