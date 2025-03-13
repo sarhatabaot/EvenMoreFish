@@ -120,9 +120,9 @@ public class EMFMessage {
     }
 
     public @NotNull List<Component> getComponentListMessage() {
-        return getLegacyListMessage().stream()
-            .map(legacy -> {
-                Component component = MINIMESSAGE.deserialize(legacy);
+        return getRawListMessage().stream()
+            .map(raw -> {
+                Component component = MINIMESSAGE.deserialize(raw);
                 return removeDefaultItalics(component);
             })
             .toList();
