@@ -26,9 +26,9 @@ public class EMFMessage {
         .useUnusualXRepeatedCharacterHexFormat()
         .build();
     private static final MiniMessage miniMessage = MiniMessage.builder().strict(true).build();
-    
+
     private final Map<String, String> liveVariables = new LinkedHashMap<>();
-    
+
     private String message;
     private boolean canSilent = false;
     private OfflinePlayer relevantPlayer;
