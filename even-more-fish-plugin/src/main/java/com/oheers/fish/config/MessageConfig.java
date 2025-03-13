@@ -75,9 +75,6 @@ public class MessageConfig extends ConfigBase {
             }
         });
 
-        // Switch to MiniMessage - config version 28
-        builder.addCustomLogic("28", this::convertLegacy);
-
         return builder.build();
     }
 
