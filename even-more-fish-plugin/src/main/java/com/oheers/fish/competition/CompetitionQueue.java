@@ -4,7 +4,6 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.FileUtil;
 import com.oheers.fish.competition.configs.CompetitionConversions;
 import com.oheers.fish.competition.configs.CompetitionFile;
-import org.antlr.runtime.tree.Tree;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
 

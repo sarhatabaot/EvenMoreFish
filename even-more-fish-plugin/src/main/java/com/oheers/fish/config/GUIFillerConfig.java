@@ -6,7 +6,6 @@ import com.oheers.fish.gui.ConfigGui;
 import com.oheers.fish.gui.GUIUtils;
 import com.oheers.fish.utils.ItemFactory;
 import de.themoep.inventorygui.GuiElement;
-import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Material;

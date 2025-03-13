@@ -1,32 +1,26 @@
 package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.GUIConfig;
-import com.oheers.fish.gui.guis.*;
+import com.oheers.fish.gui.guis.BaitsGui;
+import com.oheers.fish.gui.guis.MainMenuGui;
+import com.oheers.fish.gui.guis.SellGui;
 import com.oheers.fish.selling.SellHelper;
 import com.oheers.fish.utils.ItemBuilder;
-import com.oheers.fish.utils.ItemFactory;
-import com.oheers.fish.utils.ItemUtils;
-import de.themoep.inventorygui.*;
+import de.themoep.inventorygui.GuiElement;
+import de.themoep.inventorygui.GuiPageElement;
 import dev.dejvokep.boostedyaml.YamlDocument;
-import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class GUIUtils {
 

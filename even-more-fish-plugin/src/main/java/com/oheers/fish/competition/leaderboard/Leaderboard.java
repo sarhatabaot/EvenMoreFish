@@ -7,9 +7,7 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.impl.QOM;
 
 import java.util.ArrayList;
 import java.util.Comparator;

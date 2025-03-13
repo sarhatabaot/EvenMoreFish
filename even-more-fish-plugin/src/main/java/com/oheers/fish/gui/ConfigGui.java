@@ -2,7 +2,6 @@ package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.utils.ItemFactory;
