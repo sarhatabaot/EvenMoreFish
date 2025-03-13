@@ -108,7 +108,7 @@ fish-sale: <white>Has vendido </white><green>{amount} </green><white>pescados po
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
 help-general:
-  title: '[noPrefix]<strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>'
+  title: '<gradient:#f1ffed:#f1ffed><st>         <!st><bold><green>EvenMoreFish</green></bold></st><gradient:#73ff6b:#f1ffed>         '
   top: '[noPrefix]Muestra el leaderboard de una competición en curso.'
   help: '[noPrefix]Te muestra esta pagina.'
   shop: '[noPrefix]Abre una tienda para vender su pescado.'
