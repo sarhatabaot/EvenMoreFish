@@ -228,7 +228,7 @@ admin:
   # Quando o comando /emf admin nbt-rod é executado, mas require-rod-nbt está como false no config.yml.
   nbt-not-required: "&rAltere \"require-nbt-rod\" para true para usar esse recurso."
 
-  # Quando há uma atualização do Spigot disponível, não traduza a URL, caso contrário, ela não direcionará para a página correta.
+  # Quando há uma atualização do Modrinth disponível, não traduza a URL, caso contrário, ela não direcionará para a página correta.
   update-available: "&rHá uma atualização disponível: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # Quando o plugin é recarregado
   reload: "&rPlugin recarregado com sucesso."

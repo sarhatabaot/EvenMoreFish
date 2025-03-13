@@ -182,7 +182,7 @@ admin:
   # 當一個無效的競爭類型被嘗試啟動時
   competition-type-invalid: "&a這不是一個競爭類型，可用類型：MOST_FISH, LARGEST_FISH, SPECIFIC_FISH, LARGEST_TOTAL_FISH, SPECIFIC_RARITY"
 
-  # 當有spigot更新時，不要翻譯URL，否則它將無法引導到正確的頁面。
+  # 當有modrinth更新時，不要翻譯URL，否則它將無法引導到正確的頁面。
   update-available: "&a釣魚大賽插件更新啦！還不來看看嗎https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # 重啟插件信息
   reload: "&a成功地重新加載了插件，由Kyle翻譯。"

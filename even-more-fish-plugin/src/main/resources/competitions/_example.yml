@@ -66,7 +66,7 @@ number-needed: 3
 minimum-players: 5
 
 # The sound to play to all players when this competition starts. Defaults to NONE if not present.
-# Supported values are listed here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+# Supported values are listed here: https://jd.papermc.io/paper/1.21.4/org/bukkit/Sound.html
 start-sound: NONE
 
 # Should "fish caught" notifications only show for players holding fishing rods?

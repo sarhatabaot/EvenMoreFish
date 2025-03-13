@@ -186,7 +186,7 @@ admin:
   competition-type-invalid: "Neplatný typ soutěže, dostupné typy jsou: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH, SPECIFIC_RARITY a LARGEST_TOTAL"
 
   # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
-  update-available: "&rByla nalezena nová verze pluginu, stáhnout jí můžete zde: https://www.spigotmc.org/resources/91310/updates"
+  update-available: "&rByla nalezena nová verze pluginu, stáhnout jí můžete zde: https://modrinth.com/plugin/evenmorefish"
   # When the plugin is reloaded
   reload: "&rNastavení pluginu bylo úspěšně reloadováno."
 

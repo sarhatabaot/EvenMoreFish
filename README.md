@@ -1,4 +1,4 @@
-# 🐠 EvenMoreFish Spigot Plugin 🐟
+# 🐠 EvenMoreFish Paper Plugin 🐟
 
 Improve your server's fishing experience with an incredible **fishing competition plugin** based on elsiff's MoreFish
 plugin
@@ -11,7 +11,7 @@ plugin for your server.
 Supported Versions: 1.18.2, 1.19.4, 1.20.6, 1.21.1, 1.21.4 (Experimental, Dev Builds)
 
 If you encounter any issues with the plugin, please do the following before reporting the problem:
-- Create a Spigot or Paper test server using one of the supported versions.
+- Create a Paper test server using one of the supported versions.
 - Add the latest [dev build](https://ci.codemc.io/job/Oheers/job/EvenMoreFish/) to the server.
 - Test your issue.
 - If your issue is still happening, open a GitHub issue or send a message in the Discord server.
@@ -20,9 +20,8 @@ If you encounter any issues with the plugin, please do the following before repo
 
 ## 📦 Download 📦
 
-There are three sources for the plugin:
+There are two sources for the plugin:
 - [Modrinth](https://modrinth.com/plugin/evenmorefish)
-- [Spigot](https://www.spigotmc.org/resources/evenmorefish-%E2%96%AA-extensive-fishing-plugin-%E2%96%AA.91310/) (Less Frequent Updates)
 - [Jenkins](https://ci.codemc.io/job/Oheers/job/EvenMoreFish/) (Bleeding edge, potentially unstable)
 
 ---

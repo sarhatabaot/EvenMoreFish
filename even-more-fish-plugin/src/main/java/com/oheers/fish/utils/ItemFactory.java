@@ -663,7 +663,7 @@ public class ItemFactory {
         } catch (NullPointerException exception) {
             EvenMoreFish.getInstance()
                     .getLogger()
-                    .severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
+                    .severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://jd.papermc.io/paper/1.21.4/org/bukkit/potion/PotionEffectType.html");
         }
     }
 

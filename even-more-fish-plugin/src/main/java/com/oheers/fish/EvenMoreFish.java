@@ -702,7 +702,7 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // FISH TOGGLE METHODS
-    // We use Strings here because Spigot 1.18.2 does not have PersistentDataType.BOOLEAN.
+    // We use Strings here because Paper 1.18.2 does not have PersistentDataType.BOOLEAN.
 
     public void performFishToggle(@NotNull Player player) {
         NamespacedKey key = new NamespacedKey(this, "fish-enabled");

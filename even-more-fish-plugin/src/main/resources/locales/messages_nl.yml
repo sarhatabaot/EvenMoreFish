@@ -195,8 +195,8 @@ admin:
   # Wanneer de opdracht /emf admin nbt-rod wordt uitgevoerd, maar require-rod-nbt staat op false in het config.yml-bestand.
   nbt-not-required: "&rStel \"require-nbt-rod\" in op true om deze functie te gebruiken."
 
-  # Wanneer er een Spigot-update beschikbaar is. Vertaal de URL niet, anders wordt de pagina niet correct geopend.
-  update-available: "&rEr is een update beschikbaar: https://www.spigotmc.org/resources/even-more-fish.10485/"
+  # Wanneer er een Modrinth-update beschikbaar is. Vertaal de URL niet, anders wordt de pagina niet correct geopend.
+  update-available: "&rEr is een update beschikbaar: https://modrinth.com/plugin/evenmorefish"
 
   reload: "&rEvenMoreFish is succesvol herladen."
 

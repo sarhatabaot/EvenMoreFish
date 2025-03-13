@@ -2,8 +2,7 @@ Welcome to the EvenMoreFish Wiki.
 
 ***
 ### Downloads
-* [Modrinth (Preferred)](https://modrinth.com/plugin/evenmorefish)
-* [Spigot](https://www.spigotmc.org/resources/evenmorefish-%E2%96%AA-extensive-fishing-plugin-%E2%96%AA.91310/)
+* [Modrinth](https://modrinth.com/plugin/evenmorefish)
 * [Development Builds](https://ci.codemc.io/job/Oheers/job/EvenMoreFish/)
 ### Configuration
 * [Economy](https://github.com/Oheers/EvenMoreFish/wiki/Economy)

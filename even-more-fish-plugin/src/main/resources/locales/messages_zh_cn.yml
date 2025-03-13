@@ -200,7 +200,7 @@ admin:
   nbt-rod-given: '&rYou have given {player} a NBT rod, make sure "require-nbt-rod" is set to &atrue &rfor this to be different from any other fishing rod.' # 当运行 /emf admin nbt-rod 命令但 config.yml 文件中 require-rod-nbt 为 false 时。
   # 当运行 /emf admin nbt-rod 命令，但 config.yml 文件中的 require-rod-nbt 为 false 时。
   nbt-not-required: '&r将 "require-nbt-rod "改为 true，以便使用此功能。'
-  # 当有spigot更新时，不要翻译URL，否则它将无法引导到正确的页面。
+  # 当有modrinth更新时，不要翻译URL，否则它将无法引导到正确的页面。
   update-available: "&a有内容更新啦: https://modrinth.com/plugin/evenmorefish/versions?l=paper"
   # 重启插件信息
   reload: "&a成功地重新加载了插件!"
