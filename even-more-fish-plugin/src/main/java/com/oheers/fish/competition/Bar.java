@@ -16,7 +16,7 @@ public class Bar {
     BossBar bar;
     private boolean shouldShow = true;
 
-    String prefix;
+    EMFMessage prefix;
 
     public Bar() {
         createBar();
@@ -42,8 +42,9 @@ public class Bar {
         bar.setProgress(progress);
     }
 
-    public void setPrefix(String prefix, CompetitionType type) {
-        this.prefix = prefix.replace("{type}", type.getBarPrefix());
+    public void setPrefix(EMFMessage prefix, CompetitionType type) {
+        prefix.setVariable("{type}", type.getBarPrefix());
+        this.prefix = prefix;
     }
 
     public void setColour(BarColor colour) {

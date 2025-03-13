@@ -91,7 +91,7 @@ public class ItemFactory {
      * @return The completed ItemStack
      * @throws NullPointerException The type has not been enabled, therefore the ItemStack was never set in the first place.
      */
-    public ItemStack createItem(OfflinePlayer player, int randomIndex, @Nullable Map<String, String> replacements) {
+    public ItemStack createItem(OfflinePlayer player, int randomIndex, @Nullable Map<String, EMFMessage> replacements) {
         if (rawMaterial) {
             return this.product;
         }
@@ -597,7 +597,7 @@ public class ItemFactory {
         }
     }
 
-    private void applyLore(@Nullable Map<String, String> replacements) {
+    private void applyLore(@Nullable Map<String, EMFMessage> replacements) {
         List<String> loreConfig = this.configurationFile.getStringList(configLocation + "lore");
         if (loreConfig.isEmpty()) {
             return;
@@ -616,7 +616,7 @@ public class ItemFactory {
      * Applies a custom display name to the item, this is if server owners don't like the default colour or whatever their
      * reason is.
      */
-    private void applyDisplayName(@Nullable Map<String, String> replacements) {
+    private void applyDisplayName(@Nullable Map<String, EMFMessage> replacements) {
         final String displayName = this.configurationFile.getString(configLocation + "item.displayname", this.displayName);
 
         product.editMeta(

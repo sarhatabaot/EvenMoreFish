@@ -317,11 +317,11 @@ public class FishUtils {
     }
 
     public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
-        String formatted = message.getLegacyMessage();
+        String plain = message.getPlainTextMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
-        if (formatted.isEmpty() || activeComp == null) {
-            EvenMoreFish.debug("Formatted (Empty Message) " + formatted.isEmpty());
+        if (plain.isEmpty() || activeComp == null) {
+            EvenMoreFish.debug("Formatted (Empty Message) " + plain.isEmpty());
             EvenMoreFish.debug("Active Comp is null? " + (activeComp == null));
             return;
         }
@@ -547,10 +547,10 @@ public class FishUtils {
      * @param value The double value to be formatted.
      * @return The formatted double
      */
-    public static String formatDouble(@NotNull final String formatStr, final double value) {
+    public static Component formatDouble(@NotNull final String formatStr, final double value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
-        return format.format(value);
+        return Component.text(format.format(value));
     }
 
     /**

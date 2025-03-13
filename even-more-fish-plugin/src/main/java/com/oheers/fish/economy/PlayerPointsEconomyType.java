@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.economy.EconomyType;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.EMFMessage;
+import net.kyori.adventure.text.Component;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
@@ -77,7 +78,7 @@ public class PlayerPointsEconomyType implements EconomyType {
     }
 
     @Override
-    public @Nullable String formatWorth(double totalWorth, boolean applyMultiplier) {
+    public @Nullable Component formatWorth(double totalWorth, boolean applyMultiplier) {
         if (!isAvailable()) {
             return null;
         }
@@ -88,7 +89,7 @@ public class PlayerPointsEconomyType implements EconomyType {
         }
         EMFMessage message = EMFMessage.fromString(display);
         message.setVariable("{amount}", String.valueOf(worth));
-        return message.getLegacyMessage();
+        return message.getComponentMessage();
     }
 
     @Override

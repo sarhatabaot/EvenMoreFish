@@ -22,7 +22,7 @@ public class MessageConfig extends ConfigBase {
         EMFMessage message = EMFMessage.empty();
         message.prependMessage(PrefixType.DEFAULT.getPrefix());
         message.appendString("<reset>");
-        return message.getLegacyMessage();
+        return message.getRawMessage();
     }
 
     public int getLeaderboardCount() {

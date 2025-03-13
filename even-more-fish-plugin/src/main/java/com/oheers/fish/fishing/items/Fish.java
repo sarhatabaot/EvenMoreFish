@@ -336,7 +336,7 @@ public class Fish {
 
         newLoreLine.setVariable("{fisherman_lore}",
                 !disableFisherman && getFishermanPlayer() != null ?
-                        (ConfigMessage.FISHERMAN_LORE.getMessage()).getLegacyMessage()
+                        (ConfigMessage.FISHERMAN_LORE.getMessage())
                         : ""
         );
 
@@ -344,7 +344,7 @@ public class Fish {
 
         newLoreLine.setVariable("{length_lore}",
                 length > 0 ?
-                        ConfigMessage.LENGTH_LORE.getMessage().getLegacyMessage()
+                        ConfigMessage.LENGTH_LORE.getMessage()
                         : ""
         );
 

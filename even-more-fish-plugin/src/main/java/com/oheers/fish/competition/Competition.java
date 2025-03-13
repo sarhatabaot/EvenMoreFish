@@ -270,8 +270,8 @@ public class Competition {
         List<String> competitionColours = competitionFile.getPositionColours();
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        String leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, true, null);
-        console.sendMessage(leaderboardMessage);
+        EMFMessage leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, true, null);
+        leaderboardMessage.send(console);
 
         EMFMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
         message.setAmount(Integer.toString(leaderboard.getSize()));
@@ -294,22 +294,22 @@ public class Competition {
         List<String> competitionColours = competitionFile.getPositionColours();
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        String leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, false, player.getUniqueId());
-        player.sendMessage(leaderboardMessage);
+        EMFMessage leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, false, player.getUniqueId());
+        leaderboardMessage.send(player);
 
         EMFMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
         message.setAmount(Integer.toString(leaderboard.getSize()));
         message.send(player);
     }
 
-    private @NotNull String buildLeaderboardMessage(List<CompetitionEntry> entries, List<String> competitionColours, boolean isConsole, UUID playerUuid) {
+    private @NotNull EMFMessage buildLeaderboardMessage(List<CompetitionEntry> entries, List<String> competitionColours, boolean isConsole, UUID playerUuid) {
         if (entries == null) {
             entries = List.of();
         }
 
         int maxCount = MessageConfig.getInstance().getLeaderboardCount();
 
-        StringBuilder builder = new StringBuilder();
+        EMFMessage builder = EMFMessage.empty();
         int pos = 0;
 
         for (CompetitionEntry entry : entries) {
@@ -329,10 +329,11 @@ public class Competition {
                 message = competitionType.getStrategy().getSinglePlayerLeaderboard(message, entry);
             }
 
-            builder.append(message.getLegacyMessage()).append("\n");
+            builder.appendMessage(message);
+            builder.appendString("\n");
         }
 
-        return builder.toString();
+        return builder;
     }
 
     private void handleDatabaseUpdates(CompetitionEntry entry, boolean isTopEntry) {
@@ -400,7 +401,7 @@ public class Competition {
     public void singleReward(Player player) {
         EMFMessage message = getTypeFormat(ConfigMessage.COMPETITION_SINGLE_WINNER);
         message.setPlayer(player);
-        message.setCompetitionType(competitionType.getTypeVariable().getMessage().getLegacyMessage());
+        message.setCompetitionType(competitionType.getTypeVariable().getMessage());
 
         message.broadcast();
 

@@ -29,7 +29,7 @@ public class ConfigGui {
     protected final Map<String, BiConsumer<ConfigGui, GuiElement.Click>> actions = GUIUtils.getActionMap();
     protected final Section config;
     protected final Player player;
-    private final @NotNull Map<String, String> replacements = new HashMap<>();
+    private final @NotNull Map<String, EMFMessage> replacements = new HashMap<>();
 
     protected InventoryGui gui;
     private InventoryGui.CloseAction closeAction = null;
@@ -42,10 +42,18 @@ public class ConfigGui {
     }
 
     public void addReplacement(@NotNull String variable, @NotNull String replacement) {
+        this.replacements.put(variable, EMFMessage.fromString(replacement));
+    }
+
+    public void addReplacement(@NotNull String variable, @NotNull Component replacement) {
+        this.replacements.put(variable, EMFMessage.of(replacement));
+    }
+
+    public void addReplacement(@NotNull String variable, @NotNull EMFMessage replacement) {
         this.replacements.put(variable, replacement);
     }
 
-    public void addReplacements(@NotNull Map<String, String> replacements) {
+    public void addReplacements(@NotNull Map<String, EMFMessage> replacements) {
         this.replacements.putAll(replacements);
     }
 

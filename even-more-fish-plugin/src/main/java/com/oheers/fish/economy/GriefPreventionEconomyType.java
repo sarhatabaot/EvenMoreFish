@@ -6,6 +6,7 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.EMFMessage;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +87,7 @@ public class GriefPreventionEconomyType implements EconomyType {
     }
 
     @Override
-    public @Nullable String formatWorth(double totalWorth, boolean applyMultiplier) {
+    public @Nullable Component formatWorth(double totalWorth, boolean applyMultiplier) {
         if (!isAvailable()) {
             return null;
         }
@@ -97,7 +98,7 @@ public class GriefPreventionEconomyType implements EconomyType {
         }
         EMFMessage message = EMFMessage.fromString(display);
         message.setVariable("{amount}", String.valueOf(worth));
-        return message.getLegacyMessage();
+        return message.getComponentMessage();
     }
 
     @Override

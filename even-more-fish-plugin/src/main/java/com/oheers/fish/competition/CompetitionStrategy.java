@@ -44,7 +44,7 @@ public interface CompetitionStrategy {
      */
     default EMFMessage getBeginMessage(Competition competition, CompetitionType type) {
         EMFMessage message = ConfigMessage.COMPETITION_START.getMessage();
-        message.setCompetitionType(type.getTypeVariable().getMessage().getLegacyMessage());
+        message.setCompetitionType(type.getTypeVariable().getMessage());
         return message;
     }
 
@@ -88,7 +88,7 @@ public interface CompetitionStrategy {
         EMFMessage message = configMessage.getMessage();
         message.setTimeFormatted(FishUtils.timeFormat(competition.getTimeLeft()));
         message.setTimeRaw(FishUtils.timeRaw(competition.getTimeLeft()));
-        message.setCompetitionType(competition.getCompetitionType().getTypeVariable().getMessage().getLegacyMessage());
+        message.setCompetitionType(competition.getCompetitionType().getTypeVariable().getMessage());
         return message;
     }
 
