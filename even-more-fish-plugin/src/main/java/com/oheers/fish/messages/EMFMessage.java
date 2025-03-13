@@ -251,6 +251,7 @@ public class EMFMessage {
      * @param message The message to append
      */
     public void appendMessage(@NotNull EMFMessage message) {
+        message.formatVariables();
         appendString(message.getRawMessage());
     }
 
@@ -269,6 +270,7 @@ public class EMFMessage {
     public void appendMessageList(@NotNull List<EMFMessage> messages) {
         StringBuilder newMessage = new StringBuilder(this.message);
         for (EMFMessage message : messages) {
+            message.formatVariables();
             newMessage.append(message.getRawMessage());
         }
         this.message = newMessage.toString();
@@ -287,6 +289,7 @@ public class EMFMessage {
      * @param message The message to prepend
      */
     public void prependMessage(@NotNull EMFMessage message) {
+        message.formatVariables();
         prependString(message.getRawMessage());
     }
 
@@ -305,6 +308,7 @@ public class EMFMessage {
     public void prependMessageList(@NotNull List<EMFMessage> messages) {
         StringBuilder newMessage = new StringBuilder();
         for (EMFMessage message : messages) {
+            message.formatVariables();
             newMessage.append(message.getRawMessage());
         }
         this.message = newMessage + this.message;
