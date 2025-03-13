@@ -108,7 +108,7 @@ fish-sale: <white>Has vendido </white><green>{amount} </green><white>pescados po
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
 help-general:
-  title: '<gradient:#f1ffed:#f1ffed><st>         <!st><bold><green>EvenMoreFish</green></bold></st><gradient:#73ff6b:#f1ffed>         '
+  title: '[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><bold><green> EvenMoreFish </green></bold><st><gradient:#73ff6b:#f1ffed>         '
   top: '[noPrefix]Muestra el leaderboard de una competición en curso.'
   help: '[noPrefix]Te muestra esta pagina.'
   shop: '[noPrefix]Abre una tienda para vender su pescado.'

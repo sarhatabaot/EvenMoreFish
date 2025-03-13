@@ -113,7 +113,7 @@ fish-sale: <reset>Você vendeu <green>{amount} </green><white>peixes por </white
 help-format: '[noPrefix]<aqua>{command} </aqua><yellow>- {description}'
 
 help-general:
-  title: '<gradient:#f1ffed:#f1ffed><st>         <!st><bold><green>EvenMoreFish</green></bold></st><gradient:#73ff6b:#f1ffed>         '
+  title: '[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><bold><green> EvenMoreFish </green></bold><st><gradient:#73ff6b:#f1ffed>         '
   top: '[noPrefix]Mostra o placar da competição em andamento.'
   help: '[noPrefix]Mostra esta página.'
   shop: '[noPrefix]Abre uma loja para vender seus peixes.'
