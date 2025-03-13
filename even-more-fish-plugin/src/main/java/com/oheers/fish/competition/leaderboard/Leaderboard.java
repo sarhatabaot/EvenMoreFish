@@ -1,12 +1,11 @@
 package com.oheers.fish.competition.leaderboard;
 
-import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.CompetitionType;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.fishing.items.Fish;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +65,7 @@ public class Leaderboard implements LeaderboardHandler {
 
         Fish newFish = newTopEntry.getFish();
 
-        AbstractMessage message = ConfigMessage.NEW_FIRST_PLACE_NOTIFICATION.getMessage();
+        EMFMessage message = ConfigMessage.NEW_FIRST_PLACE_NOTIFICATION.getMessage();
 
         message.setPerPlayer(false);
 
