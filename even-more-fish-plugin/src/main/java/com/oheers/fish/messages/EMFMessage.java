@@ -113,6 +113,8 @@ public class EMFMessage {
     }
 
     public @NotNull Component getComponentMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
         Component component = MINIMESSAGE.deserialize(this.message);
         return removeDefaultItalics(component);
     }
@@ -136,9 +138,6 @@ public class EMFMessage {
     }
 
     public @NotNull String getLegacyMessage() {
-        formatVariables();
-        formatPlaceholderAPI();
-
         return LEGACY_SERIALIZER.serialize(getComponentMessage());
     }
 
