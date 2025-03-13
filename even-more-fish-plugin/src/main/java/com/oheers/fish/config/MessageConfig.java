@@ -21,7 +21,7 @@ public class MessageConfig extends ConfigBase {
     public String getSTDPrefix() {
         EMFMessage message = EMFMessage.empty();
         message.prependMessage(PrefixType.DEFAULT.getPrefix());
-        message.appendString("&r");
+        message.appendString("<reset>");
         return message.getLegacyMessage();
     }
 
@@ -36,21 +36,21 @@ public class MessageConfig extends ConfigBase {
         // Bossbar config relocations - config version 18
         builder.addCustomLogic("18", yamlDocument -> {
             if (yamlDocument.contains("bossbar.hour-color")) {
-                String hourColor = yamlDocument.getString("bossbar.hour-color", "&f");
+                String hourColor = yamlDocument.getString("bossbar.hour-color", "<white>");
                 String hour = yamlDocument.getString("bossbar.hour", "h");
                 yamlDocument.set("bossbar.hour", hourColor + "{hour}" + hour);
                 yamlDocument.remove("bossbar.hour-color");
             }
 
             if (yamlDocument.contains("bossbar.minute-color")) {
-                String minuteColor = yamlDocument.getString("bossbar.minute-color", "&f");
+                String minuteColor = yamlDocument.getString("bossbar.minute-color", "<white>");
                 String minute = yamlDocument.getString("bossbar.minute", "m");
                 yamlDocument.set("bossbar.minute", minuteColor + "{minute}" + minute);
                 yamlDocument.remove("bossbar.minute-color");
             }
 
             if (yamlDocument.contains("bossbar.second-color")) {
-                String secondColor = yamlDocument.getString("bossbar.second-color", "&f");
+                String secondColor = yamlDocument.getString("bossbar.second-color", "<white>");
                 String second = yamlDocument.getString("bossbar.second", "s");
                 yamlDocument.set("bossbar.second", secondColor + "{second}" + second);
                 yamlDocument.remove("bossbar.second-color");

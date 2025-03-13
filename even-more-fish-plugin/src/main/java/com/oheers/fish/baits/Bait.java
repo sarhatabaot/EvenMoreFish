@@ -283,7 +283,7 @@ public class Bait extends ConfigBase {
      * @return The colour theme defined for the bait.
      */
     public String getTheme() {
-        return getConfig().getString("bait-theme", "&e");
+        return getConfig().getString("bait-theme", "<yellow>");
     }
 
     /**

@@ -5,9 +5,9 @@ import com.oheers.fish.config.MessageConfig;
 public enum PrefixType {
 
     NONE(null, null),
-    ADMIN("prefix-admin", "&c[EvenMoreFish] "),
-    DEFAULT("prefix-regular", "&a[EvenMoreFish] "),
-    ERROR("prefix-error", "&c[EvenMoreFish] ");
+    ADMIN("prefix-admin", "<red>[EvenMoreFish] "),
+    DEFAULT("prefix-regular", "<green>[EvenMoreFish] "),
+    ERROR("prefix-error", "<red>[EvenMoreFish] ");
 
     private final String id, normal;
 
@@ -33,7 +33,7 @@ public enum PrefixType {
             return EMFMessage.empty();
         } else {
             EMFMessage message = EMFMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
-            message.appendString("&r");
+            message.appendString("<reset>");
             return message;
         }
     }

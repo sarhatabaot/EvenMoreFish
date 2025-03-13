@@ -174,7 +174,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The colours to show for each winning position, if the {pos_colour} variable is used.
      */
     public @NotNull List<String> getPositionColours() {
-        return getConfig().getStringList("leaderboard.position-colours", List.of("&6", "&e", "&7", "&7", "&#888888"));
+        return getConfig().getStringList("leaderboard.position-colours", List.of("<gold>", "<yellow>", "<gray>", "<gray>", "<#888888>"));
     }
 
     public @NotNull List<Long> getAlertTimes() {
@@ -255,7 +255,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The prefix for this competition's bossbar.
      */
     public EMFMessage getBossbarPrefix() {
-        String prefix = getConfig().getString("bossbar-prefix", "&a&lFishing Contest: ");
+        String prefix = getConfig().getString("bossbar-prefix", "<green><bold>Fishing Contest: ");
         return EMFMessage.fromString(prefix);
     }
 

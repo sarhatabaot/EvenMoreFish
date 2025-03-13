@@ -30,7 +30,7 @@ public class GUIUtils {
             createItemStack(
                 config.getString("gui.global.first-page.material", "arrow"),
                 Material.ARROW,
-                config.getString("gui.global.first-page.name", "&bFirst Page"),
+                config.getString("gui.global.first-page.name", "<aqua>First Page"),
                 config.getStringList("gui.global.first-page.lore")
             ),
             GuiPageElement.PageAction.FIRST
@@ -43,7 +43,7 @@ public class GUIUtils {
             createItemStack(
                 config.getString("gui.global.next-page.material", "paper"),
                 Material.PAPER,
-                config.getString("gui.global.next-page.name", "&bNext Page"),
+                config.getString("gui.global.next-page.name", "<aqua>Next Page"),
                 config.getStringList("gui.global.next-page.lore")
             ),
             GuiPageElement.PageAction.NEXT
@@ -56,7 +56,7 @@ public class GUIUtils {
             createItemStack(
                 config.getString("gui.global.previous-page.material", "paper"),
                 Material.PAPER,
-                config.getString("gui.global.previous-page.name", "&bPrevious Page"),
+                config.getString("gui.global.previous-page.name", "<aqua>Previous Page"),
                 config.getStringList("gui.global.previous-page.lore")
             ),
             GuiPageElement.PageAction.PREVIOUS
@@ -69,7 +69,7 @@ public class GUIUtils {
             createItemStack(
                 config.getString("gui.global.last-page.material", "arrow"),
                 Material.ARROW,
-                config.getString("gui.global.last-page.name", "&bLast Page"),
+                config.getString("gui.global.last-page.name", "<aqua>Last Page"),
                 config.getStringList("gui.global.last-page.lore")
             ),
             GuiPageElement.PageAction.LAST

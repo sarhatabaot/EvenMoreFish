@@ -11,7 +11,7 @@ Rusty Repair Spoon:
     material: IRON_SHOVEL
   catch-event:
     - "COMMAND:repair hand {player}"
-    - "MESSAGE:&aYour fishing rod has been repaired."
+    - "MESSAGE:<green>Your fishing rod has been repaired."
 ```
 
 ## How do I give a fish / bait to another player?
