@@ -147,7 +147,7 @@ public class EMFMessage {
     }
 
     public String getPlainTextMessage() {
-        return ChatColor.stripColor(getLegacyMessage());
+        return PlainTextComponentSerializer.plainText().serialize(getComponentMessage());
     }
 
     /**
