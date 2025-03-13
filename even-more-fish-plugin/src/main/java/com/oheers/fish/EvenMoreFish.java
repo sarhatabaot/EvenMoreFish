@@ -73,6 +73,8 @@ import static com.oheers.fish.FishUtils.classExists;
 public class EvenMoreFish extends EMFPlugin {
 
     private final Random random = new Random();
+    private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
+        || classExists("io.papermc.paper.configuration.Configuration");
 
     private Permission permission = null;
     private ItemStack customNBTRod;
@@ -126,12 +128,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onLoad() {
-        // Don't load if the server is not using Paper.
-        if (!isPaper()) {
-            throw new RuntimeException(
-                "Spigot detected! EvenMoreFish no longer runs on Spigot, please update to Paper instead. https://papermc.io/downloads/paper"
-            );
-        }
         CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
                 .shouldHookPaperReload(true)
                 .usePluginNamespace()
@@ -141,6 +137,12 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onEnable() {
+        // Don't enable if the server is not using Paper.
+        if (!isPaper) {
+            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, please update to Paper instead. https://papermc.io/downloads/paper");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         if (!NBT.preloadApi()) {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
@@ -227,6 +229,11 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onDisable() {
+        // If the server is not using Paper, the plugin won't have enabled in the first place.
+        if (!isPaper) {
+            return;
+        }
+
         CommandAPI.onDisable();
 
         terminateGUIS();
