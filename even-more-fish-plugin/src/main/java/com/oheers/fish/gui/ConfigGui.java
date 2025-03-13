@@ -3,6 +3,7 @@ package com.oheers.fish.gui;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.GUIFillerConfig;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemUtils;
 import de.themoep.inventorygui.GuiElement;
@@ -79,7 +80,7 @@ public class ConfigGui {
         String[] layout = this.config.getStringList("layout").stream().limit(6).toArray(String[]::new);
         InventoryGui gui = new InventoryGui(
             EvenMoreFish.getInstance(),
-            title == null ? null : EvenMoreFish.getAdapter().createMessage(title).getLegacyMessage(),
+            title == null ? null : EMFMessage.fromString(title).getLegacyMessage(),
             layout
         );
         loadFiller(gui, this.config);
