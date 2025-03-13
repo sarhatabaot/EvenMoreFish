@@ -113,7 +113,7 @@ public class EMFMessage {
     }
 
     public @NotNull Component getComponentMessage() {
-        Component component = MINIMESSAGE.deserialize(getLegacyMessage());
+        Component component = MINIMESSAGE.deserialize(this.message);
         return removeDefaultItalics(component);
     }
 
