@@ -54,7 +54,7 @@ public class Bar {
         EMFMessage layoutMessage = ConfigMessage.BAR_LAYOUT.getMessage();
         layoutMessage.setVariable("{prefix}", prefix);
         layoutMessage.setVariable("{time-formatted}", EMFMessage.fromString(FishUtils.timeFormat(timeLeft)));
-        layoutMessage.setVariable("{remaining}", ConfigMessage.BAR_REMAINING.getMessage().getLegacyMessage());
+        layoutMessage.setVariable("{remaining}", ConfigMessage.BAR_REMAINING.getMessage());
         bar.setTitle(layoutMessage.getLegacyMessage());
     }
 

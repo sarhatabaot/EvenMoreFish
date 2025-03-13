@@ -49,8 +49,8 @@ public class HelpMessageBuilder {
             EMFMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
             usage.setVariable("{command}", correctCommand(key));
             usage.setVariable("{description}", value.get());
-            message.appendString("\n");
-            message.appendString(usage.getLegacyMessage());
+            message.appendString("\n<reset>");
+            message.appendMessage(usage);
         });
         return message;
     }

@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -46,7 +47,7 @@ public class EMFMessage {
 
     public static EMFMessage ofList(@NotNull List<Component> components) {
         List<String> strings = components.stream().map(MINIMESSAGE::serialize).toList();
-        return new EMFMessage(String.join("\n", strings));
+        return new EMFMessage(String.join("\n<reset>", strings));
     }
 
     public static EMFMessage fromString(@NotNull String string) {
@@ -55,7 +56,7 @@ public class EMFMessage {
 
     public static EMFMessage fromStringList(@NotNull List<String> strings) {
         strings = strings.stream().map(EMFMessage::formatColours).toList();
-        return new EMFMessage(String.join("\n", strings));
+        return new EMFMessage(String.join("\n<reset>", strings));
     }
 
     /**
