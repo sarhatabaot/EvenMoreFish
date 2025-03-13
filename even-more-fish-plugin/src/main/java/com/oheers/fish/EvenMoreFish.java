@@ -139,7 +139,7 @@ public class EvenMoreFish extends EMFPlugin {
     public void onEnable() {
         // Don't enable if the server is not using Paper.
         if (!isPaper) {
-            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, please update to Paper instead. https://papermc.io/downloads/paper");
+            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, we recommend updating to Paper instead. https://papermc.io/downloads/paper");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
