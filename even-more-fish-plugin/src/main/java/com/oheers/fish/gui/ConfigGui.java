@@ -2,6 +2,7 @@ package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.utils.ItemFactory;
@@ -11,6 +12,7 @@ import de.themoep.inventorygui.GuiStorageElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -100,7 +102,7 @@ public class ConfigGui {
             return;
         }
         ItemStack item = new ItemStack(filler);
-        FishUtils.editMeta(item, meta -> meta.setDisplayName(""));
+        item.editMeta(meta -> meta.displayName(Component.empty()));
         gui.setFiller(item);
         gui.addElements(GUIFillerConfig.getInstance().getDefaultFillerItems(this));
     }

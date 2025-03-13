@@ -65,7 +65,7 @@ public class ItemBuilder {
             return null;
         }
         ItemStack stack = new ItemStack(this.material);
-        FishUtils.editMeta(stack, meta -> {
+        stack.editMeta(meta -> {
             if (this.display != null) {
                 meta.displayName(EMFMessage.fromString(this.display).getComponentMessage());
             }

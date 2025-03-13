@@ -74,7 +74,7 @@ public class Bait extends ConfigBase {
         ItemStack baitItem = itemFactory.createItem(player, -1);
         baitItem.setAmount(getDropQuantity());
 
-        FishUtils.editMeta(baitItem, meta -> meta.setLore(createBoostLore()));
+        baitItem.editMeta(meta -> meta.setLore(createBoostLore()));
 
         return BaitNBTManager.applyBaitNBT(baitItem, this.id);
     }

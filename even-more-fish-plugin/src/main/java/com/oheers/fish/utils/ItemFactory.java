@@ -559,8 +559,8 @@ public class ItemFactory {
             } catch (NumberFormatException exception) {
                 return;
             }
-            FishUtils.editMeta(
-                    product, LeatherArmorMeta.class,
+            product.editMeta(
+                    LeatherArmorMeta.class,
                     meta -> meta.setColor(org.bukkit.Color.fromRGB(colour.getRed(), colour.getGreen(), colour.getBlue()))
             );
         }
@@ -571,18 +571,19 @@ public class ItemFactory {
      * item if the config has random durability enabled.
      */
     public void applyDamage() {
-        FishUtils.editMeta(
-                product, Damageable.class, meta -> {
-                    int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
-                    if (predefinedDamage >= 0 && predefinedDamage <= 100) {
-                        meta.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
-                    } else {
-                        if (MainConfig.getInstance().doingRandomDurability()) {
-                            int max = product.getType().getMaxDurability();
-                            meta.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
-                        }
+        product.editMeta(
+            Damageable.class,
+            meta -> {
+                int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
+                if (predefinedDamage >= 0 && predefinedDamage <= 100) {
+                    meta.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
+                } else {
+                    if (MainConfig.getInstance().doingRandomDurability()) {
+                        int max = product.getType().getMaxDurability();
+                        meta.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
                     }
                 }
+            }
         );
     }
 
@@ -592,7 +593,7 @@ public class ItemFactory {
     private void applyModelData() {
         int value = this.configurationFile.getInt(configLocation + "item.custom-model-data");
         if (value != 0) {
-            FishUtils.editMeta(product, meta -> meta.setCustomModelData(value));
+            product.editMeta(meta -> meta.setCustomModelData(value));
         }
     }
 
@@ -602,8 +603,8 @@ public class ItemFactory {
             return;
         }
 
-        FishUtils.editMeta(
-                product, meta -> {
+        product.editMeta(
+                meta -> {
                     EMFMessage lore = EMFMessage.fromStringList(loreConfig);
                     lore.setVariables(replacements);
                     meta.lore(lore.getComponentListMessage());
@@ -618,8 +619,8 @@ public class ItemFactory {
     private void applyDisplayName(@Nullable Map<String, String> replacements) {
         final String displayName = this.configurationFile.getString(configLocation + "item.displayname", this.displayName);
 
-        FishUtils.editMeta(
-                product, meta -> {
+        product.editMeta(
+                meta -> {
                     if (displayName == null || displayName.isEmpty()) {
                         meta.displayName(Component.empty());
                     } else {
@@ -655,7 +656,7 @@ public class ItemFactory {
                     Integer.parseInt(split[2]) - 1,
                     false
             );
-            FishUtils.editMeta(product, PotionMeta.class, meta -> meta.addCustomEffect(effect, true));
+            product.editMeta(PotionMeta.class, meta -> meta.addCustomEffect(effect, true));
         } catch (NumberFormatException exception) {
             EvenMoreFish.getInstance()
                     .getLogger()
@@ -673,8 +674,8 @@ public class ItemFactory {
      * before they're added.
      */
     private void applyFlags() {
-        FishUtils.editMeta(
-                product, meta -> {
+        product.editMeta(
+                meta -> {
                     if (itemDyeCheck) {
                         meta.addItemFlags(ItemFlag.HIDE_DYE);
                     }

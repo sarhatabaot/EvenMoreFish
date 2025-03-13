@@ -120,7 +120,7 @@ public class BaitNBTManager {
         if (isBaitedRod(item)) {
             try {
                 if (doingLoreStuff) {
-                    FishUtils.editMeta(item, meta -> meta.setLore(deleteOldLore(item)));
+                    item.editMeta(meta -> meta.setLore(deleteOldLore(item)));
                 }
             } catch (IndexOutOfBoundsException exception) {
                 EvenMoreFish.getInstance()
@@ -161,7 +161,7 @@ public class BaitNBTManager {
                 if (getNumBaitsApplied(item) >= MainConfig.getInstance().getBaitsPerRod()) {
                     // the lore's been taken out, we're not going to be doing anymore here, so we're just re-adding it now.
                     if (doingLoreStuff) {
-                        FishUtils.editMeta(item, meta -> meta.setLore(newApplyLore(item)));
+                        item.editMeta(meta -> meta.setLore(newApplyLore(item)));
                     }
                     throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
                 }
@@ -204,7 +204,7 @@ public class BaitNBTManager {
         }
 
         if (doingLoreStuff && !combined.isEmpty()) {
-            FishUtils.editMeta(item, meta -> meta.setLore(newApplyLore(item)));
+            item.editMeta(meta -> meta.setLore(newApplyLore(item)));
         }
 
         if (maxBait.get()) {
