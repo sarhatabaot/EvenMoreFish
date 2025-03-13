@@ -204,6 +204,7 @@ public class ConfigBase {
      * If the message already contains a MiniMessage tag, this does nothing.
      */
     private String convertLegacyString(@NotNull String message) {
+        // Get MiniMessage serializer
         final MiniMessage miniMessageSerializer = MiniMessage.builder()
             .postProcessor(component -> component)
             .build();
@@ -217,10 +218,7 @@ public class ConfigBase {
         // Prepare reset characters as MiniMessage does not insert them by default
         message = message.replace("&r", "__resetchar__");
 
-        // Get our serializers
-        final MiniMessage miniMessageSerializer = MiniMessage.builder()
-            .postProcessor(component -> component)
-            .build();
+        // Get LegacyComponentSerializer
         final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
             .character('&')
             .hexColors()
