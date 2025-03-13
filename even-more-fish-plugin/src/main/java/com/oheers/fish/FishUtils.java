@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import de.tr7zw.changeme.nbtapi.NBT;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -571,10 +572,6 @@ public class FishUtils {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return format.format(value);
-    }
-
-    public static String translateColorCodes(@NotNull String string) {
-        return EMFMessage.fromString(string).getLegacyMessage();
     }
 
 }

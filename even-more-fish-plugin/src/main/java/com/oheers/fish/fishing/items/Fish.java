@@ -244,7 +244,7 @@ public class Fish {
         }
         Player player = Bukkit.getPlayer(fisherman);
         if (player != null) {
-            player.sendMessage(FishUtils.translateColorCodes(msg));
+            EMFMessage.fromString(msg).send(player);
         }
     }
 

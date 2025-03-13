@@ -465,7 +465,7 @@ public class BaitNBTManager {
             EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
             return "Invalid Bait";
         }
-        return FishUtils.translateColorCodes(bait.getDisplayName());
+        return EMFMessage.fromString(bait.getDisplayName()).getLegacyMessage();
     }
 
 }

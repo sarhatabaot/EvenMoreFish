@@ -52,7 +52,7 @@ public class Bait extends ConfigBase {
         ItemFactory factory = new ItemFactory(null, getConfig());
         factory.enableDefaultChecks();
         factory.setItemDisplayNameCheck(true);
-        factory.setDisplayName(FishUtils.translateColorCodes("&e" + this.id));
+        factory.setDisplayName("<yellow>" + this.id);
         this.itemFactory = factory;
     }
 

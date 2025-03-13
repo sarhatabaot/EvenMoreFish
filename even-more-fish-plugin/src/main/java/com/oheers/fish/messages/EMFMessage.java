@@ -20,14 +20,10 @@ import java.util.regex.Pattern;
 
 public class EMFMessage {
 
-    private static final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
-    private static final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
-        .hexColors()
-        .useUnusualXRepeatedCharacterHexFormat()
-        .build();
     public static final MiniMessage MINIMESSAGE = MiniMessage.builder()
         .postProcessor(component -> component)
         .build();
+    public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 
     private final Map<String, String> liveVariables = new LinkedHashMap<>();
 
@@ -45,11 +41,11 @@ public class EMFMessage {
     }
 
     public static EMFMessage of(@NotNull Component component) {
-        return new EMFMessage(legacySerializer.serialize(component));
+        return new EMFMessage(MINIMESSAGE.serialize(component));
     }
 
     public static EMFMessage ofList(@NotNull List<Component> components) {
-        List<String> strings = components.stream().map(legacySerializer::serialize).toList();
+        List<String> strings = components.stream().map(MINIMESSAGE::serialize).toList();
         return new EMFMessage(String.join("\n", strings));
     }
 
@@ -116,14 +112,14 @@ public class EMFMessage {
     }
 
     public @NotNull Component getComponentMessage() {
-        Component component = legacySerializer.deserialize(getLegacyMessage());
+        Component component = MINIMESSAGE.deserialize(getLegacyMessage());
         return removeDefaultItalics(component);
     }
 
     public @NotNull List<Component> getComponentListMessage() {
         return getLegacyListMessage().stream()
             .map(legacy -> {
-                Component component = legacySerializer.deserialize(legacy);
+                Component component = MINIMESSAGE.deserialize(legacy);
                 return removeDefaultItalics(component);
             })
             .toList();
@@ -170,7 +166,11 @@ public class EMFMessage {
             // Find matched String
             String matched = matcher.group();
             // Convert to Legacy Component and into a MiniMessage String
-            String parsed = formatColours(PlaceholderAPI.setPlaceholders(getRelevantPlayer(), matched));
+            String parsed = MINIMESSAGE.serialize(
+                LEGACY_SERIALIZER.deserialize(
+                    PlaceholderAPI.setPlaceholders(getRelevantPlayer(), matched)
+                )
+            );
             // Escape matched String so we don't have issues
             String safeMatched = Matcher.quoteReplacement(matched);
             // Replace all instances of the matched String with the parsed placeholder.
