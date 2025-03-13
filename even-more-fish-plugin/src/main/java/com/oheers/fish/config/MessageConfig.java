@@ -33,7 +33,7 @@ public class MessageConfig extends ConfigBase {
     public UpdaterSettings getUpdaterSettings() {
         UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());
 
-        // Bossbar config relocations - config version 2
+        // Bossbar config relocations - config version 18
         builder.addCustomLogic("18", yamlDocument -> {
             if (yamlDocument.contains("bossbar.hour-color")) {
                 String hourColor = yamlDocument.getString("bossbar.hour-color", "&f");
@@ -57,7 +57,7 @@ public class MessageConfig extends ConfigBase {
             }
         });
 
-        // Prefix config relocations - config version 3
+        // Prefix config relocations - config version 19
         builder.addCustomLogic("19", yamlDocument -> {
             if (yamlDocument.contains("prefix")) {
                 String prefix = yamlDocument.getString("prefix");
@@ -74,6 +74,9 @@ public class MessageConfig extends ConfigBase {
                 yamlDocument.remove("prefix");
             }
         });
+
+        // Switch to MiniMessage - config version 28
+        builder.addCustomLogic("28", this::convertLegacy);
 
         return builder.build();
     }

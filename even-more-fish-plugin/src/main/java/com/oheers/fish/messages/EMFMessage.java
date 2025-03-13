@@ -25,7 +25,9 @@ public class EMFMessage {
         .hexColors()
         .useUnusualXRepeatedCharacterHexFormat()
         .build();
-    private static final MiniMessage miniMessage = MiniMessage.builder().strict(true).build();
+    public static final MiniMessage MINIMESSAGE = MiniMessage.builder()
+        .postProcessor(component -> component)
+        .build();
 
     private final Map<String, String> liveVariables = new LinkedHashMap<>();
 
@@ -60,30 +62,11 @@ public class EMFMessage {
         return new EMFMessage(String.join("\n", strings));
     }
 
+    /**
+     * Replaces all section symbols with ampersands so MiniMessage doesn't explode
+     */
     private static String formatColours(@NotNull String message) {
-        // Replace all Section symbols with Ampersands so
-        // MiniMessage doesn't explode.
-        message = message.replace(ChatColor.COLOR_CHAR, '&');
-
-        try {
-            // Parse MiniMessage
-            Component component = miniMessage.deserialize(message);
-            // Get legacy color codes from MiniMessage
-            message = legacySerializer.serialize(component);
-        } catch (ParsingException exception) { /* Ignore. If MiniMessage throws an exception, we'll only use legacy colors. */ }
-
-        char COLOR_CHAR = '§';
-        Matcher matcher = HEX_PATTERN.matcher(message);
-        StringBuilder buffer = new StringBuilder(message.length() + 4 * 8);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
-                + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
-                + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
-                + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
-            );
-        }
-        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+        return message.replace('§', '&');
     }
 
     public void send(@NotNull CommandSender target) {

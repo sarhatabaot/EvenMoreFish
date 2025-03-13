@@ -1,6 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.messages.EMFMessage;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.Settings;
@@ -8,6 +9,11 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConfigBase {
 
@@ -161,6 +169,61 @@ public class ConfigBase {
         } catch (IOException exception) {
             EvenMoreFish.getInstance().getLogger().warning("Failed to update " + getFileName());
         }
+    }
+
+    // MiniMessage conversion methods. DO NOT REMOVE
+
+    /**
+     * Converts all Legacy colors to MiniMessage.
+     */
+    @SuppressWarnings("unchecked")
+    public void convertLegacy(@NotNull YamlDocument document) {
+        for (String key : document.getRoutesAsStrings(true)) {
+            if (document.isString(key)) {
+                String updated = convertLegacyString(document.getString(key));
+                document.set(key, updated);
+            } else if (document.isList(key)) {
+                List<?> list = document.getList(key);
+                List<String> strings;
+                try {
+                    strings = (List<String>) list;
+                } catch (ClassCastException exception) {
+                    continue;
+                }
+                List<String> updated = strings.stream().map(this::convertLegacyString).toList();
+                document.set(key, updated);
+            }
+        }
+    }
+
+    /**
+     * Converts a Legacy String to MiniMessage.
+     * If the message already contains a MiniMessage tag, this does nothing.
+     */
+    private String convertLegacyString(@NotNull String message) {
+        // If the message already contains tags, don't do anything
+        if (message.contains("<") && message.contains(">")) {
+            return message;
+        }
+
+        // Prepare reset characters as MiniMessage does not insert them by default
+        message = message.replace("&r", "__resetchar__");
+
+        // Get our serializers
+        final MiniMessage miniMessageSerializer = MiniMessage.builder()
+            .postProcessor(component -> component)
+            .build();
+        final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
+            .character('&')
+            .hexColors()
+            .build();
+
+        // Legacy -> Component -> MiniMessage
+        Component legacy = legacySerializer.deserialize(message);
+        String miniMessage = miniMessageSerializer.serialize(legacy);
+
+        // Replace our prepared reset characters with the reset tag
+        return miniMessage.replace("__resetchar__", "<reset>");
     }
 
 }
