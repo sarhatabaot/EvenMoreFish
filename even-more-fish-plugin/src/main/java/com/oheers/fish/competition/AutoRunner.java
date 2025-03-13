@@ -21,9 +21,10 @@ public class AutoRunner {
 
                 // Beginning the competition set for schedule
                 Map<Integer, Competition> competitions = EvenMoreFish.getInstance().getCompetitionQueue().getCompetitions();
-                if (competitions.containsKey(weekMinute)) {
+                Competition competition = competitions.get(weekMinute);
+                if (competition != null) {
                     if (!Competition.isActive()) {
-                        competitions.get(weekMinute).begin();
+                        competition.begin();
                     }
                 }
             }
