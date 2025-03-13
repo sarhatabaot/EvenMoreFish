@@ -5,33 +5,46 @@ import com.oheers.fish.permissions.AdminPerms;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class UpdateChecker {
 
+    private final String major = "2";
     private final EvenMoreFish plugin;
-    private final int resourceID;
 
-
-    public UpdateChecker(final EvenMoreFish plugin, final int resourceID) {
+    public UpdateChecker(final EvenMoreFish plugin) {
         this.plugin = plugin;
-        this.resourceID = resourceID;
     }
 
     public String getVersion() {
         try {
-            URI uri = new URI("https://api.spigotmc.org/simple/0.1/index.php?action=getResource&id=" + resourceID);
-            try (final Scanner scanner = new Scanner(uri.toURL().openStream())) {
-                String response = scanner.nextLine();
-                JSONObject jsonObject = (JSONObject) new JSONParser().parse(response);
-                return jsonObject.get("current_version").toString();
+            URI uri = new URI("https://api.modrinth.com/v2/project/vlh7rLCf/version");
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .GET()
+                .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            JSONArray versions = (JSONArray) new JSONParser().parse(response.body());
+            if (versions.isEmpty()) {
+                return plugin.getDescription().getVersion();
             }
+
+            JSONObject latestVersion = (JSONObject) versions.get(0);
+            return latestVersion.get("version_number").toString();
         } catch (Exception exception) {
-            EvenMoreFish.getInstance().getLogger().warning("EvenMoreFish failed to check for updates against the spigot website, to check manually go to https://www.spigotmc.org/resources/evenmorefish.91310/updates");
+            EvenMoreFish.getInstance().getLogger().warning("EvenMoreFish failed to check for updates against the Modrinth website, to check manually go to https://modrinth.com/plugin/evenmorefish/versions");
             return plugin.getDescription().getVersion();
         }
     }
@@ -41,7 +54,7 @@ class UpdateNotify implements Listener {
 
     @EventHandler
     // informs admins with emf.admin permission that the plugin needs updating
-    public void playerJoin(PlayerJoinEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         if (!EvenMoreFish.getInstance().isUpdateAvailable()) {
             return;
         }

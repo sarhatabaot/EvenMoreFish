@@ -65,6 +65,7 @@ import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -204,8 +205,10 @@ public class EvenMoreFish extends EMFPlugin {
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
 
-        // async check for updates on the modrinth page
-        getScheduler().runTaskAsynchronously(() -> isUpdateAvailable = checkUpdate());
+        // check for updates on the modrinth page
+        checkUpdate().thenAccept(available ->
+            isUpdateAvailable = available
+        );
 
         listeners();
         registerCommands();
@@ -486,10 +489,12 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // Checks for updates, surprisingly
-    private boolean checkUpdate() {
-        ComparableVersion spigotVersion = new ComparableVersion(new UpdateChecker(this, 91310).getVersion());
-        ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
-        return spigotVersion.compareTo(serverVersion) > 0;
+    private CompletableFuture<Boolean> checkUpdate() {
+        return CompletableFuture.supplyAsync(() -> {
+            ComparableVersion modrinthVersion = new ComparableVersion(new UpdateChecker(this).getVersion());
+            ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
+            return modrinthVersion.compareTo(serverVersion) > 0;
+        });
     }
 
     private void checkPapi() {
