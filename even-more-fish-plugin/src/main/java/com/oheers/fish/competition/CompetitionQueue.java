@@ -27,7 +27,7 @@ public class CompetitionQueue {
     }
 
     public Map<Integer, Competition> getCompetitions() {
-        return new HashMap<>(competitions);
+        return competitions;
     }
 
     public void load() {
