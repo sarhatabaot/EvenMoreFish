@@ -235,12 +235,12 @@ public class Competition {
      *
      * @return A boolean, true = do it in actionbar.
      */
-    public boolean isDoingFirstPlaceActionBar() {
+    public static boolean isDoingFirstPlaceActionBar() {
         boolean doActionBarMessage = MessageConfig.getInstance().getConfig().getBoolean("action-bar-message");
-        boolean isSupportedActionBarType = MessageConfig.getInstance().getConfig().getStringList("action-bar-types").isEmpty() || MessageConfig.getInstance()
-                .getConfig()
-                .getStringList("action-bar-types")
-                .contains(getCompetitionType().toString());
+        List<String> supportedTypes = MessageConfig.getInstance()
+            .getConfig()
+            .getStringList("action-bar-types");
+        boolean isSupportedActionBarType = active != null && supportedTypes.contains(active.competitionType.toString());
         return doActionBarMessage && isSupportedActionBarType;
     }
 
@@ -268,7 +268,7 @@ public class Competition {
         }
 
         List<String> competitionColours = competitionFile.getPositionColours();
-        List<CompetitionEntry> entries = getSortedEntries(leaderboard.getEntries());
+        List<CompetitionEntry> entries = leaderboard.getEntries();
 
         String leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, true, null);
         console.sendMessage(leaderboardMessage);
@@ -292,7 +292,7 @@ public class Competition {
         }
 
         List<String> competitionColours = competitionFile.getPositionColours();
-        List<CompetitionEntry> entries = getSortedEntries(leaderboard.getEntries());
+        List<CompetitionEntry> entries = leaderboard.getEntries();
 
         String leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, false, player.getUniqueId());
         player.sendMessage(leaderboardMessage);
@@ -300,13 +300,6 @@ public class Competition {
         EMFMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
         message.setAmount(Integer.toString(leaderboard.getSize()));
         message.send(player);
-    }
-
-    public @NotNull List<CompetitionEntry> getSortedEntries(List<CompetitionEntry> entries) {
-        if (competitionType == CompetitionType.SHORTEST_FISH) {
-            entries.sort(Comparator.comparingDouble(entry -> entry.getFish().getLength()));
-        }
-        return entries;
     }
 
     private @NotNull String buildLeaderboardMessage(List<CompetitionEntry> entries, List<String> competitionColours, boolean isConsole, UUID playerUuid) {
@@ -328,16 +321,12 @@ public class Competition {
             EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
             message.setPlayer(Bukkit.getOfflinePlayer(entry.getPlayer()));
             message.setPosition(Integer.toString(pos));
-
             message.setPositionColour(competitionColours.get(pos - 1));
 
             if (isConsole) {
                 message = competitionType.getStrategy().getSingleConsoleLeaderboardMessage(message, entry);
             } else {
                 message = competitionType.getStrategy().getSinglePlayerLeaderboard(message, entry);
-                if (entry.getPlayer().equals(playerUuid)) {
-                    message.setPositionColour("&f"); // Customize player-specific logic here if needed
-                }
             }
 
             builder.append(message.getLegacyMessage()).append("\n");
@@ -375,7 +364,7 @@ public class Competition {
         boolean databaseEnabled = MainConfig.getInstance().databaseEnabled();
         int rewardPlace = 1;
 
-        List<CompetitionEntry> entries = getSortedEntries(leaderboard.getEntries());
+        List<CompetitionEntry> entries = leaderboard.getEntries();
 
         if (databaseEnabled && !entries.isEmpty()) {
             handleDatabaseUpdates(entries.get(0), true); // Top entry

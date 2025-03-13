@@ -32,6 +32,7 @@ public class EMFMessage {
     private String message;
     private boolean canSilent = false;
     private OfflinePlayer relevantPlayer;
+    protected boolean perPlayer = true;
 
     private EMFMessage(@NotNull String message) {
         this.message = message;
@@ -216,6 +217,10 @@ public class EMFMessage {
             String replacement = formatColours(entry.getValue());
             this.message = this.message.replace(variable, replacement);
         }
+    }
+
+    public void setPerPlayer(boolean perPlayer) {
+        this.perPlayer = perPlayer;
     }
 
     /**

@@ -68,7 +68,7 @@ dependencyResolutionManagement {
             library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.6")
             library("playerpoints", "org.black_ixx:playerpoints:3.2.7")
 
-            library("vanishchecker", "uk.firedev:VanishChecker:1.0.4")
+            library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
             library("commandapi", "dev.jorel:commandapi-bukkit-shade:9.7.0")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
