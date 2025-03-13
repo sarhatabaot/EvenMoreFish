@@ -204,8 +204,13 @@ public class ConfigBase {
      * If the message already contains a MiniMessage tag, this does nothing.
      */
     private String convertLegacyString(@NotNull String message) {
+        final MiniMessage miniMessageSerializer = MiniMessage.builder()
+            .postProcessor(component -> component)
+            .build();
+
         // If the message already contains tags, don't do anything
-        if (message.contains("<") && message.contains(">")) {
+        String tagsStripped = miniMessageSerializer.stripTags(message);
+        if (!tagsStripped.equals(message)) {
             return message;
         }
 
