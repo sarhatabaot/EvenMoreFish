@@ -194,7 +194,7 @@ public class EMFMessage {
     /**
      * Formats all variables in {@link #liveVariables}
      */
-    private void formatVariables() {
+    public void formatVariables() {
         for (Map.Entry<String, String> entry : liveVariables.entrySet()) {
             String variable = entry.getKey();
             String replacement = formatColours(entry.getValue());
