@@ -1,7 +1,6 @@
 package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
@@ -29,7 +28,7 @@ import java.util.function.Supplier;
 public class BaitNBTManager {
 
     // Our line identifier. This is U+200C ZERO WIDTH NON-JOINER and is invisible
-    public static String LINE_IDENTIFIER = "\u200C";
+    public static final String LINE_IDENTIFIER = "\u200C";
 
     private BaitNBTManager() {
         throw new UnsupportedOperationException();
