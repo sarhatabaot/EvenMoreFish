@@ -11,6 +11,7 @@ import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -120,7 +121,7 @@ public class BaitNBTManager {
         if (isBaitedRod(item)) {
             try {
                 if (doingLoreStuff) {
-                    item.editMeta(meta -> meta.setLore(deleteOldLore(item)));
+                    item.editMeta(meta -> meta.lore(deleteOldLore(item)));
                 }
             } catch (IndexOutOfBoundsException exception) {
                 EvenMoreFish.getInstance()
@@ -161,7 +162,7 @@ public class BaitNBTManager {
                 if (getNumBaitsApplied(item) >= MainConfig.getInstance().getBaitsPerRod()) {
                     // the lore's been taken out, we're not going to be doing anymore here, so we're just re-adding it now.
                     if (doingLoreStuff) {
-                        item.editMeta(meta -> meta.setLore(newApplyLore(item)));
+                        item.editMeta(meta -> meta.lore(newApplyLore(item)));
                     }
                     throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
                 }
@@ -204,7 +205,7 @@ public class BaitNBTManager {
         }
 
         if (doingLoreStuff && !combined.isEmpty()) {
-            item.editMeta(meta -> meta.setLore(newApplyLore(item)));
+            item.editMeta(meta -> meta.lore(newApplyLore(item)));
         }
 
         if (maxBait.get()) {
@@ -342,13 +343,14 @@ public class BaitNBTManager {
         return totalDeleted;
     }
 
-    public static List<String> newApplyLore(ItemStack itemStack) {
+    public static List<Component> newApplyLore(ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             return Collections.emptyList();
         }
 
-        List<String> lore = meta.getLore();
+        List<Component> lore = meta.lore();
+
         if (lore == null) {
             lore = new ArrayList<>();
         }
@@ -377,12 +379,16 @@ public class BaitNBTManager {
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
                 message.appendString("\n");
+                // This is used to identify the line as belonging to EMF
+                message.appendComponent(BaitIdentifiers.getBaitLine());
                 message.appendString(baitFormat.getLegacyMessage());
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
                 for (int i = baitCount; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
                     message.appendString("\n");
+                    // This is used to identify the line as belonging to EMF
+                    message.appendComponent(BaitIdentifiers.getBaitLine());
                     message.appendMessage(ConfigMessage.BAIT_UNUSED_SLOT.getMessage());
                 }
             }
@@ -394,7 +400,7 @@ public class BaitNBTManager {
         format.setCurrentBaits(Integer.toString(getNumBaitsApplied(itemStack)));
         format.setMaxBaits(Integer.toString(MainConfig.getInstance().getBaitsPerRod()));
 
-        lore.addAll(format.getLegacyListMessage());
+        lore.addAll(format.getComponentListMessage());
 
         return lore;
     }
@@ -404,37 +410,21 @@ public class BaitNBTManager {
      * format had lines added/removed this will break the old rods.
      *
      * @param itemStack The lore of the itemstack having the bait section of its lore removed.
-     * @throws IndexOutOfBoundsException When the fishing rod doesn't have enough lines of lore to delete, this could be
-     *                                   caused by a modification to the format in the baits.yml config.
      */
-    public static List<String> deleteOldLore(ItemStack itemStack) throws IndexOutOfBoundsException {
+    public static List<Component> deleteOldLore(ItemStack itemStack) {
         if (!itemStack.hasItemMeta() || itemStack.getItemMeta() == null || !itemStack.getItemMeta().hasLore()) {
             return Collections.emptyList();
         }
 
-        List<String> lore = itemStack.getItemMeta().getLore();
+        List<Component> lore = itemStack.getItemMeta().lore();
         if (lore == null || lore.isEmpty()) {
             return Collections.emptyList();
         }
 
-        if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
-            // starting at 1, because at least one bait replacing {baits} is repeated.
-            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
-            //todo, to help this be compliant with java:S5413, we should iterate in reverse order, this should be done in another pr, left here for reference
-            //compliant version
-            for (int i = 1; i < maxBaits; i++) {
-                lore.remove(lore.size() - 1);
-            }
-        } else {
-            // starting at 1, because at least one bait replacing {baits} is repeated.
-            int numBaitsApplied = getNumBaitsApplied(itemStack) + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
-            //compliant version
-            for (int i = 1; i < numBaitsApplied; i++) {
-                lore.remove(lore.size() - 1);
-            }
-        }
-
-        return lore;
+        // Return the lore with all bait lines removed from the rod
+        return lore.stream().filter(component ->
+            !EMFMessage.MINIMESSAGE.serialize(component).startsWith("<lang:emf.bait-line>")
+        ).toList();
     }
 
     /**
