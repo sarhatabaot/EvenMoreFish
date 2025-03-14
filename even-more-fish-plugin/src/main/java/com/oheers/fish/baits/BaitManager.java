@@ -37,7 +37,6 @@ public class BaitManager {
         if (isLoaded()) {
             return;
         }
-        BaitIdentifiers.register();
         loadBaits();
         logLoadedItems();
         loaded = true;
@@ -57,7 +56,6 @@ public class BaitManager {
             return;
         }
         baitMap.clear();
-        BaitIdentifiers.unregister();
         loaded = false;
     }
     

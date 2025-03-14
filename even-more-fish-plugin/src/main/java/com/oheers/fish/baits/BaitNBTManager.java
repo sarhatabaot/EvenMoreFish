@@ -26,8 +26,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-// TODO still uses deprecated methods
 public class BaitNBTManager {
+
+    // Our line identifier. This is U+200C ZERO WIDTH NON-JOINER and is invisible
+    public static String LINE_IDENTIFIER = "\u200C";
 
     private BaitNBTManager() {
         throw new UnsupportedOperationException();
@@ -379,16 +381,12 @@ public class BaitNBTManager {
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
                 message.appendString("\n");
-                // This is used to identify the line as belonging to EMF
-                message.appendComponent(BaitIdentifiers.getBaitLine());
-                message.appendString(baitFormat.getLegacyMessage());
+                message.appendMessage(baitFormat);
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
                 for (int i = baitCount; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
                     message.appendString("\n");
-                    // This is used to identify the line as belonging to EMF
-                    message.appendComponent(BaitIdentifiers.getBaitLine());
                     message.appendMessage(ConfigMessage.BAIT_UNUSED_SLOT.getMessage());
                 }
             }
@@ -400,7 +398,12 @@ public class BaitNBTManager {
         format.setCurrentBaits(Integer.toString(getNumBaitsApplied(itemStack)));
         format.setMaxBaits(Integer.toString(MainConfig.getInstance().getBaitsPerRod()));
 
-        lore.addAll(format.getComponentListMessage());
+        // Add the lore with the line identifier added to the start of each line
+        lore.addAll(
+            format.getComponentListMessage().stream()
+                .map(component -> Component.text(LINE_IDENTIFIER).append(component))
+                .toList()
+        );
 
         return lore;
     }
@@ -422,9 +425,10 @@ public class BaitNBTManager {
         }
 
         // Return the lore with all bait lines removed from the rod
-        return lore.stream().filter(component ->
-            !EMFMessage.MINIMESSAGE.serialize(component).startsWith("<lang:emf.bait-line>")
-        ).toList();
+        return lore.stream().filter(component -> {
+            System.out.println(EMFMessage.MINIMESSAGE.serialize(component));
+            return !EMFMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER);
+        }).toList();
     }
 
     /**
@@ -449,13 +453,13 @@ public class BaitNBTManager {
      * @param baitID The baitID the bait is registered under in baits.yml
      * @return How the bait should look in the lore of the fishing rod, for example.
      */
-    private static String getBaitFormatted(String baitID) {
+    private static EMFMessage getBaitFormatted(String baitID) {
         Bait bait = BaitManager.getInstance().getBait(baitID);
         if (bait == null) {
             EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
-            return "Invalid Bait";
+            return EMFMessage.fromString("Invalid Bait");
         }
-        return EMFMessage.fromString(bait.getDisplayName()).getLegacyMessage();
+        return EMFMessage.fromString(bait.getDisplayName());
     }
 
 }
