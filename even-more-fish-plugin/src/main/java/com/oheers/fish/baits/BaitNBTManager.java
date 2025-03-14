@@ -346,6 +346,12 @@ public class BaitNBTManager {
     }
 
     public static List<Component> newApplyLore(ItemStack itemStack) {
+        // Mark this item as having reformatted lore
+        NBT.modify(itemStack, nbt -> {
+            ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+            compound.setBoolean(NbtKeys.EMF_BAIT_REFORMATTED, true);
+        });
+
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             return Collections.emptyList();
@@ -419,6 +425,12 @@ public class BaitNBTManager {
             return Collections.emptyList();
         }
 
+        // Attempt to reformat the lore of this rod
+        List<Component> removeOldLoreFormat = removeOldLoreFormat(itemStack);
+        if (removeOldLoreFormat != null) {
+            return removeOldLoreFormat;
+        }
+
         List<Component> lore = itemStack.getItemMeta().lore();
         if (lore == null || lore.isEmpty()) {
             return Collections.emptyList();
@@ -460,6 +472,50 @@ public class BaitNBTManager {
             return EMFMessage.fromString("Invalid Bait");
         }
         return EMFMessage.fromString(bait.getDisplayName());
+    }
+
+    // Conversion methods
+
+    /**
+     * Runs the old {@link #deleteOldLore(ItemStack)} one time per fishing rod to
+     * @param item The rod to reformat
+     */
+    private static List<Component> removeOldLoreFormat(@NotNull ItemStack item) {
+        if (NbtUtils.hasKey(item, NbtKeys.EMF_BAIT_REFORMATTED)) {
+            return null;
+        }
+
+        List<Component> lore = item.getItemMeta().lore();
+        if (lore == null || lore.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
+                // starting at 1, because at least one bait replacing {baits} is repeated.
+                int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+                //compliant version
+                for (int i = 1; i < maxBaits; i++) {
+                    lore.remove(lore.size() - 1);
+                }
+            } else {
+                // starting at 1, because at least one bait replacing {baits} is repeated.
+                int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+                //compliant version
+                for (int i = 1; i < numBaitsApplied; i++) {
+                    lore.remove(lore.size() - 1);
+                }
+            }
+        } catch (IndexOutOfBoundsException exception) {
+            // If an exception is caught, do nothing
+        } finally {
+            NBT.modify(item, nbt -> {
+                ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+                compound.setBoolean(NbtKeys.EMF_BAIT_REFORMATTED, true);
+            });
+        }
+
+        return lore;
     }
 
 }
