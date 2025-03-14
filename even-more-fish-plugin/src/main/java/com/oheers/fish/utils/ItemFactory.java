@@ -2,13 +2,13 @@ package com.oheers.fish.utils;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.addons.exceptions.IncorrectAssignedMaterialException;
-import com.oheers.fish.api.addons.exceptions.NoPrefixException;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.messages.EMFMessage;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NbtApiException;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class ItemFactory {
 
@@ -91,7 +91,7 @@ public class ItemFactory {
      * @return The completed ItemStack
      * @throws NullPointerException The type has not been enabled, therefore the ItemStack was never set in the first place.
      */
-    public ItemStack createItem(OfflinePlayer player, int randomIndex, @Nullable Map<String, String> replacements) {
+    public ItemStack createItem(OfflinePlayer player, int randomIndex, @Nullable Map<String, EMFMessage> replacements) {
         if (rawMaterial) {
             return this.product;
         }
@@ -559,8 +559,8 @@ public class ItemFactory {
             } catch (NumberFormatException exception) {
                 return;
             }
-            FishUtils.editMeta(
-                    product, LeatherArmorMeta.class,
+            product.editMeta(
+                    LeatherArmorMeta.class,
                     meta -> meta.setColor(org.bukkit.Color.fromRGB(colour.getRed(), colour.getGreen(), colour.getBlue()))
             );
         }
@@ -571,18 +571,19 @@ public class ItemFactory {
      * item if the config has random durability enabled.
      */
     public void applyDamage() {
-        FishUtils.editMeta(
-                product, Damageable.class, meta -> {
-                    int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
-                    if (predefinedDamage >= 0 && predefinedDamage <= 100) {
-                        meta.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
-                    } else {
-                        if (MainConfig.getInstance().doingRandomDurability()) {
-                            int max = product.getType().getMaxDurability();
-                            meta.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
-                        }
+        product.editMeta(
+            Damageable.class,
+            meta -> {
+                int predefinedDamage = this.configurationFile.getInt(configLocation + "durability");
+                if (predefinedDamage >= 0 && predefinedDamage <= 100) {
+                    meta.setDamage((int) (predefinedDamage / 100.0 * product.getType().getMaxDurability()));
+                } else {
+                    if (MainConfig.getInstance().doingRandomDurability()) {
+                        int max = product.getType().getMaxDurability();
+                        meta.setDamage(EvenMoreFish.getInstance().getRandom().nextInt() * (max + 1));
                     }
                 }
+            }
         );
     }
 
@@ -592,21 +593,21 @@ public class ItemFactory {
     private void applyModelData() {
         int value = this.configurationFile.getInt(configLocation + "item.custom-model-data");
         if (value != 0) {
-            FishUtils.editMeta(product, meta -> meta.setCustomModelData(value));
+            product.editMeta(meta -> meta.setCustomModelData(value));
         }
     }
 
-    private void applyLore(@Nullable Map<String, String> replacements) {
+    private void applyLore(@Nullable Map<String, EMFMessage> replacements) {
         List<String> loreConfig = this.configurationFile.getStringList(configLocation + "lore");
         if (loreConfig.isEmpty()) {
             return;
         }
 
-        FishUtils.editMeta(
-                product, meta -> {
-                    AbstractMessage lore = EvenMoreFish.getAdapter().createMessage(loreConfig);
+        product.editMeta(
+                meta -> {
+                    EMFMessage lore = EMFMessage.fromStringList(loreConfig);
                     lore.setVariables(replacements);
-                    meta.setLore(lore.getLegacyListMessage());
+                    meta.lore(lore.getComponentListMessage());
                 }
         );
     }
@@ -615,17 +616,17 @@ public class ItemFactory {
      * Applies a custom display name to the item, this is if server owners don't like the default colour or whatever their
      * reason is.
      */
-    private void applyDisplayName(@Nullable Map<String, String> replacements) {
+    private void applyDisplayName(@Nullable Map<String, EMFMessage> replacements) {
         final String displayName = this.configurationFile.getString(configLocation + "item.displayname", this.displayName);
 
-        FishUtils.editMeta(
-                product, meta -> {
+        product.editMeta(
+                meta -> {
                     if (displayName == null || displayName.isEmpty()) {
-                        meta.setDisplayName("");
+                        meta.displayName(Component.empty());
                     } else {
-                        AbstractMessage display = EvenMoreFish.getAdapter().createMessage(displayName);
+                        EMFMessage display = EMFMessage.fromString(displayName);
                         display.setVariables(replacements);
-                        meta.setDisplayName(display.getLegacyMessage());
+                        meta.displayName(display.getComponentMessage());
                     }
                 }
         );
@@ -655,7 +656,7 @@ public class ItemFactory {
                     Integer.parseInt(split[2]) - 1,
                     false
             );
-            FishUtils.editMeta(product, PotionMeta.class, meta -> meta.addCustomEffect(effect, true));
+            product.editMeta(PotionMeta.class, meta -> meta.addCustomEffect(effect, true));
         } catch (NumberFormatException exception) {
             EvenMoreFish.getInstance()
                     .getLogger()
@@ -663,7 +664,7 @@ public class ItemFactory {
         } catch (NullPointerException exception) {
             EvenMoreFish.getInstance()
                     .getLogger()
-                    .severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
+                    .severe(configLocation + "item.potion: " + split[0] + " is not a valid potion name. A list can be found here: https://jd.papermc.io/paper/1.21.4/org/bukkit/potion/PotionEffectType.html");
         }
     }
 
@@ -673,8 +674,8 @@ public class ItemFactory {
      * before they're added.
      */
     private void applyFlags() {
-        FishUtils.editMeta(
-                product, meta -> {
+        product.editMeta(
+                meta -> {
                     if (itemDyeCheck) {
                         meta.addItemFlags(ItemFlag.HIDE_DYE);
                     }

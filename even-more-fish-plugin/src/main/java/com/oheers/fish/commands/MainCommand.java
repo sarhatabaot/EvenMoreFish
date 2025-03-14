@@ -1,16 +1,16 @@
 package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.commands.arguments.ArgumentHelper;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.PrefixType;
-import com.oheers.fish.gui.guis.ApplyBaitsGUI;
-import com.oheers.fish.gui.guis.MainMenuGUI;
-import com.oheers.fish.gui.guis.SellGUI;
+import com.oheers.fish.gui.guis.ApplyBaitsGui;
+import com.oheers.fish.gui.guis.MainMenuGui;
+import com.oheers.fish.gui.guis.SellGui;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.PrefixType;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.permissions.UserPerms;
 import com.oheers.fish.selling.SellHelper;
@@ -56,7 +56,7 @@ public class MainCommand {
         return new CommandAPICommand("next")
                 .withPermission(UserPerms.NEXT)
                 .executes(info -> {
-                    AbstractMessage message = Competition.getNextCompetitionMessage();
+                    EMFMessage message = Competition.getNextCompetitionMessage();
                     message.prependMessage(PrefixType.DEFAULT.getPrefix());
                     message.send(info.sender());
                 });
@@ -82,7 +82,7 @@ public class MainCommand {
         return new CommandAPICommand("gui")
                 .withPermission(UserPerms.GUI)
                 .executesPlayer(info -> {
-                    new MainMenuGUI(info.sender()).open();
+                    new MainMenuGui(info.sender()).open();
                 });
     }
 
@@ -146,15 +146,15 @@ public class MainCommand {
                         return;
                     }
                     if (sender == player) {
-                        new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
+                        new SellGui(player, SellGui.SellState.NORMAL, null).open();
                         return;
                     }
                     if (!sender.hasPermission(AdminPerms.ADMIN)) {
                         ConfigMessage.NO_PERMISSION.getMessage().send(sender);
                         return;
                     }
-                    new SellGUI(player, SellGUI.SellState.NORMAL, null).open();
-                    AbstractMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
+                    new SellGui(player, SellGui.SellState.NORMAL, null).open();
+                    EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
                     message.setPlayer(player);
                     message.send(sender);
                 });
@@ -183,7 +183,7 @@ public class MainCommand {
         return new CommandAPICommand("applybaits")
                 .withPermission(UserPerms.APPLYBAITS)
                 .executesPlayer(info -> {
-                    new ApplyBaitsGUI(info.sender(), null).open();
+                    new ApplyBaitsGui(info.sender(), null).open();
                 });
     }
 

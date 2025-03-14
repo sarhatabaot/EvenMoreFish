@@ -5,16 +5,16 @@ import com.gmail.nossr50.util.player.UserManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.EMFFishEvent;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -94,7 +94,7 @@ public abstract class Processor<E extends Event> implements Listener {
         if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
-                AbstractMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
+                EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
                 message.setBaitTheme(caughtBait.getTheme());
                 message.setBait(caughtBait.getId());
                 message.setPlayer(player);
@@ -134,12 +134,12 @@ public abstract class Processor<E extends Event> implements Listener {
 
         if (!fish.isSilent()) {
             String length = decimalFormat.format(fish.getLength());
-            String rarity = FishUtils.translateColorCodes(fish.getRarity().getId());
+            EMFMessage rarity = EMFMessage.fromString(fish.getRarity().getId());
 
-            AbstractMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
+            EMFMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
             message.setPlayer(player);
             message.setRarityColour(fish.getRarity().getColour());
-            message.setRarity(rarity);
+            message.setVariable("{rarity}", rarity);
             message.setLength(length);
 
             EvenMoreFish.getInstance().incrementMetricFishCaught(1);
@@ -153,7 +153,7 @@ public abstract class Processor<E extends Event> implements Listener {
                 message.setMessage(ConfigMessage.FISH_LENGTHLESS_CAUGHT.getMessage());
             }
 
-            if (fish.getRarity().getAnnounce()) {
+            if (fish.getRarity().getAnnounce() && Competition.isActive()) {
                 FishUtils.broadcastFishMessage(message, player, false);
             } else {
                 message.send(player);

@@ -2,11 +2,11 @@ package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+// TODO still uses deprecated methods
 public class BaitNBTManager {
 
     private BaitNBTManager() {
@@ -119,7 +120,7 @@ public class BaitNBTManager {
         if (isBaitedRod(item)) {
             try {
                 if (doingLoreStuff) {
-                    FishUtils.editMeta(item, meta -> meta.setLore(deleteOldLore(item)));
+                    item.editMeta(meta -> meta.setLore(deleteOldLore(item)));
                 }
             } catch (IndexOutOfBoundsException exception) {
                 EvenMoreFish.getInstance()
@@ -160,7 +161,7 @@ public class BaitNBTManager {
                 if (getNumBaitsApplied(item) >= MainConfig.getInstance().getBaitsPerRod()) {
                     // the lore's been taken out, we're not going to be doing anymore here, so we're just re-adding it now.
                     if (doingLoreStuff) {
-                        FishUtils.editMeta(item, meta -> meta.setLore(newApplyLore(item)));
+                        item.editMeta(meta -> meta.setLore(newApplyLore(item)));
                     }
                     throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
                 }
@@ -203,7 +204,7 @@ public class BaitNBTManager {
         }
 
         if (doingLoreStuff && !combined.isEmpty()) {
-            FishUtils.editMeta(item, meta -> meta.setLore(newApplyLore(item)));
+            item.editMeta(meta -> meta.setLore(newApplyLore(item)));
         }
 
         if (maxBait.get()) {
@@ -352,10 +353,10 @@ public class BaitNBTManager {
             lore = new ArrayList<>();
         }
 
-        AbstractMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
+        EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
 
-        Supplier<AbstractMessage> baitVariable = () -> {
-            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+        Supplier<EMFMessage> baitVariable = () -> {
+            EMFMessage message = EMFMessage.empty();
 
             String rodNBT = NbtUtils.getString(itemStack, NbtKeys.EMF_APPLIED_BAIT);
 
@@ -367,7 +368,7 @@ public class BaitNBTManager {
 
             for (String bait : rodNBT.split(",")) {
                 baitCount++;
-                AbstractMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
+                EMFMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
                 // TODO this is to prevent an ArrayIndexOutOfBoundsException, but it should be handled in a better way.
                 try {
                     baitFormat.setAmount(bait.split(":")[1]);
@@ -375,7 +376,8 @@ public class BaitNBTManager {
                     baitFormat.setAmount("N/A");
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
-                message.appendMessage(baitFormat);
+                message.appendString("\n");
+                message.appendString(baitFormat.getLegacyMessage());
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
@@ -463,7 +465,7 @@ public class BaitNBTManager {
             EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
             return "Invalid Bait";
         }
-        return FishUtils.translateColorCodes(bait.getDisplayName());
+        return EMFMessage.fromString(bait.getDisplayName()).getLegacyMessage();
     }
 
 }

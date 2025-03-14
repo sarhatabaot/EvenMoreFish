@@ -3,11 +3,11 @@ disabled: false
 
 item:
   material: STRING
-  displayname: "&eStringy Worms"
+  displayname: <yellow>Stringy Worms
 glowing: true
 rarities:
-  - "Common"
-  - "Legendary"
+  - Common
+  - Legendary
 catch-weight: 20
 application-weight: 40
 max-baits: 16

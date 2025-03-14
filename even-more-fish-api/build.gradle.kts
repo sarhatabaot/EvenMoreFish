@@ -6,7 +6,7 @@ group = "com.oheers.evenmorefish"
 version = "2.0.0-SNAPSHOT"
 
 dependencies {
-    compileOnly(libs.spigot.api)
+    compileOnly(libs.paper.api)
     compileOnly(libs.annotations)
     compileOnly(libs.commons.lang3)
     compileOnly(libs.universalscheduler)

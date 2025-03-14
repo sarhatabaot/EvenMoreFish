@@ -1,63 +1,211 @@
-package com.oheers.fish.api.adapter;
+package com.oheers.fish.messages;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public abstract class AbstractMessage {
+public class EMFMessage {
 
-    private Boolean papiEnabled = null;
-    private final PlatformAdapter platformAdapter;
+    public static final MiniMessage MINIMESSAGE = MiniMessage.builder()
+        .postProcessor(component -> component)
+        .build();
+    public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
+
     private final Map<String, String> liveVariables = new LinkedHashMap<>();
+
     private String message;
     private boolean canSilent = false;
     private OfflinePlayer relevantPlayer;
+    protected boolean perPlayer = true;
 
-    protected AbstractMessage(@NotNull final String message, @NotNull PlatformAdapter platformAdapter) {
-        this.message = formatColours(message);
-        this.platformAdapter = platformAdapter;
+    private EMFMessage(@NotNull String message) {
+        this.message = message;
     }
 
-    protected AbstractMessage(@NotNull final List<String> messageList, @NotNull PlatformAdapter platformAdapter) {
-        this.message = String.join("\n", messageList.stream().map(this::formatColours).toList());
-        this.platformAdapter = platformAdapter;
+    public static EMFMessage empty() {
+        return new EMFMessage("");
+    }
+
+    public static EMFMessage of(@NotNull Component component) {
+        return new EMFMessage(MINIMESSAGE.serialize(component));
+    }
+
+    public static EMFMessage ofList(@NotNull List<Component> components) {
+        List<String> strings = components.stream().map(MINIMESSAGE::serialize).toList();
+        return new EMFMessage(String.join("\n<reset>", strings));
+    }
+
+    public static EMFMessage fromString(@NotNull String string) {
+        return new EMFMessage(formatColours(string));
+    }
+
+    public static EMFMessage fromStringList(@NotNull List<String> strings) {
+        strings = strings.stream().map(EMFMessage::formatColours).toList();
+        return new EMFMessage(String.join("\n<reset>", strings));
+    }
+
+    /**
+     * Replaces all section symbols with ampersands so MiniMessage doesn't explode
+     */
+    private static String formatColours(@NotNull String message) {
+        return message.replace('§', '&');
+    }
+
+    public void send(@NotNull CommandSender target) {
+        if (getRawMessage().isEmpty() || silentCheck()) {
+            return;
+        }
+
+        String originalMessage = getRawMessage();
+
+        if (perPlayer && target instanceof Player player) {
+            setPlayer(player);
+        }
+
+        target.sendMessage(getComponentMessage());
+
+        setMessage(originalMessage);
+    }
+
+    public void sendActionBar(@NotNull CommandSender target) {
+        if (getRawMessage().isEmpty() || silentCheck()) {
+            return;
+        }
+
+        String originalMessage = getRawMessage();
+
+        if (perPlayer && target instanceof Player player) {
+            setPlayer(player);
+        }
+
+        target.sendActionBar(getComponentMessage());
+
+        setMessage(originalMessage);
+    }
+
+    /**
+     * @return The stored String in its raw form, with no colors or variables applied.
+     */
+    public @NotNull String getRawMessage() {
+        return this.message;
+    }
+
+    /**
+     * @return The stored String in its raw list form, with no colors or variables applied.
+     */
+    public @NotNull List<String> getRawListMessage() {
+        return Arrays.asList(this.message.split("\n"));
+    }
+
+    public @NotNull Component getComponentMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
+        Component component = MINIMESSAGE.deserialize(getRawMessage());
+        return removeDefaultItalics(component);
+    }
+
+    public @NotNull List<Component> getComponentListMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
+        return getRawListMessage().stream()
+            .map(raw -> {
+                Component component = MINIMESSAGE.deserialize(raw);
+                return removeDefaultItalics(component);
+            })
+            .toList();
+    }
+
+    private @NotNull Component removeDefaultItalics(@NotNull Component component) {
+        TextDecoration decoration = TextDecoration.ITALIC;
+        TextDecoration.State oldState = component.decoration(decoration);
+        if (oldState == TextDecoration.State.NOT_SET) {
+            return component.decoration(decoration, TextDecoration.State.FALSE);
+        }
+        return component;
+    }
+
+    public @NotNull String getLegacyMessage() {
+        return LEGACY_SERIALIZER.serialize(getComponentMessage());
+    }
+
+    public @NotNull List<String> getLegacyListMessage() {
+        return Arrays.asList(getLegacyMessage().split("\n"));
+    }
+
+    public String getPlainTextMessage() {
+        return PlainTextComponentSerializer.plainText().serialize(getComponentMessage());
+    }
+
+    /**
+     * @return The formatted message as a plain text string list. All formatting will be removed.
+     */
+    public @NotNull List<String> getPlainTextListMessage() {
+        return Arrays.asList(getPlainTextMessage().split("\n"));
+    }
+
+    public void formatPlaceholderAPI() {
+        if (!isPAPIEnabled()) {
+            return;
+        }
+        String message = getRawMessage();
+        Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(message);
+        while (matcher.find()) {
+            // Find matched String
+            String matched = matcher.group();
+            // Convert to Legacy Component and into a MiniMessage String
+            String parsed = MINIMESSAGE.serialize(
+                LEGACY_SERIALIZER.deserialize(
+                    PlaceholderAPI.setPlaceholders(getRelevantPlayer(), matched)
+                )
+            );
+            // Escape matched String so we don't have issues
+            String safeMatched = Matcher.quoteReplacement(matched);
+            // Replace all instances of the matched String with the parsed placeholder.
+            message = message.replaceAll(safeMatched, parsed);
+        }
+        setMessage(message);
     }
 
     public void setMessage(@NotNull String message) {
         this.message = formatColours(message);
     }
 
-    public void setMessage(@NotNull AbstractMessage message) {
-        this.message = message.getRawMessage();
+    public void setMessage(@NotNull EMFMessage message) {
+        this.message = message.message;
     }
 
-    protected boolean isPAPIEnabled() {
-        if (papiEnabled == null) {
-            papiEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
-        }
-        return papiEnabled;
+    private boolean isPAPIEnabled() {
+        return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
     }
-
-    /**
-     * Converts colors to the format this impl requires.
-     * @param message The message to process
-     * @return The processed message.
-     */
-    public abstract String formatColours(@NotNull String message);
 
     /**
      * Formats all variables in {@link #liveVariables}
      */
-    protected void formatVariables() {
+    public void formatVariables() {
         for (Map.Entry<String, String> entry : liveVariables.entrySet()) {
             String variable = entry.getKey();
             String replacement = formatColours(entry.getValue());
             this.message = this.message.replace(variable, replacement);
         }
+    }
+
+    public void setPerPlayer(boolean perPlayer) {
+        this.perPlayer = perPlayer;
     }
 
     /**
@@ -67,12 +215,6 @@ public abstract class AbstractMessage {
         send(Bukkit.getConsoleSender());
         Bukkit.getOnlinePlayers().forEach(this::send);
     }
-
-    /**
-     * Sends this message to the provided target.
-     * @param target The target of this message.
-     */
-    public abstract void send(@NotNull CommandSender target);
 
     /**
      * Sends this message to the provided list of targets.
@@ -90,63 +232,12 @@ public abstract class AbstractMessage {
     }
 
     /**
-     * Sends this message to the provided target as an action bar.
-     * @param target The target of this message.
-     */
-    public abstract void sendActionBar(@NotNull CommandSender target);
-
-    /**
      * Sends this message to the provided list of targets as an action bar.
      * @param targets The targets of this message.
      */
     public void sendActionBar(@NotNull List<CommandSender> targets) {
         targets.forEach(this::sendActionBar);
     }
-
-    /**
-     * @return The stored String in its raw form, with no colors or variables applied.
-     */
-    public @NotNull String getRawMessage() {
-        return this.message;
-    }
-
-    /**
-     * @return The stored String in its raw list form, with no colors or variables applied.
-     */
-    public @NotNull List<String> getRawListMessage() {
-        return Arrays.asList(this.message.split("\n"));
-    }
-
-    /**
-     * @return The formatted message as a legacy string, both colors and variables will be formatted.
-     */
-    public abstract String getLegacyMessage();
-
-    /**
-     * @return The formatted message as a legacy string list, both colors and variables will be formatted.
-     */
-    public @NotNull List<String> getLegacyListMessage() {
-        return Arrays.asList(getLegacyMessage().split("\n"));
-    }
-
-    /**
-     * @return The formatted message as a plain text string. All formatting will be removed.
-     */
-    public abstract String getPlainTextMessage();
-
-    /**
-     * @return The formatted message as a plain text string list. All formatting will be removed.
-     */
-    public @NotNull List<String> getPlainTextListMessage() {
-        return Arrays.asList(getPlainTextMessage().split("\n"));
-    }
-
-    /**
-     * Formats PlaceholderAPI placeholders.
-     * <p>
-     * This is abstract because the MiniMessage impl will need to handle this manually.
-     */
-    public abstract void formatPlaceholderAPI();
 
     /**
      * Adds the provided string to the end of this message.
@@ -160,7 +251,8 @@ public abstract class AbstractMessage {
      * Adds the provided message to the end of this message.
      * @param message The message to append
      */
-    public void appendMessage(@NotNull AbstractMessage message) {
+    public void appendMessage(@NotNull EMFMessage message) {
+        message.formatVariables();
         appendString(message.getRawMessage());
     }
 
@@ -169,16 +261,17 @@ public abstract class AbstractMessage {
      * @param messages The strings to append
      */
     public void appendStringList(@NotNull List<String> messages) {
-        this.message = this.message + String.join("\n", messages.stream().map(this::formatColours).toList());
+        this.message = this.message + String.join("\n", messages.stream().map(EMFMessage::formatColours).toList());
     }
 
     /**
      * Adds the provided messages to the end of this message.
      * @param messages The messages to append
      */
-    public void appendMessageList(@NotNull List<AbstractMessage> messages) {
+    public void appendMessageList(@NotNull List<EMFMessage> messages) {
         StringBuilder newMessage = new StringBuilder(this.message);
-        for (AbstractMessage message : messages) {
+        for (EMFMessage message : messages) {
+            message.formatVariables();
             newMessage.append(message.getRawMessage());
         }
         this.message = newMessage.toString();
@@ -196,7 +289,8 @@ public abstract class AbstractMessage {
      * Adds the provided message to the start of this message.
      * @param message The message to prepend
      */
-    public void prependMessage(@NotNull AbstractMessage message) {
+    public void prependMessage(@NotNull EMFMessage message) {
+        message.formatVariables();
         prependString(message.getRawMessage());
     }
 
@@ -205,16 +299,17 @@ public abstract class AbstractMessage {
      * @param messages The strings to prepend
      */
     public void prependStringList(@NotNull List<String> messages) {
-        this.message = String.join("\n", messages.stream().map(this::formatColours).toList()) + this.message;
+        this.message = String.join("\n", messages.stream().map(EMFMessage::formatColours).toList()) + this.message;
     }
 
     /**
      * Adds the provided messages to the start of this message.
      * @param messages The messages to prepend
      */
-    public void prependMessageList(@NotNull List<AbstractMessage> messages) {
+    public void prependMessageList(@NotNull List<EMFMessage> messages) {
         StringBuilder newMessage = new StringBuilder();
-        for (AbstractMessage message : messages) {
+        for (EMFMessage message : messages) {
+            message.formatVariables();
             newMessage.append(message.getRawMessage());
         }
         this.message = newMessage + this.message;
@@ -257,28 +352,17 @@ public abstract class AbstractMessage {
     }
 
     /**
-     * @return The PlatformAdapter that created this message instance.
-     */
-    public @NotNull PlatformAdapter getPlatformAdapter() {
-        return this.platformAdapter;
-    }
-
-    /**
      * Adds a variable to be formatted when {@link #formatVariables()} is called.
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
-    public void setVariable(@NotNull final String variable, @NotNull final String replacement) {
-        this.liveVariables.put(variable, replacement);
-    }
-
-    /**
-     * Adds a variable to be formatted when {@link #formatVariables()} is called.
-     * @param variable The variable.
-     * @param replacement The replacement for the variable.
-     */
-    public void setVariable(@NotNull final String variable, @NotNull final AbstractMessage replacement) {
-        this.liveVariables.put(variable, replacement.getRawMessage());
+    public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
+        if (replacement instanceof EMFMessage emfMessage) {
+            emfMessage.formatVariables();
+            this.liveVariables.put(variable, emfMessage.getRawMessage());
+        } else {
+            this.liveVariables.put(variable, String.valueOf(replacement));
+        }
     }
 
     /**
@@ -286,24 +370,24 @@ public abstract class AbstractMessage {
      * @param variableMap The map of variables and their replacements.
      */
     public void setVariables(@Nullable Map<String, ?> variableMap) {
-        if (variableMap == null) { return; }
+        if (variableMap == null || variableMap.isEmpty()) {
+            return;
+        }
         variableMap.forEach((variable, obj) -> {
-            if (obj instanceof AbstractMessage abstractMessage) {
-                setVariable(variable, abstractMessage);
+            if (obj instanceof EMFMessage emfMessage) {
+                setVariable(variable, emfMessage);
             } else {
                 setVariable(variable, obj.toString());
             }
         });
     }
 
-    // Variable Shortcuts
-
     /**
      * The colour used by the fish's rarity to apply a clean format for the fish, to replace the {rarity_colour} variable.
      *
      * @param colour The &_ code for the colour.
      */
-    public void setRarityColour(@NotNull final String colour) {
+    public void setRarityColour(@NotNull final Object colour) {
         setVariable("{rarity_colour}", colour);
     }
 
@@ -322,7 +406,7 @@ public abstract class AbstractMessage {
      *
      * @param length The length of the fish.
      */
-    public void setLength(@NotNull final String length) {
+    public void setLength(@NotNull final Object length) {
         setVariable("{length}", length);
     }
 
@@ -331,7 +415,7 @@ public abstract class AbstractMessage {
      *
      * @param rarity The fish's rarity.
      */
-    public void setRarity(@NotNull final String rarity) {
+    public void setRarity(@NotNull final Object rarity) {
         setVariable("{rarity}", rarity);
     }
 
@@ -340,7 +424,7 @@ public abstract class AbstractMessage {
      *
      * @param fish The fish's name.
      */
-    public void setFishCaught(@NotNull final String fish) {
+    public void setFishCaught(@NotNull final Object fish) {
         setVariable("{fish}", fish);
     }
 
@@ -349,7 +433,7 @@ public abstract class AbstractMessage {
      *
      * @param sellPrice The sell price of the fish.
      */
-    public void setSellPrice(@NotNull final String sellPrice) {
+    public void setSellPrice(@NotNull final Object sellPrice) {
         setVariable("{sell-price}", sellPrice);
     }
 
@@ -358,7 +442,7 @@ public abstract class AbstractMessage {
      *
      * @param amount The amount of x.
      */
-    public void setAmount(@NotNull final String amount) {
+    public void setAmount(@NotNull final Object amount) {
         setVariable("{amount}", amount);
     }
 
@@ -367,7 +451,7 @@ public abstract class AbstractMessage {
      *
      * @param position The position.
      */
-    public void setPosition(@NotNull final String position) {
+    public void setPosition(@NotNull final Object position) {
         setVariable("{position}", position);
     }
 
@@ -376,7 +460,7 @@ public abstract class AbstractMessage {
      *
      * @param positionColour The position.
      */
-    public void setPositionColour(@NotNull final String positionColour) {
+    public void setPositionColour(@NotNull final Object positionColour) {
         setVariable("{pos_colour}", positionColour);
     }
 
@@ -385,7 +469,7 @@ public abstract class AbstractMessage {
      *
      * @param timeFormatted The formatted time.
      */
-    public void setTimeFormatted(@NotNull final String timeFormatted) {
+    public void setTimeFormatted(@NotNull final Object timeFormatted) {
         setVariable("{time_formatted}", timeFormatted);
     }
 
@@ -394,7 +478,7 @@ public abstract class AbstractMessage {
      *
      * @param timeRaw The raw time.
      */
-    public void setTimeRaw(@NotNull final String timeRaw) {
+    public void setTimeRaw(@NotNull final Object timeRaw) {
         setVariable("{time_raw}", timeRaw);
     }
 
@@ -403,7 +487,7 @@ public abstract class AbstractMessage {
      *
      * @param bait The name of the bait.
      */
-    public void setBait(@NotNull final String bait) {
+    public void setBait(@NotNull final Object bait) {
         setVariable("{bait}", bait);
     }
 
@@ -412,17 +496,16 @@ public abstract class AbstractMessage {
      *
      * @param baitTheme The bait colour theme.
      */
-    public void setBaitTheme(@NotNull final String baitTheme) {
+    public void setBaitTheme(@NotNull final Object baitTheme) {
         setVariable("{bait_theme}", baitTheme);
     }
-
 
     /**
      * Defines how many days should replace the {days} variable.
      *
      * @param days The number of days.
      */
-    public void setDays(@NotNull final String days) {
+    public void setDays(@NotNull final Object days) {
         setVariable("{days}", days);
     }
 
@@ -431,7 +514,7 @@ public abstract class AbstractMessage {
      *
      * @param hours The number of hours.
      */
-    public void setHours(@NotNull final String hours) {
+    public void setHours(@NotNull final Object hours) {
         setVariable("{hours}", hours);
     }
 
@@ -440,7 +523,7 @@ public abstract class AbstractMessage {
      *
      * @param minutes The number of minutes.
      */
-    public void setMinutes(@NotNull final String minutes) {
+    public void setMinutes(@NotNull final Object minutes) {
         setVariable("{minutes}", minutes);
     }
 
@@ -449,7 +532,7 @@ public abstract class AbstractMessage {
      *
      * @param toggleMSG The applicable toggle msg.
      */
-    public void setToggleMSG(@NotNull final String toggleMSG) {
+    public void setToggleMSG(@NotNull final Object toggleMSG) {
         setVariable("{toggle_msg}", toggleMSG);
     }
 
@@ -458,7 +541,7 @@ public abstract class AbstractMessage {
      *
      * @param toggleIcon The applicable toggle material.
      */
-    public void setToggleIcon(@NotNull final String toggleIcon) {
+    public void setToggleIcon(@NotNull final Object toggleIcon) {
         setVariable("{toggle_icon}", toggleIcon);
     }
 
@@ -467,7 +550,7 @@ public abstract class AbstractMessage {
      *
      * @param day The day number.
      */
-    public void setDay(@NotNull final String day) {
+    public void setDay(@NotNull final Object day) {
         setVariable("{day}", day);
     }
 
@@ -476,7 +559,7 @@ public abstract class AbstractMessage {
      *
      * @param name The name of the fish or user
      */
-    public void setName(@NotNull final String name) {
+    public void setName(@NotNull final Object name) {
         setVariable("{name}", name);
     }
 
@@ -485,7 +568,7 @@ public abstract class AbstractMessage {
      *
      * @param numCaught The number of fish caught.
      */
-    public void setNumCaught(@NotNull final String numCaught) {
+    public void setNumCaught(@NotNull final Object numCaught) {
         setVariable("{num_caught}", numCaught);
     }
 
@@ -494,7 +577,7 @@ public abstract class AbstractMessage {
      *
      * @param largestSize The largest size of the fish.
      */
-    public void setLargestSize(@NotNull final String largestSize) {
+    public void setLargestSize(@NotNull final Object largestSize) {
         setVariable("{largest_size}", largestSize);
     }
 
@@ -503,7 +586,7 @@ public abstract class AbstractMessage {
      *
      * @param firstCaught The first fish caught.
      */
-    public void setFirstCaught(@NotNull final String firstCaught) {
+    public void setFirstCaught(@NotNull final Object firstCaught) {
         setVariable("{first_caught}", firstCaught);
     }
 
@@ -512,7 +595,7 @@ public abstract class AbstractMessage {
      *
      * @param timeRemaining The time remaining.
      */
-    public void setTimeRemaining(@NotNull final String timeRemaining) {
+    public void setTimeRemaining(@NotNull final Object timeRemaining) {
         setVariable("{time_remaining}", timeRemaining);
     }
 
@@ -522,7 +605,7 @@ public abstract class AbstractMessage {
      *
      * @param typeString The competition type.
      */
-    public void setCompetitionType(@NotNull final String typeString) {
+    public void setCompetitionType(@NotNull final Object typeString) {
         setVariable("{type}", typeString);
     }
 
@@ -531,7 +614,7 @@ public abstract class AbstractMessage {
      *
      * @param currentBaits The amount of baits.
      */
-    public void setCurrentBaits(String currentBaits) {
+    public void setCurrentBaits(@NotNull final Object currentBaits) {
         setVariable("{current_baits}", currentBaits);
     }
 
@@ -540,7 +623,7 @@ public abstract class AbstractMessage {
      *
      * @param maxBaits The max amount of baits.
      */
-    public void setMaxBaits(String maxBaits) {
+    public void setMaxBaits(@NotNull final Object maxBaits) {
         setVariable("{max_baits}", maxBaits);
     }
 

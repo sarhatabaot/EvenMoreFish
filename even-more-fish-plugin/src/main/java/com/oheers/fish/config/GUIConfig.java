@@ -16,11 +16,6 @@ public class GUIConfig extends ConfigBase {
         return instance;
     }
 
-    public String getToggle(boolean toggleState) {
-        if (toggleState) return getConfig().getString("enabled-msg", "&a&l✔");
-        else return getConfig().getString("disabled-msg", "&c&l✘");
-    }
-
     @Override
     public UpdaterSettings getUpdaterSettings() {
         UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());

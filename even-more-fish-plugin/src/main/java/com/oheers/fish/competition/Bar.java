@@ -1,9 +1,9 @@
 package com.oheers.fish.competition;
 
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -16,7 +16,7 @@ public class Bar {
     BossBar bar;
     private boolean shouldShow = true;
 
-    String prefix;
+    EMFMessage prefix;
 
     public Bar() {
         createBar();
@@ -42,8 +42,9 @@ public class Bar {
         bar.setProgress(progress);
     }
 
-    public void setPrefix(String prefix, CompetitionType type) {
-        this.prefix = prefix.replace("{type}", type.getBarPrefix());
+    public void setPrefix(EMFMessage prefix, CompetitionType type) {
+        prefix.setVariable("{type}", type.getBarPrefix());
+        this.prefix = prefix;
     }
 
     public void setColour(BarColor colour) {
@@ -51,10 +52,10 @@ public class Bar {
     }
 
     public void setTitle(long timeLeft) {
-        AbstractMessage layoutMessage = ConfigMessage.BAR_LAYOUT.getMessage();
+        EMFMessage layoutMessage = ConfigMessage.BAR_LAYOUT.getMessage();
         layoutMessage.setVariable("{prefix}", prefix);
-        layoutMessage.setVariable("{time-formatted}", FishUtils.translateColorCodes(FishUtils.timeFormat(timeLeft)));
-        layoutMessage.setVariable("{remaining}", ConfigMessage.BAR_REMAINING.getMessage().getLegacyMessage());
+        layoutMessage.setVariable("{time-formatted}", FishUtils.timeFormat(timeLeft));
+        layoutMessage.setVariable("{remaining}", ConfigMessage.BAR_REMAINING.getMessage());
         bar.setTitle(layoutMessage.getLegacyMessage());
     }
 

@@ -3,15 +3,12 @@ package com.oheers.fish.baits;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.FileUtil;
 import com.oheers.fish.baits.configs.BaitConversions;
-import dev.dejvokep.boostedyaml.YamlDocument;
-import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;

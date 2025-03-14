@@ -2,17 +2,18 @@ package com.oheers.fish;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
-import com.oheers.fish.api.adapter.AbstractMessage;
-import com.oheers.fish.api.addons.exceptions.IncorrectAssignedMaterialException;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import com.oheers.fish.api.addons.exceptions.NoPrefixException;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.utils.ItemUtils;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
@@ -23,26 +24,25 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.DayOfWeek;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 
@@ -267,32 +267,39 @@ public class FishUtils {
         return whitelistedWorlds.contains(l.getWorld().getName());
     }
 
-    public static @NotNull String timeFormat(long timeLeft) {
-        String returning = "";
+    public static @NotNull EMFMessage timeFormat(long timeLeft) {
         long hours = timeLeft / 3600;
         long minutes = (timeLeft % 3600) / 60;
         long seconds = timeLeft % 60;
 
+        StringBuilder formatted = new StringBuilder();
+
         if (hours > 0) {
-            AbstractMessage message = ConfigMessage.BAR_HOUR.getMessage();
+            EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
-            returning += message.getLegacyMessage() + " ";
+            message.formatVariables();
+            formatted.append(message.getRawMessage());
+            formatted.append(" ");
         }
 
         if (minutes > 0) {
-            AbstractMessage message = ConfigMessage.BAR_MINUTE.getMessage();
+            EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
-            returning += message.getLegacyMessage() + " ";
+            message.formatVariables();
+            formatted.append(message.getRawMessage());
+            formatted.append(" ");
         }
 
         // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
-            AbstractMessage message = ConfigMessage.BAR_SECOND.getMessage();
+            EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
-            returning += message.getLegacyMessage() + " ";
+            message.formatVariables();
+            formatted.append(message.getRawMessage());
+            formatted.append(" ");
         }
 
-        return returning.trim();
+        return EMFMessage.fromString(formatted.toString().trim());
     }
 
     public static @NotNull String timeRaw(long timeLeft) {
@@ -312,12 +319,12 @@ public class FishUtils {
         return returning;
     }
 
-    public static void broadcastFishMessage(AbstractMessage message, Player referencePlayer, boolean actionBar) {
-        String formatted = message.getLegacyMessage();
+    public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
+        String plain = message.getPlainTextMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
-        if (formatted.isEmpty() || activeComp == null) {
-            EvenMoreFish.debug("Formatted (Empty Message) " + formatted.isEmpty());
+        if (plain.isEmpty() || activeComp == null) {
+            EvenMoreFish.debug("Formatted (Empty Message) " + plain.isEmpty());
             EvenMoreFish.debug("Active Comp is null? " + (activeComp == null));
             return;
         }
@@ -471,23 +478,6 @@ public class FishUtils {
         }
     }
 
-    // #editMeta methods. These can be safely replaced with Paper's API once we drop Spigot.
-    public static boolean editMeta(@NotNull ItemStack item, @NotNull Consumer<ItemMeta> consumer) {
-        return editMeta(item, ItemMeta.class, consumer);
-    }
-
-    public static <M extends ItemMeta> boolean editMeta(@NotNull ItemStack item, @NotNull Class<M> metaClass, @NotNull Consumer<M> consumer) {
-        ItemMeta meta = item.getItemMeta();
-        if (!metaClass.isInstance(meta)) {
-            return false;
-        }
-
-        M checked = metaClass.cast(meta);
-        consumer.accept(checked);
-        item.setItemMeta(checked);
-        return true;
-    }
-
     public static @Nullable ItemStack getCustomItem(@NotNull String materialString) {
         if (!materialString.contains(":")) {
             return null;
@@ -522,18 +512,23 @@ public class FishUtils {
         return new ItemStack(material);
     }
 
-    // The following methods have been delegated to the platform adapter.
-
-    public static @NotNull String translateColorCodes(String message) {
-        return EvenMoreFish.getAdapter().translateColorCodes(message);
-    }
-
     public static @NotNull ItemStack getSkullFromBase64(String base64) {
-        return EvenMoreFish.getAdapter().getSkullFromBase64(base64);
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        skull.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), "EMFSkull");
+            profile.setProperty(new ProfileProperty("textures", base64));
+            meta.setPlayerProfile(profile);
+        });
+        return skull;
     }
 
     public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
-        return EvenMoreFish.getAdapter().getSkullFromUUID(uuid);
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        skull.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(uuid, "EMFSkull");
+            meta.setPlayerProfile(profile);
+        });
+        return skull;
     }
 
     /**
@@ -555,10 +550,10 @@ public class FishUtils {
      * @param value The double value to be formatted.
      * @return The formatted double
      */
-    public static String formatDouble(@NotNull final String formatStr, final double value) {
+    public static Component formatDouble(@NotNull final String formatStr, final double value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
-        return format.format(value);
+        return Component.text(format.format(value));
     }
 
     /**
@@ -584,6 +579,15 @@ public class FishUtils {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return format.format(value);
+    }
+
+    /**
+     * Checks if a provided String is a legacy string by stripping MiniMessage tags and seeing if the String is the same.
+     * @return Whether this String is using legacy color codes.
+     */
+    public static boolean isLegacyString(@NotNull String string) {
+        String stripped = EMFMessage.MINIMESSAGE.stripTags(string);
+        return string.equals(stripped);
     }
 
 }

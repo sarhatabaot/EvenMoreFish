@@ -5,12 +5,10 @@ include(":even-more-fish-addons-j17")
 include(":even-more-fish-database-extras")
 include(":even-more-fish-addons-j21")
 include(":even-more-fish-plugin")
-include(":even-more-fish-paper")
 
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("spigot-api", "org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
             library("paper-api", "io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
             library("vault-api", "com.github.MilkBowl:VaultAPI:1.7.1")
             library("placeholder-api", "me.clip:placeholderapi:2.11.6")
@@ -70,7 +68,7 @@ dependencyResolutionManagement {
             library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.6")
             library("playerpoints", "org.black_ixx:playerpoints:3.2.7")
 
-            library("vanishchecker", "uk.firedev:VanishChecker:1.0.4")
+            library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
             library("commandapi", "dev.jorel:commandapi-bukkit-shade:9.7.0")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")

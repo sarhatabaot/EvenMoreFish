@@ -2,16 +2,16 @@ package com.oheers.fish.competition.strategies;
 
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.CompetitionStrategy;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,9 +53,9 @@ public class SpecificFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public @NotNull AbstractMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
+    public @NotNull EMFMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
         Fish selectedFish = competition.getSelectedFish();
-        AbstractMessage message = CompetitionStrategy.super.getTypeFormat(competition, configMessage);
+        EMFMessage message = CompetitionStrategy.super.getTypeFormat(competition, configMessage);
         message.setAmount(Integer.toString(competition.getNumberNeeded()));
         if (selectedFish != null) {
             message.setRarityColour(selectedFish.getRarity().getColour());
@@ -66,7 +66,7 @@ public class SpecificFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public AbstractMessage getBeginMessage(@NotNull Competition competition, CompetitionType type) {
+    public EMFMessage getBeginMessage(@NotNull Competition competition, CompetitionType type) {
         return getTypeFormat(competition, ConfigMessage.COMPETITION_START);
     }
 

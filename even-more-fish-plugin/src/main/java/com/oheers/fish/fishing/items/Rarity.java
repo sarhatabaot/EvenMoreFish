@@ -54,7 +54,7 @@ public class Rarity extends ConfigBase {
     }
 
     public @NotNull String getColour() {
-        return getConfig().getString("colour", "&f");
+        return getConfig().getString("colour", "<white>");
     }
 
     public double getWeight() {
@@ -90,7 +90,7 @@ public class Rarity extends ConfigBase {
         if (!getUseConfigCasing()) {
             finalName = finalName.toUpperCase();
         }
-        return this.getColour() + "&l" + finalName;
+        return this.getColour() + "<bold>" + finalName;
     }
 
     public @Nullable String getPermission() {

@@ -1,7 +1,7 @@
 id: Junk
 disabled: false
 weight: 5
-colour: '&#888888'
+colour: <#888888>
 worth-multiplier: 0.2
 broadcast: false
 size:
@@ -19,7 +19,7 @@ fish:
     item:
       material: FISHING_ROD
   Explorers Boat:
-    displayname: "Explorer's Boat"
+    displayname: Explorer's Boat
     item:
       materials:
         - OAK_BOAT
@@ -32,5 +32,5 @@ fish:
   Old Fishers Hat:
     item:
       material: LEATHER_HELMET
-    dye-colour: "#888877"
-    displayname: "Old Fisher's Hat"
+    dye-colour: '#888877'
+    displayname: Old Fisher's Hat

@@ -2,15 +2,15 @@ package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFMessage;
 import com.oheers.fish.utils.ItemFactory;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Location;
@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// TODO still uses deprecated methods
 public class Bait extends ConfigBase {
 
     private static final Logger logger = EvenMoreFish.getInstance().getLogger();
@@ -51,7 +52,7 @@ public class Bait extends ConfigBase {
         ItemFactory factory = new ItemFactory(null, getConfig());
         factory.enableDefaultChecks();
         factory.setItemDisplayNameCheck(true);
-        factory.setDisplayName(FishUtils.translateColorCodes("&e" + this.id));
+        factory.setDisplayName("<yellow>" + this.id);
         this.itemFactory = factory;
     }
 
@@ -73,7 +74,7 @@ public class Bait extends ConfigBase {
         ItemStack baitItem = itemFactory.createItem(player, -1);
         baitItem.setAmount(getDropQuantity());
 
-        FishUtils.editMeta(baitItem, meta -> meta.setLore(createBoostLore()));
+        baitItem.editMeta(meta -> meta.setLore(createBoostLore()));
 
         return BaitNBTManager.applyBaitNBT(baitItem, this.id);
     }
@@ -118,10 +119,10 @@ public class Bait extends ConfigBase {
      */
     private List<String> createBoostLore() {
 
-        AbstractMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
+        EMFMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
 
-        Supplier<AbstractMessage> boostsVariable = () -> {
-            AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+        Supplier<EMFMessage> boostsVariable = () -> {
+            EMFMessage message = EMFMessage.empty();
             List<Rarity> rarityList = getRarities();
             if (!rarityList.isEmpty()) {
                 if (rarityList.size() > 1) {
@@ -142,7 +143,7 @@ public class Bait extends ConfigBase {
         };
         lore.setVariable("{boosts}", boostsVariable.get());
 
-        Supplier<AbstractMessage> loreVariable = () -> EvenMoreFish.getAdapter().createMessage(getConfig().getStringList("lore"));
+        Supplier<EMFMessage> loreVariable = () -> EMFMessage.fromStringList(getConfig().getStringList("lore"));
         lore.setVariable("{lore}", loreVariable.get());
 
         lore.setBaitTheme(getTheme());
@@ -243,7 +244,7 @@ public class Bait extends ConfigBase {
             return;
         }
 
-        AbstractMessage message = ConfigMessage.BAIT_USED.getMessage();
+        EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
         message.setBait(id);
         message.setBaitTheme(getTheme());
         message.send(player);
@@ -282,7 +283,7 @@ public class Bait extends ConfigBase {
      * @return The colour theme defined for the bait.
      */
     public String getTheme() {
-        return getConfig().getString("bait-theme", "&e");
+        return getConfig().getString("bait-theme", "<yellow>");
     }
 
     /**
