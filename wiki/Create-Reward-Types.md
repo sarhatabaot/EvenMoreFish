@@ -6,7 +6,7 @@ The [RewardType](https://github.com/Oheers/EvenMoreFish/blob/master/even-more-fi
 /**
  * This is the EXP RewardType that exists inside EvenMoreFish.
  */
-public class EXPRewardType implements RewardType {
+public class EXPRewardType extends RewardType {
 
     /**
      * The reward itself is handled here.

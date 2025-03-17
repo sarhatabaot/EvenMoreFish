@@ -4,7 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.api.addons.Addon;
-import com.oheers.fish.api.reward.RewardManager;
+import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.baits.BaitNBTManager;
@@ -394,7 +394,7 @@ public class AdminCommand {
                 .executes(info -> {
                     TextComponent.Builder builder = Component.text();
                     builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
-                    RewardManager.getInstance().getRegisteredRewardTypes().forEach(rewardType -> {
+                    RewardType.getLoadedTypes().forEach((string, rewardType) -> {
                         Component show = EMFMessage.fromString(
                             "Author: " + rewardType.getAuthor() + "\n" +
                             "Registered Plugin: " + rewardType.getPlugin().getName()

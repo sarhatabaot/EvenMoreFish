@@ -8,7 +8,7 @@ import com.oheers.fish.api.EMFAPI;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementManager;
-import com.oheers.fish.api.reward.RewardManager;
+import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
@@ -200,7 +200,7 @@ public class EvenMoreFish extends EMFPlugin {
         BaitManager.getInstance().load();
 
         // Do this before anything competition related.
-        loadRewardManager();
+        loadRewardTypes();
 
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
@@ -251,7 +251,7 @@ public class EvenMoreFish extends EMFPlugin {
             active.end(false);
         }
 
-        RewardManager.getInstance().unload();
+        RewardType.unregisterAll();
 
         if (MainConfig.getInstance().databaseEnabled()) {
             database.shutdown();
@@ -630,11 +630,7 @@ public class EvenMoreFish extends EMFPlugin {
         }
     }
 
-    private void loadRewardManager() {
-        // Load RewardManager
-        RewardManager.getInstance().load();
-        getServer().getPluginManager().registerEvents(RewardManager.getInstance(), this);
-
+    private void loadRewardTypes() {
         // Load RewardTypes
         new CommandRewardType().register();
         new EffectRewardType().register();
