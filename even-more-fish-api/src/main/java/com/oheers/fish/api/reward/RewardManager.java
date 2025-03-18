@@ -11,12 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @deprecated This class will be removed for EvenMoreFish 2.1.0. Please use the static methods on {@link RewardType} instead.
+ */
+@Deprecated(forRemoval = true, since = "2.0.0")
 public class RewardManager implements Listener {
 
     private static RewardManager instance = null;
-
-    private final Map<String, RewardType> rewardTypes = new HashMap<>();
-    private boolean loaded = false;
 
     private RewardManager() {}
 
@@ -27,50 +28,26 @@ public class RewardManager implements Listener {
         return instance;
     }
 
-    public void load() {
-        if (!isLoaded()) {
-            Bukkit.getPluginManager().callEvent(new EMFRewardsLoadEvent());
-            loaded = true;
-            EMFPlugin.getInstance().getLogger().info("Loaded RewardManager");
-        }
-    }
-
-    public void unload() {
-        if (isLoaded()) {
-            this.rewardTypes.clear();
-            loaded = false;
-            EMFPlugin.getInstance().getLogger().info("Unloaded RewardManager");
-        }
-    }
-
-    public boolean isLoaded() { return loaded; }
+    /**
+     * This will always return true as the new system can never be disabled.
+     */
+    public boolean isLoaded() { return true; }
 
     /**
-     * Register a custom reward type.
-     * @param rewardType The reward type instance you wish to register
-     * @return Whether the reward type was added or not
+     * @deprecated Use {@link RewardType#register()} instead.
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public boolean registerRewardType(RewardType rewardType) {
-        // Don't allow registration if the manager's load() method was not called.
-        if (!isLoaded()) {
-            return false;
-        }
-        String identifier = rewardType.getIdentifier();
-        if (rewardTypes.containsKey(identifier.toUpperCase())) {
-            return false;
-        }
-        EMFPlugin.getInstance().getLogger().info("Registered " + rewardType.getIdentifier() + " RewardType by " + rewardType.getAuthor() + " from the plugin " + rewardType.getPlugin().getName());
-        rewardTypes.put(identifier.toUpperCase(), rewardType);
+        rewardType.register();
         return true;
     }
 
+    /**
+     * @deprecated Use {@link RewardType#getLoadedTypes()} and {@link Map#values()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public List<RewardType> getRegisteredRewardTypes() {
-        return new ArrayList<>(rewardTypes.values());
-    }
-
-    @EventHandler
-    public void onServerLoad(ServerLoadEvent event) {
-        Bukkit.getPluginManager().callEvent(new EMFRewardsLoadEvent());
+        return new ArrayList<>(RewardType.getLoadedTypes().values());
     }
 
 }

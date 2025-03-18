@@ -1,5 +1,6 @@
 package com.oheers.fish.api.reward;
 
+import com.oheers.fish.api.plugin.EMFPlugin;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -52,6 +53,7 @@ public abstract class RewardType {
             return false;
         }
         loadedTypes.put(getIdentifier(), this);
+        EMFPlugin.getInstance().getLogger().info("Registered " + getIdentifier() + " RewardType by " + getAuthor() + " from the plugin " + getPlugin().getName());
         return true;
     }
 
