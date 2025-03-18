@@ -7,6 +7,7 @@ import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
+import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
@@ -250,6 +251,7 @@ public class EvenMoreFish extends EMFPlugin {
         }
 
         RewardType.unregisterAll();
+        RequirementType.unregisterAll();
 
         if (MainConfig.getInstance().databaseEnabled()) {
             database.shutdown();
