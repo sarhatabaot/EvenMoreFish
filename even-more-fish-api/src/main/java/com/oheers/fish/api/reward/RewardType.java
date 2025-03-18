@@ -36,10 +36,6 @@ public abstract class RewardType {
 
     public RewardType() {}
 
-    public boolean isApplicable(@NotNull String key) {
-        return key.equalsIgnoreCase(getIdentifier());
-    }
-
     public abstract void doReward(@NotNull Player player, @NotNull String key, @NotNull String value, Location hookLocation);
 
     public abstract @NotNull String getIdentifier();

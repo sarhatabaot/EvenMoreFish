@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class WorldRequirementType implements RequirementType {
+public class WorldRequirementType extends RequirementType {
 
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {

@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.List;
 
 // TODO same as InGameTimeRequirementType
-public class IRLTimeRequirementType implements RequirementType {
+public class IRLTimeRequirementType extends RequirementType {
 
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {

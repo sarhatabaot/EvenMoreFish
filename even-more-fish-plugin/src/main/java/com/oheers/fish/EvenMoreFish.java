@@ -7,7 +7,6 @@ import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
-import com.oheers.fish.api.requirement.RequirementManager;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
@@ -194,13 +193,12 @@ public class EvenMoreFish extends EMFPlugin {
 
         setupPermissions();
 
-        loadRequirementManager();
+        // Do this before anything fish or competition related.
+        loadRewardTypes();
+        loadRequirementTypes();
 
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
-
-        // Do this before anything competition related.
-        loadRewardTypes();
 
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
@@ -642,11 +640,7 @@ public class EvenMoreFish extends EMFPlugin {
         loadExternalRewardTypes();
     }
 
-    private void loadRequirementManager() {
-        // Load RequirementManager
-        RequirementManager.getInstance().load();
-        getServer().getPluginManager().registerEvents(RequirementManager.getInstance(), this);
-
+    private void loadRequirementTypes() {
         // Load RequirementTypes
         new BiomeRequirementType().register();
         new BiomeSetRequirementType().register();
