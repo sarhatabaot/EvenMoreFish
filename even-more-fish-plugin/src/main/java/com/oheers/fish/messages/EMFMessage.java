@@ -119,7 +119,7 @@ public class EMFMessage {
         // Disgusting code incoming
         // Serialize the message into a MiniMessage String, split it by newlines, then deserialize each line into a Component
         String serialized = MINIMESSAGE.serialize(this.message);
-        String[] split = serialized.split("\n");
+        String[] split = serialized.split("<br>");
         return Arrays.stream(split).map(line -> {
             Component component = MINIMESSAGE.deserialize(line);
             return removeDefaultItalics(component);
