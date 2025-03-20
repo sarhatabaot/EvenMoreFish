@@ -18,11 +18,11 @@ public class MessageConfig extends ConfigBase {
         return instance;
     }
 
-    public String getSTDPrefix() {
+    public EMFMessage getSTDPrefix() {
         EMFMessage message = EMFMessage.empty();
         message.prependMessage(PrefixType.DEFAULT.getPrefix());
         message.appendString("<reset>");
-        return message.getRawMessage();
+        return message;
     }
 
     public int getLeaderboardCount() {

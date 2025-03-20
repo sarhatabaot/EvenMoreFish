@@ -419,7 +419,7 @@ public class BaitNBTManager {
 
         if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
             // starting at 1, because at least one bait replacing {baits} is repeated.
-            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getComponentListMessage().size();
             //todo, to help this be compliant with java:S5413, we should iterate in reverse order, this should be done in another pr, left here for reference
             //compliant version
             for (int i = 1; i < maxBaits; i++) {
@@ -427,7 +427,7 @@ public class BaitNBTManager {
             }
         } else {
             // starting at 1, because at least one bait replacing {baits} is repeated.
-            int numBaitsApplied = getNumBaitsApplied(itemStack) + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            int numBaitsApplied = getNumBaitsApplied(itemStack) + ConfigMessage.BAIT_ROD_LORE.getMessage().getComponentListMessage().size();
             //compliant version
             for (int i = 1; i < numBaitsApplied; i++) {
                 lore.remove(lore.size() - 1);

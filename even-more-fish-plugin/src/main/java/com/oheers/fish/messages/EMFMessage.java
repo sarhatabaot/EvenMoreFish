@@ -2,22 +2,22 @@ package com.oheers.fish.messages;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class EMFMessage {
 
@@ -25,53 +25,59 @@ public class EMFMessage {
         .postProcessor(component -> component)
         .build();
     public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
+    public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
 
-    private final Map<String, String> liveVariables = new LinkedHashMap<>();
+    private final Map<String, Component> liveVariables = new LinkedHashMap<>();
 
-    private String message;
+    private Component message;
     private boolean canSilent = false;
     private OfflinePlayer relevantPlayer;
     protected boolean perPlayer = true;
 
-    private EMFMessage(@NotNull String message) {
-        this.message = message;
+    private EMFMessage(@Nullable Component message) {
+        if (message == null) {
+            this.message = Component.empty();
+        } else {
+            this.message = Component.empty().append(message);
+        }
     }
 
     public static EMFMessage empty() {
-        return new EMFMessage("");
+        return new EMFMessage(null);
     }
 
     public static EMFMessage of(@NotNull Component component) {
-        return new EMFMessage(MINIMESSAGE.serialize(component));
+        return new EMFMessage(component);
     }
 
     public static EMFMessage ofList(@NotNull List<Component> components) {
-        List<String> strings = components.stream().map(MINIMESSAGE::serialize).toList();
-        return new EMFMessage(String.join("\n<reset>", strings));
+        Component finalComponent = Component.join(JoinConfiguration.newlines(), components);
+        return new EMFMessage(finalComponent);
     }
 
     public static EMFMessage fromString(@NotNull String string) {
-        return new EMFMessage(formatColours(string));
+        return of(formatString(string));
     }
 
     public static EMFMessage fromStringList(@NotNull List<String> strings) {
-        strings = strings.stream().map(EMFMessage::formatColours).toList();
-        return new EMFMessage(String.join("\n<reset>", strings));
+        return ofList(strings.stream().map(EMFMessage::formatString).toList());
     }
 
     /**
      * Replaces all section symbols with ampersands so MiniMessage doesn't explode
      */
-    private static String formatColours(@NotNull String message) {
-        return message.replace('§', '&');
+    private static Component formatString(@NotNull String message) {
+        return MINIMESSAGE.deserialize(
+            message.replace('§', '&')
+        );
     }
 
     public void send(@NotNull CommandSender target) {
-        if (getRawMessage().isEmpty() || silentCheck()) {
+        if (isEmpty() || silentCheck()) {
             return;
         }
 
-        String originalMessage = getRawMessage();
+        Component originalMessage = this.message;
 
         if (perPlayer && target instanceof Player player) {
             setPlayer(player);
@@ -79,15 +85,15 @@ public class EMFMessage {
 
         target.sendMessage(getComponentMessage());
 
-        setMessage(originalMessage);
+        this.message = originalMessage;
     }
 
     public void sendActionBar(@NotNull CommandSender target) {
-        if (getRawMessage().isEmpty() || silentCheck()) {
+        if (isEmpty() || silentCheck()) {
             return;
         }
 
-        String originalMessage = getRawMessage();
+        Component originalMessage = this.message;
 
         if (perPlayer && target instanceof Player player) {
             setPlayer(player);
@@ -95,39 +101,29 @@ public class EMFMessage {
 
         target.sendActionBar(getComponentMessage());
 
-        setMessage(originalMessage);
+        this.message = originalMessage;
     }
 
     /**
      * @return The stored String in its raw form, with no colors or variables applied.
      */
-    public @NotNull String getRawMessage() {
-        return this.message;
-    }
-
-    /**
-     * @return The stored String in its raw list form, with no colors or variables applied.
-     */
-    public @NotNull List<String> getRawListMessage() {
-        return Arrays.asList(this.message.split("\n"));
-    }
-
     public @NotNull Component getComponentMessage() {
         formatVariables();
         formatPlaceholderAPI();
-        Component component = MINIMESSAGE.deserialize(getRawMessage());
-        return removeDefaultItalics(component);
+        return removeDefaultItalics(this.message);
     }
 
     public @NotNull List<Component> getComponentListMessage() {
         formatVariables();
         formatPlaceholderAPI();
-        return getRawListMessage().stream()
-            .map(raw -> {
-                Component component = MINIMESSAGE.deserialize(raw);
-                return removeDefaultItalics(component);
-            })
-            .toList();
+        // Disgusting code incoming
+        // Serialize the message into a MiniMessage String, split it by newlines, then deserialize each line into a Component
+        String serialized = MINIMESSAGE.serialize(this.message);
+        String[] split = serialized.split("\n");
+        return Arrays.stream(split).map(line -> {
+            Component component = MINIMESSAGE.deserialize(line);
+            return removeDefaultItalics(component);
+        }).toList();
     }
 
     private @NotNull Component removeDefaultItalics(@NotNull Component component) {
@@ -148,7 +144,7 @@ public class EMFMessage {
     }
 
     public String getPlainTextMessage() {
-        return PlainTextComponentSerializer.plainText().serialize(getComponentMessage());
+        return PLAINTEXT_SERIALIZER.serialize(getComponentMessage());
     }
 
     /**
@@ -162,27 +158,25 @@ public class EMFMessage {
         if (!isPAPIEnabled()) {
             return;
         }
-        String message = getRawMessage();
-        Matcher matcher = PlaceholderAPI.getPlaceholderPattern().matcher(message);
-        while (matcher.find()) {
-            // Find matched String
-            String matched = matcher.group();
-            // Convert to Legacy Component and into a MiniMessage String
-            String parsed = MINIMESSAGE.serialize(
-                LEGACY_SERIALIZER.deserialize(
+        TextReplacementConfig trc = TextReplacementConfig.builder()
+            .match(PlaceholderAPI.getPlaceholderPattern())
+            .replacement((matchResult, builder) -> {
+                String matched = matchResult.group();
+                Component parsed = LEGACY_SERIALIZER.deserialize(
                     PlaceholderAPI.setPlaceholders(getRelevantPlayer(), matched)
-                )
-            );
-            // Escape matched String so we don't have issues
-            String safeMatched = Matcher.quoteReplacement(matched);
-            // Replace all instances of the matched String with the parsed placeholder.
-            message = message.replaceAll(safeMatched, parsed);
-        }
-        setMessage(message);
+                );
+                return builder.append(parsed);
+            })
+            .build();
+        this.message = this.message.replaceText(trc);
     }
 
     public void setMessage(@NotNull String message) {
-        this.message = formatColours(message);
+        this.message = formatString(message);
+    }
+
+    public void setMessage(@NotNull Component message) {
+        this.message = message;
     }
 
     public void setMessage(@NotNull EMFMessage message) {
@@ -197,10 +191,12 @@ public class EMFMessage {
      * Formats all variables in {@link #liveVariables}
      */
     public void formatVariables() {
-        for (Map.Entry<String, String> entry : liveVariables.entrySet()) {
-            String variable = entry.getKey();
-            String replacement = formatColours(entry.getValue());
-            this.message = this.message.replace(variable, replacement);
+        TextReplacementConfig.Builder trc = TextReplacementConfig.builder();
+        for (Map.Entry<String, Component> entry : liveVariables.entrySet()) {
+            Component replaceComponent = entry.getValue();
+            String placeholder =entry.getKey();
+            trc.matchLiteral(placeholder).replacement(replaceComponent);
+            this.message = this.message.replaceText(trc.build());
         }
     }
 
@@ -244,7 +240,7 @@ public class EMFMessage {
      * @param message The string to append
      */
     public void appendString(@NotNull String message) {
-        this.message = this.message + formatColours(message);
+        this.message = this.message.append(formatString(message));
     }
 
     /**
@@ -253,7 +249,15 @@ public class EMFMessage {
      */
     public void appendMessage(@NotNull EMFMessage message) {
         message.formatVariables();
-        appendString(message.getRawMessage());
+        this.message = this.message.append(message.message);
+    }
+
+    /**
+     * Adds the provided component to the end of this message.
+     * @param component The message to append
+     */
+    public void appendComponent(@NotNull Component component) {
+        this.message = this.message.append(component);
     }
 
     /**
@@ -261,7 +265,7 @@ public class EMFMessage {
      * @param messages The strings to append
      */
     public void appendStringList(@NotNull List<String> messages) {
-        this.message = this.message + String.join("\n", messages.stream().map(EMFMessage::formatColours).toList());
+        appendString(String.join("\n", messages));
     }
 
     /**
@@ -269,12 +273,15 @@ public class EMFMessage {
      * @param messages The messages to append
      */
     public void appendMessageList(@NotNull List<EMFMessage> messages) {
-        StringBuilder newMessage = new StringBuilder(this.message);
-        for (EMFMessage message : messages) {
-            message.formatVariables();
-            newMessage.append(message.getRawMessage());
-        }
-        this.message = newMessage.toString();
+        messages.forEach(this::appendMessage);
+    }
+
+    /**
+     * Adds the provided components to the end of this message.
+     * @param components The components to append
+     */
+    public void appendComponentList(@NotNull List<Component> components) {
+        components.forEach(this::appendComponent);
     }
 
     /**
@@ -282,7 +289,7 @@ public class EMFMessage {
      * @param message The string to prepend
      */
     public void prependString(@NotNull String message) {
-        this.message = formatColours(message) + this.message;
+        this.message = Component.empty().append(formatString(message)).append(this.message);
     }
 
     /**
@@ -291,7 +298,15 @@ public class EMFMessage {
      */
     public void prependMessage(@NotNull EMFMessage message) {
         message.formatVariables();
-        prependString(message.getRawMessage());
+        this.message = message.message.append(this.message);
+    }
+
+    /**
+     * Adds the provided component to the start of this message.
+     * @param component The component to prepend
+     */
+    public void prependComponent(@NotNull Component component) {
+        this.message = component.append(this.message);
     }
 
     /**
@@ -299,7 +314,7 @@ public class EMFMessage {
      * @param messages The strings to prepend
      */
     public void prependStringList(@NotNull List<String> messages) {
-        this.message = String.join("\n", messages.stream().map(EMFMessage::formatColours).toList()) + this.message;
+        prependString(String.join("\n", messages));
     }
 
     /**
@@ -307,12 +322,15 @@ public class EMFMessage {
      * @param messages The messages to prepend
      */
     public void prependMessageList(@NotNull List<EMFMessage> messages) {
-        StringBuilder newMessage = new StringBuilder();
-        for (EMFMessage message : messages) {
-            message.formatVariables();
-            newMessage.append(message.getRawMessage());
-        }
-        this.message = newMessage + this.message;
+        messages.forEach(this::prependMessage);
+    }
+
+    /**
+     * Adds the provided components to the start of this message.
+     * @param components The components to prepend
+     */
+    public void prependComponentList(@NotNull List<Component> components) {
+        components.forEach(this::prependComponent);
     }
 
     /**
@@ -333,7 +351,7 @@ public class EMFMessage {
      * @return Should this message be silent?
      */
     public boolean silentCheck() {
-        return canSilent && this.message.endsWith(" -s");
+        return canSilent && getPlainTextMessage().endsWith(" -s");
     }
 
     /**
@@ -359,11 +377,11 @@ public class EMFMessage {
     public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
         if (replacement instanceof EMFMessage emfMessage) {
             emfMessage.formatVariables();
-            this.liveVariables.put(variable, emfMessage.getRawMessage());
+            this.liveVariables.put(variable, emfMessage.message);
         } else if (replacement instanceof Component component) {
-            this.liveVariables.put(variable, of(component).getRawMessage());
+            this.liveVariables.put(variable, component);
         } else {
-            this.liveVariables.put(variable, String.valueOf(replacement));
+            this.liveVariables.put(variable, formatString(String.valueOf(replacement)));
         }
     }
 
@@ -621,6 +639,14 @@ public class EMFMessage {
      */
     public void setMaxBaits(@NotNull final Object maxBaits) {
         setVariable("{max_baits}", maxBaits);
+    }
+
+    public boolean isEmpty() {
+        return PLAINTEXT_SERIALIZER.serialize(this.message).isEmpty();
+    }
+
+    public boolean containsString(@NotNull String string) {
+        return PLAINTEXT_SERIALIZER.serialize(this.message).contains(string);
     }
 
 }

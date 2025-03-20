@@ -347,33 +347,34 @@ public class AdminCommand {
 
                 final String msgString =
                     """
-                    {prefix} EvenMoreFish by Oheers {version}\s
-                    {prefix} Feature Branch: {branch}\s
-                    {prefix} Feature Build/Date: {build-date}\s
-                    {prefix} MCV: {mcv}\s
-                    {prefix} SSV: {ssv}\s
-                    {prefix} Online: {online}\s
-                    {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
-                    {prefix} Database Engine: {engine}\s
-                    {prefix} Database Type: {type}\s
-                    """
-                        .replace("{prefix}", MessageConfig.getInstance().getSTDPrefix())
-                        .replace("{version}", EvenMoreFish.getInstance().getDescription().getVersion())
-                        .replace("{branch}", getFeatureBranchName())
-                        .replace("{build-date}", getFeatureBranchBuildOrDate())
-                        .replace("{mcv}", Bukkit.getServer().getVersion())
-                        .replace("{ssv}", Bukkit.getServer().getBukkitVersion())
-                        .replace("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()))
-                        .replace("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()))
-                        .replace("{fish}", String.valueOf(fishCount))
-                        .replace("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()))
-                        .replace("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()))
-                        .replace("{engine}", databaseEngine)
-                        .replace("{type}", databaseType);
+                        {prefix} EvenMoreFish by Oheers {version}\s
+                        {prefix} Feature Branch: {branch}\s
+                        {prefix} Feature Build/Date: {build-date}\s
+                        {prefix} MCV: {mcv}\s
+                        {prefix} SSV: {ssv}\s
+                        {prefix} Online: {online}\s
+                        {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
+                        {prefix} Database Engine: {engine}\s
+                        {prefix} Database Type: {type}\s
+                        """;
 
+                EMFMessage message = EMFMessage.fromString(msgString);
 
-                EMFMessage msg = EMFMessage.fromString(msgString);
-                msg.send(info.sender());
+                message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
+                message.setVariable("{version}", EvenMoreFish.getInstance().getDescription().getVersion());
+                message.setVariable("{branch}", getFeatureBranchName());
+                message.setVariable("{build-date}", getFeatureBranchBuildOrDate());
+                message.setVariable("{mcv}", Bukkit.getServer().getVersion());
+                message.setVariable("{ssv}", Bukkit.getServer().getBukkitVersion());
+                message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
+                message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
+                message.setVariable("{fish}", String.valueOf(fishCount));
+                message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
+                message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
+                message.setVariable("{engine}", databaseEngine);
+                message.setVariable("{type}", databaseType);
+
+                message.send(info.sender());
             });
     }
 

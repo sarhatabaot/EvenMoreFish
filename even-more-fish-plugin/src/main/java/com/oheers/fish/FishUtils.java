@@ -272,22 +272,22 @@ public class FishUtils {
         long minutes = (timeLeft % 3600) / 60;
         long seconds = timeLeft % 60;
 
-        StringBuilder formatted = new StringBuilder();
+        EMFMessage formatted = EMFMessage.empty();
 
         if (hours > 0) {
             EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
             message.formatVariables();
-            formatted.append(message.getRawMessage());
-            formatted.append(" ");
+            formatted.appendMessage(message);
+            formatted.appendComponent(Component.space());
         }
 
         if (minutes > 0) {
             EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
             message.formatVariables();
-            formatted.append(message.getRawMessage());
-            formatted.append(" ");
+            formatted.appendMessage(message);
+            formatted.appendComponent(Component.space());
         }
 
         // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
@@ -295,11 +295,11 @@ public class FishUtils {
             EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
             message.formatVariables();
-            formatted.append(message.getRawMessage());
-            formatted.append(" ");
+            formatted.appendMessage(message);
+            formatted.appendComponent(Component.space());
         }
 
-        return EMFMessage.fromString(formatted.toString().trim());
+        return formatted;
     }
 
     public static @NotNull String timeRaw(long timeLeft) {
