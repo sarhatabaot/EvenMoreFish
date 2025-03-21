@@ -217,7 +217,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                     } else {
                         message.setLength(Float.toString(fish.getLength()));
                     }
-                    
+
                     message.setFishCaught(fish.getDisplayName());
                     message.setRarity(fish.getRarity().getDisplayName());
                     return message.getLegacyMessage();

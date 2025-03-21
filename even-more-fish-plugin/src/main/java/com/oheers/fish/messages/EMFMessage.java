@@ -404,7 +404,7 @@ public class EMFMessage {
      */
     public void setRarity(@NotNull final Object rarity) {
         setVariable("{rarity}", rarity);
-        setVariable("{rarity_colour", "");
+        setVariable("{rarity_colour}", "");
     }
 
     /**
