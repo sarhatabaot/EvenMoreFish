@@ -1,7 +1,7 @@
 id: Legendary
 disabled: false
 weight: 1
-colour: <gold>
+format: <gold>{name}
 worth-multiplier: 0.2
 broadcast: true
 size:

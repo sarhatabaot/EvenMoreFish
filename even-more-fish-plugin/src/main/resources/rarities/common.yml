@@ -1,7 +1,7 @@
 id: Common
 disabled: false
 weight: 100
-colour: <gray>
+format: <gray>{name}
 worth-multiplier: 0.1
 broadcast: false
 size:

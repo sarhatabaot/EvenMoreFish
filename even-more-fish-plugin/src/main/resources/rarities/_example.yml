@@ -8,8 +8,8 @@ id: exampleRarity
 # Should this rarity be disabled?
 disabled: false
 
-# What colour should the fish's name be?
-colour: <light_purple>
+# How should the rarity be formatted in messages?
+format: <light_purple>{name}
 
 # How likely is the rarity to be chosen? Having a greater weight means the rarity is more likely to be chosen (the total weights don't have to add to 100)
 weight: 5
