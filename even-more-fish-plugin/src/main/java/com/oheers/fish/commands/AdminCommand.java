@@ -171,7 +171,7 @@ public class AdminCommand {
                                 rarityBuilder.append(message.getComponentMessage());
                                 rarityBuilder.hoverEvent(HoverEvent.hoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    EMFMessage.fromString("Click to view " + rarity.getDisplayName() + " fish.").getComponentMessage()
+                                    EMFMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
                                 ));
                                 rarityBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin list fish " + rarity.getId()));
                                 builder.append(rarityBuilder);
