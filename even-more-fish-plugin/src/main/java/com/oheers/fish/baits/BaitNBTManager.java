@@ -478,11 +478,44 @@ public class BaitNBTManager {
             return false;
         }
 
-        item.lore(null);
+        if (!item.hasItemMeta() || item.getItemMeta() == null || !item.getItemMeta().hasLore()) {
+            return true;
+        }
+
+        List<Component> lore = item.lore();
+        if (lore == null || lore.isEmpty()) {
+            return true;
+        }
+
+        if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
+            // starting at 1, because at least one bait replacing {baits} is repeated.
+            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            for (int i = 1; i < maxBaits; i++) {
+                try {
+                    lore.remove(lore.size() - 1);
+                } catch (IndexOutOfBoundsException exception) {
+                    break;
+                }
+            }
+        } else {
+            // starting at 1, because at least one bait replacing {baits} is repeated.
+            int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            //compliant version
+            for (int i = 1; i < numBaitsApplied; i++) {
+                try {
+                lore.remove(lore.size() - 1);
+                } catch (IndexOutOfBoundsException exception) {
+                    break;
+                }
+            }
+        }
+
+        item.lore(lore);
         NBT.modify(item, nbt -> {
             ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
             compound.setBoolean(NbtKeys.EMF_BAIT_REFORMATTED, true);
         });
+
         return true;
     }
 
