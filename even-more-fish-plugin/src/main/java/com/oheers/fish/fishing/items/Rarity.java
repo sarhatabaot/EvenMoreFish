@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.fishing.items.config.RarityFileUpdates;
 import com.oheers.fish.messages.EMFMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -31,6 +32,7 @@ public class Rarity extends ConfigBase {
      */
     public Rarity(@NotNull File file) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
+        RarityFileUpdates.update(this);
         performRequiredConfigChecks();
         updateRequirementFormats();
         fishList = loadFish();
