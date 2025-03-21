@@ -149,12 +149,13 @@ public class AdminCommand {
                                 return;
                             }
                             TextComponent.Builder builder = Component.text();
-                            builder.append(EMFMessage.fromString(rarity.getColour() + rarity.getDisplayName() + " ").getComponentMessage());
+                            builder.append(rarity.getDisplayName().getComponentMessage());
+                            builder.append(Component.space());
                             for (Fish fish : rarity.getOriginalFishList()) {
                                 TextComponent.Builder fishBuilder = Component.text();
-                                fishBuilder.append(EMFMessage.fromString(
-                                    rarity.getColour() + "[" + fish.getDisplayName() + rarity.getColour() + "] "
-                                ).getComponentMessage());
+                                EMFMessage message = EMFMessage.fromString("<gray>[</gray>{fish}<gray>]</gray>");
+                                message.setVariable("{fish}", fish.getDisplayName());
+                                fishBuilder.append(message.getComponentMessage());
                                 fishBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to receive fish")));
                                 fishBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin fish " + rarity.getId() + " " + fish.getName().replace(" ", "_")));
                                 builder.append(fishBuilder);
@@ -165,9 +166,9 @@ public class AdminCommand {
                             TextComponent.Builder builder = Component.text();
                             for (Rarity rarity : FishManager.getInstance().getRarityMap().values()) {
                                 TextComponent.Builder rarityBuilder = Component.text();
-                                rarityBuilder.append(
-                                    EMFMessage.fromString(rarity.getColour() + "[" + rarity.getDisplayName() + "] ").getComponentMessage()
-                                );
+                                EMFMessage message = EMFMessage.fromString("<gray>[</gray>{rarity}<gray>]</gray>");
+                                message.setVariable("{rarity}", rarity.getDisplayName());
+                                rarityBuilder.append(message.getComponentMessage());
                                 rarityBuilder.hoverEvent(HoverEvent.hoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
                                     EMFMessage.fromString("Click to view " + rarity.getDisplayName() + " fish.").getComponentMessage()

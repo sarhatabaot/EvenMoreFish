@@ -62,7 +62,6 @@ public class SpecificRarityStrategy implements CompetitionStrategy {
             EvenMoreFish.getInstance().getLogger().warning("Null rarity found. Please check your config files.");
             return message;
         }
-        message.setRarityColour(selectedRarity.getColour());
         message.setRarity(selectedRarity.getDisplayName());
 
         return message;

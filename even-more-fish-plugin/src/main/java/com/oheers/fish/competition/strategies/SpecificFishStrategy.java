@@ -58,7 +58,6 @@ public class SpecificFishStrategy implements CompetitionStrategy {
         EMFMessage message = CompetitionStrategy.super.getTypeFormat(competition, configMessage);
         message.setAmount(Integer.toString(competition.getNumberNeeded()));
         if (selectedFish != null) {
-            message.setRarityColour(selectedFish.getRarity().getColour());
             message.setRarity(selectedFish.getRarity().getDisplayName());
             message.setFishCaught(selectedFish.getDisplayName());
         }
