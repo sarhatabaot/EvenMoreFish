@@ -389,6 +389,8 @@ public class EMFMessage {
         if (replacement instanceof EMFMessage emfMessage) {
             emfMessage.formatVariables();
             this.liveVariables.put(variable, emfMessage.getRawMessage());
+        } else if (replacement instanceof Component component) {
+            this.liveVariables.put(variable, of(component).getRawMessage());
         } else {
             this.liveVariables.put(variable, String.valueOf(replacement));
         }
@@ -402,13 +404,7 @@ public class EMFMessage {
         if (variableMap == null || variableMap.isEmpty()) {
             return;
         }
-        variableMap.forEach((variable, obj) -> {
-            if (obj instanceof EMFMessage emfMessage) {
-                setVariable(variable, emfMessage);
-            } else {
-                setVariable(variable, obj.toString());
-            }
-        });
+        variableMap.forEach(this::setVariable);
     }
 
     /**
