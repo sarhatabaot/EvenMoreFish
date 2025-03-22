@@ -47,7 +47,7 @@ public class Requirement {
                 EMFPlugin.getInstance().getLogger().warning("Attempted to process an invalid Requirement. Please check for earlier warnings.");
                 continue;
             }
-            RequirementType requirementType = RequirementManager.getInstance().getRegisteredRequirements().get(key);
+            RequirementType requirementType = RequirementType.get(key);
             if (requirementType == null) {
                 EMFPlugin.getInstance().getLogger().warning("Invalid requirement. Possible typo?: " + key);
                 continue;

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public class HungerRewardType implements RewardType {
+public class HungerRewardType extends RewardType {
 
 
     @Override
