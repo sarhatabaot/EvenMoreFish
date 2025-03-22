@@ -408,15 +408,6 @@ public class EMFMessage {
     }
 
     /**
-     * The colour used by the fish's rarity to apply a clean format for the fish, to replace the {rarity_colour} variable.
-     *
-     * @param colour The &_ code for the colour.
-     */
-    public void setRarityColour(@NotNull final Object colour) {
-        setVariable("{rarity_colour}", colour);
-    }
-
-    /**
      * The player's name to replace the {player} variable. Also sets the relevantPlayer variable to this player.
      *
      * @param player The player.
@@ -442,6 +433,7 @@ public class EMFMessage {
      */
     public void setRarity(@NotNull final Object rarity) {
         setVariable("{rarity}", rarity);
+        setVariable("{rarity_colour}", "");
     }
 
     /**

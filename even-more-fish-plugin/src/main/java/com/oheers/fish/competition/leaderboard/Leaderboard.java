@@ -69,7 +69,6 @@ public class Leaderboard implements LeaderboardHandler {
 
         message.setPlayer(Bukkit.getOfflinePlayer(newPlayer));
         message.setLength(Float.toString(newFish.getLength()));
-        message.setRarityColour(newFish.getRarity().getColour());
         message.setFishCaught(newFish.getName());
         message.setRarity(newFish.getRarity().getDisplayName());
 
