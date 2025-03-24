@@ -7,8 +7,8 @@ import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.api.EMFAPI;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
-import com.oheers.fish.api.requirement.RequirementManager;
-import com.oheers.fish.api.reward.RewardManager;
+import com.oheers.fish.api.requirement.RequirementType;
+import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
@@ -194,13 +194,12 @@ public class EvenMoreFish extends EMFPlugin {
 
         setupPermissions();
 
-        loadRequirementManager();
+        // Do this before anything fish or competition related.
+        loadRewardTypes();
+        loadRequirementTypes();
 
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
-
-        // Do this before anything competition related.
-        loadRewardManager();
 
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
@@ -251,7 +250,8 @@ public class EvenMoreFish extends EMFPlugin {
             active.end(false);
         }
 
-        RewardManager.getInstance().unload();
+        RewardType.unregisterAll();
+        RequirementType.unregisterAll();
 
         if (MainConfig.getInstance().databaseEnabled()) {
             database.shutdown();
@@ -630,11 +630,7 @@ public class EvenMoreFish extends EMFPlugin {
         }
     }
 
-    private void loadRewardManager() {
-        // Load RewardManager
-        RewardManager.getInstance().load();
-        getServer().getPluginManager().registerEvents(RewardManager.getInstance(), this);
-
+    private void loadRewardTypes() {
         // Load RewardTypes
         new CommandRewardType().register();
         new EffectRewardType().register();
@@ -646,11 +642,7 @@ public class EvenMoreFish extends EMFPlugin {
         loadExternalRewardTypes();
     }
 
-    private void loadRequirementManager() {
-        // Load RequirementManager
-        RequirementManager.getInstance().load();
-        getServer().getPluginManager().registerEvents(RequirementManager.getInstance(), this);
-
+    private void loadRequirementTypes() {
         // Load RequirementTypes
         new BiomeRequirementType().register();
         new BiomeSetRequirementType().register();

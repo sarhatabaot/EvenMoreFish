@@ -26,11 +26,9 @@ public class Reward {
             this.key = split[0];
             this.value = String.join(":", Arrays.copyOfRange(split, 1, split.length));
         }
-        for (RewardType rewardType : RewardManager.getInstance().getRegisteredRewardTypes()) {
-            if (rewardType.isApplicable(this.key)) {
-                this.rewardType = rewardType;
-                return;
-            }
+        RewardType rewardType = RewardType.get(this.key);
+        if (rewardType != null) {
+            this.rewardType = rewardType;
         }
     }
 

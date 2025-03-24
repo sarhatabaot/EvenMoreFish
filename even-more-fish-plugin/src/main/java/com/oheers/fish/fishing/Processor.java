@@ -138,7 +138,6 @@ public abstract class Processor<E extends Event> implements Listener {
 
             EMFMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
             message.setPlayer(player);
-            message.setRarityColour(fish.getRarity().getColour());
             message.setVariable("{rarity}", rarity);
             message.setLength(length);
 

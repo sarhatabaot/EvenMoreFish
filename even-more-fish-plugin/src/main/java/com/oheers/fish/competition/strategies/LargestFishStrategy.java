@@ -32,7 +32,6 @@ public class LargestFishStrategy implements CompetitionStrategy {
     @Override
     public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
-        message.setRarityColour(fish.getRarity().getColour());
         message.setLength(getDecimalFormat().format(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());
         message.setFishCaught(fish.getDisplayName());
@@ -43,7 +42,6 @@ public class LargestFishStrategy implements CompetitionStrategy {
     @Override
     public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
-        message.setRarityColour(fish.getRarity().getColour());
         message.setLength(getDecimalFormat().format(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());
         message.setFishCaught(fish.getDisplayName());

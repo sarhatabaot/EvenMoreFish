@@ -1,7 +1,7 @@
 id: Epic
 disabled: false
 weight: 3
-colour: <light_purple>
+format: <light_purple>{name}
 worth-multiplier: 0.15
 broadcast: true
 size:

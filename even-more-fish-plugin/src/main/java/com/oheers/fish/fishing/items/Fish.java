@@ -1,7 +1,6 @@
 package com.oheers.fish.fishing.items;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.exceptions.InvalidFishException;
@@ -152,7 +151,7 @@ public class Fish {
         if (fishMeta != null) {
             NBT.modify(fish, nbt -> {
                 nbt.modifyMeta((readOnlyNbt, meta) -> {
-                    meta.displayName(EMFMessage.fromString(getDisplayName()).getComponentMessage());
+                    meta.displayName(getDisplayName().getComponentMessage());
                     if (!section.getBoolean("disable-lore", false)) {
                         meta.lore(getFishLore());
                     }
@@ -324,7 +323,6 @@ public class Fish {
         } else {
             newLoreLine = ConfigMessage.FISH_LORE.getMessage();
         }
-        newLoreLine.setRarityColour(rarity.getColour());
 
         List<String> fishLore = section.getStringList("lore");
         String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
@@ -492,11 +490,11 @@ public class Fish {
     }
 
     @NotNull
-    public String getDisplayName() {
+    public EMFMessage getDisplayName() {
         if (displayName == null) {
-            return rarity.getColour() + name;
+            return rarity.format(name);
         }
-        return rarity.getColour() + displayName;
+        return rarity.format(displayName);
     }
 
     public ItemFactory getFactory() {

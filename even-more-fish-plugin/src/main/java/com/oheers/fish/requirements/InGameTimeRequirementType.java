@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 // TODO auto-update configs to reflect the new format required for this
-public class InGameTimeRequirementType implements RequirementType {
+public class InGameTimeRequirementType extends RequirementType {
 
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {

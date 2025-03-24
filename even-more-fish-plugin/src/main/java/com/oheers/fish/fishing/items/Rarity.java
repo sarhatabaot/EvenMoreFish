@@ -4,6 +4,8 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.fishing.items.config.RarityFileUpdates;
+import com.oheers.fish.messages.EMFMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +32,7 @@ public class Rarity extends ConfigBase {
      */
     public Rarity(@NotNull File file) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
+        RarityFileUpdates.update(this);
         performRequiredConfigChecks();
         updateRequirementFormats();
         fishList = loadFish();
@@ -53,8 +56,15 @@ public class Rarity extends ConfigBase {
         return getConfig().getBoolean("disabled");
     }
 
-    public @NotNull String getColour() {
-        return getConfig().getString("colour", "<white>");
+    public @NotNull EMFMessage getFormat() {
+        String format = getConfig().getString("format", "<white>{name}");
+        return EMFMessage.fromString(format);
+    }
+
+    public @NotNull EMFMessage format(@NotNull String name) {
+        EMFMessage message = getFormat();
+        message.setVariable("{name}", name);
+        return message;
     }
 
     public double getWeight() {
@@ -69,28 +79,25 @@ public class Rarity extends ConfigBase {
         return getConfig().getBoolean("use-this-casing");
     }
 
-    public @NotNull String getDisplayName() {
+    public @NotNull EMFMessage getDisplayName() {
         String displayName = getConfig().getString("displayname");
-        if (displayName == null) {
-            return getId();
-        }
-        return displayName;
+        return format(Objects.requireNonNullElseGet(displayName, this::getId));
     }
 
-    public @NotNull String getLorePrep() {
+    public @NotNull EMFMessage getLorePrep() {
         String loreOverride = getConfig().getString("override-lore");
         if (loreOverride != null) {
-            return loreOverride;
+            return EMFMessage.fromString(loreOverride);
         }
         String displayName = getConfig().getString("displayname");
         if (displayName != null) {
-            return displayName;
+            return EMFMessage.fromString(displayName);
         }
         String finalName = getId();
         if (!getUseConfigCasing()) {
             finalName = finalName.toUpperCase();
         }
-        return this.getColour() + "<bold>" + finalName;
+        return format(finalName);
     }
 
     public @Nullable String getPermission() {

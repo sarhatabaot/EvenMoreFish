@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class GroupRequirementType implements RequirementType {
+public class GroupRequirementType extends RequirementType {
 
     private final @NotNull Permission permission;
 
