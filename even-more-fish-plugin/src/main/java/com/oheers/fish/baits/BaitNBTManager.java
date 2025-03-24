@@ -489,7 +489,7 @@ public class BaitNBTManager {
 
         if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
             // starting at 1, because at least one bait replacing {baits} is repeated.
-            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getPlainTextListMessage().size();
             for (int i = 1; i < maxBaits; i++) {
                 try {
                     lore.remove(lore.size() - 1);
@@ -499,7 +499,7 @@ public class BaitNBTManager {
             }
         } else {
             // starting at 1, because at least one bait replacing {baits} is repeated.
-            int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getPlainTextListMessage().size();
             //compliant version
             for (int i = 1; i < numBaitsApplied; i++) {
                 try {

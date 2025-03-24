@@ -244,14 +244,6 @@ public class EMFMessage {
     }
 
     /**
-     * Adds the provided component to the end of this message.
-     * @param message The component to append
-     */
-    public void appendComponent(@NotNull Component message) {
-        this.message = this.message + MINIMESSAGE.serialize(message);
-    }
-
-    /**
      * Adds the provided message to the end of this message.
      * @param message The message to append
      */
@@ -274,14 +266,6 @@ public class EMFMessage {
      */
     public void appendStringList(@NotNull List<String> messages) {
         appendString(String.join("\n", messages));
-    }
-
-    /**
-     * Adds the provided components to the end of this message.
-     * @param messages The strings to append
-     */
-    public void appendComponentList(@NotNull List<Component> messages) {
-        this.message = this.message + String.join("\n", messages.stream().map(MINIMESSAGE::serialize).toList());
     }
 
     /**
@@ -309,14 +293,6 @@ public class EMFMessage {
     }
 
     /**
-     * Adds the provided component to the start of this message.
-     * @param message The component to prepend
-     */
-    public void prependComponent(@NotNull Component message) {
-        this.message = MINIMESSAGE.serialize(message) + this.message;
-    }
-
-    /**
      * Adds the provided message to the start of this message.
      * @param message The message to prepend
      */
@@ -339,14 +315,6 @@ public class EMFMessage {
      */
     public void prependStringList(@NotNull List<String> messages) {
         prependString(String.join("\n", messages));
-    }
-
-    /**
-     * Adds the provided components to the start of this message.
-     * @param messages The components to prepend
-     */
-    public void prependComponentList(@NotNull List<Component> messages) {
-        this.message = String.join("\n", messages.stream().map(MINIMESSAGE::serialize).toList()) + this.message;
     }
 
     /**
