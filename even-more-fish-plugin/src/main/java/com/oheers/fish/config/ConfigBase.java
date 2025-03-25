@@ -201,6 +201,7 @@ public class ConfigBase {
     private String convertLegacyString(@NotNull String message) {
         // Get MiniMessage serializer
         final MiniMessage miniMessageSerializer = MiniMessage.builder()
+            .strict(true)
             .postProcessor(component -> component)
             .build();
 
