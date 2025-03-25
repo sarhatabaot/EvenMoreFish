@@ -6,14 +6,12 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextReplacementConfig;
-import org.checkerframework.checker.units.qual.C;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -138,6 +136,13 @@ public class EMFListMessage extends EMFMessage {
     @Override
     public void prependComponent(@NotNull Component component) {
         this.message.add(0, component);
+    }
+
+    @Override
+    public void decorateIfAbsent(@NotNull TextDecoration decoration, TextDecoration.@NotNull State state) {
+        this.message = this.message.stream()
+            .map(line -> FishUtils.decorateIfAbsent(line, decoration, state))
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

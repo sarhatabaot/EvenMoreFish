@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -169,6 +170,11 @@ public class EMFSingleMessage extends EMFMessage {
     public void prependComponent(@NotNull Component component) {
         // Ensure the base component is always empty
         this.message = EMPTY.append(component).append(this.message);
+    }
+
+    @Override
+    public void decorateIfAbsent(@NotNull TextDecoration decoration, TextDecoration.@NotNull State state) {
+        this.message = FishUtils.decorateIfAbsent(this.message, decoration, state);
     }
 
     @Override

@@ -163,6 +163,8 @@ public abstract class EMFMessage {
         components.forEach(this::prependComponent);
     }
 
+    public abstract void decorateIfAbsent(@NotNull TextDecoration decoration, @NotNull TextDecoration.State state);
+
     // Variables
 
     /**
