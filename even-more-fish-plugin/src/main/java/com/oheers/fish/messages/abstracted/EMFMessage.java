@@ -3,11 +3,11 @@ package com.oheers.fish.messages.abstracted;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -164,6 +164,8 @@ public abstract class EMFMessage {
     }
 
     public abstract void decorateIfAbsent(@NotNull TextDecoration decoration, @NotNull TextDecoration.State state);
+
+    public abstract void colorIfAbsent(@NotNull TextColor color);
 
     // Variables
 

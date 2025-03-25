@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -175,6 +176,11 @@ public class EMFSingleMessage extends EMFMessage {
     @Override
     public void decorateIfAbsent(@NotNull TextDecoration decoration, TextDecoration.@NotNull State state) {
         this.message = FishUtils.decorateIfAbsent(this.message, decoration, state);
+    }
+
+    @Override
+    public void colorIfAbsent(@NotNull TextColor color) {
+        this.message = this.message.colorIfAbsent(color);
     }
 
     @Override

@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -142,6 +143,13 @@ public class EMFListMessage extends EMFMessage {
     public void decorateIfAbsent(@NotNull TextDecoration decoration, TextDecoration.@NotNull State state) {
         this.message = this.message.stream()
             .map(line -> FishUtils.decorateIfAbsent(line, decoration, state))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    @Override
+    public void colorIfAbsent(@NotNull TextColor color) {
+        this.message = this.message.stream()
+            .map(line -> line.colorIfAbsent(color))
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
