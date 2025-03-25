@@ -329,7 +329,7 @@ public class Fish {
         String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
 
         newLoreLine.setVariable(
-                "\n{fish_lore}",
+                "{fish_lore}",
                 replacement
         );
 

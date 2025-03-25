@@ -20,6 +20,7 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
@@ -323,7 +324,7 @@ public class AdminCommand {
                         messageList.add(String.format(messageFormat, prefix, addonManager.isLoading(prefix), entry.getValue().getVersion()));
                     }
 
-                    EMFSingleMessage.fromString(StringUtils.join(messageList, "\n")).send(info.sender());
+                    EMFListMessage.fromStringList(messageList).send(info.sender());
                 });
     }
 
