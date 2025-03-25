@@ -1,7 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
@@ -18,8 +18,8 @@ public class MessageConfig extends ConfigBase {
         return instance;
     }
 
-    public EMFMessage getSTDPrefix() {
-        EMFMessage message = EMFMessage.empty();
+    public EMFSingleMessage getSTDPrefix() {
+        EMFSingleMessage message = EMFSingleMessage.empty();
         message.prependMessage(PrefixType.DEFAULT.getPrefix());
         message.appendString("<reset>");
         return message;

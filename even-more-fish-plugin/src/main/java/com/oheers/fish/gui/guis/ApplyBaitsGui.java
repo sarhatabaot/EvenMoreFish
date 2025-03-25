@@ -11,7 +11,7 @@ import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.gui.ConfigGui;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import de.themoep.inventorygui.GuiStorageElement;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Bukkit;
@@ -74,7 +74,7 @@ public class ApplyBaitsGui extends ConfigGui {
                 EvenMoreFish.getInstance().incrementMetricBaitsApplied(item.getAmount());
                 // When a specific bait is maxed.
             } catch (MaxBaitReachedException exception) {
-                EMFMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
+                EMFSingleMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
                 message.setBaitTheme(bait.getTheme());
                 message.setBait(bait.getId());
                 message.send(this.player);

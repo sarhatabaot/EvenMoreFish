@@ -6,7 +6,7 @@ import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.FishReport;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -69,7 +69,7 @@ public class JoinChecker implements Listener {
         Competition activeComp = Competition.getCurrentlyActive();
         if (activeComp != null) {
             activeComp.getStatusBar().addPlayer(event.getPlayer());
-            EMFMessage startMessage = activeComp.getStartMessage();
+            EMFSingleMessage startMessage = activeComp.getStartMessage();
             if (startMessage != null) {
                 startMessage.setMessage(ConfigMessage.COMPETITION_JOIN.getMessage());
                 EvenMoreFish.getScheduler().runTaskLater(() -> startMessage.send(event.getPlayer()), 20L * 3);

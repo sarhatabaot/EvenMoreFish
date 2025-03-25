@@ -5,7 +5,7 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.economy.EconomyType;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
@@ -96,7 +96,7 @@ public class VaultEconomyType implements EconomyType {
         double worth = prepareValue(totalWorth, applyMultiplier);
         String display = MainConfig.getInstance().getEconomyDisplay(this);
         if (display != null) {
-            EMFMessage message = EMFMessage.fromString(display);
+            EMFSingleMessage message = EMFSingleMessage.fromString(display);
             message.setVariable("{amount}", String.valueOf(worth));
             return message.getComponentMessage();
         }

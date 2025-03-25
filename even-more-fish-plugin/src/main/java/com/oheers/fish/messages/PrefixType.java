@@ -28,11 +28,11 @@ public enum PrefixType {
      *
      * @return The unformatted prefix, unless the type is NONE.
      */
-    public EMFMessage getPrefix() {
+    public EMFSingleMessage getPrefix() {
         if (id == null) {
-            return EMFMessage.empty();
+            return EMFSingleMessage.empty();
         } else {
-            EMFMessage message = EMFMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
+            EMFSingleMessage message = EMFSingleMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
             message.appendString("<reset>");
             return message;
         }

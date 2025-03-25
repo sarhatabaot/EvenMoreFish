@@ -9,7 +9,7 @@ import com.oheers.fish.gui.guis.ApplyBaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.permissions.UserPerms;
@@ -64,7 +64,7 @@ public class MainCommand {
         return new CommandAPICommand(name)
             .withPermission(UserPerms.NEXT)
             .executes(info -> {
-                EMFMessage message = Competition.getNextCompetitionMessage();
+                EMFSingleMessage message = Competition.getNextCompetitionMessage();
                 message.prependMessage(PrefixType.DEFAULT.getPrefix());
                 message.send(info.sender());
             });
@@ -167,7 +167,7 @@ public class MainCommand {
                     return;
                 }
                 new SellGui(player, SellGui.SellState.NORMAL, null).open();
-                EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
+                EMFSingleMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
                 message.setPlayer(player);
                 message.send(sender);
             });

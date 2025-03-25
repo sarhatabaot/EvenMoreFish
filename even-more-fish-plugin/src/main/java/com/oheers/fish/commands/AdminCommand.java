@@ -20,7 +20,7 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.utils.ManifestUtil;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -123,7 +123,7 @@ public class AdminCommand {
 
                     FishUtils.giveItem(fishItem, target);
 
-                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
+                    EMFSingleMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
                     message.setPlayer(target);
                     message.setFishCaught(fish.getName());
                     message.send(sender);
@@ -153,7 +153,7 @@ public class AdminCommand {
                             builder.append(Component.space());
                             for (Fish fish : rarity.getOriginalFishList()) {
                                 TextComponent.Builder fishBuilder = Component.text();
-                                EMFMessage message = EMFMessage.fromString("<gray>[</gray>{fish}<gray>]</gray>");
+                                EMFSingleMessage message = EMFSingleMessage.fromString("<gray>[</gray>{fish}<gray>]</gray>");
                                 message.setVariable("{fish}", fish.getDisplayName());
                                 fishBuilder.append(message.getComponentMessage());
                                 fishBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to receive fish")));
@@ -166,12 +166,12 @@ public class AdminCommand {
                             TextComponent.Builder builder = Component.text();
                             for (Rarity rarity : FishManager.getInstance().getRarityMap().values()) {
                                 TextComponent.Builder rarityBuilder = Component.text();
-                                EMFMessage message = EMFMessage.fromString("<gray>[</gray>{rarity}<gray>]</gray>");
+                                EMFSingleMessage message = EMFSingleMessage.fromString("<gray>[</gray>{rarity}<gray>]</gray>");
                                 message.setVariable("{rarity}", rarity.getDisplayName());
                                 rarityBuilder.append(message.getComponentMessage());
                                 rarityBuilder.hoverEvent(HoverEvent.hoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    EMFMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
+                                    EMFSingleMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
                                 ));
                                 rarityBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin list fish " + rarity.getId()));
                                 builder.append(rarityBuilder);
@@ -209,7 +209,7 @@ public class AdminCommand {
                     }
 
                     FishUtils.giveItems(Collections.singletonList(EvenMoreFish.getInstance().getCustomNBTRod()), player);
-                    EMFMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
+                    EMFSingleMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
                     giveMessage.setPlayer(player);
                     giveMessage.send(sender);
                 }));
@@ -244,7 +244,7 @@ public class AdminCommand {
                     ItemStack baitItem = bait.create(target);
                     baitItem.setAmount(quantity);
                     FishUtils.giveItems(List.of(baitItem), target);
-                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
+                    EMFSingleMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
                     message.setPlayer(target);
                     message.setBait(bait.getId());
                     message.send(sender);
@@ -289,7 +289,7 @@ public class AdminCommand {
                         fishingRod.editMeta(meta -> meta.lore(BaitNBTManager.deleteOldLore(fishingRod)));
                     }
 
-                    EMFMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
+                    EMFSingleMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
                     message.setAmount(Integer.toString(totalDeleted));
                     message.send(player);
                 }));
@@ -322,7 +322,7 @@ public class AdminCommand {
                         messageList.add(String.format(messageFormat, prefix, addonManager.isLoading(prefix), entry.getValue().getVersion()));
                     }
 
-                    EMFMessage.fromString(StringUtils.join(messageList, "\n")).send(info.sender());
+                    EMFSingleMessage.fromString(StringUtils.join(messageList, "\n")).send(info.sender());
                 });
     }
 
@@ -358,7 +358,7 @@ public class AdminCommand {
                         {prefix} Database Type: {type}\s
                         """;
 
-                EMFMessage message = EMFMessage.fromString(msgString);
+                EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
 
                 message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
                 message.setVariable("{version}", EvenMoreFish.getInstance().getDescription().getVersion());
@@ -396,7 +396,7 @@ public class AdminCommand {
                     TextComponent.Builder builder = Component.text();
                     builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
                     RewardType.getLoadedTypes().forEach((string, rewardType) -> {
-                        Component show = EMFMessage.fromString(
+                        Component show = EMFSingleMessage.fromString(
                             "Author: " + rewardType.getAuthor() + "\n" +
                             "Registered Plugin: " + rewardType.getPlugin().getName()
                         ).getComponentMessage();
@@ -417,7 +417,7 @@ public class AdminCommand {
         return new CommandAPICommand("migrate")
                 .executes(info -> {
                     if (!MainConfig.getInstance().databaseEnabled()) {
-                        EMFMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
+                        EMFSingleMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
                             .send(info.sender());
                         return;
                     }

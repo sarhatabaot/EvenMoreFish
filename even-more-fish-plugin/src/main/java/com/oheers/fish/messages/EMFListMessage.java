@@ -1,0 +1,127 @@
+package com.oheers.fish.messages;
+
+import com.oheers.fish.FishUtils;
+import com.oheers.fish.messages.abstracted.EMFMessage;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextReplacementConfig;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+public class EMFListMessage extends EMFMessage {
+
+    private List<Component> message;
+
+    private EMFListMessage(@Nullable List<Component> message) {
+        super();
+        this.message = Objects.requireNonNullElseGet(message, ArrayList::new);
+    }
+
+    @Override
+    public EMFListMessage createCopy() {
+        EMFListMessage copy = new EMFListMessage(List.copyOf(message));
+        copy.liveVariables.putAll(this.liveVariables);
+        return copy;
+    }
+
+    @Override
+    public void send(@NotNull Audience target) {
+        target.sendMessage(getComponentMessage());
+    }
+
+    @Override
+    public void sendActionBar(@NotNull Audience target) {
+        target.sendActionBar(getComponentMessage());
+    }
+
+    @Override
+    public @NotNull Component getComponentMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
+        return Component.join(JoinConfiguration.newlines(), this.message);
+    }
+
+    @Override
+    public @NotNull List<Component> getComponentListMessage() {
+        formatVariables();
+        formatPlaceholderAPI();
+        return List.copyOf(this.message);
+    }
+
+    @Override
+    protected void formatPlaceholderAPI() {
+        this.message = this.message.stream()
+            .map(line -> FishUtils.parsePlaceholderAPI(line, relevantPlayer))
+            .toList();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return message.isEmpty();
+    }
+
+    @Override
+    public boolean containsString(@NotNull String string) {
+        return this.message.stream().anyMatch(line -> FishUtils.componentContainsString(line, string));
+    }
+
+    @Override
+    public void appendString(@NotNull String string) {
+        this.message.add(formatString(string));
+    }
+
+    @Override
+    public void appendMessage(@NotNull EMFMessage message) {
+        message.formatVariables();
+        this.message.addAll(message.getComponentListMessage());
+    }
+
+    @Override
+    public void appendComponent(@NotNull Component component) {
+        this.message.add(component);
+    }
+
+    @Override
+    public void prependString(@NotNull String string) {
+        this.message.add(0, formatString(string));
+    }
+
+    @Override
+    public void prependMessage(@NotNull EMFMessage message) {
+        message.formatVariables();
+        this.message.addAll(0, message.getComponentListMessage());
+    }
+
+    @Override
+    public void prependComponent(@NotNull Component component) {
+        this.message.add(0, component);
+    }
+
+    /**
+     * Formats all variables in {@link #liveVariables}
+     */
+    @Override
+    public void formatVariables() {
+        List<TextReplacementConfig> trcs = liveVariables.entrySet().stream()
+            .map(entry -> TextReplacementConfig.builder()
+                .matchLiteral(entry.getKey())
+                .replacement(entry.getValue())
+                .build())
+            .toList();
+
+        for (TextReplacementConfig trc : trcs) {
+            this.message = this.message.stream()
+                .map(line -> line.replaceText(trc))
+                .toList();
+        }
+    }
+
+}

@@ -7,7 +7,7 @@ import com.oheers.fish.competition.CompetitionStrategy;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public class LargestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
+    public EMFSingleMessage getSingleConsoleLeaderboardMessage(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
         message.setLength(getDecimalFormat().format(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());
@@ -40,7 +40,7 @@ public class LargestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
+    public EMFSingleMessage getSinglePlayerLeaderboard(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
         message.setLength(getDecimalFormat().format(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());

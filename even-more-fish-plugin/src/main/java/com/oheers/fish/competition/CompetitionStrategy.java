@@ -4,7 +4,7 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,8 +42,8 @@ public interface CompetitionStrategy {
      * @param type        The type of competition.
      * @return The begin message for the competition.
      */
-    default EMFMessage getBeginMessage(Competition competition, CompetitionType type) {
-        EMFMessage message = ConfigMessage.COMPETITION_START.getMessage();
+    default EMFSingleMessage getBeginMessage(Competition competition, CompetitionType type) {
+        EMFSingleMessage message = ConfigMessage.COMPETITION_START.getMessage();
         message.setCompetitionType(type.getTypeVariable().getMessage());
         return message;
     }
@@ -55,7 +55,7 @@ public interface CompetitionStrategy {
      * @param entry   The competition entry to get the leaderboard information from.
      * @return The single console leaderboard message.
      */
-    default EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
+    default EMFSingleMessage getSingleConsoleLeaderboardMessage(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
         //todo temp, since this really isn't supposed to be the case, but was the original code. idk
         message.setMessage(ConfigMessage.LEADERBOARD_MOST_FISH.getMessage());
         message.setAmount(Integer.toString((int) entry.getValue()));
@@ -69,7 +69,7 @@ public interface CompetitionStrategy {
      * @param entry   The competition entry to get the leaderboard information from.
      * @return The single player leaderboard message.
      */
-    default EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
+    default EMFSingleMessage getSinglePlayerLeaderboard(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
         //todo temp, since this really isn't supposed to be the case, but was the original code. idk
         message.setMessage(ConfigMessage.LEADERBOARD_MOST_FISH.getMessage());
         message.setAmount(Integer.toString((int) entry.getValue()));
@@ -84,8 +84,8 @@ public interface CompetitionStrategy {
      * @param configMessage The configmessage to use. Must have the {type} variable in it.
      * @return A message object that's pre-set to be compatible for the time remaining.
      */
-    default @NotNull EMFMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
-        EMFMessage message = configMessage.getMessage();
+    default @NotNull EMFSingleMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
+        EMFSingleMessage message = configMessage.getMessage();
         message.setTimeFormatted(FishUtils.timeFormat(competition.getTimeLeft()));
         message.setTimeRaw(FishUtils.timeRaw(competition.getTimeLeft()));
         message.setCompetitionType(competition.getCompetitionType().getTypeVariable().getMessage());

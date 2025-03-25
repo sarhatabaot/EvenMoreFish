@@ -2,7 +2,7 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 
 public class HelpMessageBuilder {
 
-    private final HashMap<String, Supplier<EMFMessage>> usages;
+    private final HashMap<String, Supplier<EMFSingleMessage>> usages;
 
-    private HelpMessageBuilder(@NotNull HashMap<String, Supplier<EMFMessage>> usages) {
+    private HelpMessageBuilder(@NotNull HashMap<String, Supplier<EMFSingleMessage>> usages) {
         this.usages = usages;
     }
 
@@ -27,14 +27,14 @@ public class HelpMessageBuilder {
     /**
      * Creates a HelpMessageBuilder instance with the provided usages
      */
-    public static HelpMessageBuilder create(@NotNull HashMap<String, Supplier<EMFMessage>> usages) {
+    public static HelpMessageBuilder create(@NotNull HashMap<String, Supplier<EMFSingleMessage>> usages) {
         return new HelpMessageBuilder(usages);
     }
 
     /**
      * Adds a usage to this builder
      */
-    public HelpMessageBuilder addUsage(@NotNull String name, @NotNull Supplier<EMFMessage> helpMessage) {
+    public HelpMessageBuilder addUsage(@NotNull String name, @NotNull Supplier<EMFSingleMessage> helpMessage) {
         this.usages.putIfAbsent(name, helpMessage);
         return this;
     }
@@ -43,10 +43,10 @@ public class HelpMessageBuilder {
      * Creates the final message.
      * @return The created help message
      */
-    public EMFMessage buildMessage() {
-        final EMFMessage message = ConfigMessage.HELP_GENERAL_TITLE.getMessage();
+    public EMFSingleMessage buildMessage() {
+        final EMFSingleMessage message = ConfigMessage.HELP_GENERAL_TITLE.getMessage();
         usages.forEach((key, value) -> {
-            EMFMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
+            EMFSingleMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
             usage.setVariable("{command}", correctCommand(key));
             usage.setVariable("{description}", value.get());
             message.appendString("\n<reset>");

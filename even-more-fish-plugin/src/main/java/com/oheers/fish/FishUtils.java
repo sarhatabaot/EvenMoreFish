@@ -13,7 +13,8 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.ItemUtils;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
@@ -24,7 +25,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import de.tr7zw.changeme.nbtapi.NBT;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -267,15 +270,15 @@ public class FishUtils {
         return whitelistedWorlds.contains(l.getWorld().getName());
     }
 
-    public static @NotNull EMFMessage timeFormat(long timeLeft) {
+    public static @NotNull EMFSingleMessage timeFormat(long timeLeft) {
         long hours = timeLeft / 3600;
         long minutes = (timeLeft % 3600) / 60;
         long seconds = timeLeft % 60;
 
-        EMFMessage formatted = EMFMessage.empty();
+        EMFSingleMessage formatted = EMFSingleMessage.empty();
 
         if (hours > 0) {
-            EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
+            EMFSingleMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
             message.formatVariables();
             formatted.appendMessage(message);
@@ -283,7 +286,7 @@ public class FishUtils {
         }
 
         if (minutes > 0) {
-            EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
+            EMFSingleMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
             message.formatVariables();
             formatted.appendMessage(message);
@@ -292,7 +295,7 @@ public class FishUtils {
 
         // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
-            EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
+            EMFSingleMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
             message.formatVariables();
             formatted.appendMessage(message);
@@ -319,7 +322,7 @@ public class FishUtils {
         return returning;
     }
 
-    public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
+    public static void broadcastFishMessage(EMFSingleMessage message, Player referencePlayer, boolean actionBar) {
         String plain = message.getPlainTextMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
@@ -586,8 +589,29 @@ public class FishUtils {
      * @return Whether this String is using legacy color codes.
      */
     public static boolean isLegacyString(@NotNull String string) {
-        String stripped = EMFMessage.MINIMESSAGE.stripTags(string);
+        String stripped = EMFSingleMessage.MINIMESSAGE.stripTags(string);
         return string.equals(stripped);
+    }
+
+    public static @NotNull Component parsePlaceholderAPI(@NotNull Component component, @Nullable OfflinePlayer target) {
+        if (!EvenMoreFish.getInstance().isUsingPAPI()) {
+            return component;
+        }
+        TextReplacementConfig trc = TextReplacementConfig.builder()
+            .match(PlaceholderAPI.getPlaceholderPattern())
+            .replacement((matchResult, builder) -> {
+                String matched = matchResult.group();
+                Component parsed = EMFMessage.LEGACY_SERIALIZER.deserialize(
+                    PlaceholderAPI.setPlaceholders(target, matched)
+                );
+                return builder.append(parsed);
+            })
+            .build();
+        return component.replaceText(trc);
+    }
+
+    public static boolean componentContainsString(@NotNull Component component, @NotNull String string) {
+        return EMFMessage.PLAINTEXT_SERIALIZER.serialize(component).contains(string);
     }
 
 }

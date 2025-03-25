@@ -5,7 +5,7 @@ import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.items.config.RarityFileUpdates;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
@@ -56,13 +56,13 @@ public class Rarity extends ConfigBase {
         return getConfig().getBoolean("disabled");
     }
 
-    public @NotNull EMFMessage getFormat() {
+    public @NotNull EMFSingleMessage getFormat() {
         String format = getConfig().getString("format", "<white>{name}");
-        return EMFMessage.fromString(format);
+        return EMFSingleMessage.fromString(format);
     }
 
-    public @NotNull EMFMessage format(@NotNull String name) {
-        EMFMessage message = getFormat();
+    public @NotNull EMFSingleMessage format(@NotNull String name) {
+        EMFSingleMessage message = getFormat();
         message.setVariable("{name}", name);
         return message;
     }
@@ -79,19 +79,19 @@ public class Rarity extends ConfigBase {
         return getConfig().getBoolean("use-this-casing");
     }
 
-    public @NotNull EMFMessage getDisplayName() {
+    public @NotNull EMFSingleMessage getDisplayName() {
         String displayName = getConfig().getString("displayname");
         return format(Objects.requireNonNullElseGet(displayName, this::getId));
     }
 
-    public @NotNull EMFMessage getLorePrep() {
+    public @NotNull EMFSingleMessage getLorePrep() {
         String loreOverride = getConfig().getString("override-lore");
         if (loreOverride != null) {
-            return EMFMessage.fromString(loreOverride);
+            return EMFSingleMessage.fromString(loreOverride);
         }
         String displayName = getConfig().getString("displayname");
         if (displayName != null) {
-            return EMFMessage.fromString(displayName);
+            return EMFSingleMessage.fromString(displayName);
         }
         String finalName = getId();
         if (!getUseConfigCasing()) {
