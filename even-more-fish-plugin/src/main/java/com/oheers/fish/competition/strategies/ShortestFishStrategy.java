@@ -8,6 +8,7 @@ import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public class ShortestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFSingleMessage getSingleConsoleLeaderboardMessage(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
         message.setLength("%.1f".formatted(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());
@@ -40,7 +41,7 @@ public class ShortestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFSingleMessage getSinglePlayerLeaderboard(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
         message.setLength("%.1f".formatted(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());

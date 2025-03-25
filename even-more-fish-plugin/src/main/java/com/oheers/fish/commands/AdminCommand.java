@@ -21,6 +21,7 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.utils.ManifestUtil;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -123,7 +124,7 @@ public class AdminCommand {
 
                     FishUtils.giveItem(fishItem, target);
 
-                    EMFSingleMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
                     message.setPlayer(target);
                     message.setFishCaught(fish.getName());
                     message.send(sender);
@@ -209,7 +210,7 @@ public class AdminCommand {
                     }
 
                     FishUtils.giveItems(Collections.singletonList(EvenMoreFish.getInstance().getCustomNBTRod()), player);
-                    EMFSingleMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
+                    EMFMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
                     giveMessage.setPlayer(player);
                     giveMessage.send(sender);
                 }));
@@ -244,7 +245,7 @@ public class AdminCommand {
                     ItemStack baitItem = bait.create(target);
                     baitItem.setAmount(quantity);
                     FishUtils.giveItems(List.of(baitItem), target);
-                    EMFSingleMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
                     message.setPlayer(target);
                     message.setBait(bait.getId());
                     message.send(sender);
@@ -289,7 +290,7 @@ public class AdminCommand {
                         fishingRod.editMeta(meta -> meta.lore(BaitNBTManager.deleteOldLore(fishingRod)));
                     }
 
-                    EMFSingleMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
+                    EMFMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
                     message.setAmount(Integer.toString(totalDeleted));
                     message.send(player);
                 }));

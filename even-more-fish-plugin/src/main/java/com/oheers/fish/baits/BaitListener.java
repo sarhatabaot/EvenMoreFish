@@ -6,6 +6,7 @@ import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.oheers.fish.utils.nbt.NbtVersion;
@@ -77,7 +78,7 @@ public class BaitListener implements Listener {
             result = exception.getRecoveryResult();
         } catch (MaxBaitReachedException exception) {
             result = exception.getRecoveryResult();
-            EMFSingleMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
+            EMFMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
             message.setBaitTheme(bait.getTheme());
             message.setBait(bait.getId());
             message.send(event.getWhoClicked());

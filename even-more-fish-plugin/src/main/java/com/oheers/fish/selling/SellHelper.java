@@ -9,6 +9,7 @@ import com.oheers.fish.database.DataManager;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.themoep.inventorygui.GuiStorageElement;
@@ -86,7 +87,7 @@ public class SellHelper {
 
         // sending the sell message to the player
 
-        EMFSingleMessage message = ConfigMessage.FISH_SALE.getMessage();
+        EMFMessage message = ConfigMessage.FISH_SALE.getMessage();
         message.setSellPrice(economy.getWorthFormat(totalWorth, true));
         message.setAmount(Integer.toString(fishCount));
         message.setPlayer(this.player);

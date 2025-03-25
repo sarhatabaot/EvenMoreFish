@@ -15,7 +15,9 @@ import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -38,7 +40,7 @@ public class Competition {
     private int numberNeeded;
     private String competitionName;
     private boolean adminStarted = false;
-    private EMFSingleMessage startMessage;
+    private EMFMessage startMessage;
     private long maxDuration;
     private long timeLeft;
     private Bar statusBar;
@@ -188,7 +190,7 @@ public class Competition {
      */
     private boolean processCompetitionSecond(long timeLeft) {
         if (alertTimes.contains(timeLeft)) {
-            EMFSingleMessage message = getTypeFormat(ConfigMessage.TIME_ALERT);
+            EMFMessage message = getTypeFormat(ConfigMessage.TIME_ALERT);
             message.broadcast();
         } else if (timeLeft <= 0) {
             end(false);
@@ -204,7 +206,7 @@ public class Competition {
      * @param configMessage The configmessage to use. Must have the {type} variable in it.
      * @return A message object that's pre-set to be compatible for the time remaining.
      */
-    private @NotNull EMFSingleMessage getTypeFormat(ConfigMessage configMessage) {
+    private @NotNull EMFMessage getTypeFormat(ConfigMessage configMessage) {
         return competitionType.getStrategy().getTypeFormat(this, configMessage);
     }
 
@@ -270,10 +272,10 @@ public class Competition {
         List<String> competitionColours = competitionFile.getPositionColours();
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        EMFSingleMessage leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, true, null);
+        EMFMessage leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, true, null);
         leaderboardMessage.send(console);
 
-        EMFSingleMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
+        EMFMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
         message.setAmount(Integer.toString(leaderboard.getSize()));
         message.send(console);
     }
@@ -294,22 +296,22 @@ public class Competition {
         List<String> competitionColours = competitionFile.getPositionColours();
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        EMFSingleMessage leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, false, player.getUniqueId());
+        EMFMessage leaderboardMessage = buildLeaderboardMessage(entries, competitionColours, false, player.getUniqueId());
         leaderboardMessage.send(player);
 
-        EMFSingleMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
+        EMFMessage message = ConfigMessage.LEADERBOARD_TOTAL_PLAYERS.getMessage();
         message.setAmount(Integer.toString(leaderboard.getSize()));
         message.send(player);
     }
 
-    private @NotNull EMFSingleMessage buildLeaderboardMessage(List<CompetitionEntry> entries, List<String> competitionColours, boolean isConsole, UUID playerUuid) {
+    private @NotNull EMFMessage buildLeaderboardMessage(List<CompetitionEntry> entries, List<String> competitionColours, boolean isConsole, UUID playerUuid) {
         if (entries == null) {
             entries = List.of();
         }
 
         int maxCount = MessageConfig.getInstance().getLeaderboardCount();
 
-        EMFSingleMessage builder = EMFSingleMessage.empty();
+        EMFListMessage builder = EMFListMessage.empty();
         int pos = 0;
 
         for (CompetitionEntry entry : entries) {
@@ -318,7 +320,7 @@ public class Competition {
             if (pos > competitionColours.size() || pos > maxCount) {
                 break;
             }
-            EMFSingleMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
+            EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
             message.setPlayer(Bukkit.getOfflinePlayer(entry.getPlayer()));
             message.setPosition(Integer.toString(pos));
             message.setPositionColour(competitionColours.get(pos - 1));
@@ -330,7 +332,6 @@ public class Competition {
             }
 
             builder.appendMessage(message);
-            builder.appendString("\n");
         }
 
         return builder;
@@ -399,7 +400,7 @@ public class Competition {
     }
 
     public void singleReward(Player player) {
-        EMFSingleMessage message = getTypeFormat(ConfigMessage.COMPETITION_SINGLE_WINNER);
+        EMFMessage message = getTypeFormat(ConfigMessage.COMPETITION_SINGLE_WINNER);
         message.setPlayer(player);
         message.setCompetitionType(competitionType.getTypeVariable().getMessage());
 
@@ -432,7 +433,7 @@ public class Competition {
         return leaderboard;
     }
 
-    public @Nullable EMFSingleMessage getStartMessage() {
+    public @Nullable EMFMessage getStartMessage() {
         return startMessage;
     }
 
@@ -448,14 +449,14 @@ public class Competition {
         this.competitionName = competitionName;
     }
 
-    public static @NotNull EMFSingleMessage getNextCompetitionMessage() {
+    public static @NotNull EMFMessage getNextCompetitionMessage() {
         if (Competition.isActive()) {
             return ConfigMessage.PLACEHOLDER_TIME_REMAINING_DURING_COMP.getMessage();
         }
 
         int remainingTime = getRemainingTime();
 
-        EMFSingleMessage message = ConfigMessage.PLACEHOLDER_TIME_REMAINING.getMessage();
+        EMFMessage message = ConfigMessage.PLACEHOLDER_TIME_REMAINING.getMessage();
         message.setDays(Integer.toString(remainingTime / 1440));
         message.setHours(Integer.toString((remainingTime % 1440) / 60));
         message.setMinutes(Integer.toString((((remainingTime % 1440) % 60) % 60)));

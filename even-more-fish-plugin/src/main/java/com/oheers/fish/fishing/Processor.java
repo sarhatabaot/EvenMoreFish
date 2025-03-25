@@ -15,6 +15,7 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -94,7 +95,7 @@ public abstract class Processor<E extends Event> implements Listener {
         if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
-                EMFSingleMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
+                EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
                 message.setBaitTheme(caughtBait.getTheme());
                 message.setBait(caughtBait.getId());
                 message.setPlayer(player);
@@ -134,9 +135,9 @@ public abstract class Processor<E extends Event> implements Listener {
 
         if (!fish.isSilent()) {
             String length = decimalFormat.format(fish.getLength());
-            EMFSingleMessage rarity = EMFSingleMessage.fromString(fish.getRarity().getId());
+            EMFMessage rarity = EMFSingleMessage.fromString(fish.getRarity().getId());
 
-            EMFSingleMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
+            EMFMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
             message.setPlayer(player);
             message.setVariable("{rarity}", rarity);
             message.setLength(length);

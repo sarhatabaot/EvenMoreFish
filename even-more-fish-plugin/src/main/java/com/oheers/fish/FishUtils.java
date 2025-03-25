@@ -270,7 +270,7 @@ public class FishUtils {
         return whitelistedWorlds.contains(l.getWorld().getName());
     }
 
-    public static @NotNull EMFSingleMessage timeFormat(long timeLeft) {
+    public static @NotNull EMFMessage timeFormat(long timeLeft) {
         long hours = timeLeft / 3600;
         long minutes = (timeLeft % 3600) / 60;
         long seconds = timeLeft % 60;
@@ -278,7 +278,7 @@ public class FishUtils {
         EMFSingleMessage formatted = EMFSingleMessage.empty();
 
         if (hours > 0) {
-            EMFSingleMessage message = ConfigMessage.BAR_HOUR.getMessage();
+            EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
             message.formatVariables();
             formatted.appendMessage(message);
@@ -286,7 +286,7 @@ public class FishUtils {
         }
 
         if (minutes > 0) {
-            EMFSingleMessage message = ConfigMessage.BAR_MINUTE.getMessage();
+            EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
             message.formatVariables();
             formatted.appendMessage(message);
@@ -295,7 +295,7 @@ public class FishUtils {
 
         // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
-            EMFSingleMessage message = ConfigMessage.BAR_SECOND.getMessage();
+            EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
             message.formatVariables();
             formatted.appendMessage(message);
@@ -322,7 +322,7 @@ public class FishUtils {
         return returning;
     }
 
-    public static void broadcastFishMessage(EMFSingleMessage message, Player referencePlayer, boolean actionBar) {
+    public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
         String plain = message.getPlainTextMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
@@ -589,7 +589,7 @@ public class FishUtils {
      * @return Whether this String is using legacy color codes.
      */
     public static boolean isLegacyString(@NotNull String string) {
-        String stripped = EMFSingleMessage.MINIMESSAGE.stripTags(string);
+        String stripped = EMFMessage.MINIMESSAGE.stripTags(string);
         return string.equals(stripped);
     }
 

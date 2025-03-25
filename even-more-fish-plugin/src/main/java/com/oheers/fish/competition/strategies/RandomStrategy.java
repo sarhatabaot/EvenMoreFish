@@ -10,6 +10,7 @@ import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,22 +30,22 @@ public class RandomStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFSingleMessage getSingleConsoleLeaderboardMessage(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         return randomType.getStrategy().getSingleConsoleLeaderboardMessage(message, entry);
     }
 
     @Override
-    public EMFSingleMessage getBeginMessage(Competition competition, CompetitionType type) {
+    public EMFMessage getBeginMessage(Competition competition, CompetitionType type) {
         return randomType.getStrategy().getBeginMessage(competition, type);
     }
 
     @Override
-    public EMFSingleMessage getSinglePlayerLeaderboard(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         return randomType.getStrategy().getSinglePlayerLeaderboard(message, entry);
     }
 
     @Override
-    public @NotNull EMFSingleMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
+    public @NotNull EMFMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
         return randomType.getStrategy().getTypeFormat(competition, configMessage);
     }
 

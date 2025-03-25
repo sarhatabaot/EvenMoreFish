@@ -12,6 +12,7 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,13 +50,13 @@ public class SpecificRarityStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFSingleMessage getBeginMessage(@NotNull Competition competition, CompetitionType type) {
+    public EMFMessage getBeginMessage(@NotNull Competition competition, CompetitionType type) {
         return getTypeFormat(competition, ConfigMessage.COMPETITION_START);
     }
 
     @Override
-    public @NotNull EMFSingleMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
-        final EMFSingleMessage message = CompetitionStrategy.super.getTypeFormat(competition, configMessage);
+    public @NotNull EMFMessage getTypeFormat(@NotNull Competition competition, ConfigMessage configMessage) {
+        final EMFMessage message = CompetitionStrategy.super.getTypeFormat(competition, configMessage);
         message.setAmount(Integer.toString(competition.getNumberNeeded()));
         Rarity selectedRarity = competition.getSelectedRarity();
         if (selectedRarity == null) {

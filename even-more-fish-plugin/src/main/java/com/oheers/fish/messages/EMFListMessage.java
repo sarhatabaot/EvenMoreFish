@@ -6,23 +6,22 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextReplacementConfig;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class EMFListMessage extends EMFMessage {
 
-    private List<Component> message;
+    private List<Component> message = new ArrayList<>();
 
     private EMFListMessage(@Nullable List<Component> message) {
         super();
-        this.message = Objects.requireNonNullElseGet(message, ArrayList::new);
+        if (message != null) {
+            this.message.addAll(message);
+        }
     }
 
     @Override
@@ -31,6 +30,30 @@ public class EMFListMessage extends EMFMessage {
         copy.liveVariables.putAll(this.liveVariables);
         return copy;
     }
+
+    // Factory methods
+
+    public static EMFListMessage empty() {
+        return new EMFListMessage(null);
+    }
+
+    public static EMFListMessage of(@NotNull Component component) {
+        return new EMFListMessage(List.of(component));
+    }
+
+    public static EMFListMessage ofList(@NotNull List<Component> components) {
+        return new EMFListMessage(components);
+    }
+
+    public static EMFListMessage fromString(@NotNull String string) {
+        return of(formatString(string));
+    }
+
+    public static EMFListMessage fromStringList(@NotNull List<String> strings) {
+        return ofList(strings.stream().map(EMFListMessage::formatString).toList());
+    }
+
+    // Class methods
 
     @Override
     public void send(@NotNull Audience target) {
@@ -57,10 +80,10 @@ public class EMFListMessage extends EMFMessage {
     }
 
     @Override
-    protected void formatPlaceholderAPI() {
+    public void formatPlaceholderAPI() {
         this.message = this.message.stream()
             .map(line -> FishUtils.parsePlaceholderAPI(line, relevantPlayer))
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -71,6 +94,11 @@ public class EMFListMessage extends EMFMessage {
     @Override
     public boolean containsString(@NotNull String string) {
         return this.message.stream().anyMatch(line -> FishUtils.componentContainsString(line, string));
+    }
+
+    @Override
+    public void setMessage(@NotNull EMFMessage message) {
+        this.message = new ArrayList<>(message.getComponentListMessage());
     }
 
     @Override
@@ -120,7 +148,7 @@ public class EMFListMessage extends EMFMessage {
         for (TextReplacementConfig trc : trcs) {
             this.message = this.message.stream()
                 .map(line -> line.replaceText(trc))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         }
     }
 

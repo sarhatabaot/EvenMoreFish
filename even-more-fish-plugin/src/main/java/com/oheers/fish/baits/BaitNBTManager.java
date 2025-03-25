@@ -6,6 +6,7 @@ import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -362,7 +363,7 @@ public class BaitNBTManager {
             lore = new ArrayList<>();
         }
 
-        EMFSingleMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
+        EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
 
         Supplier<EMFSingleMessage> baitVariable = () -> {
             EMFSingleMessage message = EMFSingleMessage.empty();
@@ -377,7 +378,7 @@ public class BaitNBTManager {
 
             for (String bait : rodNBT.split(",")) {
                 baitCount++;
-                EMFSingleMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
+                EMFMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
                 // TODO this is to prevent an ArrayIndexOutOfBoundsException, but it should be handled in a better way.
                 try {
                     baitFormat.setAmount(bait.split(":")[1]);

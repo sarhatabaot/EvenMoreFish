@@ -10,6 +10,7 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.ItemFactory;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
@@ -119,10 +120,10 @@ public class Bait extends ConfigBase {
      */
     private List<Component> createBoostLore() {
 
-        EMFSingleMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
+        EMFMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage();
 
-        Supplier<EMFSingleMessage> boostsVariable = () -> {
-            EMFSingleMessage message = EMFSingleMessage.empty();
+        Supplier<EMFMessage> boostsVariable = () -> {
+            EMFMessage message = EMFSingleMessage.empty();
             List<Rarity> rarityList = getRarities();
             if (!rarityList.isEmpty()) {
                 if (rarityList.size() > 1) {
@@ -135,7 +136,6 @@ public class Bait extends ConfigBase {
 
             List<Fish> fishList = getFish();
             if (!fishList.isEmpty()) {
-                message.appendString("\n");
                 message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
                 message.setAmount(Integer.toString(fishList.size()));
             }
@@ -244,11 +244,10 @@ public class Bait extends ConfigBase {
             return;
         }
 
-        EMFSingleMessage message = ConfigMessage.BAIT_USED.getMessage();
+        EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
         message.setBait(id);
         message.setBaitTheme(getTheme());
         message.send(player);
-
     }
 
     /**

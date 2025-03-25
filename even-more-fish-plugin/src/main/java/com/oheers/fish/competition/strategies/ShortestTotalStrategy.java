@@ -8,6 +8,7 @@ import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,14 +29,14 @@ public class ShortestTotalStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFSingleMessage getSingleConsoleLeaderboardMessage(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         message.setMessage(ConfigMessage.LEADERBOARD_SHORTEST_TOTAL.getMessage());
         message.setAmount(getDecimalFormat().format(entry.getValue()));
         return message;
     }
 
     @Override
-    public EMFSingleMessage getSinglePlayerLeaderboard(@NotNull EMFSingleMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         message.setMessage(ConfigMessage.LEADERBOARD_SHORTEST_TOTAL.getMessage());
         message.setAmount(getDecimalFormat().format(entry.getValue()));
         return message;

@@ -2,6 +2,7 @@ package com.oheers.fish.messages;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MessageConfig;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -322,35 +323,36 @@ public enum ConfigMessage {
         return prefixType;
     }
 
-    public EMFSingleMessage getMessage() {
-        EMFSingleMessage message = EMFSingleMessage.empty();
+    public EMFMessage getMessage() {
         if (isListForm()) {
+            EMFListMessage listMessage = EMFListMessage.empty();
             List<String> list = getStringList(getNormalList(), getId());
             for (String line : list) {
                 if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                    message.appendString(line.substring(10));
+                    listMessage.appendString(line.substring(10));
                 } else {
-                    message.appendMessage(getPrefixType().getPrefix());
-                    message.appendString(line);
-                }
-
-                if (!Objects.equals(line, list.get(list.size() - 1))) {
-                    message.appendString("\n");
+                    EMFMessage prefix = getPrefixType().getPrefix();
+                    prefix.appendString(line);
+                    listMessage.appendMessage(prefix);
                 }
             }
+            listMessage.setCanSilent(this.canSilent);
+            return listMessage;
         } else {
             String line = getString(getNormal(), getId());
+            EMFSingleMessage singleMessage = EMFSingleMessage.empty();
             if (line != null) {
                 if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                    message.appendString(line.substring(10));
+                    singleMessage.appendString(line.substring(10));
                 } else {
-                    message.appendMessage(getPrefixType().getPrefix());
-                    message.appendString(line);
+                    EMFMessage prefix = getPrefixType().getPrefix();
+                    prefix.appendString(line);
+                    singleMessage.appendMessage(prefix);
                 }
             }
+            singleMessage.setCanSilent(this.canSilent);
+            return singleMessage;
         }
-        message.setCanSilent(this.canSilent);
-        return message;
     }
 
     /**

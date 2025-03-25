@@ -24,7 +24,7 @@ public abstract class EMFMessage {
 
     protected final Map<String, Component> liveVariables = new LinkedHashMap<>();
 
-    protected boolean perPlayer = false;
+    protected boolean perPlayer = true;
     protected boolean canSilent = false;
     protected OfflinePlayer relevantPlayer = null;
 
@@ -82,7 +82,7 @@ public abstract class EMFMessage {
         return getComponentListMessage().stream().map(PLAINTEXT_SERIALIZER::serialize).toList();
     }
 
-    protected abstract void formatPlaceholderAPI();
+    public abstract void formatPlaceholderAPI();
 
     public void setPerPlayer(boolean perPlayer) {
         this.perPlayer = perPlayer;
@@ -108,6 +108,8 @@ public abstract class EMFMessage {
     public abstract boolean isEmpty();
 
     public abstract boolean containsString(@NotNull String string);
+
+    public abstract void setMessage(@NotNull EMFMessage message);
 
     // Broadcast
 
