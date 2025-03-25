@@ -97,7 +97,6 @@ public class EMFSingleMessage extends EMFMessage {
      */
     @Override
     public @NotNull Component getComponentMessage() {
-        formatVariables();
         formatPlaceholderAPI();
         return removeDefaultItalics(this.message);
     }
@@ -124,24 +123,6 @@ public class EMFSingleMessage extends EMFMessage {
         this.message = message.message;
     }
 
-    /**
-     * Formats all variables in {@link #liveVariables}
-     */
-    @Override
-    public void formatVariables() {
-        for (Map.Entry<String, List<Component>> entry : liveVariables.entrySet()) {
-            String placeholder = entry.getKey();
-            List<Component> replaceComponents = entry.getValue();
-            for (Component replaceComponent : replaceComponents) {
-                TextReplacementConfig trc = TextReplacementConfig.builder()
-                    .matchLiteral(placeholder)
-                    .replacement(replaceComponent)
-                    .build();
-                this.message = this.message.replaceText(trc);
-            }
-        }
-    }
-
     @Override
     public boolean isEmpty() {
         return PLAINTEXT_SERIALIZER.serialize(this.message).isEmpty();
@@ -164,7 +145,6 @@ public class EMFSingleMessage extends EMFMessage {
 
     @Override
     public void appendMessage(@NotNull EMFMessage message) {
-        message.formatVariables();
         this.message = this.message.append(message.getComponentMessage());
     }
 
@@ -189,6 +169,20 @@ public class EMFSingleMessage extends EMFMessage {
     public void prependComponent(@NotNull Component component) {
         // Ensure the base component is always empty
         this.message = EMPTY.append(component).append(this.message);
+    }
+
+    @Override
+    protected void setEMFMessageVariable(@NotNull String variable, @NotNull EMFMessage replacement) {
+        setComponentVariable(variable, replacement.getComponentMessage());
+    }
+
+    @Override
+    protected void setComponentVariable(@NotNull String variable, @NotNull Component replacement) {
+        TextReplacementConfig trc = TextReplacementConfig.builder()
+            .matchLiteral(variable)
+            .replacement(replacement)
+            .build();
+        this.message = this.message.replaceText(trc);
     }
 
 }

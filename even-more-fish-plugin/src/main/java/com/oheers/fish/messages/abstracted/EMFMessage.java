@@ -166,31 +166,22 @@ public abstract class EMFMessage {
     // Variables
 
     /**
-     * Formats all variables in {@link #liveVariables}
-     */
-    public abstract void formatVariables();
-
-    /**
-     * Adds a variable to be formatted when {@link #formatVariables()} is called.
+     * Formats the provided variable.
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
     public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
-        if (replacement instanceof EMFSingleMessage emfSingleMessage) {
-            emfSingleMessage.formatVariables();
-            this.liveVariables.put(variable, List.of(emfSingleMessage.getRawMessage()));
-        } else if (replacement instanceof EMFListMessage emfListMessage) {
-            emfListMessage.formatVariables();
-            this.liveVariables.put(variable, emfListMessage.getRawMessage());
+        if (replacement instanceof EMFMessage emfMessage) {
+            setEMFMessageVariable(variable, emfMessage);
         } else if (replacement instanceof Component component) {
-            this.liveVariables.put(variable, List.of(component));
+            setComponentVariable(variable, component);
         } else {
-            this.liveVariables.put(variable, List.of(formatString(String.valueOf(replacement))));
+            setComponentVariable(variable, formatString(String.valueOf(replacement)));
         }
     }
 
     /**
-     * Adds a map of variables to be formatted when {@link #formatVariables()} is called.
+     * Formats the provided map of variables.
      * @param variableMap The map of variables and their replacements.
      */
     public void setVariables(@Nullable Map<String, ?> variableMap) {
@@ -199,6 +190,10 @@ public abstract class EMFMessage {
         }
         variableMap.forEach(this::setVariable);
     }
+
+    protected abstract void setEMFMessageVariable(@NotNull final String variable, @NotNull final EMFMessage replacement);
+
+    protected abstract void setComponentVariable(@NotNull final String variable, @NotNull final Component replacement);
 
     /**
      * The player's name to replace the {player} variable. Also sets the relevantPlayer variable to this player.

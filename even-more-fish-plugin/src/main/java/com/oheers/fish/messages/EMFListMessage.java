@@ -11,9 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EMFListMessage extends EMFMessage {
 
@@ -117,7 +119,6 @@ public class EMFListMessage extends EMFMessage {
 
     @Override
     public void appendMessage(@NotNull EMFMessage message) {
-        message.formatVariables();
         this.message.addAll(message.getComponentListMessage());
     }
 
@@ -133,7 +134,6 @@ public class EMFListMessage extends EMFMessage {
 
     @Override
     public void prependMessage(@NotNull EMFMessage message) {
-        message.formatVariables();
         this.message.addAll(0, message.getComponentListMessage());
     }
 
@@ -142,25 +142,28 @@ public class EMFListMessage extends EMFMessage {
         this.message.add(0, component);
     }
 
-    /**
-     * Formats all variables in {@link #liveVariables}
-     */
-    // This feels awful, but I don't know if there's a better way to do it
     @Override
-    public void formatVariables() {
-        for (Map.Entry<String, List<Component>> entry : liveVariables.entrySet()) {
-            String placeholder = entry.getKey();
-            List<Component> replaceComponents = entry.getValue();
-            for (Component replaceComponent : replaceComponents) {
-                TextReplacementConfig trc = TextReplacementConfig.builder()
-                    .matchLiteral(placeholder)
-                    .replacement(replaceComponent)
-                    .build();
-                this.message = this.message.stream()
-                    .map(line -> line.replaceText(trc))
-                    .collect(Collectors.toCollection(ArrayList::new));
-            }
+    protected void setEMFMessageVariable(@NotNull String variable, @NotNull EMFMessage replacement) {
+        if (replacement instanceof EMFSingleMessage singleMessage) {
+            setComponentVariable(variable, singleMessage.getComponentMessage());
+        } else if (replacement instanceof EMFListMessage listMessage) {
+            this.message = this.message.stream()
+                .flatMap(line -> FishUtils.componentContainsString(line, variable)
+                    ? listMessage.getComponentListMessage().stream()
+                    : Stream.of(line))
+                .collect(Collectors.toCollection(ArrayList::new));
         }
+    }
+
+    @Override
+    protected void setComponentVariable(@NotNull String variable, @NotNull Component replacement) {
+        TextReplacementConfig trc = TextReplacementConfig.builder()
+            .matchLiteral(variable)
+            .replacement(replacement)
+            .build();
+        this.message = this.message.stream()
+            .map(line -> line.replaceText(trc))
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
 }

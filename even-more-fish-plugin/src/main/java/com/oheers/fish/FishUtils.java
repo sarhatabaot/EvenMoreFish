@@ -281,7 +281,6 @@ public class FishUtils {
         if (hours > 0) {
             EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
-            message.formatVariables();
             formatted.appendMessage(message);
             formatted.appendComponent(Component.space());
         }
@@ -289,7 +288,6 @@ public class FishUtils {
         if (minutes > 0) {
             EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
-            message.formatVariables();
             formatted.appendMessage(message);
             formatted.appendComponent(Component.space());
         }
@@ -298,7 +296,6 @@ public class FishUtils {
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
             EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
-            message.formatVariables();
             formatted.appendMessage(message);
             formatted.appendComponent(Component.space());
         }
