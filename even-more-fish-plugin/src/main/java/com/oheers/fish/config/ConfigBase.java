@@ -210,9 +210,6 @@ public class ConfigBase {
             return message;
         }
 
-        // Prepare reset characters as MiniMessage does not insert them by default
-        message = message.replace("&r", "__resetchar__");
-
         // Get LegacyComponentSerializer
         final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
             .character('&')
@@ -221,10 +218,7 @@ public class ConfigBase {
 
         // Legacy -> Component -> MiniMessage
         Component legacy = legacySerializer.deserialize(message);
-        String miniMessage = miniMessageSerializer.serialize(legacy);
-
-        // Replace our prepared reset characters with the reset tag
-        return miniMessage.replace("__resetchar__", "<reset>");
+        return miniMessageSerializer.serialize(legacy);
     }
 
 }
