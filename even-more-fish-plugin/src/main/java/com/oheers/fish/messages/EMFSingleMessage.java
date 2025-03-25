@@ -129,12 +129,16 @@ public class EMFSingleMessage extends EMFMessage {
      */
     @Override
     public void formatVariables() {
-        TextReplacementConfig.Builder trc = TextReplacementConfig.builder();
-        for (Map.Entry<String, Component> entry : liveVariables.entrySet()) {
-            Component replaceComponent = entry.getValue();
+        for (Map.Entry<String, List<Component>> entry : liveVariables.entrySet()) {
             String placeholder = entry.getKey();
-            trc.matchLiteral(placeholder).replacement(replaceComponent);
-            this.message = this.message.replaceText(trc.build());
+            List<Component> replaceComponents = entry.getValue();
+            for (Component replaceComponent : replaceComponents) {
+                TextReplacementConfig trc = TextReplacementConfig.builder()
+                    .matchLiteral(placeholder)
+                    .replacement(replaceComponent)
+                    .build();
+                this.message = this.message.replaceText(trc);
+            }
         }
     }
 

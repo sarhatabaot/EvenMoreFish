@@ -6,11 +6,13 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextReplacementConfig;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EMFListMessage extends EMFMessage {
@@ -63,6 +65,13 @@ public class EMFListMessage extends EMFMessage {
     @Override
     public void sendActionBar(@NotNull Audience target) {
         target.sendActionBar(getComponentMessage());
+    }
+
+    /**
+     * @return The stored components in their original form, with no variables applied.
+     */
+    public @NotNull List<Component> getRawMessage() {
+        return this.message;
     }
 
     @Override
@@ -136,19 +145,21 @@ public class EMFListMessage extends EMFMessage {
     /**
      * Formats all variables in {@link #liveVariables}
      */
+    // This feels awful, but I don't know if there's a better way to do it
     @Override
     public void formatVariables() {
-        List<TextReplacementConfig> trcs = liveVariables.entrySet().stream()
-            .map(entry -> TextReplacementConfig.builder()
-                .matchLiteral(entry.getKey())
-                .replacement(entry.getValue())
-                .build())
-            .toList();
-
-        for (TextReplacementConfig trc : trcs) {
-            this.message = this.message.stream()
-                .map(line -> line.replaceText(trc))
-                .collect(Collectors.toCollection(ArrayList::new));
+        for (Map.Entry<String, List<Component>> entry : liveVariables.entrySet()) {
+            String placeholder = entry.getKey();
+            List<Component> replaceComponents = entry.getValue();
+            for (Component replaceComponent : replaceComponents) {
+                TextReplacementConfig trc = TextReplacementConfig.builder()
+                    .matchLiteral(placeholder)
+                    .replacement(replaceComponent)
+                    .build();
+                this.message = this.message.stream()
+                    .map(line -> line.replaceText(trc))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.oheers.fish.messages.abstracted;
 
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import net.kyori.adventure.audience.Audience;
@@ -27,7 +28,7 @@ public abstract class EMFMessage {
     public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
     public static final Component EMPTY = Component.empty().colorIfAbsent(NamedTextColor.WHITE);
 
-    protected final Map<String, Component> liveVariables = new LinkedHashMap<>();
+    protected final Map<String, List<Component>> liveVariables = new LinkedHashMap<>();
 
     protected boolean perPlayer = true;
     protected boolean canSilent = false;
@@ -96,7 +97,6 @@ public abstract class EMFMessage {
         return this.canSilent;
     }
 
-    // TODO rework whatever uses this to also check isCanSilent
     protected boolean silentCheck(@NotNull Component component) {
         return isCanSilent() && PLAINTEXT_SERIALIZER.serialize(component).endsWith(" -s");
     }
@@ -175,15 +175,17 @@ public abstract class EMFMessage {
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
-    // TODO add support for EMFListMessage
     public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
         if (replacement instanceof EMFSingleMessage emfSingleMessage) {
             emfSingleMessage.formatVariables();
-            this.liveVariables.put(variable, emfSingleMessage.getRawMessage());
+            this.liveVariables.put(variable, List.of(emfSingleMessage.getRawMessage()));
+        } else if (replacement instanceof EMFListMessage emfListMessage) {
+            emfListMessage.formatVariables();
+            this.liveVariables.put(variable, emfListMessage.getRawMessage());
         } else if (replacement instanceof Component component) {
-            this.liveVariables.put(variable, component);
+            this.liveVariables.put(variable, List.of(component));
         } else {
-            this.liveVariables.put(variable, formatString(String.valueOf(replacement)));
+            this.liveVariables.put(variable, List.of(formatString(String.valueOf(replacement))));
         }
     }
 
