@@ -28,6 +28,7 @@ import de.tr7zw.changeme.nbtapi.NBT;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -612,6 +613,14 @@ public class FishUtils {
 
     public static boolean componentContainsString(@NotNull Component component, @NotNull String string) {
         return EMFMessage.PLAINTEXT_SERIALIZER.serialize(component).contains(string);
+    }
+
+    public static @NotNull Component decorateIfAbsent(@NotNull Component component, @NotNull TextDecoration decoration, @NotNull TextDecoration.State state) {
+        TextDecoration.State oldState = component.decoration(decoration);
+        if (oldState == TextDecoration.State.NOT_SET) {
+            return component.decoration(decoration, state);
+        }
+        return component;
     }
 
 }

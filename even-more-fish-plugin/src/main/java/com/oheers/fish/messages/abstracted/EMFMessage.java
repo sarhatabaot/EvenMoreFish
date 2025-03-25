@@ -1,8 +1,12 @@
 package com.oheers.fish.messages.abstracted;
 
+import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -21,6 +25,7 @@ public abstract class EMFMessage {
         .build();
     public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
     public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
+    public static final Component EMPTY = Component.empty().colorIfAbsent(NamedTextColor.WHITE);
 
     protected final Map<String, Component> liveVariables = new LinkedHashMap<>();
 
@@ -42,12 +47,7 @@ public abstract class EMFMessage {
     }
 
     public static @NotNull Component removeDefaultItalics(@NotNull Component component) {
-        TextDecoration decoration = TextDecoration.ITALIC;
-        TextDecoration.State oldState = component.decoration(decoration);
-        if (oldState == TextDecoration.State.NOT_SET) {
-            return component.decoration(decoration, TextDecoration.State.FALSE);
-        }
-        return component;
+        return FishUtils.decorateIfAbsent(component, TextDecoration.ITALIC, TextDecoration.State.FALSE);
     }
 
     public abstract void send(@NotNull Audience target);

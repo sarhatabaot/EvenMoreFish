@@ -19,9 +19,9 @@ public class EMFSingleMessage extends EMFMessage {
     private EMFSingleMessage(@Nullable Component message) {
         super();
         if (message == null) {
-            this.message = Component.empty();
+            this.message = EMPTY;
         } else {
-            this.message = Component.empty().append(message);
+            this.message = EMPTY.append(message);
         }
     }
 
@@ -172,7 +172,7 @@ public class EMFSingleMessage extends EMFMessage {
     @Override
     public void prependString(@NotNull String string) {
         // Ensure the base component is always empty
-        this.message = Component.empty().append(formatString(string)).append(this.message);
+        this.message = EMPTY.append(formatString(string)).append(this.message);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class EMFSingleMessage extends EMFMessage {
     @Override
     public void prependComponent(@NotNull Component component) {
         // Ensure the base component is always empty
-        this.message = Component.empty().append(component).append(this.message);
+        this.message = EMPTY.append(component).append(this.message);
     }
 
 }
