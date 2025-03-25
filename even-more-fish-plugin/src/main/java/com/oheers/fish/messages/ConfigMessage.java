@@ -7,7 +7,6 @@ import com.oheers.fish.messages.abstracted.EMFMessage;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public enum ConfigMessage {
 

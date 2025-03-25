@@ -9,7 +9,6 @@ import com.oheers.fish.gui.guis.ApplyBaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;

@@ -4,7 +4,6 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
