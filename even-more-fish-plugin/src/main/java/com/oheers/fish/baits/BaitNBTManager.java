@@ -5,6 +5,7 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
@@ -365,8 +366,8 @@ public class BaitNBTManager {
 
         EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
 
-        Supplier<EMFSingleMessage> baitVariable = () -> {
-            EMFSingleMessage message = EMFSingleMessage.empty();
+        Supplier<EMFListMessage> baitVariable = () -> {
+            EMFListMessage message = EMFListMessage.empty();
 
             String rodNBT = NbtUtils.getString(itemStack, NbtKeys.EMF_APPLIED_BAIT);
 
@@ -386,13 +387,11 @@ public class BaitNBTManager {
                     baitFormat.setAmount("N/A");
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
-                message.appendString("\n");
                 message.appendMessage(baitFormat);
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
                 for (int i = baitCount; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
-                    message.appendString("\n");
                     message.appendMessage(ConfigMessage.BAIT_UNUSED_SLOT.getMessage());
                 }
             }
@@ -432,10 +431,9 @@ public class BaitNBTManager {
         }
 
         // Return the lore with all bait lines removed from the rod
-        return lore.stream().filter(component -> {
-            System.out.println(EMFSingleMessage.MINIMESSAGE.serialize(component));
-            return !EMFSingleMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER);
-        }).toList();
+        return lore.stream().filter(component ->
+            !EMFSingleMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER)
+        ).toList();
     }
 
     /**
