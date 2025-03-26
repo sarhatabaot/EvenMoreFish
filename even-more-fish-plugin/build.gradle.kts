@@ -122,6 +122,9 @@ paper {
     apiVersion = "1.20"
     foliaSupported = true
 
+    loader = "com.oheers.fish.EMFLibraryLoader"
+    generateLibrariesJson = true
+
     serverDependencies {
         register("Vault") {
             required = false
