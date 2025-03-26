@@ -697,23 +697,24 @@ public class EvenMoreFish extends EMFPlugin {
     // FISH TOGGLE METHODS
 
     public void performFishToggle(@NotNull Player player) {
-        NamespacedKey key = new NamespacedKey(this, "fish-enabled");
+        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        // If it is enabled, disable it
-        if (isCustomFishing(player)) {
+        // If custom fishing is disabled
+        if (isCustomFishingDisabled(player)) {
+            // Set fish-disabled to false
             pdc.set(key, PersistentDataType.BOOLEAN, false);
-            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
-            // If it is disabled, enable it
-        } else {
-            pdc.set(key, PersistentDataType.BOOLEAN, true);
             ConfigMessage.TOGGLE_ON.getMessage().send(player);
+        } else {
+            // Set fish-disabled to true
+            pdc.set(key, PersistentDataType.BOOLEAN, true);
+            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
         }
     }
 
-    public boolean isCustomFishing(@NotNull Player player) {
+    public boolean isCustomFishingDisabled(@NotNull Player player) {
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(this, "fish-enabled");
-        return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, true);
+        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
+        return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, false);
     }
 
     public boolean isFirstLoad() {

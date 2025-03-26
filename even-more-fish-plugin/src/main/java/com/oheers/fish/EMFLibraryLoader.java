@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * Loads the plugin's libraries.
+ */
 @SuppressWarnings("UnstableApiUsage")
 public class EMFLibraryLoader implements PluginLoader {
 
