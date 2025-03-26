@@ -117,7 +117,7 @@ bukkit {
     main = "com.oheers.fish.EvenMoreFish"
     version = project.version.toString()
     description = project.description.toString()
-    website = "https://github.com/Oheers/EvenMoreFish"
+    website = "https://github.com/EvenMoreFish/EvenMoreFish"
     foliaSupported = true
 
     depend = listOf()
@@ -292,11 +292,10 @@ tasks {
     }
 }
 
-/*
 publishing {
     repositories { // Copied directly from CodeMC's docs
         maven {
-            url = uri("https://repo.codemc.io/repository/Oheers/")
+            url = uri("https://repo.codemc.io/repository/EvenMoreFish/")
 
             val mavenUsername = System.getenv("JENKINS_USERNAME")
             val mavenPassword = System.getenv("JENKINS_PASSWORD")
@@ -320,7 +319,6 @@ publishing {
         }
     }
 }
- */
 
 java {
     toolchain {
