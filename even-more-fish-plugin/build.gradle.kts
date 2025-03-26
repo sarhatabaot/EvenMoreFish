@@ -1,4 +1,5 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import net.minecrell.pluginyml.paper.PaperPluginDescription
 import nu.studer.gradle.jooq.JooqExtension
 import org.jooq.meta.jaxb.Property
 import java.time.Instant
@@ -111,35 +112,82 @@ dependencies {
     jooqGenerator(libs.connectors.mysql)
 }
 
-bukkit {
+paper {
     name = "EvenMoreFish"
     author = "Oheers"
     main = "com.oheers.fish.EvenMoreFish"
     version = project.version.toString()
     description = project.description.toString()
     website = "https://github.com/EvenMoreFish/EvenMoreFish"
+    apiVersion = "1.20"
     foliaSupported = true
 
-    depend = listOf()
-    softDepend = listOf(
-        "Vault",
-        "PlayerPoints",
-        "WorldGuard",
-        "PlaceholderAPI",
-        "RedProtect",
-        "mcMMO",
-        "AureliumSkills",
-        "AuraSkills",
-        "ItemsAdder",
-        "Denizen",
-        "EcoItems",
-        "Oraxen",
-        "Nexo",
-        "HeadDatabase",
-        "GriefPrevention"
-    )
-    loadBefore = listOf("AntiAC")
-    apiVersion = "1.20"
+    serverDependencies {
+        register("Vault") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("PlayerPoints") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("WorldGuard") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("PlaceholderAPI") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("RedProtect") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("mcMMO") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("AureliumSkills") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("AuraSkills") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("ItemsAdder") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("Denizen") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("EcoItems") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("Oraxen") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("Nexo") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("HeadDatabase") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("GriefPrevention") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+        register("AntiAC") {
+            required = false
+            load = PaperPluginDescription.RelativeLoadOrder.AFTER
+        }
+    }
 
     permissions {
         register("emf.*") {
