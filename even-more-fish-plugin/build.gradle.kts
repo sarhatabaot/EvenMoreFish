@@ -139,7 +139,7 @@ bukkit {
         "GriefPrevention"
     )
     loadBefore = listOf("AntiAC")
-    apiVersion = "1.18"
+    apiVersion = "1.20"
 
     permissions {
         register("emf.*") {
