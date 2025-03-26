@@ -88,31 +88,29 @@ dependencies {
     implementation(libs.commandapi)
     implementation(libs.inventorygui)
     implementation(libs.boostedyaml)
+    implementation(libs.vanishchecker)
+    implementation(libs.universalscheduler)
 
-    // Loaded using Paper's LibraryLoader
-    // This will allow us to load libraries from any repo instead of just Maven Central.
-    paperLibrary(libs.friendlyid)
-    paperLibrary(libs.flyway.core)
-    paperLibrary(libs.flyway.mysql)
-    paperLibrary(libs.hikaricp)
-    paperLibrary(libs.caffeine)
-    paperLibrary(libs.commons.lang3)
-    paperLibrary(libs.commons.codec)
-    paperLibrary(libs.json.simple)
-    paperLibrary(libs.jooq)
-    paperLibrary(libs.jooq.codegen)
-    paperLibrary(libs.jooq.meta)
-    paperLibrary(libs.connectors.h2)
-    paperLibrary(libs.maven.artifact)
-    paperLibrary(libs.vanishchecker)
-    paperLibrary(libs.universalscheduler)
+    library(libs.friendlyid)
+    library(libs.flyway.core)
+    library(libs.flyway.mysql)
+    library(libs.hikaricp)
+    library(libs.caffeine)
+    library(libs.commons.lang3)
+    library(libs.commons.codec)
+    library(libs.json.simple)
+    library(libs.jooq)
+    library(libs.jooq.codegen)
+    library(libs.jooq.meta)
+    library(libs.connectors.h2)
+    library(libs.maven.artifact)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
     jooqGenerator(libs.connectors.mysql)
 }
 
-paper {
+bukkit {
     name = "EvenMoreFish"
     author = "Oheers"
     main = "com.oheers.fish.EvenMoreFish"
@@ -122,75 +120,25 @@ paper {
     apiVersion = "1.20"
     foliaSupported = true
 
-    loader = "com.oheers.fish.EMFLibraryLoader"
-    generateLibrariesJson = true
-
-    serverDependencies {
-        register("Vault") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("PlayerPoints") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("WorldGuard") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("PlaceholderAPI") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("RedProtect") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("mcMMO") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("AureliumSkills") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("AuraSkills") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("ItemsAdder") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("Denizen") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("EcoItems") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("Oraxen") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("Nexo") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("HeadDatabase") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("GriefPrevention") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("AntiAC") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.AFTER
-        }
-    }
+    depend = listOf()
+    softDepend = listOf(
+        "Vault",
+        "PlayerPoints",
+        "WorldGuard",
+        "PlaceholderAPI",
+        "RedProtect",
+        "mcMMO",
+        "AureliumSkills",
+        "AuraSkills",
+        "ItemsAdder",
+        "Denizen",
+        "EcoItems",
+        "Oraxen",
+        "Nexo",
+        "HeadDatabase",
+        "GriefPrevention"
+    )
+    loadBefore = listOf("AntiAC")
 
     permissions {
         register("emf.*") {
@@ -309,8 +257,6 @@ tasks {
     shadowJar {
         val buildNumberOrDate = getBuildNumberOrDate()
         manifest {
-            attributes["paperweight-mappings-namespace"] = "spigot"
-
             val buildNumber: String? by project
 
             attributes["Specification-Title"] = "EvenMoreFish"
@@ -331,7 +277,9 @@ tasks {
 
         relocate("de.tr7zw.changeme.nbtapi", "com.oheers.fish.utils.nbtapi")
         relocate("org.bstats", "com.oheers.fish.libs.bstats")
+        relocate("com.github.Anon8281.universalScheduler", "com.oheers.fish.libs.universalScheduler")
         relocate("de.themoep.inventorygui", "com.oheers.fish.libs.inventorygui")
+        relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
         relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
         relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
     }
