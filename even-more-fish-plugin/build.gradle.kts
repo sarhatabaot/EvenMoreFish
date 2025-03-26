@@ -309,6 +309,8 @@ tasks {
     shadowJar {
         val buildNumberOrDate = getBuildNumberOrDate()
         manifest {
+            attributes["paperweight-mappings-namespace"] = "spigot"
+
             val buildNumber: String? by project
 
             attributes["Specification-Title"] = "EvenMoreFish"
