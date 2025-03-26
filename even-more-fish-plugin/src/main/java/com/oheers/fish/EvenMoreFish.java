@@ -694,18 +694,17 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // FISH TOGGLE METHODS
-    // We use Strings here because Paper 1.18.2 does not have PersistentDataType.BOOLEAN.
 
     public void performFishToggle(@NotNull Player player) {
         NamespacedKey key = new NamespacedKey(this, "fish-enabled");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         // If it is enabled, disable it
         if (isCustomFishing(player)) {
-            pdc.set(key, PersistentDataType.STRING, "false");
+            pdc.set(key, PersistentDataType.BOOLEAN, false);
             ConfigMessage.TOGGLE_OFF.getMessage().send(player);
             // If it is disabled, enable it
         } else {
-            pdc.set(key, PersistentDataType.STRING, "true");
+            pdc.set(key, PersistentDataType.BOOLEAN, true);
             ConfigMessage.TOGGLE_ON.getMessage().send(player);
         }
     }
@@ -713,18 +712,7 @@ public class EvenMoreFish extends EMFPlugin {
     public boolean isCustomFishing(@NotNull Player player) {
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(this, "fish-enabled");
-        String toggleValue = pdc.getOrDefault(key, PersistentDataType.STRING, "true");
-        return toggleValue.equals("true");
-    }
-
-    /**
-     * Check if the server is Paper
-     * @return Whether the server is running Paper
-     */
-    private boolean isPaper() {
-        // Class names taken from PaperLib's initialize method
-        return classExists("com.destroystokyo.paper.PaperConfig")
-            || classExists("io.papermc.paper.configuration.Configuration");
+        return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, true);
     }
 
     public boolean isFirstLoad() {
