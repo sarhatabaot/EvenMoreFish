@@ -326,6 +326,7 @@ public class AdminCommand {
                 });
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private CommandAPICommand getVersion() {
         helpMessageBuilder.addUsage(
             "admin version",
@@ -358,7 +359,7 @@ public class AdminCommand {
                     {prefix} Database Type: {type}\s
                     """
                         .replace("{prefix}", MessageConfig.getInstance().getSTDPrefix())
-                        .replace("{version}", EvenMoreFish.getInstance().getDescription().getVersion())
+                        .replace("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion())
                         .replace("{branch}", getFeatureBranchName())
                         .replace("{build-date}", getFeatureBranchBuildOrDate())
                         .replace("{mcv}", Bukkit.getServer().getVersion())

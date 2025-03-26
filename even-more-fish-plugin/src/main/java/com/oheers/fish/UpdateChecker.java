@@ -23,6 +23,7 @@ public class UpdateChecker {
         this.plugin = plugin;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public String getVersion() {
         try {
             URI uri = new URI("https://api.modrinth.com/v2/project/vlh7rLCf/version");
@@ -36,14 +37,14 @@ public class UpdateChecker {
 
             JSONArray versions = (JSONArray) new JSONParser().parse(response.body());
             if (versions.isEmpty()) {
-                return plugin.getDescription().getVersion();
+                return plugin.getPluginMeta().getVersion();
             }
 
             JSONObject latestVersion = (JSONObject) versions.get(0);
             return latestVersion.get("version_number").toString();
         } catch (Exception exception) {
             EvenMoreFish.getInstance().getLogger().warning("EvenMoreFish failed to check for updates against the Modrinth website, to check manually go to https://modrinth.com/plugin/evenmorefish/versions");
-            return plugin.getDescription().getVersion();
+            return plugin.getPluginMeta().getVersion();
         }
     }
 }

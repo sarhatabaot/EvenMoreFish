@@ -60,8 +60,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
      * @return The name of the author as a String.
      */
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public @NotNull String getAuthor() {
-        return plugin.getDescription().getAuthors().toString();
+        return plugin.getPluginMeta().getAuthors().toString();
     }
     
     /**
@@ -87,8 +88,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
      * @return The version as a String.
      */
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public @NotNull String getVersion() {
-        return plugin.getDescription().getVersion();
+        return plugin.getPluginMeta().getVersion();
     }
     
     /**

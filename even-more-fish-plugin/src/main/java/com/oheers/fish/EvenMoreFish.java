@@ -489,10 +489,11 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // Checks for updates, surprisingly
+    @SuppressWarnings("UnstableApiUsage")
     private CompletableFuture<Boolean> checkUpdate() {
         return CompletableFuture.supplyAsync(() -> {
             ComparableVersion modrinthVersion = new ComparableVersion(new UpdateChecker(this).getVersion());
-            ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
+            ComparableVersion serverVersion = new ComparableVersion(getPluginMeta().getVersion());
             return modrinthVersion.compareTo(serverVersion) > 0;
         });
     }

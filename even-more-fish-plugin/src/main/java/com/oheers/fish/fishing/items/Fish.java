@@ -155,7 +155,7 @@ public class Fish {
                     if (!section.getBoolean("disable-lore", false)) {
                         meta.lore(getFishLore());
                     }
-                    meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+                    meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 });
