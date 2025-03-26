@@ -85,27 +85,27 @@ dependencies {
 
     implementation(libs.nbt.api)
     implementation(libs.bstats)
-    implementation(libs.universalscheduler)
     implementation(libs.commandapi)
     implementation(libs.inventorygui)
-    implementation(libs.vanishchecker)
     implementation(libs.boostedyaml)
 
-    library(libs.friendlyid)
-    library(libs.flyway.core)
-    library(libs.flyway.mysql)
-    library(libs.hikaricp)
-    library(libs.caffeine)
-    library(libs.commons.lang3)
-    library(libs.commons.codec)
-    library(libs.json.simple)
-
-    library(libs.jooq)
-    library(libs.jooq.codegen)
-    library(libs.jooq.meta)
-    library(libs.connectors.h2)
-
-    library(libs.maven.artifact)
+    // Loaded using Paper's LibraryLoader
+    // This will allow us to load libraries from any repo instead of just Maven Central.
+    paperLibrary(libs.friendlyid)
+    paperLibrary(libs.flyway.core)
+    paperLibrary(libs.flyway.mysql)
+    paperLibrary(libs.hikaricp)
+    paperLibrary(libs.caffeine)
+    paperLibrary(libs.commons.lang3)
+    paperLibrary(libs.commons.codec)
+    paperLibrary(libs.json.simple)
+    paperLibrary(libs.jooq)
+    paperLibrary(libs.jooq.codegen)
+    paperLibrary(libs.jooq.meta)
+    paperLibrary(libs.connectors.h2)
+    paperLibrary(libs.maven.artifact)
+    paperLibrary(libs.vanishchecker)
+    paperLibrary(libs.universalscheduler)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
@@ -331,9 +331,7 @@ tasks {
 
         relocate("de.tr7zw.changeme.nbtapi", "com.oheers.fish.utils.nbtapi")
         relocate("org.bstats", "com.oheers.fish.libs.bstats")
-        relocate("com.github.Anon8281.universalScheduler", "com.oheers.fish.libs.universalScheduler")
         relocate("de.themoep.inventorygui", "com.oheers.fish.libs.inventorygui")
-        relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
         relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
         relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
     }
