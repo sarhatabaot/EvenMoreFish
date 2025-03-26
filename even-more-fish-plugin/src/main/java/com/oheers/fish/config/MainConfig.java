@@ -6,6 +6,7 @@ import com.oheers.fish.api.economy.EconomyType;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import dev.dejvokep.boostedyaml.route.Route;
+import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.block.Biome;
 import org.bukkit.boss.BarStyle;
@@ -176,8 +177,25 @@ public class MainConfig extends ConfigBase {
     }
 
     public boolean blockCrafting() {
-        return getConfig().getBoolean("block-crafting", false);
+        return getConfig().getBoolean("item-protection.block-crafting", true);
     }
+
+    public boolean blockConsume() {
+        return getConfig().getBoolean("item-protection.block-consume", true);
+    }
+
+    public boolean blockFurnaceBurn() {
+        return getConfig().getBoolean("item-protection.block-furnace-burn", true);
+    }
+
+    public boolean blockCooking() {
+        return getConfig().getBoolean("item-protection.block-cooking", true);
+    }
+
+    public boolean blockPlacing() {
+        return getConfig().getBoolean("item-protection.block-placing", true);
+    }
+
     public boolean debugSession() {
         return getConfig().getBoolean("debug-session", false);
     }
@@ -356,6 +374,20 @@ public class MainConfig extends ConfigBase {
         }
 
         save();
+    }
+
+    @Override
+    public UpdaterSettings getUpdaterSettings() {
+        return UpdaterSettings.builder(super.getUpdaterSettings())
+            // Config Version 25 - Add item protection configs
+            .addCustomLogic("25", document -> {
+                if (document.contains("block-crafting")) {
+                    boolean blockCrafting = document.getBoolean("block-crafting");
+                    document.set("item-protection.block-crafting", blockCrafting);
+                    document.remove("block-crafting");
+                }
+            })
+            .build();
     }
 
     public boolean hasCredentials() {
