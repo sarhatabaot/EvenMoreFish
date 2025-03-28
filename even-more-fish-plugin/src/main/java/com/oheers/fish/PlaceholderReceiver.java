@@ -6,7 +6,7 @@ import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -239,7 +239,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                 }
                 
                 EMFMessage message = ConfigMessage.PLACEHOLDER_FISH_MOST_FORMAT.getMessage();
-                message.setAmount(Integer.toString((int) value));
+                message.setAmount((int) value);
                 return message.getLegacyMessage();
             }
             

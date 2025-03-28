@@ -3,7 +3,7 @@ package com.oheers.fish.economy;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.economy.EconomyType;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import net.kyori.adventure.text.Component;
@@ -96,7 +96,7 @@ public class GriefPreventionEconomyType implements EconomyType {
         if (display == null) {
             display = "{amount} Claim Block(s)";
         }
-        EMFMessage message = EMFMessage.fromString(display);
+        EMFSingleMessage message = EMFSingleMessage.fromString(display);
         message.setVariable("{amount}", String.valueOf(worth));
         return message.getComponentMessage();
     }

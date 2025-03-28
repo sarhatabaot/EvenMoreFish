@@ -15,7 +15,8 @@ import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -309,7 +310,7 @@ public class Competition {
 
         int maxCount = MessageConfig.getInstance().getLeaderboardCount();
 
-        EMFMessage builder = EMFMessage.empty();
+        EMFListMessage builder = EMFListMessage.empty();
         int pos = 0;
 
         for (CompetitionEntry entry : entries) {
@@ -330,7 +331,6 @@ public class Competition {
             }
 
             builder.appendMessage(message);
-            builder.appendString("\n");
         }
 
         return builder;

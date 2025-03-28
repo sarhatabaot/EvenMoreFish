@@ -20,7 +20,9 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.utils.ManifestUtil;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -32,7 +34,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -153,7 +154,7 @@ public class AdminCommand {
                             builder.append(Component.space());
                             for (Fish fish : rarity.getOriginalFishList()) {
                                 TextComponent.Builder fishBuilder = Component.text();
-                                EMFMessage message = EMFMessage.fromString("<gray>[</gray>{fish}<gray>]</gray>");
+                                EMFSingleMessage message = EMFSingleMessage.fromString("<gray>[</gray>{fish}<gray>]</gray>");
                                 message.setVariable("{fish}", fish.getDisplayName());
                                 fishBuilder.append(message.getComponentMessage());
                                 fishBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to receive fish")));
@@ -166,12 +167,12 @@ public class AdminCommand {
                             TextComponent.Builder builder = Component.text();
                             for (Rarity rarity : FishManager.getInstance().getRarityMap().values()) {
                                 TextComponent.Builder rarityBuilder = Component.text();
-                                EMFMessage message = EMFMessage.fromString("<gray>[</gray>{rarity}<gray>]</gray>");
+                                EMFSingleMessage message = EMFSingleMessage.fromString("<gray>[</gray>{rarity}<gray>]</gray>");
                                 message.setVariable("{rarity}", rarity.getDisplayName());
                                 rarityBuilder.append(message.getComponentMessage());
                                 rarityBuilder.hoverEvent(HoverEvent.hoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    EMFMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
+                                    EMFSingleMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
                                 ));
                                 rarityBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin list fish " + rarity.getId()));
                                 builder.append(rarityBuilder);
@@ -322,7 +323,7 @@ public class AdminCommand {
                         messageList.add(String.format(messageFormat, prefix, addonManager.isLoading(prefix), entry.getValue().getVersion()));
                     }
 
-                    EMFMessage.fromString(StringUtils.join(messageList, "\n")).send(info.sender());
+                    EMFListMessage.fromStringList(messageList).send(info.sender());
                 });
     }
 
@@ -348,33 +349,34 @@ public class AdminCommand {
 
                 final String msgString =
                     """
-                    {prefix} EvenMoreFish by Oheers {version}\s
-                    {prefix} Feature Branch: {branch}\s
-                    {prefix} Feature Build/Date: {build-date}\s
-                    {prefix} MCV: {mcv}\s
-                    {prefix} SSV: {ssv}\s
-                    {prefix} Online: {online}\s
-                    {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
-                    {prefix} Database Engine: {engine}\s
-                    {prefix} Database Type: {type}\s
-                    """
-                        .replace("{prefix}", MessageConfig.getInstance().getSTDPrefix())
-                        .replace("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion())
-                        .replace("{branch}", getFeatureBranchName())
-                        .replace("{build-date}", getFeatureBranchBuildOrDate())
-                        .replace("{mcv}", Bukkit.getServer().getVersion())
-                        .replace("{ssv}", Bukkit.getServer().getBukkitVersion())
-                        .replace("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()))
-                        .replace("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()))
-                        .replace("{fish}", String.valueOf(fishCount))
-                        .replace("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()))
-                        .replace("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()))
-                        .replace("{engine}", databaseEngine)
-                        .replace("{type}", databaseType);
+                        {prefix} EvenMoreFish by Oheers {version}\s
+                        {prefix} Feature Branch: {branch}\s
+                        {prefix} Feature Build/Date: {build-date}\s
+                        {prefix} MCV: {mcv}\s
+                        {prefix} SSV: {ssv}\s
+                        {prefix} Online: {online}\s
+                        {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
+                        {prefix} Database Engine: {engine}\s
+                        {prefix} Database Type: {type}\s
+                        """;
 
+                EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
 
-                EMFMessage msg = EMFMessage.fromString(msgString);
-                msg.send(info.sender());
+                message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
+                message.setVariable("{version}", EvenMoreFish.getInstance().getDescription().getVersion());
+                message.setVariable("{branch}", getFeatureBranchName());
+                message.setVariable("{build-date}", getFeatureBranchBuildOrDate());
+                message.setVariable("{mcv}", Bukkit.getServer().getVersion());
+                message.setVariable("{ssv}", Bukkit.getServer().getBukkitVersion());
+                message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
+                message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
+                message.setVariable("{fish}", String.valueOf(fishCount));
+                message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
+                message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
+                message.setVariable("{engine}", databaseEngine);
+                message.setVariable("{type}", databaseType);
+
+                message.send(info.sender());
             });
     }
 
@@ -396,7 +398,7 @@ public class AdminCommand {
                     TextComponent.Builder builder = Component.text();
                     builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
                     RewardType.getLoadedTypes().forEach((string, rewardType) -> {
-                        Component show = EMFMessage.fromString(
+                        Component show = EMFSingleMessage.fromString(
                             "Author: " + rewardType.getAuthor() + "\n" +
                             "Registered Plugin: " + rewardType.getPlugin().getName()
                         ).getComponentMessage();
@@ -417,7 +419,7 @@ public class AdminCommand {
         return new CommandAPICommand("migrate")
                 .executes(info -> {
                     if (!MainConfig.getInstance().databaseEnabled()) {
-                        EMFMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
+                        EMFSingleMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
                             .send(info.sender());
                         return;
                     }

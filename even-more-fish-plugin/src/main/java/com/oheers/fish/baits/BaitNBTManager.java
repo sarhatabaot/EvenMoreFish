@@ -5,7 +5,9 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -366,8 +368,8 @@ public class BaitNBTManager {
 
         EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
 
-        Supplier<EMFMessage> baitVariable = () -> {
-            EMFMessage message = EMFMessage.empty();
+        Supplier<EMFListMessage> baitVariable = () -> {
+            EMFListMessage message = EMFListMessage.empty();
 
             String rodNBT = NbtUtils.getString(itemStack, NbtKeys.EMF_APPLIED_BAIT);
 
@@ -387,13 +389,11 @@ public class BaitNBTManager {
                     baitFormat.setAmount("N/A");
                 }
                 baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
-                message.appendString("\n");
                 message.appendMessage(baitFormat);
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
                 for (int i = baitCount; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
-                    message.appendString("\n");
                     message.appendMessage(ConfigMessage.BAIT_UNUSED_SLOT.getMessage());
                 }
             }
@@ -433,10 +433,9 @@ public class BaitNBTManager {
         }
 
         // Return the lore with all bait lines removed from the rod
-        return lore.stream().filter(component -> {
-            System.out.println(EMFMessage.MINIMESSAGE.serialize(component));
-            return !EMFMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER);
-        }).toList();
+        return lore.stream().filter(component ->
+            !EMFSingleMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER)
+        ).toList();
     }
 
     /**
@@ -461,13 +460,13 @@ public class BaitNBTManager {
      * @param baitID The baitID the bait is registered under in baits.yml
      * @return How the bait should look in the lore of the fishing rod, for example.
      */
-    private static EMFMessage getBaitFormatted(String baitID) {
+    private static EMFSingleMessage getBaitFormatted(String baitID) {
         Bait bait = BaitManager.getInstance().getBait(baitID);
         if (bait == null) {
             EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
-            return EMFMessage.fromString("Invalid Bait");
+            return EMFSingleMessage.fromString("Invalid Bait");
         }
-        return EMFMessage.fromString(bait.getDisplayName());
+        return EMFSingleMessage.fromString(bait.getDisplayName());
     }
 
     // Conversion methods
@@ -491,7 +490,7 @@ public class BaitNBTManager {
 
         if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
             // starting at 1, because at least one bait replacing {baits} is repeated.
-            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getPlainTextListMessage().size();
             for (int i = 1; i < maxBaits; i++) {
                 try {
                     lore.remove(lore.size() - 1);
@@ -501,7 +500,7 @@ public class BaitNBTManager {
             }
         } else {
             // starting at 1, because at least one bait replacing {baits} is repeated.
-            int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getRawListMessage().size();
+            int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getPlainTextListMessage().size();
             //compliant version
             for (int i = 1; i < numBaitsApplied; i++) {
                 try {
