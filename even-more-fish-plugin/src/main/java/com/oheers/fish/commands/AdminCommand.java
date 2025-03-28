@@ -327,6 +327,7 @@ public class AdminCommand {
                 });
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private CommandAPICommand getVersion() {
         helpMessageBuilder.addUsage(
             "admin version",

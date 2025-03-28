@@ -486,10 +486,11 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // Checks for updates, surprisingly
+    @SuppressWarnings("UnstableApiUsage")
     private CompletableFuture<Boolean> checkUpdate() {
         return CompletableFuture.supplyAsync(() -> {
             ComparableVersion modrinthVersion = new ComparableVersion(new UpdateChecker(this).getVersion());
-            ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
+            ComparableVersion serverVersion = new ComparableVersion(getPluginMeta().getVersion());
             return modrinthVersion.compareTo(serverVersion) > 0;
         });
     }
@@ -691,37 +692,26 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // FISH TOGGLE METHODS
-    // We use Strings here because Paper 1.18.2 does not have PersistentDataType.BOOLEAN.
 
     public void performFishToggle(@NotNull Player player) {
-        NamespacedKey key = new NamespacedKey(this, "fish-enabled");
+        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        // If it is enabled, disable it
-        if (isCustomFishing(player)) {
-            pdc.set(key, PersistentDataType.STRING, "false");
-            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
-            // If it is disabled, enable it
-        } else {
-            pdc.set(key, PersistentDataType.STRING, "true");
+        // If custom fishing is disabled
+        if (isCustomFishingDisabled(player)) {
+            // Set fish-disabled to false
+            pdc.set(key, PersistentDataType.BOOLEAN, false);
             ConfigMessage.TOGGLE_ON.getMessage().send(player);
+        } else {
+            // Set fish-disabled to true
+            pdc.set(key, PersistentDataType.BOOLEAN, true);
+            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
         }
     }
 
-    public boolean isCustomFishing(@NotNull Player player) {
+    public boolean isCustomFishingDisabled(@NotNull Player player) {
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(this, "fish-enabled");
-        String toggleValue = pdc.getOrDefault(key, PersistentDataType.STRING, "true");
-        return toggleValue.equals("true");
-    }
-
-    /**
-     * Check if the server is Paper
-     * @return Whether the server is running Paper
-     */
-    private boolean isPaper() {
-        // Class names taken from PaperLib's initialize method
-        return classExists("com.destroystokyo.paper.PaperConfig")
-            || classExists("io.papermc.paper.configuration.Configuration");
+        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
+        return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, false);
     }
 
     public boolean isFirstLoad() {

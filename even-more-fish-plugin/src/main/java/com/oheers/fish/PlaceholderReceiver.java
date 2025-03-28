@@ -60,8 +60,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
      * @return The name of the author as a String.
      */
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public @NotNull String getAuthor() {
-        return plugin.getDescription().getAuthors().toString();
+        return plugin.getPluginMeta().getAuthors().toString();
     }
     
     /**
@@ -87,8 +88,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
      * @return The version as a String.
      */
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public @NotNull String getVersion() {
-        return plugin.getDescription().getVersion();
+        return plugin.getPluginMeta().getVersion();
     }
     
     /**
@@ -277,13 +279,13 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                 return Boolean.toString(Competition.isActive());
             }
             case "custom_fishing_boolean" -> {
-                return Boolean.toString(plugin.isCustomFishing(player));
+                return Boolean.toString(!plugin.isCustomFishingDisabled(player));
             }
             case "custom_fishing_status" -> {
-                if (plugin.isCustomFishing(player)) {
-                    return ConfigMessage.CUSTOM_FISHING_ENABLED.getMessage().getLegacyMessage();
-                } else {
+                if (plugin.isCustomFishingDisabled(player)) {
                     return ConfigMessage.CUSTOM_FISHING_DISABLED.getMessage().getLegacyMessage();
+                } else {
+                    return ConfigMessage.CUSTOM_FISHING_ENABLED.getMessage().getLegacyMessage();
                 }
             }
         }

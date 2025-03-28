@@ -1,4 +1,5 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import net.minecrell.pluginyml.paper.PaperPluginDescription
 import nu.studer.gradle.jooq.JooqExtension
 import org.jooq.meta.jaxb.Property
 import java.time.Instant
@@ -84,11 +85,11 @@ dependencies {
 
     implementation(libs.nbt.api)
     implementation(libs.bstats)
-    implementation(libs.universalscheduler)
     implementation(libs.commandapi)
     implementation(libs.inventorygui)
-    implementation(libs.vanishchecker)
     implementation(libs.boostedyaml)
+    implementation(libs.vanishchecker)
+    implementation(libs.universalscheduler)
 
     library(libs.friendlyid)
     library(libs.flyway.core)
@@ -98,12 +99,10 @@ dependencies {
     library(libs.commons.lang3)
     library(libs.commons.codec)
     library(libs.json.simple)
-
     library(libs.jooq)
     library(libs.jooq.codegen)
     library(libs.jooq.meta)
     library(libs.connectors.h2)
-
     library(libs.maven.artifact)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
@@ -114,10 +113,16 @@ dependencies {
 bukkit {
     name = "EvenMoreFish"
     author = "Oheers"
+    // This is being used for developers instead of contributors
+    contributors = listOf(
+        "FireML",
+        "sarhatabaot"
+    )
     main = "com.oheers.fish.EvenMoreFish"
     version = project.version.toString()
     description = project.description.toString()
     website = "https://github.com/EvenMoreFish/EvenMoreFish"
+    apiVersion = "1.20"
     foliaSupported = true
 
     depend = listOf()
@@ -139,7 +144,6 @@ bukkit {
         "GriefPrevention"
     )
     loadBefore = listOf("AntiAC")
-    apiVersion = "1.18"
 
     permissions {
         register("emf.*") {
