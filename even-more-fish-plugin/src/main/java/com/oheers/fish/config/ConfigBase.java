@@ -201,6 +201,7 @@ public class ConfigBase {
     private String convertLegacyString(@NotNull String message) {
         // Get MiniMessage serializer
         final MiniMessage miniMessageSerializer = MiniMessage.builder()
+            .strict(true)
             .postProcessor(component -> component)
             .build();
 
@@ -208,9 +209,6 @@ public class ConfigBase {
         if (!FishUtils.isLegacyString(message)) {
             return message;
         }
-
-        // Prepare reset characters as MiniMessage does not insert them by default
-        message = message.replace("&r", "__resetchar__");
 
         // Get LegacyComponentSerializer
         final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
@@ -220,10 +218,7 @@ public class ConfigBase {
 
         // Legacy -> Component -> MiniMessage
         Component legacy = legacySerializer.deserialize(message);
-        String miniMessage = miniMessageSerializer.serialize(legacy);
-
-        // Replace our prepared reset characters with the reset tag
-        return miniMessage.replace("__resetchar__", "<reset>");
+        return miniMessageSerializer.serialize(legacy);
     }
 
 }

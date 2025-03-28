@@ -2,11 +2,11 @@ package com.oheers.fish.messages;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MessageConfig;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public enum ConfigMessage {
 
@@ -257,7 +257,7 @@ public enum ConfigMessage {
 
     /**
      * This is the config enum for a value in the messages.yml file. It does not store the actual data but references
-     * where to look in the file for the data. This must be passed through an EMFMessage object before it can be sent to
+     * where to look in the file for the data. This must be passed through an EMFSingleMessage object before it can be sent to
      * players. In there, it is possible to add variable options, and it will be colour formatted too.
      *
      * @param id            The id in messages.yml for the ConfigMessage.
@@ -276,7 +276,7 @@ public enum ConfigMessage {
 
     /**
      * This is the config enum for a list value in the messages.yml file. It does not store the actual data but references
-     * where to look in the file for the data. This must be passed through an EMFMessage object before it can be sent to
+     * where to look in the file for the data. This must be passed through an EMFSingleMessage object before it can be sent to
      * players. In there, it is possible to add variable options, and it will be colour formatted too. It also must be
      * a list within the file.
      *
@@ -323,34 +323,35 @@ public enum ConfigMessage {
     }
 
     public EMFMessage getMessage() {
-        EMFMessage message = EMFMessage.empty();
         if (isListForm()) {
+            EMFListMessage listMessage = EMFListMessage.empty();
             List<String> list = getStringList(getNormalList(), getId());
             for (String line : list) {
                 if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                    message.appendString(line.substring(10));
+                    listMessage.appendString(line.substring(10));
                 } else {
-                    message.appendMessage(getPrefixType().getPrefix());
-                    message.appendString(line);
-                }
-
-                if (!Objects.equals(line, list.get(list.size() - 1))) {
-                    message.appendString("\n");
+                    EMFMessage prefix = getPrefixType().getPrefix();
+                    prefix.appendString(line);
+                    listMessage.appendMessage(prefix);
                 }
             }
+            listMessage.setCanSilent(this.canSilent);
+            return listMessage;
         } else {
             String line = getString(getNormal(), getId());
+            EMFSingleMessage singleMessage = EMFSingleMessage.empty();
             if (line != null) {
                 if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                    message.appendString(line.substring(10));
+                    singleMessage.appendString(line.substring(10));
                 } else {
-                    message.appendMessage(getPrefixType().getPrefix());
-                    message.appendString(line);
+                    EMFMessage prefix = getPrefixType().getPrefix();
+                    prefix.appendString(line);
+                    singleMessage.appendMessage(prefix);
                 }
             }
+            singleMessage.setCanSilent(this.canSilent);
+            return singleMessage;
         }
-        message.setCanSilent(this.canSilent);
-        return message;
     }
 
     /**

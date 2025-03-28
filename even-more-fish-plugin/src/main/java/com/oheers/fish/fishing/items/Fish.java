@@ -5,7 +5,8 @@ import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.selling.WorthNBT;
 import com.oheers.fish.utils.ItemFactory;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -238,7 +239,7 @@ public class Fish {
         }
         Player player = Bukkit.getPlayer(fisherman);
         if (player != null) {
-            EMFMessage.fromString(msg).send(player);
+            EMFSingleMessage.fromString(msg).send(player);
         }
     }
 
@@ -314,7 +315,7 @@ public class Fish {
         List<String> loreOverride = section.getStringList("lore-override");
         EMFMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
-            newLoreLine = EMFMessage.fromStringList(loreOverride);
+            newLoreLine = EMFSingleMessage.fromStringList(loreOverride);
         } else {
             newLoreLine = ConfigMessage.FISH_LORE.getMessage();
         }
@@ -323,7 +324,7 @@ public class Fish {
         String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
 
         newLoreLine.setVariable(
-                "\n{fish_lore}",
+                "{fish_lore}",
                 replacement
         );
 
@@ -485,7 +486,7 @@ public class Fish {
     }
 
     @NotNull
-    public EMFMessage getDisplayName() {
+    public EMFSingleMessage getDisplayName() {
         if (displayName == null) {
             return rarity.format(name);
         }

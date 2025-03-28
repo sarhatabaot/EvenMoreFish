@@ -8,7 +8,7 @@ import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -254,9 +254,9 @@ public class CompetitionFile extends ConfigBase {
     /**
      * @return The prefix for this competition's bossbar.
      */
-    public EMFMessage getBossbarPrefix() {
+    public EMFSingleMessage getBossbarPrefix() {
         String prefix = getConfig().getString("bossbar-prefix", "<green><bold>Fishing Contest: ");
-        return EMFMessage.fromString(prefix);
+        return EMFSingleMessage.fromString(prefix);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.oheers.fish.utils;
 
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -66,10 +66,10 @@ public class ItemBuilder {
         ItemStack stack = new ItemStack(this.material);
         stack.editMeta(meta -> {
             if (this.display != null) {
-                meta.displayName(EMFMessage.fromString(this.display).getComponentMessage());
+                meta.displayName(EMFSingleMessage.fromString(this.display).getComponentMessage());
             }
             if (!this.lore.isEmpty()) {
-                meta.lore(EMFMessage.fromStringList(this.lore).getComponentListMessage());
+                meta.lore(EMFSingleMessage.fromStringList(this.lore).getComponentListMessage());
             }
         });
         if (this.glowing) {

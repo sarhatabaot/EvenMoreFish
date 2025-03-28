@@ -3,7 +3,7 @@ package com.oheers.fish.competition.rewardtypes;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.reward.RewardType;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -22,7 +22,7 @@ public class MessageRewardType extends RewardType {
             );
         } else {
             player.sendMessage(
-                EMFMessage.MINIMESSAGE.deserialize(value)
+                EMFSingleMessage.MINIMESSAGE.deserialize(value)
             );
         }
     }

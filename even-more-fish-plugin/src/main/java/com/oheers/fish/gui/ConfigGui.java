@@ -3,7 +3,7 @@ package com.oheers.fish.gui;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.GUIFillerConfig;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemUtils;
 import de.themoep.inventorygui.GuiElement;
@@ -29,7 +29,7 @@ public class ConfigGui {
     protected final Map<String, BiConsumer<ConfigGui, GuiElement.Click>> actions = GUIUtils.getActionMap();
     protected final Section config;
     protected final Player player;
-    private final @NotNull Map<String, EMFMessage> replacements = new HashMap<>();
+    private final @NotNull Map<String, EMFSingleMessage> replacements = new HashMap<>();
 
     protected InventoryGui gui;
     private InventoryGui.CloseAction closeAction = null;
@@ -42,18 +42,18 @@ public class ConfigGui {
     }
 
     public void addReplacement(@NotNull String variable, @NotNull String replacement) {
-        this.replacements.put(variable, EMFMessage.fromString(replacement));
+        this.replacements.put(variable, EMFSingleMessage.fromString(replacement));
     }
 
     public void addReplacement(@NotNull String variable, @NotNull Component replacement) {
-        this.replacements.put(variable, EMFMessage.of(replacement));
+        this.replacements.put(variable, EMFSingleMessage.of(replacement));
     }
 
-    public void addReplacement(@NotNull String variable, @NotNull EMFMessage replacement) {
+    public void addReplacement(@NotNull String variable, @NotNull EMFSingleMessage replacement) {
         this.replacements.put(variable, replacement);
     }
 
-    public void addReplacements(@NotNull Map<String, EMFMessage> replacements) {
+    public void addReplacements(@NotNull Map<String, EMFSingleMessage> replacements) {
         this.replacements.putAll(replacements);
     }
 
@@ -89,7 +89,7 @@ public class ConfigGui {
         String[] layout = this.config.getStringList("layout").stream().limit(6).toArray(String[]::new);
         InventoryGui gui = new InventoryGui(
             EvenMoreFish.getInstance(),
-            title == null ? null : EMFMessage.fromString(title).getLegacyMessage(),
+            title == null ? null : EMFSingleMessage.fromString(title).getLegacyMessage(),
             layout
         );
         loadFiller(gui, this.config);

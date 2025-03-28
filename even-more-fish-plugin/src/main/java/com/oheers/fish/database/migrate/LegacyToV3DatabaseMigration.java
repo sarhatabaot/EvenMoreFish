@@ -6,7 +6,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.connection.MigrationManager;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -130,14 +130,14 @@ public class LegacyToV3DatabaseMigration {
      */
     public void migrate(CommandSender initiator) {
         if (!migrationManager.usingV2()) {
-            EMFMessage msg = EMFMessage.fromString("EvenMoreFish is already using the latest V3 database engine.");
+            EMFSingleMessage msg = EMFSingleMessage.fromString("EvenMoreFish is already using the latest V3 database engine.");
             msg.prependMessage(PrefixType.ERROR.getPrefix());
             msg.send(initiator);
             return;
         }
         
         EvenMoreFish.getInstance().getLogger().info(() -> initiator.getName() + " has begun the migration to EMF database V3 from V2.");
-        EMFMessage msg = EMFMessage.fromString("Beginning conversion to V3 database engine.");
+        EMFSingleMessage msg = EMFSingleMessage.fromString("Beginning conversion to V3 database engine.");
         msg.prependMessage(PrefixType.ADMIN.getPrefix());
         msg.send(initiator);
         
@@ -145,17 +145,17 @@ public class LegacyToV3DatabaseMigration {
         File dataFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "data-archived");
         
         if (oldDataFolder.renameTo(dataFolder)) {
-            EMFMessage message = EMFMessage.fromString("Archived /data/ folder.");
+            EMFSingleMessage message = EMFSingleMessage.fromString("Archived /data/ folder.");
             message.prependMessage(PrefixType.ADMIN.getPrefix());
             message.send(initiator);
         } else {
-            EMFMessage message = EMFMessage.fromString("Failed to archive /data/ folder. Cancelling migration. [No further information]");
+            EMFSingleMessage message = EMFSingleMessage.fromString("Failed to archive /data/ folder. Cancelling migration. [No further information]");
             message.prependMessage(PrefixType.ADMIN.getPrefix());
             message.send(initiator);
             return;
         }
         
-        EMFMessage fishReportMSG = EMFMessage.fromString("Beginning FishReport migrations. This may take a while.");
+        EMFSingleMessage fishReportMSG = EMFSingleMessage.fromString("Beginning FishReport migrations. This may take a while.");
         fishReportMSG.prependMessage(PrefixType.ADMIN.getPrefix());
         fishReportMSG.send(initiator);
         
@@ -177,13 +177,13 @@ public class LegacyToV3DatabaseMigration {
                 database.createUser(playerUUID);
                 translateFishReportsV2(playerUUID, reports);
                 
-                EMFMessage migratedMSG = EMFMessage.fromString("Migrated " + reports.size() + " fish for: " + playerUUID);
+                EMFSingleMessage migratedMSG = EMFSingleMessage.fromString("Migrated " + reports.size() + " fish for: " + playerUUID);
                 migratedMSG.prependMessage(PrefixType.ADMIN.getPrefix());
                 migratedMSG.send(initiator);
             }
             
         } catch (NullPointerException | FileNotFoundException exception) {
-            EMFMessage message = EMFMessage.fromString("Fatal error whilst upgrading to V3 database engine.");
+            EMFSingleMessage message = EMFSingleMessage.fromString("Fatal error whilst upgrading to V3 database engine.");
             message.prependMessage(PrefixType.ERROR.getPrefix());
             message.send(initiator);
             
@@ -193,11 +193,11 @@ public class LegacyToV3DatabaseMigration {
             throw new RuntimeException(e);
         }
         
-        EMFMessage migratedMSG = EMFMessage.fromString("Migration completed. Your database is now using the V3 database engine: to complete the migration, it is recommended to restart your server.");
+        EMFSingleMessage migratedMSG = EMFSingleMessage.fromString("Migration completed. Your database is now using the V3 database engine: to complete the migration, it is recommended to restart your server.");
         migratedMSG.prependMessage(PrefixType.ADMIN.getPrefix());
         migratedMSG.send(initiator);
         
-        EMFMessage thankyou = EMFMessage.fromString("Now that migration is complete, you will be able to use functionality in upcoming" +
+        EMFSingleMessage thankyou = EMFSingleMessage.fromString("Now that migration is complete, you will be able to use functionality in upcoming" +
             " updates such as quests, deliveries and a fish log. - Oheers");
         thankyou.prependMessage(PrefixType.ERROR.getPrefix());
         thankyou.send(initiator);

@@ -2,7 +2,7 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +49,6 @@ public class HelpMessageBuilder {
             EMFMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
             usage.setVariable("{command}", correctCommand(key));
             usage.setVariable("{description}", value.get());
-            message.appendString("\n<reset>");
             message.appendMessage(usage);
         });
         return message;

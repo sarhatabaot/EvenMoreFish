@@ -14,7 +14,8 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -134,7 +135,7 @@ public abstract class Processor<E extends Event> implements Listener {
 
         if (!fish.isSilent()) {
             String length = decimalFormat.format(fish.getLength());
-            EMFMessage rarity = EMFMessage.fromString(fish.getRarity().getId());
+            EMFMessage rarity = EMFSingleMessage.fromString(fish.getRarity().getId());
 
             EMFMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
             message.setPlayer(player);
