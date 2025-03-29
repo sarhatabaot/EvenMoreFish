@@ -12,7 +12,7 @@ import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.BaitFile;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
@@ -231,7 +231,7 @@ public class FishingProcessor implements Listener {
                     EvenMoreFish.getInstance().getDatabase().createFishData(fish, player.getUniqueId());
                 }
 
-                DataManager.getInstance().handleFishCatch(player.getUniqueId(), fish);
+                DataManagerOld.getInstance().handleFishCatch(player.getUniqueId(), fish);
             });
         }
 

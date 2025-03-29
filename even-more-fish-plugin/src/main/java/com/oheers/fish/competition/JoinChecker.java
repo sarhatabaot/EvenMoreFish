@@ -4,7 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.user.UserReport;
 import org.bukkit.event.EventHandler;
@@ -55,7 +55,7 @@ public class JoinChecker implements Listener {
             }
 
             if (fishReports != null && userReport != null) {
-                DataManager.getInstance().cacheUser(userUUID, userReport, fishReports);
+                DataManagerOld.getInstance().cacheUser(userUUID, userReport, fishReports);
             } else {
                 EvenMoreFish.getInstance().getLogger().severe("Null value when fetching data for user (" + userName + "),\n" +
                         "UserReport: " + (userReport == null) +
@@ -104,17 +104,17 @@ public class JoinChecker implements Listener {
                 EvenMoreFish.getInstance().getDatabase().createEmptyUserReport(userUUID);
             }
 
-            List<FishReportOld> fishReports = DataManager.getInstance().getFishReportsIfExists(userUUID);
+            List<FishReportOld> fishReports = DataManagerOld.getInstance().getFishReportsIfExists(userUUID);
             if (fishReports != null) {
                 EvenMoreFish.getInstance().getDatabase().writeFishReports(userUUID, fishReports);
             }
 
-            UserReport userReport = DataManager.getInstance().getUserReportIfExists(userUUID);
+            UserReport userReport = DataManagerOld.getInstance().getUserReportIfExists(userUUID);
             if (userReport != null) {
                 EvenMoreFish.getInstance().getDatabase().writeUserReport(userUUID, userReport);
             }
 
-            DataManager.getInstance().uncacheUser(userUUID);
+            DataManagerOld.getInstance().uncacheUser(userUUID);
         });
         
     }

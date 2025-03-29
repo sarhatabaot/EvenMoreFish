@@ -12,7 +12,7 @@ import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
@@ -351,7 +351,7 @@ public class Competition {
             return;
         }
 
-        UserReport userReport = DataManager.getInstance().getUserReportIfExists(entry.getPlayer());
+        UserReport userReport = DataManagerOld.getInstance().getUserReportIfExists(entry.getPlayer());
         if (userReport == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not fetch User Report for " + entry.getPlayer() + ", their data has not been modified.");
             return;

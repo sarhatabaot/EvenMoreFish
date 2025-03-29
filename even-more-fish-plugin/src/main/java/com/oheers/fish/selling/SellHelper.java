@@ -7,7 +7,7 @@ import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
@@ -170,8 +170,8 @@ public class SellHelper {
 
         double moneyEarned = getTotalWorth(soldFish);
         int fishSold = calcFishSold(soldFish);
-        DataManager.getInstance().getUserReportIfExists(uuid).incrementFishSold(fishSold);
-        DataManager.getInstance().getUserReportIfExists(uuid).incrementMoneyEarned(moneyEarned);
+        DataManagerOld.getInstance().getUserReportIfExists(uuid).incrementFishSold(fishSold);
+        DataManagerOld.getInstance().getUserReportIfExists(uuid).incrementMoneyEarned(moneyEarned);
     }
 
     private int calcFishSold(@NotNull List<SoldFish> soldFish) {

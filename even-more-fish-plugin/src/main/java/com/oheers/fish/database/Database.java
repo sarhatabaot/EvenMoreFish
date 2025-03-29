@@ -2,6 +2,8 @@ package com.oheers.fish.database;
 
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.annotations.NeedsTesting;
+import com.oheers.fish.api.annotations.TestType;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
@@ -35,6 +37,10 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+@NeedsTesting(
+        reason="Requires full testing, unit where possible, integration eventually.",
+        testType={TestType.MANUAL, TestType.UNIT, TestType.INTEGRATION}
+)
 public class Database implements DatabaseAPI {
     private String version;
     private final ConnectionFactory connectionFactory;
@@ -370,27 +376,6 @@ public class Database implements DatabaseAPI {
         return userHasFish(fish.getRarity().getId(), fish.getName(), getUserId(user.getUniqueId()));
     }
 
-//    @Override
-//    public boolean userHasFish(@NotNull String rarity, @NotNull String fish, int userId) {
-//        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
-//            @Override
-//            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
-//                return dslContext.select()
-//                        .from(Tables.FISH_LOG)
-//                        .where(Tables.FISH_LOG.USER_ID.eq(userId)
-//                                .and(Tables.FISH_LOG.RARITY.eq(rarity)
-//                                        .and(Tables.FISH_LOG.FISH.eq(fish))))
-//                        .fetch()
-//                        .isNotEmpty();
-//            }
-//
-//            @Override
-//            protected Boolean empty() {
-//                return false;
-//            }
-//        }.prepareAndRunQuery();
-//    }
-
     @Override
     public void createCompetitionReport(@NotNull Competition competition) {
         new ExecuteUpdate(connectionFactory, settings) {
@@ -647,5 +632,32 @@ public class Database implements DatabaseAPI {
                         .execute();
             }
         }.executeUpdate();
+    }
+
+    /**
+     * Checks if a user has caught a specific fish with a given rarity.
+     *
+     * @param rarity The rarity of the fish.
+     * @param fish   The name of the fish.
+     * @param id     The unique identifier of the user.
+     * @return {@code true} if the user has caught the fish, {@code false} otherwise.
+     */
+    @Override
+    public boolean userHasFish(@NotNull String rarity, @NotNull String fish, int id) {
+        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
+            @Override
+            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
+                return dslContext.fetchExists(Tables.USER_FISH_STATS,
+                        Tables.USER_FISH_STATS.USER_ID.eq(id)
+                                .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(rarity))
+                                .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fish)));
+            }
+
+            @Override
+            protected Boolean empty() {
+                return false;
+            }
+        }.prepareAndRunQuery();
+
     }
 }

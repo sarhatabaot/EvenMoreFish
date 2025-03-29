@@ -4,7 +4,7 @@ import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -247,7 +247,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
         if (identifier.startsWith("total_money_earned_")) {
             try {
                 final UUID uuid = UUID.fromString(identifier.split("total_money_earned_")[1]);
-                final UserReport userReport = DataManager.getInstance().getUserReportIfExists(uuid);
+                final UserReport userReport = DataManagerOld.getInstance().getUserReportIfExists(uuid);
                 if (userReport == null) {
                     return null;
                 }
@@ -260,7 +260,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
         if (identifier.startsWith("total_fish_sold_")) {
             try {
                 final UUID uuid = UUID.fromString(identifier.split("total_fish_sold_")[1]);
-                final UserReport userReport = DataManager.getInstance().getUserReportIfExists(uuid);
+                final UserReport userReport = DataManagerOld.getInstance().getUserReportIfExists(uuid);
                 if (userReport == null) {
                     return null;
                 }

@@ -28,7 +28,7 @@ import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
 import com.oheers.fish.economy.PlayerPointsEconomyType;
@@ -210,10 +210,10 @@ public class EvenMoreFish extends EMFPlugin {
         AutoRunner.init();
 
         if (MainConfig.getInstance().databaseEnabled()) {
-            DataManager.init();
+            DataManagerOld.init();
 
             database = new Database();
-            DataManager.getInstance().loadUserReportsIntoCache();
+            DataManagerOld.getInstance().loadUserReportsIntoCache();
         }
 
         registerCommands();
@@ -396,10 +396,10 @@ public class EvenMoreFish extends EMFPlugin {
                 return;
             }
 
-            DataManager.getInstance().saveFishReports();
-            DataManager.getInstance().saveUserReports();
+            DataManagerOld.getInstance().saveFishReports();
+            DataManagerOld.getInstance().saveUserReports();
 
-            DataManager.getInstance().uncacheAll();
+            DataManagerOld.getInstance().uncacheAll();
         };
         if (scheduler) {
             getScheduler().runTask(save);
