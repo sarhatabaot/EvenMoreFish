@@ -10,17 +10,15 @@ import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
-public class DataManager {
+public class DataManagerOld {
 
-    private static DataManager instance;
+    private static DataManagerOld instance;
 
     private final LoadingCache<UUID, UserReport> userReportCache = Caffeine.newBuilder()
             .expireAfter(new Expiry<UUID, UserReport>() {
@@ -102,16 +100,17 @@ public class DataManager {
         return fishReportCache.asMap();
     }
 
-    public static DataManager getInstance() {
+    public static DataManagerOld getInstance() {
         return instance;
     }
 
     public static void init() {
         if (instance == null) {
-            instance = new DataManager();
+            instance = new DataManagerOld();
         }
     }
 
+    @Deprecated
     public void saveFishReports() {
         ConcurrentMap<UUID, List<FishReportOld>> allReports = getAllFishReports();
         EvenMoreFish.getInstance().getLogger().info("Saving " + allReports.size() + " fish reports.");
@@ -123,6 +122,7 @@ public class DataManager {
             }
         }
     }
+
 
     public void saveUserReports() {
         EvenMoreFish.getInstance().getLogger().info("Saving " + getAllUserReports().size() + " user reports.");
