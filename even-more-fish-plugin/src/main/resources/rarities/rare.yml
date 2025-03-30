@@ -1,7 +1,7 @@
 id: Rare
 disabled: false
 weight: 10
-colour: '&b'
+format: <aqua>{name}
 worth-multiplier: 0.2
 broadcast: false
 size:
@@ -23,7 +23,7 @@ fish:
       material: INK_SAC
   Squid:
     item:
-      head-64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTE2ZjU5ZWNmNzI3ZTEyOTNjYzY3NWNjOGMwZWMwNmMzN2Y2NmVhYTcwNTU1OTVmMjYxNGQ5YWFmNTU4NGE0NSJ9fX0="
+      head-64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTE2ZjU5ZWNmNzI3ZTEyOTNjYzY3NWNjOGMwZWMwNmMzN2Y2NmVhYTcwNTU1OTVmMjYxNGQ5YWFmNTU4NGE0NSJ9fX0=
   Coral:
     item:
       materials:
@@ -34,12 +34,12 @@ fish:
         - HORN_CORAL
   Jellyfish:
     item:
-      head-64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjI2MTcyODE5MmI3ZDU5NmQwZTdkYjg2YjkzM2NlYWMyNmQwYzg1MDIwNmU3NDljZmNlYTg2NjM1OTMyNzFjMyJ9fX0="
+      head-64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjI2MTcyODE5MmI3ZDU5NmQwZTdkYjg2YjkzM2NlYWMyNmQwYzg1MDIwNmU3NDljZmNlYTg2NjM1OTMyNzFjMyJ9fX0=
   Temperate Frog:
     item:
-      head-64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWYzZTI5ZGQ5NDdhMTc3ODk1ZjYxMjFkMjMzMWI2NWFjM2Y4OTZmZGE0YmRkMTE1MTQ5MWU0MGI4MDQ5NTJhNyJ9fX0="
+      head-64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWYzZTI5ZGQ5NDdhMTc3ODk1ZjYxMjFkMjMzMWI2NWFjM2Y4OTZmZGE0YmRkMTE1MTQ5MWU0MGI4MDQ5NTJhNyJ9fX0=
     requirements:
-      weather: "DOWNFALL"
+      weather: DOWNFALL
       biome:
         - RIVER
         - BEACH
@@ -69,9 +69,9 @@ fish:
         - DEEP_LUKEWARM_OCEAN
   Cold Frog:
     item:
-      head-64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2U2MmU4YTA0OGQwNDBlYjA1MzNiYTI2YTg2NmNkOWMyZDA5MjhjOTMxYzUwYjQ0ODJhYzNhMzI2MWZhYjZmMCJ9fX0="
+      head-64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2U2MmU4YTA0OGQwNDBlYjA1MzNiYTI2YTg2NmNkOWMyZDA5MjhjOTMxYzUwYjQ0ODJhYzNhMzI2MWZhYjZmMCJ9fX0=
     requirements:
-      weather: "DOWNFALL"
+      weather: DOWNFALL
       biome:
         - FROZEN_RIVER
         - SNOWY_BEACH
@@ -86,9 +86,9 @@ fish:
         - DEEP_FROZEN_OCEAN
   Warm Frog:
     item:
-      head-64: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWU5MzEyYjViMmJhYjlhZDUxZWE0YjZhNDA3ZDZkMzkwYmI1MDQzNDA4NzU3Yjk3NmE3NTU2ODk4YWM0M2RlMCJ9fX0="
+      head-64: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWU5MzEyYjViMmJhYjlhZDUxZWE0YjZhNDA3ZDZkMzkwYmI1MDQzNDA4NzU3Yjk3NmE3NTU2ODk4YWM0M2RlMCJ9fX0=
     requirements:
-      weather: "DOWNFALL"
+      weather: DOWNFALL
       biome:
         - JUNGLE
         - BAMBOO_JUNGLE
@@ -103,13 +103,11 @@ fish:
         - WARM_OCEAN
         - MANGROVE_SWAMP
   Electric Eel:
-    message: "&e*Zap!*"
+    message: <yellow>*Zap!*
     health: -1
   Sunfish:
     requirements:
-      ingame-time:
-        minTime: 6000
-        maxTime: 18000
+      ingame-time: 6000-18000
     item:
       material: SUNFLOWER
   Goldfish:

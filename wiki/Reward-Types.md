@@ -3,7 +3,7 @@ To use, change the identifier to the one you want using the table below:
 rewards:
   1:
     - "MONEY:5000"
-    - "MESSAGE:&eCongratulations!"
+    - "MESSAGE:<yellow>Congratulations!"
   2:
     - "MONEY:2000"
 ```
@@ -16,7 +16,7 @@ rewards:
 | Health      | `HEALTH:5`                          | Adds health.                                     | -                                          |
 | Hunger      | `HUNGER:20`                         | Sets hunger level                                | -                                          |
 | Items       | `ITEM:cobblestone,1`                | Gives an item (doesn't support addons - for now) | -                                          |
-| Message     | `MESSAGE:Reward Type!`              | Sends a message                                  | -                                          |
+| Message     | `MESSAGE:<green>Reward Type!`       | Sends a message                                  | -                                          |
 | Exp         | `EXP:5000`                          | Gives experience points.                         | -                                          |
 
 ## External Plugin Types

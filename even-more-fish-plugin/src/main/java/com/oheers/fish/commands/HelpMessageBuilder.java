@@ -1,20 +1,19 @@
 package com.oheers.fish.commands;
 
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class HelpMessageBuilder {
 
-    private final HashMap<String, Supplier<AbstractMessage>> usages;
+    private final HashMap<String, Supplier<EMFMessage>> usages;
 
-    private HelpMessageBuilder(@NotNull HashMap<String, Supplier<AbstractMessage>> usages) {
+    private HelpMessageBuilder(@NotNull HashMap<String, Supplier<EMFMessage>> usages) {
         this.usages = usages;
     }
 
@@ -28,14 +27,14 @@ public class HelpMessageBuilder {
     /**
      * Creates a HelpMessageBuilder instance with the provided usages
      */
-    public static HelpMessageBuilder create(@NotNull HashMap<String, Supplier<AbstractMessage>> usages) {
+    public static HelpMessageBuilder create(@NotNull HashMap<String, Supplier<EMFMessage>> usages) {
         return new HelpMessageBuilder(usages);
     }
 
     /**
      * Adds a usage to this builder
      */
-    public HelpMessageBuilder addUsage(@NotNull String name, @NotNull Supplier<AbstractMessage> helpMessage) {
+    public HelpMessageBuilder addUsage(@NotNull String name, @NotNull Supplier<EMFMessage> helpMessage) {
         this.usages.putIfAbsent(name, helpMessage);
         return this;
     }
@@ -44,14 +43,13 @@ public class HelpMessageBuilder {
      * Creates the final message.
      * @return The created help message
      */
-    public AbstractMessage buildMessage() {
-        final AbstractMessage message = ConfigMessage.HELP_GENERAL_TITLE.getMessage();
+    public EMFMessage buildMessage() {
+        final EMFMessage message = ConfigMessage.HELP_GENERAL_TITLE.getMessage();
         usages.forEach((key, value) -> {
-            AbstractMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
+            EMFMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
             usage.setVariable("{command}", correctCommand(key));
             usage.setVariable("{description}", value.get());
-            message.appendString("\n");
-            message.appendString(usage.getLegacyMessage());
+            message.appendMessage(usage);
         });
         return message;
     }

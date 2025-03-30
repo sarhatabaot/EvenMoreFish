@@ -9,10 +9,13 @@ id: exampleBait
 disabled: false
 
 # This can be used in the lore format to create a consistent colour theme. Defaults to &e (yellow)
-bait-theme: "&e"
+bait-theme: "<yellow>"
 
 # When more than 1 types of baits are applied, how likely is it that this one should be used?
 application-weight: 150
+
+# Can this bait be caught by fishing?
+can-be-caught: true
 
 # How likely should it be to find this bait when they're caught.
 catch-weight: 100
@@ -32,7 +35,7 @@ drop-quantity: 1
 # Item configuration follows the same format as fish
 item:
   material: NAUTILUS_SHELL
-  displayname: "&7Example Bait"
+  displayname: "<gray>Example Bait"
 
 # This lists the fish that are attracted to this bait (make sure to specify the rarity and ensure there's no typos)
 fish:
@@ -52,4 +55,4 @@ rarities:
 
 # This is the bait's custom lore, this is added as the {lore} variable in the general bait lore (configured in messages.yml)
 lore:
-  - "&7Boosts Epic & Legendary fish."
+  - "<gray>Boosts Epic & Legendary fish."

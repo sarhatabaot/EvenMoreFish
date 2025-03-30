@@ -1,14 +1,13 @@
-package com.oheers.fish.config.messages;
+package com.oheers.fish.messages;
 
-import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.oheers.fish.config.MessageConfig;
 
 public enum PrefixType {
 
     NONE(null, null),
-    ADMIN("prefix-admin", "&c[EvenMoreFish] "),
-    DEFAULT("prefix-regular", "&a[EvenMoreFish] "),
-    ERROR("prefix-error", "&c[EvenMoreFish] ");
+    ADMIN("prefix-admin", "<red>[EvenMoreFish] "),
+    DEFAULT("prefix-regular", "<green>[EvenMoreFish] "),
+    ERROR("prefix-error", "<red>[EvenMoreFish] ");
 
     private final String id, normal;
 
@@ -29,12 +28,12 @@ public enum PrefixType {
      *
      * @return The unformatted prefix, unless the type is NONE.
      */
-    public AbstractMessage getPrefix() {
+    public EMFSingleMessage getPrefix() {
         if (id == null) {
-            return EvenMoreFish.getAdapter().createMessage("");
+            return EMFSingleMessage.empty();
         } else {
-            AbstractMessage message = EvenMoreFish.getAdapter().createMessage(MessageConfig.getInstance().getConfig().getString(id, normal));
-            message.appendString("&r");
+            EMFSingleMessage message = EMFSingleMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
+            message.appendString("<reset>");
             return message;
         }
     }

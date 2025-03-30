@@ -1,9 +1,8 @@
-package com.oheers.fish.config.messages;
+package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.api.adapter.AbstractMessage;
-import com.oheers.fish.config.ConfigBase;
-import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.PrefixType;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
 public class MessageConfig extends ConfigBase {
@@ -19,11 +18,11 @@ public class MessageConfig extends ConfigBase {
         return instance;
     }
 
-    public String getSTDPrefix() {
-        AbstractMessage message = EvenMoreFish.getAdapter().createMessage("");
+    public EMFSingleMessage getSTDPrefix() {
+        EMFSingleMessage message = EMFSingleMessage.empty();
         message.prependMessage(PrefixType.DEFAULT.getPrefix());
-        message.appendString("&r");
-        return message.getLegacyMessage();
+        message.appendString("<reset>");
+        return message;
     }
 
     public int getLeaderboardCount() {
@@ -34,31 +33,31 @@ public class MessageConfig extends ConfigBase {
     public UpdaterSettings getUpdaterSettings() {
         UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());
 
-        // Bossbar config relocations - config version 2
+        // Bossbar config relocations - config version 18
         builder.addCustomLogic("18", yamlDocument -> {
             if (yamlDocument.contains("bossbar.hour-color")) {
-                String hourColor = yamlDocument.getString("bossbar.hour-color", "&f");
+                String hourColor = yamlDocument.getString("bossbar.hour-color", "<white>");
                 String hour = yamlDocument.getString("bossbar.hour", "h");
                 yamlDocument.set("bossbar.hour", hourColor + "{hour}" + hour);
                 yamlDocument.remove("bossbar.hour-color");
             }
 
             if (yamlDocument.contains("bossbar.minute-color")) {
-                String minuteColor = yamlDocument.getString("bossbar.minute-color", "&f");
+                String minuteColor = yamlDocument.getString("bossbar.minute-color", "<white>");
                 String minute = yamlDocument.getString("bossbar.minute", "m");
                 yamlDocument.set("bossbar.minute", minuteColor + "{minute}" + minute);
                 yamlDocument.remove("bossbar.minute-color");
             }
 
             if (yamlDocument.contains("bossbar.second-color")) {
-                String secondColor = yamlDocument.getString("bossbar.second-color", "&f");
+                String secondColor = yamlDocument.getString("bossbar.second-color", "<white>");
                 String second = yamlDocument.getString("bossbar.second", "s");
                 yamlDocument.set("bossbar.second", secondColor + "{second}" + second);
                 yamlDocument.remove("bossbar.second-color");
             }
         });
 
-        // Prefix config relocations - config version 3
+        // Prefix config relocations - config version 19
         builder.addCustomLogic("19", yamlDocument -> {
             if (yamlDocument.contains("prefix")) {
                 String prefix = yamlDocument.getString("prefix");

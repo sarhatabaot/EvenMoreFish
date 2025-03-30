@@ -1,12 +1,12 @@
 ## How to create your own RewardTypes
 
-The [RewardType](https://github.com/Oheers/EvenMoreFish/blob/master/even-more-fish-api/src/main/java/com/oheers/fish/api/reward/RewardType.java) interface exists in the API module of EvenMoreFish. Below is an example of how to use it.
+The [RewardType](https://github.com/EvenMoreFish/EvenMoreFish/blob/master/even-more-fish-api/src/main/java/com/oheers/fish/api/reward/RewardType.java) interface exists in the API module of EvenMoreFish. Below is an example of how to use it.
 
 ```
 /**
  * This is the EXP RewardType that exists inside EvenMoreFish.
  */
-public class EXPRewardType implements RewardType {
+public class EXPRewardType extends RewardType {
 
     /**
      * The reward itself is handled here.

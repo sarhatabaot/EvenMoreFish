@@ -41,7 +41,7 @@ database:
   # WARNING: Changing this will create new tables in the database.
   # Only use this during first setup or before migrations.
   # (Or after, but only if you know what you're doing).
-  table-prefix: "emf_"
+  table-prefix: emf_
   # Login information
   username: root
   password: ''
@@ -64,16 +64,16 @@ economy:
   playerpoints:
     enabled: false
     multiplier: 1.0
-    display: "{amount} Player Point(s)"
+    display: '{amount} Player Point(s)'
   # Allows fish to pay out with claim blocks
   griefprevention:
     enabled: false
     multiplier: 1.0
-    display: "{amount} Claim Block(s)"
+    display: '{amount} Claim Block(s)'
 
 # Setting this to change the boosbar style
 # you can use like: SEGMENTED_6 SEGMENTED_10 SEGMENTED_12 SEGMENTED_20 SOLID
-barstyle: 'SEGMENTED_10'
+barstyle: SEGMENTED_10
 
 # Requires that the fishing rod to have the "emf-rod-nbt" value in order to catch custom fish defined in fish.yml.
 # This allows you to sell rods that will be the only ones able to catch EvenMoreFish fish.
@@ -85,20 +85,35 @@ nbt-rod-item:
   item:
     # This needs to be FISHING_ROD, can be an addon string, but the base material has to be FISHING_ROD
     material: FISHING_ROD
-    displayname: "&eEvenMoreFish Fishing Rod"
+    displayname: <yellow>EvenMoreFish Fishing Rod
   glowing: true
   lore:
-    - ""
-    - "&7Catch &ecustom &7fish using this"
-    - "&7fishing rod."
+    - ''
+    - <gray>Catch </gray><yellow>custom </yellow><gray>fish using this
+    - <gray>fishing rod.
 
 # Should the user need emf.use_rod permission in order to catch default custom fish defined in fish.yml. This requires
 # Vault and a permission manager such as LuckPerms.
 requires-fishing-permission: false
 
-# Should fish and baits be blocked from being crafted into other items. For example, when the player tries to craft
-# the starfish into a beacon.
-block-crafting: true
+# Various protections for EMF items.
+# These do not apply if raw-material is used.
+item-protection:
+  # Should EMF items be blocked from being crafted into other items?
+  # For example, when the player tries to craft the starfish into a beacon.
+  block-crafting: true
+  # Should EMF items be blocked from being consumed?
+  # For example, when the player tries to drink the epic elixir bait.
+  block-consume: true
+  # Should EMF items be blocked from being used in furnaces as fuel?
+  # For example, when the player places an NBT rod in a furnace's fuel slot.
+  block-furnace-burn: true
+  # Should EMF items be blocked from being cooked?
+  # For example, when the player tries to cook an atlantic cod.
+  block-cooking: true
+  # Should EMF items be blocked from being placed?
+  # For example, when the player tries to place a Spongebob.
+  block-placing: true
 
 # /emf shop configuration. If you wish to change the layout, please look at the guis.yml file.
 sell-gui:
@@ -121,26 +136,26 @@ sell-gui:
 # To disable a boost, comment out the corresponding line.
 # Region boost settings the rarity is case-sensitive.
 #region-boosts:
-  #fishing:
-    # The boost multiplier for the "Common" rarity in the "fishing" region.
-    # This means the weight of "Common" fish will be multiplied by 0.5.
-    # To enable, comment out the line below.
-    #Common: 0.5
+#fishing:
+# The boost multiplier for the "Common" rarity in the "fishing" region.
+# This means the weight of "Common" fish will be multiplied by 0.5.
+# To enable, comment out the line below.
+#Common: 0.5
 
-    # The boost multiplier for the "Rare" rarity in the "fishing" region.
-    # This means the weight of "Rare" fish will be multiplied by 1.0 (no change).
-    # To enable, comment out the line below.
-    #Rare: 1.0
+# The boost multiplier for the "Rare" rarity in the "fishing" region.
+# This means the weight of "Rare" fish will be multiplied by 1.0 (no change).
+# To enable, comment out the line below.
+#Rare: 1.0
 
-    # The boost multiplier for the "Epic" rarity in the "fishing" region.
-    # This means the weight of "Epic" fish will be multiplied by 3.0.
-    # To enable, comment out the line below.
-    #Epic: 3.0
+# The boost multiplier for the "Epic" rarity in the "fishing" region.
+# This means the weight of "Epic" fish will be multiplied by 3.0.
+# To enable, comment out the line below.
+#Epic: 3.0
 
-    # The boost multiplier for the "Legendary" rarity in the "fishing" region.
-    # This means the weight of "Legendary" fish will be multiplied by 15.0.
-    # To enable, comment out the line below.
-    #Legendary: 15.0
+# The boost multiplier for the "Legendary" rarity in the "fishing" region.
+# This means the weight of "Legendary" fish will be multiplied by 15.0.
+# To enable, comment out the line below.
+#Legendary: 15.0
 
 # Prevents mcMMO from overriding fishing loot, this means treasure won't appear when fish can.
 disable-mcmmo-loot: true
@@ -193,16 +208,38 @@ requirements:
 give-straight-to-inventory: false
 
 # Customize the plugin's command. Requires a server restart to take effect.
+# NOTE: All names and aliases must use English letters only, as the command library does not support other characters.
 command:
   # The /emf admin shortcut command
   admin-shortcut:
     enabled: true
-    name: "emfa"
+    name: emfa
   # The plugin's main command
-  main: "emf"
+  main: emf
   # Aliases for the main command
   aliases:
-    - "evenmorefish"
+    - evenmorefish
+
+  # Change the name of the plugin's subcommands
+  subcommands:
+    # The /emf admin command
+    admin: "admin"
+    # The /emf next command
+    next: "next"
+    # The /emf toggle command
+    toggle: "toggle"
+    # The /emf gui command
+    gui: "gui"
+    # The /emf help command
+    help: "help"
+    # The /emf top command
+    top: "top"
+    # The /emf shop command
+    shop: "shop"
+    # The /emf sellall command
+    sellall: "sellall"
+    # The /emf applybaits command
+    applybaits: "applybaits"
 
 # Customizable sets of biomes for fish.yml configuration
 biome-sets:
@@ -218,4 +255,4 @@ biome-sets:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 22
+config-version: 25

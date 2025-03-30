@@ -1,12 +1,12 @@
 package com.oheers.fish;
 
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionType;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.model.UserReport;
 import com.oheers.fish.fishing.items.Fish;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -60,8 +60,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
      * @return The name of the author as a String.
      */
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public @NotNull String getAuthor() {
-        return plugin.getDescription().getAuthors().toString();
+        return plugin.getPluginMeta().getAuthors().toString();
     }
     
     /**
@@ -87,8 +88,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
      * @return The version as a String.
      */
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public @NotNull String getVersion() {
-        return plugin.getDescription().getVersion();
+        return plugin.getPluginMeta().getVersion();
     }
     
     /**
@@ -211,14 +213,13 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                     fish = null;
                 }
                 if (fish != null) {
-                    AbstractMessage message = ConfigMessage.PLACEHOLDER_FISH_FORMAT.getMessage();
+                    EMFMessage message = ConfigMessage.PLACEHOLDER_FISH_FORMAT.getMessage();
                     if (fish.getLength() == -1) {
                         message.setMessage(ConfigMessage.PLACEHOLDER_FISH_LENGTHLESS_FORMAT.getMessage());
                     } else {
                         message.setLength(Float.toString(fish.getLength()));
                     }
-                    
-                    message.setRarityColour(fish.getRarity().getColour());
+
                     message.setFishCaught(fish.getDisplayName());
                     message.setRarity(fish.getRarity().getDisplayName());
                     return message.getLegacyMessage();
@@ -237,8 +238,8 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                     return ConfigMessage.PLACEHOLDER_NO_FISH_IN_PLACE.getMessage().getLegacyMessage();
                 }
                 
-                AbstractMessage message = ConfigMessage.PLACEHOLDER_FISH_MOST_FORMAT.getMessage();
-                message.setAmount(Integer.toString((int) value));
+                EMFMessage message = ConfigMessage.PLACEHOLDER_FISH_MOST_FORMAT.getMessage();
+                message.setAmount((int) value);
                 return message.getLegacyMessage();
             }
             
@@ -278,13 +279,13 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                 return Boolean.toString(Competition.isActive());
             }
             case "custom_fishing_boolean" -> {
-                return Boolean.toString(plugin.isCustomFishing(player));
+                return Boolean.toString(!plugin.isCustomFishingDisabled(player));
             }
             case "custom_fishing_status" -> {
-                if (plugin.isCustomFishing(player)) {
-                    return ConfigMessage.CUSTOM_FISHING_ENABLED.getMessage().getLegacyMessage();
-                } else {
+                if (plugin.isCustomFishingDisabled(player)) {
                     return ConfigMessage.CUSTOM_FISHING_DISABLED.getMessage().getLegacyMessage();
+                } else {
+                    return ConfigMessage.CUSTOM_FISHING_ENABLED.getMessage().getLegacyMessage();
                 }
             }
         }

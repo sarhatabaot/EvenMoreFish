@@ -2,13 +2,13 @@ package com.oheers.fish.competition.configs;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.competition.Bar;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -174,7 +174,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The colours to show for each winning position, if the {pos_colour} variable is used.
      */
     public @NotNull List<String> getPositionColours() {
-        return getConfig().getStringList("leaderboard.position-colours", List.of("&6", "&e", "&7", "&7", "&#888888"));
+        return getConfig().getStringList("leaderboard.position-colours", List.of("<gold>", "<yellow>", "<gray>", "<gray>", "<#888888>"));
     }
 
     public @NotNull List<Long> getAlertTimes() {
@@ -254,9 +254,9 @@ public class CompetitionFile extends ConfigBase {
     /**
      * @return The prefix for this competition's bossbar.
      */
-    public AbstractMessage getBossbarPrefix() {
-        String prefix = getConfig().getString("bossbar-prefix", "&a&lFishing Contest: ");
-        return EvenMoreFish.getAdapter().createMessage(prefix);
+    public EMFSingleMessage getBossbarPrefix() {
+        String prefix = getConfig().getString("bossbar-prefix", "<green><bold>Fishing Contest: ");
+        return EMFSingleMessage.fromString(prefix);
     }
 
     /**
@@ -266,7 +266,7 @@ public class CompetitionFile extends ConfigBase {
         Bar bar = new Bar();
         bar.setShouldShow(shouldShowBossbar());
         bar.setColour(getBossbarColour());
-        bar.setPrefix(getBossbarPrefix().getLegacyMessage(), getType());
+        bar.setPrefix(getBossbarPrefix(), getType());
         return bar;
     }
 

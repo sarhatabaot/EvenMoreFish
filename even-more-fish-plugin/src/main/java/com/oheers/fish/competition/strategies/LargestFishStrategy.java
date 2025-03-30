@@ -1,13 +1,13 @@
 package com.oheers.fish.competition.strategies;
 
 
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.CompetitionStrategy;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.fishing.items.Fish;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,9 +30,8 @@ public class LargestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public AbstractMessage getSingleConsoleLeaderboardMessage(@NotNull AbstractMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
-        message.setRarityColour(fish.getRarity().getColour());
         message.setLength(getDecimalFormat().format(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());
         message.setFishCaught(fish.getDisplayName());
@@ -41,9 +40,8 @@ public class LargestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public AbstractMessage getSinglePlayerLeaderboard(@NotNull AbstractMessage message, @NotNull CompetitionEntry entry) {
+    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
         Fish fish = entry.getFish();
-        message.setRarityColour(fish.getRarity().getColour());
         message.setLength(getDecimalFormat().format(entry.getValue()));
         message.setRarity(fish.getRarity().getDisplayName());
         message.setFishCaught(fish.getDisplayName());

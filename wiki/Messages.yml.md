@@ -2,12 +2,12 @@
 This is the file for modifying messages sent to the players from the plugin: if you're running the server locally or viewing the files on a panel through FTP/SFTP, you can use a text-editor such as [Notepad++](https://notepad-plus-plus.org/). At some point in the very distant future I plan to add in a way of modifying this file using a web-editor like LuckPerms uses, but right now (and probably for quite a while) it's just the basic text editor.
 
 ## The Wiki
-This file has every value explained already so unlike the [competitions.yml wiki](https://github.com/Oheers/EvenMoreFish/wiki/competitions.yml) and [fish.yml wiki](https://github.com/Oheers/EvenMoreFish/wiki/fish.yml), not every value will be explained but a copy of messages_en.yml can be found on the Spigot page in the "Technical Stuff" section.
+This file has every value explained already so unlike the [competitions.yml wiki](https://github.com/EvenMoreFish/EvenMoreFish/wiki/competitions.yml) and [fish.yml wiki](https://github.com/EvenMoreFish/EvenMoreFish/wiki/fish.yml), not every value will be explained but a copy of messages_en.yml can be found [here](https://github.com/EvenMoreFish/EvenMoreFish/blob/master/even-more-fish-plugin/src/main/resources/locales/messages_en.yml).
 
 ***
 
 ## Tags
-It's possible to add "tags" to the messages, these cause the message to be formatted differently or to act differently. Right now (as of 1.7.3) there are only two - `-s` and `[noPrefix]`, there will be more in the future. It's worth noting that not all tags work for all messages due to issues with formatting, consistency or it just doesn't make sense to have one (i.e. a `-s` tag for the /emf help page wouldn't be very useful). All colours are supported by the &_ format or &#______ for hex codes. 
+It's possible to add "tags" to the messages, these cause the message to be formatted differently or to act differently. Right now (as of 1.7.3) there are only two - `-s` and `[noPrefix]`, there will be more in the future. It's worth noting that not all tags work for all messages due to issues with formatting, consistency or it just doesn't make sense to have one (i.e. a `-s` tag for the /emf help page wouldn't be very useful). All colours are supported using MiniMessage. 
 
 #### -s
 This variable simply causes the message to not be sent. You might want to do this if you don't want players to see when someone overtakes them in the competition leaderboard (previously you had to delete the config value to do this).
@@ -18,7 +18,7 @@ This stops the [EvenMoreFish] logo (or your server's equivalent) from displaying
 ***
 
 ## Use Table
-This shows the table for which tabs can be used in each message. The `id` column represents the tag given before each message in the file, (`new-first: &r{player} is now #1`: `new-first` is the id in this case. You may notice some are separated by full stops, this simply means that it is in a sub-section, for example `bossbar.hour` points to the "`hour: h` value in the `bossbar:` section. 
+This shows the table for which tabs can be used in each message. The `id` column represents the tag given before each message in the file, (`new-first: <reset>{player} is now #1`: `new-first` is the id in this case. You may notice some are separated by full stops, this simply means that it is in a sub-section, for example `bossbar.hour` points to the "`hour: h` value in the `bossbar:` section. 
 ➖ (Not applicable: there isn't a prefix there anyway).
  
 |             Message ID              | Tag: `-s` | Tag: `[noPrefix]` |

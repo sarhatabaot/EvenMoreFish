@@ -1,23 +1,22 @@
 package com.oheers.fish.fishing.items;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.selling.WorthNBT;
 import com.oheers.fish.utils.ItemFactory;
-import de.tr7zw.changeme.nbtapi.NBT;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
-import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class Fish {
 
@@ -145,26 +143,21 @@ public class Fish {
      * @return An ItemStack version of the fish.
      */
     public ItemStack give(int randomIndex) {
-
         ItemStack fish = factory.createItem(getFishermanPlayer(), randomIndex);
-        if (factory.isRawMaterial()) return fish;
-        ItemMeta fishMeta = fish.getItemMeta();
-
-        if (fishMeta != null) {
-            NBT.modify(fish, nbt -> {
-                nbt.modifyMeta((readOnlyNbt, meta) -> {
-                    meta.setDisplayName(FishUtils.translateColorCodes(getDisplayName()));
-                    if (!section.getBoolean("disable-lore", false)) {
-                        meta.setLore(getFishLore());
-                    }
-                    meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                });
-            });
-
-            WorthNBT.setNBT(fish, this);
+        if (factory.isRawMaterial()) {
+            return fish;
         }
+
+        fish.editMeta(meta -> {
+            meta.displayName(getDisplayName().getComponentMessage());
+            if (!section.getBoolean("disable-lore", false)) {
+                meta.lore(getFishLore());
+            }
+            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        });
+        WorthNBT.setNBT(fish, this);
 
         return fish;
     }
@@ -245,7 +238,7 @@ public class Fish {
         }
         Player player = Bukkit.getPlayer(fisherman);
         if (player != null) {
-            player.sendMessage(FishUtils.translateColorCodes(msg));
+            EMFSingleMessage.fromString(msg).send(player);
         }
     }
 
@@ -317,27 +310,26 @@ public class Fish {
      *
      * @return A lore to be used by fetching data from the old messages.yml set-up.
      */
-    private List<String> getFishLore() {
+    private List<Component> getFishLore() {
         List<String> loreOverride = section.getStringList("lore-override");
-        AbstractMessage newLoreLine;
+        EMFMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
-            newLoreLine = EvenMoreFish.getAdapter().createMessage(loreOverride);
+            newLoreLine = EMFListMessage.fromStringList(loreOverride);
         } else {
             newLoreLine = ConfigMessage.FISH_LORE.getMessage();
         }
-        newLoreLine.setRarityColour(rarity.getColour());
 
         List<String> fishLore = section.getStringList("lore");
         String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
 
         newLoreLine.setVariable(
-                "\n{fish_lore}",
+                "{fish_lore}",
                 replacement
         );
 
         newLoreLine.setVariable("{fisherman_lore}",
                 !disableFisherman && getFishermanPlayer() != null ?
-                        (ConfigMessage.FISHERMAN_LORE.getMessage()).getLegacyMessage()
+                        (ConfigMessage.FISHERMAN_LORE.getMessage())
                         : ""
         );
 
@@ -345,7 +337,7 @@ public class Fish {
 
         newLoreLine.setVariable("{length_lore}",
                 length > 0 ?
-                        ConfigMessage.LENGTH_LORE.getMessage().getLegacyMessage()
+                        ConfigMessage.LENGTH_LORE.getMessage()
                         : ""
         );
 
@@ -353,12 +345,13 @@ public class Fish {
 
         newLoreLine.setRarity(this.rarity.getLorePrep());
 
-        List<String> newLore = newLoreLine.getLegacyListMessage();
-        if (getFishermanPlayer() != null && EvenMoreFish.getInstance().isUsingPAPI()) {
-            return newLore.stream().map(l -> PlaceholderAPI.setPlaceholders(getFishermanPlayer(), l)).collect(Collectors.toList());
+        OfflinePlayer fisherman = getFishermanPlayer();
+        if (fisherman != null) {
+            newLoreLine.setPlayer(fisherman);
+            newLoreLine.formatPlaceholderAPI();
         }
 
-        return newLore;
+        return newLoreLine.getComponentListMessage();
     }
 
     public void checkDisplayName() {
@@ -492,11 +485,11 @@ public class Fish {
     }
 
     @NotNull
-    public String getDisplayName() {
+    public EMFSingleMessage getDisplayName() {
         if (displayName == null) {
-            return rarity.getColour() + name;
+            return rarity.format(name);
         }
-        return rarity.getColour() + displayName;
+        return rarity.format(displayName);
     }
 
     public ItemFactory getFactory() {

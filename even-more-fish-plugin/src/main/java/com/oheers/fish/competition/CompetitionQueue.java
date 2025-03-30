@@ -26,7 +26,7 @@ public class CompetitionQueue {
     }
 
     public Map<Integer, Competition> getCompetitions() {
-        return Map.copyOf(competitions);
+        return competitions;
     }
 
     public void load() {
