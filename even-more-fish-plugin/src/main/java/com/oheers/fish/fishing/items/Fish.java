@@ -11,7 +11,9 @@ import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.selling.WorthNBT;
 import com.oheers.fish.utils.ItemFactory;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import jdk.jfr.Experimental;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -310,7 +312,12 @@ public class Fish {
      *
      * @return A lore to be used by fetching data from the old messages.yml set-up.
      */
+    /**
+     * Gets the formatted lore for the fish item, handling newlines and empty placeholders properly.
+     * @return A list of MiniMessage components for the item lore
+     */
     private List<Component> getFishLore() {
+        // Get the lore format (either from override or default config)
         List<String> loreOverride = section.getStringList("lore-override");
         EMFMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
@@ -319,12 +326,14 @@ public class Fish {
             newLoreLine = ConfigMessage.FISH_LORE.getMessage();
         }
 
+        // Prepare the fish lore content
         List<String> fishLore = section.getStringList("lore");
         String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
 
+        // Set {EMPTY} marker for empty fish lore
         newLoreLine.setVariable(
                 "{fish_lore}",
-                replacement
+                replacement.isEmpty() ? "{EMPTY}" : replacement
         );
 
         newLoreLine.setVariable("{fisherman_lore}",
@@ -341,17 +350,41 @@ public class Fish {
                         : ""
         );
 
-        if (length > 0) newLoreLine.setLength(Float.toString(length));
+        if (length > 0) {
+            newLoreLine.setLength(Float.toString(length));
+        }
 
         newLoreLine.setRarity(this.rarity.getLorePrep());
 
+        // Process PlaceholderAPI if available
         OfflinePlayer fisherman = getFishermanPlayer();
         if (fisherman != null) {
             newLoreLine.setPlayer(fisherman);
             newLoreLine.formatPlaceholderAPI();
         }
 
-        return newLoreLine.getComponentListMessage();
+        // Process the final lore output
+        List<Component> finalLore = new ArrayList<>();
+        for (Component component : newLoreLine.getComponentListMessage()) {
+            String serialized = MiniMessage.miniMessage().serialize(component);
+
+            // TODO: Rework EMFMessage#setVariable to accept a boolean indicating if the line contains the variable. If the replacement message is empty, remove the entire line instead of just the variable.
+            // Check if the serialized string contains the {EMPTY} marker
+            if (serialized.contains("{EMPTY}")) {
+                continue;
+            }
+
+            // Split by newlines and create separate components
+            String[] lines = serialized.split("\n");
+            for (String line : lines) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    finalLore.add(MiniMessage.miniMessage().deserialize(line));
+                }
+            }
+        }
+
+        return finalLore;
     }
 
     public void checkDisplayName() {
