@@ -12,13 +12,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EMFListMessage extends EMFMessage {
 
-    private List<Component> message = new ArrayList<>();
+    private ArrayList<Component> message = new ArrayList<>();
 
     private EMFListMessage(@Nullable List<Component> message) {
         super();
@@ -152,19 +154,21 @@ public class EMFListMessage extends EMFMessage {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    /**
+     * Formats an EMFMessage replacement.
+     */
     @Override
     protected void setEMFMessageVariable(@NotNull String variable, @NotNull EMFMessage replacement) {
         if (replacement instanceof EMFSingleMessage singleMessage) {
             setComponentVariable(variable, singleMessage.getComponentMessage());
         } else if (replacement instanceof EMFListMessage listMessage) {
-            this.message = this.message.stream()
-                .flatMap(line -> FishUtils.componentContainsString(line, variable)
-                    ? listMessage.getComponentListMessage().stream()
-                    : Stream.of(line))
-                .collect(Collectors.toCollection(ArrayList::new));
+            this.message = formatListVariable(variable, listMessage);
         }
     }
 
+    /**
+     * Formats a Component replacement.
+     */
     @Override
     protected void setComponentVariable(@NotNull String variable, @NotNull Component replacement) {
         TextReplacementConfig trc = TextReplacementConfig.builder()
@@ -173,6 +177,25 @@ public class EMFListMessage extends EMFMessage {
             .build();
         this.message = this.message.stream()
             .map(line -> line.replaceText(trc))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private ArrayList<Component> formatListVariable(@NotNull String variable, @NotNull EMFListMessage replacement) {
+        return this.message.stream()
+            .flatMap(line -> {
+                // If the replacement is empty, return an empty stream to remove the line
+                if (replacement.isEmpty()) {
+                    return Stream.empty();
+                }
+                // If the variable is present in the line, replace it
+                if (FishUtils.componentContainsString(line, variable)) {
+                    return replacement.getComponentListMessage().stream();
+                // If not, return the original line
+                } else {
+                    return Stream.of(line);
+                }
+            })
+            // Ensure it's returned as an ArrayList
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
