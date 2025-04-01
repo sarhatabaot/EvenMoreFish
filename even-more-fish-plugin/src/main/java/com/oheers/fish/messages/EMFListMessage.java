@@ -31,9 +31,7 @@ public class EMFListMessage extends EMFMessage {
 
     @Override
     public EMFListMessage createCopy() {
-        EMFListMessage copy = new EMFListMessage(List.copyOf(message));
-        copy.liveVariables.putAll(this.liveVariables);
-        return copy;
+        return toListMessage();
     }
 
     // Factory methods
