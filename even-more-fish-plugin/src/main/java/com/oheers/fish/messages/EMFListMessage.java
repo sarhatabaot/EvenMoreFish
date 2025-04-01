@@ -181,12 +181,12 @@ public class EMFListMessage extends EMFMessage {
     private void formatListVariable(@NotNull String variable, @NotNull EMFListMessage replacement) {
         this.message = this.message.stream()
             .flatMap(line -> {
-                // If the replacement is empty, return an empty stream to remove the line
-                if (replacement.isEmpty()) {
-                    return Stream.empty();
-                }
                 // If the variable is present in the line, replace it
                 if (FishUtils.componentContainsString(line, variable)) {
+                    // If the replacement is empty, return an empty stream to remove the line
+                    if (replacement.isEmpty()) {
+                        return Stream.empty();
+                    }
                     return replacement.getComponentListMessage().stream();
                 // If not, return the original line
                 } else {
