@@ -17,4 +17,3 @@ Link related issues or describe which problem this PR fixes.
 
 - [ ] I have added tests that prove my fix is effective or that my feature works.
 - [ ] I have updated the documentation as needed.
-- [ ] I have added any labels that fit this PR.
