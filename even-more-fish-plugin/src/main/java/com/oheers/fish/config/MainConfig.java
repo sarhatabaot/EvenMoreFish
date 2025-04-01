@@ -37,7 +37,6 @@ public class MainConfig extends ConfigBase {
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
-        applyOneTimeConversions();
 
         // Command caching
         this.mainCommandName = getConfig().getString("command.main", "emf");
@@ -351,7 +350,10 @@ public class MainConfig extends ConfigBase {
         return getConfig().getString("economy." + type.getIdentifier().toLowerCase() + ".display");
     }
 
-    private void applyOneTimeConversions() {
+    @Override
+    protected boolean performRelocations() {
+        boolean changed = false;
+
         YamlDocument yamlDocument = getConfig();
 
         // Economy Rework - Requires the config to contain the new format first.
@@ -363,6 +365,7 @@ public class MainConfig extends ConfigBase {
                 String path = "economy." + economyType.toLowerCase();
                 yamlDocument.set(path + ".enabled", true);
             }
+            changed = true;
         }
 
         // Updated fishing section - Requires the section to exist first.
@@ -371,9 +374,19 @@ public class MainConfig extends ConfigBase {
             boolean fishOnlyInCompetition = yamlDocument.getBoolean(oldFishUniqueKey, false);
             yamlDocument.set("fishing.catch-only-in-competition", fishOnlyInCompetition);
             yamlDocument.remove(oldFishUniqueKey);
+            changed = true;
         }
 
-        save();
+        // Updated fishing configs
+        String vanillaFishingKey = "vanilla-fishing";
+        if (yamlDocument.contains(vanillaFishingKey)) {
+            boolean vanillaFishing = yamlDocument.getBoolean(vanillaFishingKey);
+            yamlDocument.set("fishing.catch-enabled", !vanillaFishing);
+            yamlDocument.remove(vanillaFishingKey);
+            changed = true;
+        }
+
+        return changed;
     }
 
     @Override
