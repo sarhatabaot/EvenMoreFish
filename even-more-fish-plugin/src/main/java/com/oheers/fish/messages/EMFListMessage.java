@@ -160,7 +160,7 @@ public class EMFListMessage extends EMFMessage {
         if (replacement instanceof EMFSingleMessage singleMessage) {
             setComponentVariable(variable, singleMessage.getComponentMessage());
         } else if (replacement instanceof EMFListMessage listMessage) {
-            this.message = formatListVariable(variable, listMessage);
+            formatListVariable(variable, listMessage);
         }
     }
 
@@ -178,8 +178,8 @@ public class EMFListMessage extends EMFMessage {
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private ArrayList<Component> formatListVariable(@NotNull String variable, @NotNull EMFListMessage replacement) {
-        return this.message.stream()
+    private void formatListVariable(@NotNull String variable, @NotNull EMFListMessage replacement) {
+        this.message = this.message.stream()
             .flatMap(line -> {
                 // If the replacement is empty, return an empty stream to remove the line
                 if (replacement.isEmpty()) {

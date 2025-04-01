@@ -320,28 +320,22 @@ public class Fish {
         }
 
         List<String> fishLore = section.getStringList("lore");
-        String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
+        EMFListMessage fishLoreReplacement = fishLore.isEmpty() ? EMFListMessage.empty() : EMFListMessage.fromStringList(fishLore);
+        newLoreLine.setVariable("{fish_lore}", fishLoreReplacement);
 
-        newLoreLine.setVariable(
-                "{fish_lore}",
-                replacement
-        );
+        if (!disableFisherman && getFishermanPlayer() != null) {
+            newLoreLine.setVariable("{fisherman_lore}", ConfigMessage.FISHERMAN_LORE.getMessage().toListMessage());
+            newLoreLine.setPlayer(getFishermanPlayer());
+        } else {
+            newLoreLine.setVariable("{fisherman_lore}", EMFListMessage.empty());
+        }
 
-        newLoreLine.setVariable("{fisherman_lore}",
-                !disableFisherman && getFishermanPlayer() != null ?
-                        (ConfigMessage.FISHERMAN_LORE.getMessage())
-                        : ""
-        );
-
-        if (!disableFisherman && getFishermanPlayer() != null) newLoreLine.setPlayer(getFishermanPlayer());
-
-        newLoreLine.setVariable("{length_lore}",
-                length > 0 ?
-                        ConfigMessage.LENGTH_LORE.getMessage()
-                        : ""
-        );
-
-        if (length > 0) newLoreLine.setLength(Float.toString(length));
+        if (length > 0) {
+            newLoreLine.setVariable("{length_lore}", ConfigMessage.LENGTH_LORE.getMessage().toListMessage());
+            newLoreLine.setLength(Float.toString(length));
+        } else {
+            newLoreLine.setVariable("{length_lore}", EMFListMessage.empty());
+        }
 
         newLoreLine.setRarity(this.rarity.getLorePrep());
 
