@@ -1,6 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
+import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
 public class GUIConfig extends ConfigBase {
@@ -17,13 +18,18 @@ public class GUIConfig extends ConfigBase {
     }
 
     @Override
-    public UpdaterSettings getUpdaterSettings() {
-        UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());
+    protected boolean postLoad() {
+        boolean changed = false;
+        YamlDocument document = getConfig();
 
-        // Config Version 5 - Remove competition menu button
-        builder.addCustomLogic("5", document -> document.remove("main-menu.coming-soon-competitions"));
+        // Remove competition menu button
+        String competitionsKey = "main-menu.coming-soon-competitions";
+        if (document.contains(competitionsKey)) {
+            document.remove(competitionsKey);
+            changed = true;
+        }
 
-        return builder.build();
+        return changed;
     }
 
 }

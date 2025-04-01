@@ -351,56 +351,49 @@ public class MainConfig extends ConfigBase {
     }
 
     @Override
-    protected boolean performRelocations() {
+    protected boolean postLoad() {
         boolean changed = false;
-
-        YamlDocument yamlDocument = getConfig();
+        YamlDocument document = getConfig();
 
         // Economy Rework - Requires the config to contain the new format first.
-        String economyType = yamlDocument.getString("economy-type");
+        String economyType = document.getString("economy-type");
         if (economyType != null) {
-            yamlDocument.remove("enable-economy");
-            yamlDocument.remove("economy-type");
+            document.remove("enable-economy");
+            document.remove("economy-type");
             if (!economyType.equalsIgnoreCase("NONE")) {
                 String path = "economy." + economyType.toLowerCase();
-                yamlDocument.set(path + ".enabled", true);
+                document.set(path + ".enabled", true);
             }
             changed = true;
         }
 
         // Updated fishing section - Requires the section to exist first.
         String oldFishUniqueKey = "fish-only-in-competition";
-        if (yamlDocument.contains(oldFishUniqueKey)) {
-            boolean fishOnlyInCompetition = yamlDocument.getBoolean(oldFishUniqueKey, false);
-            yamlDocument.set("fishing.catch-only-in-competition", fishOnlyInCompetition);
-            yamlDocument.remove(oldFishUniqueKey);
+        if (document.contains(oldFishUniqueKey)) {
+            boolean fishOnlyInCompetition = document.getBoolean(oldFishUniqueKey, false);
+            document.set("fishing.catch-only-in-competition", fishOnlyInCompetition);
+            document.remove(oldFishUniqueKey);
             changed = true;
+        }
+
+        // Added item protection configs
+        String blockCraftingKey = "block-crafting";
+        if (document.contains(blockCraftingKey)) {
+            boolean blockCrafting = document.getBoolean(blockCraftingKey);
+            document.set("item-protection.block-crafting", blockCrafting);
+            document.remove(blockCraftingKey);
         }
 
         // Updated fishing configs
         String vanillaFishingKey = "vanilla-fishing";
-        if (yamlDocument.contains(vanillaFishingKey)) {
-            boolean vanillaFishing = yamlDocument.getBoolean(vanillaFishingKey);
-            yamlDocument.set("fishing.catch-enabled", !vanillaFishing);
-            yamlDocument.remove(vanillaFishingKey);
+        if (document.contains(vanillaFishingKey)) {
+            boolean vanillaFishing = document.getBoolean(vanillaFishingKey);
+            document.set("fishing.catch-enabled", !vanillaFishing);
+            document.remove(vanillaFishingKey);
             changed = true;
         }
 
         return changed;
-    }
-
-    @Override
-    public UpdaterSettings getUpdaterSettings() {
-        return UpdaterSettings.builder(super.getUpdaterSettings())
-            // Config Version 25 - Add item protection configs
-            .addCustomLogic("25", document -> {
-                if (document.contains("block-crafting")) {
-                    boolean blockCrafting = document.getBoolean("block-crafting");
-                    document.set("item-protection.block-crafting", blockCrafting);
-                    document.remove("block-crafting");
-                }
-            })
-            .build();
     }
 
     public boolean hasCredentials() {
