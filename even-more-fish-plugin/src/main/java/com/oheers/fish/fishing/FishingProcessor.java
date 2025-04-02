@@ -100,4 +100,9 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
         return ConfigMessage.FISH_LENGTHLESS_CAUGHT;
     }
 
+    @Override
+    protected boolean shouldCatchBait() {
+        return true;
+    }
+
 }

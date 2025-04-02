@@ -93,7 +93,7 @@ public abstract class Processor<E extends Event> implements Listener {
         }
 
         double baitCatchPercentage = MainConfig.getInstance().getBaitCatchPercentage();
-        if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
+        if (shouldCatchBait() && baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
@@ -203,5 +203,7 @@ public abstract class Processor<E extends Event> implements Listener {
     protected abstract ConfigMessage getCaughtMessage();
 
     protected abstract ConfigMessage getLengthlessCaughtMessage();
+
+    protected abstract boolean shouldCatchBait();
 
 }

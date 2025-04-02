@@ -90,4 +90,9 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
         return ConfigMessage.FISH_LENGTHLESS_HUNTED;
     }
 
+    @Override
+    protected boolean shouldCatchBait() {
+        return false;
+    }
+
 }
