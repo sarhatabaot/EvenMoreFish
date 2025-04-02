@@ -29,9 +29,7 @@ public class EMFSingleMessage extends EMFMessage {
 
     @Override
     public EMFSingleMessage createCopy() {
-        EMFSingleMessage copy = new EMFSingleMessage(this.message);
-        copy.liveVariables.putAll(this.liveVariables);
-        return copy;
+        return toSingleMessage();
     }
 
     // Factory methods

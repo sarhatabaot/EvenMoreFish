@@ -1,6 +1,8 @@
 package com.oheers.fish.messages.abstracted;
 
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,7 +27,6 @@ public abstract class EMFMessage {
     public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
     public static final Component EMPTY = Component.empty().colorIfAbsent(NamedTextColor.WHITE);
 
-    protected final Map<String, List<Component>> liveVariables = new LinkedHashMap<>();
 
     protected boolean perPlayer = true;
     protected boolean canSilent = false;
@@ -431,6 +432,24 @@ public abstract class EMFMessage {
      */
     public void setMaxBaits(@NotNull final Object maxBaits) {
         setVariable("{max_baits}", maxBaits);
+    }
+
+    // Subclass things
+
+    public EMFSingleMessage toSingleMessage() {
+        EMFSingleMessage message = EMFSingleMessage.of(getComponentMessage());
+        message.perPlayer = this.perPlayer;
+        message.canSilent = this.canSilent;
+        message.relevantPlayer = this.relevantPlayer;
+        return message;
+    }
+
+    public EMFListMessage toListMessage() {
+        EMFListMessage message = EMFListMessage.ofList(getComponentListMessage());
+        message.perPlayer = this.perPlayer;
+        message.canSilent = this.canSilent;
+        message.relevantPlayer = this.relevantPlayer;
+        return message;
     }
 
 }
