@@ -70,8 +70,16 @@ public class MainConfig extends ConfigBase {
         return databaseEnabled() && !EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2();
     }
 
+    public boolean isCatchEnabled() {
+        return getConfig().getBoolean("fishing.catch-enabled", true);
+    }
+
     public boolean isFishCatchOnlyInCompetition() {
         return getConfig().getBoolean("fishing.catch-only-in-competition", false);
+    }
+
+    public boolean isHuntEnabled() {
+        return getConfig().getBoolean("fishing.hunt-enabled", false);
     }
 
     public boolean isFishHuntOnlyInCompetition() {
@@ -105,10 +113,6 @@ public class MainConfig extends ConfigBase {
     public boolean shouldRespectVanish() { return getConfig().getBoolean("respect-vanished", true); }
 
     public boolean shouldProtectBaitedRods() { return getConfig().getBoolean("protect-baited-rods", true); }
-    
-    public boolean isVanillaFishing() {
-        return getConfig().getBoolean("vanilla-fishing", true);
-    }
 
     public BarStyle getBarStyle() {
         BarStyle barStyle;

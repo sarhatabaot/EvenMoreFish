@@ -48,8 +48,10 @@ public abstract class Processor<E extends Event> implements Listener {
     }
 
     protected boolean isCustomFishAllowed(Player player) {
-        return MainConfig.getInstance().getEnabled() && (competitionOnlyCheck() || EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) && !EvenMoreFish.getInstance().isCustomFishingDisabled(player);
+        return isEnabled() && MainConfig.getInstance().getEnabled() && (competitionOnlyCheck() || EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) && !EvenMoreFish.getInstance().isCustomFishingDisabled(player);
     }
+
+    protected abstract boolean isEnabled();
 
     /**
      * Chooses a bait without needing to specify a bait to be used. randomWeightedRarity & getFish methods are used to

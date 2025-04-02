@@ -20,7 +20,6 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
     @Override
     @EventHandler(priority = EventPriority.HIGHEST)
     protected void process(EntityDeathEvent event) {
-
         if (!(event.getEntity() instanceof org.bukkit.entity.Fish fishEntity)) {
             return;
         }
@@ -59,6 +58,11 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
                 event.getDrops().add(fish);
             }
         }
+    }
+
+    @Override
+    protected boolean isEnabled() {
+        return MainConfig.getInstance().isHuntEnabled();
     }
 
     @Override
