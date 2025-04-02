@@ -32,9 +32,7 @@ public enum PrefixType {
         if (id == null) {
             return EMFSingleMessage.empty();
         } else {
-            EMFSingleMessage message = EMFSingleMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
-            message.appendString("<reset>");
-            return message;
+            return EMFSingleMessage.fromString(MessageConfig.getInstance().getConfig().getString(id, normal));
         }
     }
 }

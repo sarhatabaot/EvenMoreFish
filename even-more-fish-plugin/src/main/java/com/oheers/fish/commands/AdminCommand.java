@@ -363,7 +363,7 @@ public class AdminCommand {
                 EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
 
                 message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
-                message.setVariable("{version}", EvenMoreFish.getInstance().getDescription().getVersion());
+                message.setVariable("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion());
                 message.setVariable("{branch}", getFeatureBranchName());
                 message.setVariable("{build-date}", getFeatureBranchBuildOrDate());
                 message.setVariable("{mcv}", Bukkit.getServer().getVersion());
