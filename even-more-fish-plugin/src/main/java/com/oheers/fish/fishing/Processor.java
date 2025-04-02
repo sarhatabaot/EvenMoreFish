@@ -71,7 +71,7 @@ public abstract class Processor<E extends Event> implements Listener {
             return null;
         }
 
-        Fish fish = FishManager.getInstance().getFish(fishRarity, location, player, 1, null, true);
+        Fish fish = FishManager.getInstance().getFish(fishRarity, location, player, 1, null, true, this);
         if (fish == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not determine a fish for " + player.getName());
             return null;
@@ -207,5 +207,7 @@ public abstract class Processor<E extends Event> implements Listener {
     protected abstract ConfigMessage getLengthlessCaughtMessage();
 
     protected abstract boolean shouldCatchBait();
+
+    public abstract boolean canUseFish(@NotNull Fish fish);
 
 }

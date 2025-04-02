@@ -551,4 +551,22 @@ public class Fish {
         return rewardString;
     }
 
+    public @NotNull CatchType getCatchType() {
+        String typeStr = section.getString("catch-type", "CATCH");
+        CatchType type;
+        try {
+            type = CatchType.valueOf(typeStr.toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            EvenMoreFish.getInstance().getLogger().warning("Fish " + getName() + " has an incorrect catch-type. Defaulting to CATCH.");
+            type = CatchType.CATCH;
+        }
+        return type;
+    }
+
+    public enum CatchType {
+        CATCH,
+        HUNT,
+        BOTH
+    }
+
 }

@@ -85,6 +85,9 @@ fish:
     # Lets you set a custom displayname for the fish, this replaces the {fish} in "You have caught a {rarity} {fish}" and the fish name in the item.
     displayname: <red>Example Fish
 
+    # The catch type for this fish. Current supported values: CATCH, HUNT, BOTH
+    catch-type: CATCH
+
     # Should the fisherman be removed from the fish lore?
     # This overrides the rarity's setting.
     disable-fisherman: false

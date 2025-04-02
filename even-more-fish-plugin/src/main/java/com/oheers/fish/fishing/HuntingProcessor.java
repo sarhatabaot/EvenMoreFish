@@ -99,4 +99,10 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
         return false;
     }
 
+    @Override
+    public boolean canUseFish(@NotNull Fish fish) {
+        return fish.getCatchType().equals(Fish.CatchType.HUNT)
+            || fish.getCatchType().equals(Fish.CatchType.BOTH);
+    }
+
 }

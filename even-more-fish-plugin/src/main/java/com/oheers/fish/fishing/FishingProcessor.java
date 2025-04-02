@@ -110,4 +110,10 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
         return true;
     }
 
+    @Override
+    public boolean canUseFish(@NotNull Fish fish) {
+        return fish.getCatchType().equals(Fish.CatchType.CATCH)
+            || fish.getCatchType().equals(Fish.CatchType.BOTH);
+    }
+
 }
