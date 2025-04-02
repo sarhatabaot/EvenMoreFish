@@ -26,9 +26,9 @@ displayname: <yellow>Example Rarity
 # The permission required to fish this rarity.
 permission: emf.rarity.example
 
-# The catch type for this rarity. Defaults to CATCH if missing.
+# The catch type for this rarity. Defaults to BOTH if missing.
 # Current supported values: CATCH, HUNT, BOTH
-catch-type: CATCH
+catch-type: BOTH
 
 # You can set custom requirements for this rarity to appear, all possible requirements are on the wiki: https://github.com/EvenMoreFish/EvenMoreFish/wiki/Requirements
 requirements:
@@ -90,7 +90,7 @@ fish:
     displayname: <red>Example Fish
 
     # The catch type for this fish. This overrides the rarity's value.
-    catch-type: CATCH
+    catch-type: BOTH
 
     # Should the fisherman be removed from the fish lore?
     # This overrides the rarity's setting.

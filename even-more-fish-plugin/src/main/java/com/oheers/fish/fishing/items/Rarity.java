@@ -255,8 +255,8 @@ public class Rarity extends ConfigBase {
         try {
             type = CatchType.valueOf(typeStr.toUpperCase());
         } catch (IllegalArgumentException exception) {
-            EvenMoreFish.getInstance().getLogger().warning("Rarity " + getId() + " has an incorrect catch-type. Defaulting to CATCH.");
-            type = CatchType.CATCH;
+            EvenMoreFish.getInstance().getLogger().warning("Rarity " + getId() + " has an incorrect catch-type. Defaulting to BOTH.");
+            type = CatchType.BOTH;
         }
         return type;
     }
