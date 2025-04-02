@@ -21,7 +21,7 @@ fishing:
   # Should fish be caught by killing fish entities?
   hunt-enabled: false
   # Should fish hunting only be enabled during a competition?
-  hunt-only-in-competition: true
+  hunt-only-in-competition: false
   # Allows spawner fish to be ignored for hunting
   hunt-ignore-spawner-fish: true
 

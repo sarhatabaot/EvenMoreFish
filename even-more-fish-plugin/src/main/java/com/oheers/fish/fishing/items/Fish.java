@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.fishing.CatchType;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
@@ -552,21 +553,16 @@ public class Fish {
     }
 
     public @NotNull CatchType getCatchType() {
-        String typeStr = section.getString("catch-type", "CATCH");
-        CatchType type;
-        try {
-            type = CatchType.valueOf(typeStr.toUpperCase());
-        } catch (IllegalArgumentException exception) {
-            EvenMoreFish.getInstance().getLogger().warning("Fish " + getName() + " has an incorrect catch-type. Defaulting to CATCH.");
-            type = CatchType.CATCH;
+        String typeStr = section.getString("catch-type");
+        if (typeStr == null) {
+            return rarity.getCatchType();
         }
-        return type;
-    }
-
-    public enum CatchType {
-        CATCH,
-        HUNT,
-        BOTH
+        try {
+            return CatchType.valueOf(typeStr.toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            EvenMoreFish.getInstance().getLogger().warning("Fish " + getName() + " has an incorrect catch-type. Defaulting to its rarity's catch-type.");
+            return rarity.getCatchType();
+        }
     }
 
 }
