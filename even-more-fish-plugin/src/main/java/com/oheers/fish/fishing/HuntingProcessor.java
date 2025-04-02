@@ -80,4 +80,14 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
         return !fishHuntEvent.isCancelled();
     }
 
+    @Override
+    protected ConfigMessage getCaughtMessage() {
+        return ConfigMessage.FISH_HUNTED;
+    }
+
+    @Override
+    protected ConfigMessage getLengthlessCaughtMessage() {
+        return ConfigMessage.FISH_LENGTHLESS_HUNTED;
+    }
+
 }

@@ -90,4 +90,14 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
         return !fishEvent.isCancelled();
     }
 
+    @Override
+    protected ConfigMessage getCaughtMessage() {
+        return ConfigMessage.FISH_CAUGHT;
+    }
+
+    @Override
+    protected ConfigMessage getLengthlessCaughtMessage() {
+        return ConfigMessage.FISH_LENGTHLESS_CAUGHT;
+    }
+
 }

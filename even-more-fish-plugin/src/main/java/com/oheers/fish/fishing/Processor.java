@@ -4,6 +4,7 @@ import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.util.player.UserManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.PlaceholderReceiver;
 import com.oheers.fish.api.EMFFishEvent;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitNBTManager;
@@ -138,8 +139,8 @@ public abstract class Processor<E extends Event> implements Listener {
             String length = decimalFormat.format(fish.getLength());
 
             EMFMessage message = fish.getLength() == -1 ?
-                ConfigMessage.FISH_LENGTHLESS_CAUGHT.getMessage() :
-                ConfigMessage.FISH_CAUGHT.getMessage();
+                getLengthlessCaughtMessage().getMessage() :
+                getCaughtMessage().getMessage();
 
             message.setPlayer(player);
             message.setLength(length);
@@ -198,5 +199,9 @@ public abstract class Processor<E extends Event> implements Listener {
     }
 
     protected abstract boolean fireEvent(@NotNull Fish fish, @NotNull Player player);
+
+    protected abstract ConfigMessage getCaughtMessage();
+
+    protected abstract ConfigMessage getLengthlessCaughtMessage();
 
 }
