@@ -1,14 +1,19 @@
 package com.oheers.fish.fishing;
 
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.EMFFishEvent;
+import com.oheers.fish.api.EMFFishHuntEvent;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class HuntingProcessor extends Processor<EntityDeathEvent> {
 
@@ -66,6 +71,13 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
             return false;
         }
         return active.getCompetitionFile().isAllowHunting();
+    }
+
+    @Override
+    protected boolean fireEvent(@NotNull Fish fish, @NotNull Player player) {
+        EMFFishHuntEvent fishHuntEvent = new EMFFishHuntEvent(fish, player);
+        Bukkit.getPluginManager().callEvent(fishHuntEvent);
+        return !fishHuntEvent.isCancelled();
     }
 
 }

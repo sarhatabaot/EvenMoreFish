@@ -123,9 +123,10 @@ public abstract class Processor<E extends Event> implements Listener {
 
         fish.init();
 
-        EMFFishEvent cEvent = new EMFFishEvent(fish, player);
-        Bukkit.getPluginManager().callEvent(cEvent);
-        if (cEvent.isCancelled()) return null;
+        // If the event is cancelled
+        if (!fireEvent(fish, player)) {
+            return null;
+        }
 
         fish.checkFishEvent();
 
@@ -195,5 +196,7 @@ public abstract class Processor<E extends Event> implements Listener {
         }
         active.applyToLeaderboard(fish, fisherman);
     }
+
+    protected abstract boolean fireEvent(@NotNull Fish fish, @NotNull Player player);
 
 }

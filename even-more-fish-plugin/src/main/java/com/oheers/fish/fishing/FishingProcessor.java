@@ -1,18 +1,23 @@
 package com.oheers.fish.fishing;
 
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.EMFFishEvent;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.permissions.UserPerms;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class FishingProcessor extends Processor<PlayerFishEvent> {
 
@@ -76,6 +81,13 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
         } else {
             return true;
         }
+    }
+
+    @Override
+    protected boolean fireEvent(@NotNull Fish fish, @NotNull Player player) {
+        EMFFishEvent fishEvent = new EMFFishEvent(fish, player);
+        Bukkit.getPluginManager().callEvent(fishEvent);
+        return !fishEvent.isCancelled();
     }
 
 }
