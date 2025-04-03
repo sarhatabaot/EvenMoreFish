@@ -42,6 +42,10 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(file);
         update();
+
+        if (postLoad()) {
+            save();
+        }
     }
 
     public ConfigBase(@NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean configUpdater) {
@@ -52,6 +56,10 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
+
+        if (postLoad()) {
+            save();
+        }
     }
 
     /**
@@ -69,7 +77,6 @@ public class ConfigBase {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
     }
 
     public void reload(@NotNull File configFile) {
@@ -219,6 +226,14 @@ public class ConfigBase {
         // Legacy -> Component -> MiniMessage
         Component legacy = legacySerializer.deserialize(message);
         return miniMessageSerializer.serialize(legacy);
+    }
+
+    /**
+     * If any configs have been moved, they should be relocated in this method instead of UpdaterSettings.
+     * @return true if any changes have been made
+     */
+    protected boolean postLoad() {
+        return false;
     }
 
 }

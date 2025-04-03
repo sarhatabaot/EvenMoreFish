@@ -9,6 +9,11 @@
 fish-caught: <bold>{player} <reset>has fished a {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}!
 # By setting a fish's minimum-length to less than 0, you can create a lengthless fish. This is used when a player fishes a lengthless fish.
 lengthless-fish-caught: <bold>{player} <reset>has fished a {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}!
+# Sent to players when they hunt an EvenMoreFish fish
+fish-hunted: <bold>{player} <reset>has hunted a {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}!
+# This is used when a player hunts a lengthless fish.
+lengthless-fish-hunted: <bold>{player} <reset>has hunted a {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}!
+
 # Sent to a player when they don't have permission to execute a command.
 no-permission: <red>You don't have permission to run that command.
 
@@ -291,4 +296,4 @@ bait:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: '28'
+config-version: '29'

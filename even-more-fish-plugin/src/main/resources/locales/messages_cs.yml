@@ -285,7 +285,7 @@ bait:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: '28'
+config-version: '29'
 
 # The format of commands in /emf help (this message doesn't support papi placeholders)
 help: /{command} - {description}

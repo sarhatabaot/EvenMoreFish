@@ -8,16 +8,16 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when an EMF Fish is caught with a fishing rod
+ * Called when an EMF Fish is caught via hunting
  */
-public class EMFFishEvent extends Event implements Cancellable {
+public class EMFFishHuntEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final Fish fish;
     private final Player player;
     private boolean cancel;
 
-    public EMFFishEvent(@NotNull Fish fish, @NotNull Player player) {
+    public EMFFishHuntEvent(@NotNull Fish fish, @NotNull Player player) {
         this.fish = fish;
         this.player = player;
     }
@@ -39,7 +39,7 @@ public class EMFFishEvent extends Event implements Cancellable {
     }
 
     /**
-     * @return The player that has fished the fish
+     * @return The player that hunted the fish
      */
     public @NotNull Player getPlayer() {
         return player;

@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.fishing.CatchType;
 import com.oheers.fish.fishing.items.config.RarityFileUpdates;
 import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
@@ -246,6 +247,18 @@ public class Rarity extends ConfigBase {
             irlSection.remove("maxTime");
             section.set("requirements.irl-time", min + "-" + max);
         }
+    }
+
+    protected @NotNull CatchType getCatchType() {
+        String typeStr = getConfig().getString("catch-type", "CATCH");
+        CatchType type;
+        try {
+            type = CatchType.valueOf(typeStr.toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            EvenMoreFish.getInstance().getLogger().warning("Rarity " + getId() + " has an incorrect catch-type. Defaulting to BOTH.");
+            type = CatchType.BOTH;
+        }
+        return type;
     }
 
 }
