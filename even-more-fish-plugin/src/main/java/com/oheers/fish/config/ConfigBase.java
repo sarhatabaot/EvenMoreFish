@@ -43,7 +43,7 @@ public class ConfigBase {
         reload(file);
         update();
 
-        if (postLoad()) {
+        if (performRelocations()) {
             save();
         }
     }
@@ -57,7 +57,7 @@ public class ConfigBase {
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
 
-        if (postLoad()) {
+        if (performRelocations()) {
             save();
         }
     }
@@ -232,7 +232,7 @@ public class ConfigBase {
      * If any configs have been moved, they should be relocated in this method instead of UpdaterSettings.
      * @return true if any changes have been made
      */
-    protected boolean postLoad() {
+    protected boolean performRelocations() {
         return false;
     }
 
