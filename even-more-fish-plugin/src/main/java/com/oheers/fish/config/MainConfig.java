@@ -136,36 +136,9 @@ public class MainConfig extends ConfigBase {
         return getConfig().getBoolean("disable-aureliumskills-loot", true);
     }
 
-    public String rewardEffect() {
-        return getConfig().getString("reward-gui.reward-effect");
-    }
-
-    public String rewardItem() {
-        return getConfig().getString("reward-gui.reward-item");
-    }
-
-    public String rewardMoney() {
-        return getConfig().getString("reward-gui.reward-money");
-    }
-
-    public String rewardHealth() {
-        return getConfig().getString("reward-gui.reward-health");
-    }
-
-    public String rewardHunger() {
-        return getConfig().getString("reward-gui.reward-hunger");
-    }
-
-    public String rewardCommand(String command) {
-        return getConfig().getString("reward-gui.command-override." + command);
-    }
-
-
     public boolean doDBVerbose() {
         return !getConfig().getBoolean("disable-db-verbose", false);
     }
-
-
 
     public boolean blockPlacingHeads() {
         return getConfig().getBoolean("place-head-fish", false);
