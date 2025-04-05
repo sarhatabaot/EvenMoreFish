@@ -3,6 +3,9 @@ package com.oheers.fish.config;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import dev.dejvokep.boostedyaml.YamlDocument;
+import dev.dejvokep.boostedyaml.dvs.Pattern;
+import dev.dejvokep.boostedyaml.dvs.segment.Segment;
+import dev.dejvokep.boostedyaml.dvs.versioning.AutomaticVersioning;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.Settings;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -10,10 +13,15 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.flattener.ComponentFlattener;
+import net.kyori.adventure.text.flattener.FlattenerListener;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.impl.QOM;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,10 +50,6 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(file);
         update();
-
-        if (performRelocations()) {
-            save();
-        }
     }
 
     public ConfigBase(@NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean configUpdater) {
@@ -56,10 +60,6 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
-
-        if (performRelocations()) {
-            save();
-        }
     }
 
     /**
@@ -151,7 +151,23 @@ public class ConfigBase {
     }
 
     public UpdaterSettings getUpdaterSettings() {
-        return UpdaterSettings.builder().setVersioning(new BasicVersioning("config-version")).setKeepAll(true).setEnableDowngrading(false).build();
+        return UpdaterSettings.builder()
+            /*
+            .setVersioning(
+                new AutomaticVersioning(
+                    new Pattern(
+                        Segment.range(1, Integer.MAX_VALUE),
+                        Segment.literal("."),
+                        Segment.range(1, Integer.MAX_VALUE)
+                    ),
+                    "config-version"
+                )
+            )
+            */
+            .setVersioning(new BasicVersioning("config-version"))
+            .setKeepAll(true)
+            .setEnableDowngrading(false)
+            .build();
     }
 
     public void save() {
@@ -226,14 +242,6 @@ public class ConfigBase {
         // Legacy -> Component -> MiniMessage
         Component legacy = legacySerializer.deserialize(message);
         return miniMessageSerializer.serialize(legacy);
-    }
-
-    /**
-     * If any configs have been moved, they should be relocated in this method instead of UpdaterSettings.
-     * @return true if any changes have been made
-     */
-    protected boolean performRelocations() {
-        return false;
     }
 
 }
