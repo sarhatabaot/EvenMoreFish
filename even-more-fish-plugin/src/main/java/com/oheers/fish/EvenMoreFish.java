@@ -19,8 +19,8 @@ import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.competition.rewardtypes.*;
 import com.oheers.fish.competition.rewardtypes.external.*;
-import com.oheers.fish.config.GUIConfig;
-import com.oheers.fish.config.GUIFillerConfig;
+import com.oheers.fish.config.GuiConfig;
+import com.oheers.fish.config.GuiFillerConfig;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
 import com.oheers.fish.database.DataManager;
@@ -176,8 +176,8 @@ public class EvenMoreFish extends EMFPlugin {
         this.addonManager = new AddonManager(this);
         this.addonManager.load();
 
-        new GUIConfig();
-        new GUIFillerConfig();
+        new GuiConfig();
+        new GuiFillerConfig();
 
         checkPapi();
 
@@ -449,8 +449,8 @@ public class EvenMoreFish extends EMFPlugin {
 
         MainConfig.getInstance().reload();
         MessageConfig.getInstance().reload();
-        GUIConfig.getInstance().reload();
-        GUIFillerConfig.getInstance().reload();
+        GuiConfig.getInstance().reload();
+        GuiFillerConfig.getInstance().reload();
 
         FishManager.getInstance().reload();
         BaitManager.getInstance().reload();

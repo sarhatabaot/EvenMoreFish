@@ -3,16 +3,16 @@ package com.oheers.fish.config;
 import com.oheers.fish.EvenMoreFish;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
-public class GUIConfig extends ConfigBase {
+public class GuiConfig extends ConfigBase {
 
-    private static GUIConfig instance = null;
+    private static GuiConfig instance = null;
 
-    public GUIConfig() {
+    public GuiConfig() {
         super("guis.yml", "guis.yml", EvenMoreFish.getInstance(), true);
         instance = this;
     }
     
-    public static GUIConfig getInstance() {
+    public static GuiConfig getInstance() {
         return instance;
     }
 
@@ -20,7 +20,7 @@ public class GUIConfig extends ConfigBase {
     public UpdaterSettings getUpdaterSettings() {
         UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());
 
-        // Config Version 5 - Remove competition menu button
+        // Config Version 1 - Remove competition menu button
         builder.addCustomLogic("5", document -> document.remove("main-menu.coming-soon-competitions"));
 
         return builder.build();

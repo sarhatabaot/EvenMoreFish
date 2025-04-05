@@ -16,16 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class GUIFillerConfig extends ConfigBase {
+public class GuiFillerConfig extends ConfigBase {
 
-    private static GUIFillerConfig instance;
+    private static GuiFillerConfig instance;
 
-    public GUIFillerConfig() {
+    public GuiFillerConfig() {
         super("gui-fillers.yml", "gui-fillers.yml", EvenMoreFish.getInstance(), true);
         instance = this;
     }
 
-    public static GUIFillerConfig getInstance() { return instance; }
+    public static GuiFillerConfig getInstance() { return instance; }
 
     // TODO these were copied from ConfigGui and won't be needed after the switch to Triumph
 

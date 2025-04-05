@@ -2,7 +2,7 @@ package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.config.GUIFillerConfig;
+import com.oheers.fish.config.GuiFillerConfig;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.ItemFactory;
@@ -112,7 +112,7 @@ public class ConfigGui {
         ItemStack item = new ItemStack(filler);
         item.editMeta(meta -> meta.displayName(Component.empty()));
         gui.setFiller(item);
-        gui.addElements(GUIFillerConfig.getInstance().getDefaultFillerItems(this));
+        gui.addElements(GuiFillerConfig.getInstance().getDefaultFillerItems(this));
     }
 
     private void loadItems(@NotNull InventoryGui gui, @NotNull Section config) {

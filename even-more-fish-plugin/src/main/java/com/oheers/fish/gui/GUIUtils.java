@@ -1,7 +1,7 @@
 package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.config.GUIConfig;
+import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.gui.guis.BaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 public class GUIUtils {
 
     public static GuiPageElement getFirstPageButton() {
-        YamlDocument config = GUIConfig.getInstance().getConfig();
+        YamlDocument config = GuiConfig.getInstance().getConfig();
         return new GuiPageElement('f',
             createItemStack(
                 config.getString("gui.global.first-page.material", "arrow"),
@@ -38,7 +38,7 @@ public class GUIUtils {
     }
 
     public static GuiPageElement getNextPageButton() {
-        YamlDocument config = GUIConfig.getInstance().getConfig();
+        YamlDocument config = GuiConfig.getInstance().getConfig();
         return new GuiPageElement('n',
             createItemStack(
                 config.getString("gui.global.next-page.material", "paper"),
@@ -51,7 +51,7 @@ public class GUIUtils {
     }
 
     public static GuiPageElement getPreviousPageButton() {
-        YamlDocument config = GUIConfig.getInstance().getConfig();
+        YamlDocument config = GuiConfig.getInstance().getConfig();
         return new GuiPageElement('p',
             createItemStack(
                 config.getString("gui.global.previous-page.material", "paper"),
@@ -64,7 +64,7 @@ public class GUIUtils {
     }
 
     public static GuiPageElement getLastPageButton() {
-        YamlDocument config = GUIConfig.getInstance().getConfig();
+        YamlDocument config = GuiConfig.getInstance().getConfig();
         return new GuiPageElement('l',
             createItemStack(
                 config.getString("gui.global.last-page.material", "arrow"),
