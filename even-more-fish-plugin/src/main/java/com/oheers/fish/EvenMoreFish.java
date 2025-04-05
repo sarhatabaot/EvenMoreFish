@@ -240,7 +240,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         CommandAPI.onDisable();
 
-        terminateGUIS();
+        terminateGuis();
         // Don't use the scheduler here because it will throw errors on disable
         saveUserData(false);
 
@@ -384,8 +384,8 @@ public class EvenMoreFish extends EMFPlugin {
         return permission != null;
     }
 
-    // gets called on server shutdown to simulate all players closing their GUIs
-    private void terminateGUIS() {
+    // gets called on server shutdown to simulate all players closing their Guis
+    private void terminateGuis() {
         getServer().getOnlinePlayers().forEach(player -> {
             InventoryGui inventoryGui = InventoryGui.getOpen(player);
             if (inventoryGui != null) {
@@ -442,7 +442,7 @@ public class EvenMoreFish extends EMFPlugin {
         // If EMF folder does not exist, assume first load again.
         firstLoad = !getDataFolder().exists();
 
-        terminateGUIS();
+        terminateGuis();
 
         reloadConfig();
         saveDefaultConfig();

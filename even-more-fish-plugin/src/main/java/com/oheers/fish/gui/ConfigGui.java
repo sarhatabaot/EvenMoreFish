@@ -27,7 +27,7 @@ import java.util.function.BiConsumer;
 
 public class ConfigGui {
 
-    protected final Map<String, BiConsumer<ConfigGui, GuiElement.Click>> actions = GUIUtils.getActionMap();
+    protected final Map<String, BiConsumer<ConfigGui, GuiElement.Click>> actions = GuiUtils.getActionMap();
     protected final Section config;
     protected final Player player;
     private final @NotNull Map<String, EMFMessage> replacements = new HashMap<>();
@@ -124,10 +124,10 @@ public class ConfigGui {
             addGuiItem(gui, itemSection);
         });
         gui.addElements(
-            GUIUtils.getFirstPageButton(),
-            GUIUtils.getPreviousPageButton(),
-            GUIUtils.getNextPageButton(),
-            GUIUtils.getLastPageButton()
+            GuiUtils.getFirstPageButton(),
+            GuiUtils.getPreviousPageButton(),
+            GuiUtils.getNextPageButton(),
+            GuiUtils.getLastPageButton()
         );
     }
 

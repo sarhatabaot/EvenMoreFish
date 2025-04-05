@@ -3,7 +3,7 @@ package com.oheers.fish.config;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.gui.ConfigGui;
-import com.oheers.fish.gui.GUIUtils;
+import com.oheers.fish.gui.GuiUtils;
 import com.oheers.fish.utils.ItemFactory;
 import de.themoep.inventorygui.GuiElement;
 import de.themoep.inventorygui.StaticGuiElement;
@@ -59,10 +59,10 @@ public class GuiFillerConfig extends ConfigBase {
         if (actionSection != null) {
             return new StaticGuiElement(character, item, click -> {
                 BiConsumer<ConfigGui, GuiElement.Click> action = switch (click.getType()) {
-                    case LEFT -> GUIUtils.getActionMap().get(actionSection.getString("left", ""));
-                    case RIGHT -> GUIUtils.getActionMap().get(actionSection.getString("right", ""));
-                    case MIDDLE -> GUIUtils.getActionMap().get(actionSection.getString("middle", ""));
-                    case DROP -> GUIUtils.getActionMap().get(actionSection.getString("drop", ""));
+                    case LEFT -> GuiUtils.getActionMap().get(actionSection.getString("left", ""));
+                    case RIGHT -> GuiUtils.getActionMap().get(actionSection.getString("right", ""));
+                    case MIDDLE -> GuiUtils.getActionMap().get(actionSection.getString("middle", ""));
+                    case DROP -> GuiUtils.getActionMap().get(actionSection.getString("drop", ""));
                     default -> null;
                 };
                 if (action != null) {
@@ -72,7 +72,7 @@ public class GuiFillerConfig extends ConfigBase {
             });
         } else {
             return new StaticGuiElement(character, item, click -> {
-                BiConsumer<ConfigGui, GuiElement.Click> action = GUIUtils.getActionMap().get(itemSection.getString("click-action", ""));
+                BiConsumer<ConfigGui, GuiElement.Click> action = GuiUtils.getActionMap().get(itemSection.getString("click-action", ""));
                 if (action != null) {
                     action.accept(gui, click);
                 }
