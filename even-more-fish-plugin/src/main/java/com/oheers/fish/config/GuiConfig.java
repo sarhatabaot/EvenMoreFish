@@ -21,7 +21,7 @@ public class GuiConfig extends ConfigBase {
         UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());
 
         // Config Version 1 - Remove competition menu button
-        builder.addCustomLogic("5", document -> document.remove("main-menu.coming-soon-competitions"));
+        builder.addCustomLogic("1", document -> document.remove("main-menu.coming-soon-competitions"));
 
         return builder.build();
     }
