@@ -33,46 +33,47 @@ public class MessageConfig extends ConfigBase {
     public UpdaterSettings getUpdaterSettings() {
         UpdaterSettings.Builder builder = UpdaterSettings.builder(super.getUpdaterSettings());
 
-        // Bossbar config relocations - config version 18
-        builder.addCustomLogic("18", yamlDocument -> {
-            if (yamlDocument.contains("bossbar.hour-color")) {
-                String hourColor = yamlDocument.getString("bossbar.hour-color", "<white>");
-                String hour = yamlDocument.getString("bossbar.hour", "h");
-                yamlDocument.set("bossbar.hour", hourColor + "{hour}" + hour);
-                yamlDocument.remove("bossbar.hour-color");
+        // Config Version 1 - Rework bossbar config layout
+        builder.addCustomLogic("1", document -> {
+            if (document.contains("bossbar.hour-color")) {
+                String hourColor = document.getString("bossbar.hour-color", "<white>");
+                String hour = document.getString("bossbar.hour", "h");
+                document.set("bossbar.hour", hourColor + "{hour}" + hour);
+                document.remove("bossbar.hour-color");
             }
 
-            if (yamlDocument.contains("bossbar.minute-color")) {
-                String minuteColor = yamlDocument.getString("bossbar.minute-color", "<white>");
-                String minute = yamlDocument.getString("bossbar.minute", "m");
-                yamlDocument.set("bossbar.minute", minuteColor + "{minute}" + minute);
-                yamlDocument.remove("bossbar.minute-color");
+            if (document.contains("bossbar.minute-color")) {
+                String minuteColor = document.getString("bossbar.minute-color", "<white>");
+                String minute = document.getString("bossbar.minute", "m");
+                document.set("bossbar.minute", minuteColor + "{minute}" + minute);
+                document.remove("bossbar.minute-color");
             }
 
-            if (yamlDocument.contains("bossbar.second-color")) {
-                String secondColor = yamlDocument.getString("bossbar.second-color", "<white>");
-                String second = yamlDocument.getString("bossbar.second", "s");
-                yamlDocument.set("bossbar.second", secondColor + "{second}" + second);
-                yamlDocument.remove("bossbar.second-color");
+            if (document.contains("bossbar.second-color")) {
+                String secondColor = document.getString("bossbar.second-color", "<white>");
+                String second = document.getString("bossbar.second", "s");
+                document.set("bossbar.second", secondColor + "{second}" + second);
+                document.remove("bossbar.second-color");
             }
         });
 
-        // Prefix config relocations - config version 19
-        builder.addCustomLogic("19", yamlDocument -> {
-            if (yamlDocument.contains("prefix")) {
-                String prefix = yamlDocument.getString("prefix");
-
-                String oldRegular = yamlDocument.getString("prefix-regular");
-                yamlDocument.set("prefix-regular", oldRegular + prefix);
-
-                String oldAdmin = yamlDocument.getString("prefix-admin");
-                yamlDocument.set("prefix-admin", oldAdmin + prefix);
-
-                String oldError = yamlDocument.getString("prefix-error");
-                yamlDocument.set("prefix-error", oldError + prefix);
-
-                yamlDocument.remove("prefix");
+        // Config Version 1 - Rework prefix config layout
+        builder.addCustomLogic("1", document -> {
+            if (!document.contains("prefix")) {
+                return;
             }
+            String prefix = document.getString("prefix");
+
+            String oldRegular = document.getString("prefix-regular");
+            document.set("prefix-regular", oldRegular + prefix);
+
+            String oldAdmin = document.getString("prefix-admin");
+            document.set("prefix-admin", oldAdmin + prefix);
+
+            String oldError = document.getString("prefix-error");
+            document.set("prefix-error", oldError + prefix);
+
+            document.remove("prefix");
         });
 
         return builder.build();
