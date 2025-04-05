@@ -345,6 +345,9 @@ public class MainConfig extends ConfigBase {
             .addRelocation("1", "fish-only-in-competition", "fishing.catch-only-in-competition", '.')
             // Config Version 1 - Add fishing.catch-enabled config
             .addCustomLogic("1", document -> {
+                if (!document.contains("vanilla-fishing")) {
+                    return;
+                }
                 boolean vanillaFishing = document.getBoolean("vanilla-fishing");
                 document.set("fishing.catch-enabled", !vanillaFishing);
                 document.remove("vanilla-fishing");
