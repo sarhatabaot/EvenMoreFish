@@ -50,6 +50,9 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(file);
         update();
+
+        getConfig().remove("config-version");
+        save();
     }
 
     public ConfigBase(@NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean configUpdater) {
@@ -60,6 +63,9 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
+
+        getConfig().remove("config-version");
+        save();
     }
 
     /**
@@ -152,19 +158,7 @@ public class ConfigBase {
 
     public UpdaterSettings getUpdaterSettings() {
         return UpdaterSettings.builder()
-            /*
-            .setVersioning(
-                new AutomaticVersioning(
-                    new Pattern(
-                        Segment.range(1, Integer.MAX_VALUE),
-                        Segment.literal("."),
-                        Segment.range(1, Integer.MAX_VALUE)
-                    ),
-                    "config-version"
-                )
-            )
-            */
-            .setVersioning(new BasicVersioning("config-version"))
+            .setVersioning(new BasicVersioning("version"))
             .setKeepAll(true)
             .setEnableDowngrading(false)
             .build();

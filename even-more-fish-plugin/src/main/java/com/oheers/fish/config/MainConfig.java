@@ -330,8 +330,8 @@ public class MainConfig extends ConfigBase {
     @Override
     public UpdaterSettings getUpdaterSettings() {
         return UpdaterSettings.builder(super.getUpdaterSettings())
-            // Config Version 2.0 - Economy Rework
-            .addCustomLogic("2.0", document -> {
+            // Config Version 1 - Economy Rework
+            .addCustomLogic("1", document -> {
                 String economyType = document.getString("economy-type");
                 document.remove("enable-economy");
                 document.remove("economy-type");
@@ -340,12 +340,12 @@ public class MainConfig extends ConfigBase {
                     document.set(path + ".enabled", true);
                 }
             })
-            // Config Version 2.0 - Add item protection configs
-            .addRelocation("2.0", "block-crafting", "item-protection.block-crafting", '.')
-            // Config Version 2.0 - Update fishing section of the config
-            .addRelocation("2.0", "fish-only-in-competition", "fishing.catch-only-in-competition", '.')
-            // Config Version 2.0 - Add fishing.catch-enabled config
-            .addCustomLogic("2.0", document -> {
+            // Config Version 1 - Add item protection configs
+            .addRelocation("1", "block-crafting", "item-protection.block-crafting", '.')
+            // Config Version 1 - Update fishing section of the config
+            .addRelocation("1", "fish-only-in-competition", "fishing.catch-only-in-competition", '.')
+            // Config Version 1 - Add fishing.catch-enabled config
+            .addCustomLogic("1", document -> {
                 boolean vanillaFishing = document.getBoolean("vanilla-fishing");
                 document.set("fishing.catch-enabled", !vanillaFishing);
                 document.remove("vanilla-fishing");
