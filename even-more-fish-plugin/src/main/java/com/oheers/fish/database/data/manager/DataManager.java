@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class DataManager<T> {
+    // todo, should use caffeine instead?
     private final Map<String, T> cache = new ConcurrentHashMap<>();
     private final DataSavingStrategy<T> savingStrategy;
 

@@ -9,29 +9,31 @@ public class UserReport {
     private String firstFish;
     private String recentFish;
     private String largestFish;
+    private String shortestFish;
     private int numFishCaught;
     private int competitionsWon;
     private int competitionsJoined;
 
     private float largestLength;
+    private float shortestLength;
     private float totalFishLength;
     
     private int fishSold;
     private double moneyEarned;
 
-    public UserReport(final int id, final int numFishCaught, final int competitionsWon, final int competitionsJoined,
-                      final String firstFish, final String recentFish, final String largestFish, final float totalFishLength,
-                      final float largestLength, final String uuid, final int fishSold, final double moneyEarned) {
+    public UserReport(int id, UUID uuid, String firstFish, String recentFish, String largestFish, String shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
         this.id = id;
-        this.numFishCaught = numFishCaught;
-        this.competitionsWon = competitionsWon;
-        this.competitionsJoined = competitionsJoined;
+        this.uuid = uuid;
         this.firstFish = firstFish;
         this.recentFish = recentFish;
         this.largestFish = largestFish;
-        this.totalFishLength = totalFishLength;
+        this.shortestFish = shortestFish;
+        this.numFishCaught = numFishCaught;
+        this.competitionsWon = competitionsWon;
+        this.competitionsJoined = competitionsJoined;
         this.largestLength = largestLength;
-        this.uuid = UUID.fromString(uuid);
+        this.shortestLength = shortestLength;
+        this.totalFishLength = totalFishLength;
         this.fishSold = fishSold;
         this.moneyEarned = moneyEarned;
     }
@@ -158,5 +160,21 @@ public class UserReport {
     
     public double getMoneyEarned() {
         return moneyEarned;
+    }
+
+    public String getShortestFish() {
+        return shortestFish;
+    }
+
+    public float getShortestLength() {
+        return shortestLength;
+    }
+
+    public void setShortestFish(String shortestFish) {
+        this.shortestFish = shortestFish;
+    }
+
+    public void setShortestLength(float shortestLength) {
+        this.shortestLength = shortestLength;
     }
 }

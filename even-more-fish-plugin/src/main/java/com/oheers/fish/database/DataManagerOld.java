@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
+@Deprecated
 public class DataManagerOld {
 
     private static DataManagerOld instance;

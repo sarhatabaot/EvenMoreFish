@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class DirtyTracked {
-    private transient boolean dirty = false;
-    private transient Set<String> dirtyFields = new HashSet<>();
+    private boolean dirty = false;
+    private final Set<String> dirtyFields = new HashSet<>();
 
     protected void markDirty() {
         this.dirty = true;

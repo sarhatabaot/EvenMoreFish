@@ -2,7 +2,6 @@ package com.oheers.fish.database;
 
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

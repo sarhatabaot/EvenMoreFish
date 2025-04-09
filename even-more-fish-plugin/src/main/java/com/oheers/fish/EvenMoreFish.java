@@ -16,10 +16,7 @@ import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
 import com.oheers.fish.commands.MainCommand;
-import com.oheers.fish.competition.AutoRunner;
-import com.oheers.fish.competition.Competition;
-import com.oheers.fish.competition.CompetitionQueue;
-import com.oheers.fish.competition.JoinChecker;
+import com.oheers.fish.competition.*;
 import com.oheers.fish.competition.rewardtypes.*;
 import com.oheers.fish.competition.rewardtypes.external.*;
 import com.oheers.fish.config.BaitFile;
@@ -30,6 +27,12 @@ import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
 import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.data.manager.DataManager;
+import com.oheers.fish.database.data.strategy.impl.*;
+import com.oheers.fish.database.model.fish.FishLog;
+import com.oheers.fish.database.model.fish.FishStats;
+import com.oheers.fish.database.model.user.UserFishStats;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
 import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
@@ -110,6 +113,12 @@ public class EvenMoreFish extends EMFPlugin {
 
     private AddonManager addonManager;
     private Map<String, String> commandUsages = new HashMap<>();
+
+    private DataManager<Collection<FishLog>> fishLogDataManager;
+    private DataManager<FishStats> fishStatsDataManager;
+    private DataManager<UserFishStats> userFishStatsDataManager;
+    private DataManager<UserReport> userReportDataManager;
+    private DataManager<Competition> competitionDataManager;
 
     public static EvenMoreFish getInstance() {
         return instance;
@@ -210,10 +219,18 @@ public class EvenMoreFish extends EMFPlugin {
         AutoRunner.init();
 
         if (MainConfig.getInstance().databaseEnabled()) {
-            DataManagerOld.init();
+            this.database = new Database();
 
-            database = new Database();
-            DataManagerOld.getInstance().loadUserReportsIntoCache();
+            this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy());
+            this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy());
+
+            this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(5L));
+            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy());
+
+            this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L));
+
+
+
         }
 
         registerCommands();
@@ -390,6 +407,8 @@ public class EvenMoreFish extends EMFPlugin {
         });
     }
 
+    @Deprecated
+    //we use datamanagers now
     private void saveUserData(boolean scheduler) {
         Runnable save = () -> {
             if (!(MainConfig.getInstance().isDatabaseOnline())) {

@@ -40,6 +40,9 @@ database:
   # Login information
   username: root
   password: ''
+  advanced:
+    save-interval:
+      user-fish-stats: 5
 
 # Prevents verbose output when the plugin interacts with the database.
 disable-db-verbose: true

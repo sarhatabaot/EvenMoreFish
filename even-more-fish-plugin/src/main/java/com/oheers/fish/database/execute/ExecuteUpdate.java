@@ -32,6 +32,7 @@ public abstract class ExecuteUpdate extends ExecuteBase {
 
     /**
      * Executes an update operation within a transaction.
+     * Perhaps this should be a part of execute update, but we check if it's supported first, can have this saved somewhere too
      */
     public void executeInTransaction() {
         try (Connection connection = getConnection()) {

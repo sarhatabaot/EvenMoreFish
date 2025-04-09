@@ -65,7 +65,7 @@ This design doc is a helpful tool for us to track the changes needed to be made 
 
 1. [*] Finish base models
 2. [*] Set up base migrations (Create Tables first)
-3. [ ] Create admin commands to easily view this info. Can use the "admin database".
+3. [ ] Create admin commands to easily view this info. Can use the "admin database". Also add an option to "regenerate" the stats from the log. Not high priority so add this as an issue.
 4. [ ] Update the gui impl to reflect these changes.
 5. [ ] Write migrations for 7.1 -> 8.1
 6. [ ] Test with MySQL & SQLite

@@ -76,9 +76,19 @@ public class Users extends TableImpl<UsersRecord> {
     public final TableField<UsersRecord, String> LARGEST_FISH = createField(DSL.name("LARGEST_FISH"), SQLDataType.VARCHAR(256).nullable(false), this, "");
 
     /**
+     * The column <code>${table.prefix}users.SHORTEST_FISH</code>.
+     */
+    public final TableField<UsersRecord, String> SHORTEST_FISH = createField(DSL.name("SHORTEST_FISH"), SQLDataType.VARCHAR(256).nullable(false), this, "");
+
+    /**
      * The column <code>${table.prefix}users.LARGEST_LENGTH</code>.
      */
     public final TableField<UsersRecord, Float> LARGEST_LENGTH = createField(DSL.name("LARGEST_LENGTH"), SQLDataType.REAL.nullable(false), this, "");
+
+    /**
+     * The column <code>${table.prefix}users.SHORTEST_LENGTH</code>.
+     */
+    public final TableField<UsersRecord, Float> SHORTEST_LENGTH = createField(DSL.name("SHORTEST_LENGTH"), SQLDataType.REAL.nullable(false), this, "");
 
     /**
      * The column <code>${table.prefix}users.NUM_FISH_CAUGHT</code>.
