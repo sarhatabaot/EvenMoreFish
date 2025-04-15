@@ -3,20 +3,20 @@
 # If a message contains EvenMoreFish placeholders, e.g. {player} or {rarity} it also supports placeholderapi placeholders.
 
 # Sent to players when they fish an EvenMoreFish fish
-fish-caught: "&l{player} {rarity_colour}{length}cm &l{rarity} {rarity_colour}{fish}&r tuttu!"
+fish-caught: <bold>{player} {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}<reset> tuttu!
 # By setting a fish's minimum-length to less than 0, you can create a lengthless fish. This is used when a player fishes a lengthless fish.
-lengthless-fish-caught: "&l{player} {rarity_colour}&l{rarity} {rarity_colour}{fish}&r tuttu!"
+lengthless-fish-caught: <bold>{player} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset> tuttu!
 # Sent to a player when they don't have permission to execute a command.
-no-permission: "&cBu komutu kullanmak için yetkin yok."
+no-permission: <red>Bu komutu kullanmak için yetkin yok.
 
 # The message to be sent when a competition starts and ends
-contest-start: "&rEtkinlik başladı! Tür: {type}"
-contest-end: "&rEtkinlik sona erdi."
+contest-start: '<reset>Etkinlik başladı! Tür: {type}'
+contest-end: <reset>Etkinlik sona erdi.
 # The message to be sent when a player joins whilst a competition is going on
-contest-join: "&rBir tkinliği düzenleniyor. Tür: {type}"
+contest-join: '<reset>Bir tkinliği düzenleniyor. Tür: {type}'
 
 # Shown to players when a new player takes #1 spot, remove this value or set it to "" to disable this message
-new-first: "&r{player} artık #1. sırada"
+new-first: '<reset>{player} artık #1. sırada'
 # Should this message appear in chat (false) or above the exp bar (true)
 action-bar-message: true
 # What competition types should the action bar be used for? (recommended: MOST_FISH)
@@ -26,90 +26,88 @@ action-bar-types:
 # What should replace the {type} variable for each competition type?
 competition-types:
   # MOST_FISH
-  most: "en çok balık"
+  most: en çok balık
   # LARGEST_FISH
-  largest: "en uzun balık"
+  largest: en uzun balık
   # SPECIFIC_FISH
-  specific: "{amount} {rarity_colour}&l{rarity} {rarity_colour}{fish}&r"
+  specific: '{amount} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>'
 
 # Segments shown in the bossbar when competitions run
 bossbar:
-  layout: "{prefix}&r{time-formatted}&r{remaining}"
+  layout: '{prefix}<reset>{time-formatted}<reset>{remaining}'
   # The abbreviations used for different units of time
-  hour: "&r{hour}st"
-  minute: "&r{minute}dk"
-  second: "&r{second}sn"
+  hour: <reset>{hour}st
+  minute: <reset>{minute}dk
+  second: <reset>{second}sn
   # For translating the "left" at the end e.g. "5s left" -> "5s kvar"
-  remaining: "kaldı"
+  remaining: kaldı
 
 # The colour of the [EvenMoreFish] prefix in commands (for when your prefix doesn't have colours)
-prefix-regular: "&a&7[&9&lBalıkçılık&7] "
+prefix-regular: '<gray>[</gray><bold><blue>Balıkçılık</blue></bold><gray>] '
 # The colour of the [EvenMoreFish] prefix in admin commands (for when your prefix doesn't have colours)
-prefix-admin: "&c&7[&9&lBalıkçılık&7] "
+prefix-admin: '<gray>[</gray><bold><blue>Balıkçılık</blue></bold><gray>] '
 # The colour of the [EvenMoreFish] prefix when errors occur e.g. no permission to run a command (for when your prefix doesn't have colours)
-prefix-error: "&c&7[&9&lBalıkçılık&7] "
+prefix-error: '<gray>[</gray><bold><blue>Balıkçılık</blue></bold><gray>] '
 
 # The text shown in a fish's lore before who caught the fish
-fish-caught-by: "&fTutan: {player}"
+fish-caught-by: '<white>Tutan: {player}'
 # The text shown in a fish's lore before the length of the fish
-fish-length: "&fUzunluk: {length}cm"
-# The text to come before the rarity of the fish i.e. "Rarity: UNCOMMON"
-#fish-rarity-prefix: "&fRarity: "
+fish-length: '<white>Uzunluk: {length}cm'
 
 # The format of commands in /emf help (this message doesn't support papi placeholders)
-help: "/{command} - {description}"
+help: /{command} - {description}
 
 # The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
-leaderboard-largest-fish: "{pos_colour}#{position}&r | {pos_colour}{player} &r({rarity_colour}&l{rarity} {rarity_colour}{fish}&r, {length}cm&r)"
-leaderboard-most-fish: "&r#{position} | {pos_colour}{player} &r({pos_colour}{amount} &rfish)"
+leaderboard-largest-fish: '{pos_colour}#{position}<reset> | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)'
+leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
-single-winner: "&r{player} etkinliği kazandı. Tebrikler!"
+single-winner: <reset>{player} etkinliği kazandı. Tebrikler!
 # The number of positions shown in the leaderboard - can't be less than 1.
 leaderboard-count: 10
 # If the player doesn't appear on /emf top, should their position be displayed at the bottom?
 always-show-pos: true
 # Sent to players when nobody got a record during a competition
-no-winners: "&rHiç balık tutan olmadı."
+no-winners: <reset>Hiç balık tutan olmadı.
 # When an individual player didn't get a record
-no-record: "&rSen hiç balık tutmadın."
+no-record: <reset>Sen hiç balık tutmadın.
 # Sent when an admin tries to start a competition where the type doesn't exist e.g. /emf admin competition start 600 ABCDEFGH
-invalid-type: "&rBu bir etkinlik türü değil. Kullanılabilir türler: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
+invalid-type: '<reset>Bu bir etkinlik türü değil. Kullanılabilir türler: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH'
 # Sent to all online players when not enough players are on to start a competition
-not-enough-players: "&rEtkinliğin başlaması için yeterli sayıda oyuncu bulunamadı!"
+not-enough-players: <reset>Etkinliğin başlaması için yeterli sayıda oyuncu bulunamadı!
 # Sent to all players at specific times to show the remaining time left
 # {time_formatted} shows the time (e.g. 5m left, 10m 30s left)
 # {time_raw} is what you input in competitions.yml
-time-alert: "&rEtkinliğin bitmesine {time_formatted} kaldı!"
+time-alert: <reset>Etkinliğin bitmesine {time_formatted} kaldı!
 
 # The message sent to players when they've sold their fish in the /emf shop
-fish-sale: "&a{amount} &fadet balığı &a{sell-price}&f fiyatına sattın."
+fish-sale: <green>{amount} </green><white>adet balığı </white><green>{sell-price}</green><white> fiyatına sattın.
 
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
 help-general:
-  - "&f&m &#f1ffed&m &#DEDEFF&m &#C9CAFF&m &#BBB8FF&m &#AAA6FF&m &#9791FF&m &#8680FF&m &#6B6DFF&m &9&m &f &9&lBalıkçılık &9&m &#6B6DFF&m&m &#8680FF&m &#9791FF&m &#AAA6FF&m &#BBB8FF&m &#C9CAFF&m &#f1ffed&m &f&m &f"
-  - "/emf top - Mevcut etkinlikteki sıralamayı gösterir."
-  - "/emf help - Balıkçılık komutlarını gösterir."
-  - "/emf shop - Balık satmak için marketi açar."
-  - "/emf admin - Balıkçılık admin komutlarını gösterir."
+  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#dedeff> </#dedeff></strikethrough><strikethrough><#c9caff> </#c9caff></strikethrough><strikethrough><#bbb8ff> </#bbb8ff></strikethrough><strikethrough><#aaa6ff> </#aaa6ff></strikethrough><strikethrough><#9791ff> </#9791ff></strikethrough><strikethrough><#8680ff> </#8680ff></strikethrough><strikethrough><#6b6dff> </#6b6dff></strikethrough><strikethrough><blue> </blue></strikethrough><white> </white><bold><blue>Balıkçılık </blue></bold><strikethrough><blue> </blue></strikethrough><strikethrough><#6b6dff> </#6b6dff></strikethrough><strikethrough><#8680ff> </#8680ff></strikethrough><strikethrough><#9791ff> </#9791ff></strikethrough><strikethrough><#aaa6ff> </#aaa6ff></strikethrough><strikethrough><#bbb8ff> </#bbb8ff></strikethrough><strikethrough><#c9caff> </#c9caff></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
+  - /emf top - Mevcut etkinlikteki sıralamayı gösterir.
+  - /emf help - Balıkçılık komutlarını gösterir.
+  - /emf shop - Balık satmak için marketi açar.
+  - /emf admin - Balıkçılık admin komutlarını gösterir.
 
 # Competition help (/emf admin competition help)
 help-competition:
-  - "&f&m &#f1ffed&m &#DEDEFF&m &#C9CAFF&m &#BBB8FF&m &#AAA6FF&m &#9791FF&m &#8680FF&m &#6B6DFF&m &9&m &f &9&lBalıkçılık &9&m &#6B6DFF&m&m &#8680FF&m &#9791FF&m &#AAA6FF&m &#BBB8FF&m &#C9CAFF&m &#f1ffed&m &f&m &f"
-  - "/emf admin competition start <süre> <tür> - Belirtilen sürede bir etkinlik başlatır"
-  - "/emf admin competition end - Devam eden bir yarışmayı sonlandırır"
+  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#dedeff> </#dedeff></strikethrough><strikethrough><#c9caff> </#c9caff></strikethrough><strikethrough><#bbb8ff> </#bbb8ff></strikethrough><strikethrough><#aaa6ff> </#aaa6ff></strikethrough><strikethrough><#9791ff> </#9791ff></strikethrough><strikethrough><#8680ff> </#8680ff></strikethrough><strikethrough><#6b6dff> </#6b6dff></strikethrough><strikethrough><blue> </blue></strikethrough><white> </white><bold><blue>Balıkçılık </blue></bold><strikethrough><blue> </blue></strikethrough><strikethrough><#6b6dff> </#6b6dff></strikethrough><strikethrough><#8680ff> </#8680ff></strikethrough><strikethrough><#9791ff> </#9791ff></strikethrough><strikethrough><#aaa6ff> </#aaa6ff></strikethrough><strikethrough><#bbb8ff> </#bbb8ff></strikethrough><strikethrough><#c9caff> </#c9caff></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
+  - /emf admin competition start \<süre> \<tür> - Belirtilen sürede bir etkinlik başlatır
+  - /emf admin competition end - Devam eden bir yarışmayı sonlandırır
 
 # Admin help (/emf admin help)
 help-admin:
-  - "&f&m &#f1ffed&m &#DEDEFF&m &#C9CAFF&m &#BBB8FF&m &#AAA6FF&m &#9791FF&m &#8680FF&m &#6B6DFF&m &9&m &f &9&lBalıkçılık &9&m &#6B6DFF&m&m &#8680FF&m &#9791FF&m &#AAA6FF&m &#BBB8FF&m &#C9CAFF&m &#f1ffed&m &f&m &f"
-  - "/emf admin competition <start/end> <süre> <tür> - Etkinlik başlatır/bitirir"
-  - "/emf admin reload - Eklenti dosyalarını yeniden yükler"
-  - "/emf admin version - Eklenti bilgilerini görüntüler."
+  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#dedeff> </#dedeff></strikethrough><strikethrough><#c9caff> </#c9caff></strikethrough><strikethrough><#bbb8ff> </#bbb8ff></strikethrough><strikethrough><#aaa6ff> </#aaa6ff></strikethrough><strikethrough><#9791ff> </#9791ff></strikethrough><strikethrough><#8680ff> </#8680ff></strikethrough><strikethrough><#6b6dff> </#6b6dff></strikethrough><strikethrough><blue> </blue></strikethrough><white> </white><bold><blue>Balıkçılık </blue></bold><strikethrough><blue> </blue></strikethrough><strikethrough><#6b6dff> </#6b6dff></strikethrough><strikethrough><#8680ff> </#8680ff></strikethrough><strikethrough><#9791ff> </#9791ff></strikethrough><strikethrough><#aaa6ff> </#aaa6ff></strikethrough><strikethrough><#bbb8ff> </#bbb8ff></strikethrough><strikethrough><#c9caff> </#c9caff></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
+  - /emf admin competition \<start/end> \<süre> \<tür> - Etkinlik başlatır/bitirir
+  - /emf admin reload - Eklenti dosyalarını yeniden yükler
+  - /emf admin version - Eklenti bilgilerini görüntüler.
 
 # Shown when the emf competition placeholders request a position in the leaderboard that doesn't exist
-no-player-in-place: "Bu yeri almak için balık tut"
+no-player-in-place: Bu yeri almak için balık tut
 # Shown when the emf competition placeholders are used when there's no competition running
-no-competition-running: "Şu anda bir balıkçılık etkinliği yok"
+no-competition-running: Şu anda bir balıkçılık etkinliği yok
 # Should %emf_competition_place_player_*% contain the above (false) or return null (true).
 emf-competition-player-null: false
 # Should %emf_competition_place_size_*% contain the above (false) or return null (true).
@@ -117,8 +115,8 @@ emf-competition-size-null: true
 # Should %emf_competition_place_fish_*% contain the above (false) or return null (true).
 emf-competition-fish-null: true
 # How should the %emf_competition_place_fish_*% be formatted?
-emf-competition-fish-format: "{length}cm &l{rarity} {fish}"
+emf-competition-fish-format: '{length}cm <bold>{rarity}</bold> {fish}'
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 26
+version: 1

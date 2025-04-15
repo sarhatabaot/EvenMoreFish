@@ -1,7 +1,7 @@
 package com.oheers.fish.competition;
 
 import com.oheers.fish.competition.strategies.*;
-import com.oheers.fish.config.messages.ConfigMessage;
+import com.oheers.fish.messages.ConfigMessage;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -46,7 +46,7 @@ public enum CompetitionType {
     SHORTEST_FISH(
             ConfigMessage.COMPETITION_TYPE_SHORTEST,
             "Shortest Fish",
-            false,
+            true,
             new ShortestFishStrategy()
     ),
     SHORTEST_TOTAL(

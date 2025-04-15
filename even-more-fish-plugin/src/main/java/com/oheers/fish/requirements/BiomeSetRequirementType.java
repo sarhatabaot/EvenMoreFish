@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class BiomeSetRequirementType implements RequirementType {
+public class BiomeSetRequirementType extends RequirementType {
 
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {

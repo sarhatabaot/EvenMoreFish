@@ -3,19 +3,19 @@ disabled: false
 type: SPECIFIC_FISH
 duration: 60
 allowed-rarities:
-  - "Uncommon"
-  - "Epic"
-  - "Legendary"
+  - Uncommon
+  - Epic
+  - Legendary
 days:
   Saturday:
-    - "03:00"
-    - "15:00"
+    - 03:00
+    - 15:00
   Sunday:
-    - "03:00"
-    - "15:00"
+    - 03:00
+    - 15:00
 rewards:
-  1:
-    - "MONEY:5000"
-    - "MESSAGE:&eCongratulations!"
-  2:
-    - "MONEY:2000"
+  '1':
+    - MONEY:5000
+    - MESSAGE:<yellow>Congratulations!
+  '2':
+    - MONEY:2000

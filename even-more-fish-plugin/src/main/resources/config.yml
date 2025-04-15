@@ -8,12 +8,22 @@ locale: en
 
 # The decimal format of the plugin
 # Used to change default formatting for numbers, for example: en_US for 1,000.99 or de_DE for 1.000,99
-# Note: all locales supported by the jvm are avaialable.
+# Note: all locales supported by the jvm are available.
 # Only relevant if you use vault
 decimal-locale: en_US
 
-# Should EMF fish only be given during a competition?
-fish-only-in-competition: false
+fishing:
+  # Should fish be caught from fishing rods?
+  catch-enabled: true
+  # Should EMF fish only be given during a competition?
+  catch-only-in-competition: false
+
+  # Should fish be caught by killing fish entities?
+  hunt-enabled: false
+  # Should fish hunting only be enabled during a competition?
+  hunt-only-in-competition: false
+  # Allows spawner fish to be ignored for hunting
+  hunt-ignore-spawner-fish: true
 
 # Should competition player requirements respect vanished players?
 # Supports EssentialsX and CMI.
@@ -36,7 +46,7 @@ database:
   # WARNING: Changing this will create new tables in the database.
   # Only use this during first setup or before migrations.
   # (Or after, but only if you know what you're doing).
-  table-prefix: "emf_"
+  table-prefix: emf_
   # Login information
   username: root
   password: ''
@@ -59,16 +69,16 @@ economy:
   playerpoints:
     enabled: false
     multiplier: 1.0
-    display: "{amount} Player Point(s)"
+    display: '{amount} Player Point(s)'
   # Allows fish to pay out with claim blocks
   griefprevention:
     enabled: false
     multiplier: 1.0
-    display: "{amount} Claim Block(s)"
+    display: '{amount} Claim Block(s)'
 
 # Setting this to change the boosbar style
 # you can use like: SEGMENTED_6 SEGMENTED_10 SEGMENTED_12 SEGMENTED_20 SOLID
-barstyle: 'SEGMENTED_10'
+barstyle: SEGMENTED_10
 
 # Requires that the fishing rod to have the "emf-rod-nbt" value in order to catch custom fish.
 # This allows you to sell rods that will be the only ones able to catch EvenMoreFish fish.
@@ -79,20 +89,35 @@ nbt-rod-item:
   item:
     # This needs to be FISHING_ROD, can be an addon string, but the base material has to be FISHING_ROD
     material: FISHING_ROD
-    displayname: "&eEvenMoreFish Fishing Rod"
+    displayname: <yellow>EvenMoreFish Fishing Rod
   glowing: true
   lore:
-    - ""
-    - "&7Catch &ecustom &7fish using this"
-    - "&7fishing rod."
+    - ''
+    - <gray>Catch </gray><yellow>custom </yellow><gray>fish using this
+    - <gray>fishing rod.
 
 # Should the user need emf.use_rod permission in order to catch default custom fish. This requires
 # Vault and a permission manager such as LuckPerms.
 requires-fishing-permission: false
 
-# Should fish and baits be blocked from being crafted into other items. For example, when the player tries to craft
-# the starfish into a beacon.
-block-crafting: true
+# Various protections for EMF items.
+# These do not apply if raw-material is used.
+item-protection:
+  # Should EMF items be blocked from being crafted into other items?
+  # For example, when the player tries to craft the starfish into a beacon.
+  block-crafting: true
+  # Should EMF items be blocked from being consumed?
+  # For example, when the player tries to drink the epic elixir bait.
+  block-consume: true
+  # Should EMF items be blocked from being used in furnaces as fuel?
+  # For example, when the player places an NBT rod in a furnace's fuel slot.
+  block-furnace-burn: true
+  # Should EMF items be blocked from being cooked?
+  # For example, when the player tries to cook an atlantic cod.
+  block-cooking: true
+  # Should EMF items be blocked from being placed?
+  # For example, when the player tries to place a Spongebob.
+  block-placing: true
 
 # /emf shop configuration. If you wish to change the layout, please look at the guis.yml file.
 sell-gui:
@@ -115,26 +140,26 @@ sell-gui:
 # To disable a boost, comment out the corresponding line.
 # Region boost settings the rarity is case-sensitive.
 #region-boosts:
-  #fishing:
-    # The boost multiplier for the "Common" rarity in the "fishing" region.
-    # This means the weight of "Common" fish will be multiplied by 0.5.
-    # To enable, comment out the line below.
-    #Common: 0.5
+#fishing:
+# The boost multiplier for the "Common" rarity in the "fishing" region.
+# This means the weight of "Common" fish will be multiplied by 0.5.
+# To enable, comment out the line below.
+#Common: 0.5
 
-    # The boost multiplier for the "Rare" rarity in the "fishing" region.
-    # This means the weight of "Rare" fish will be multiplied by 1.0 (no change).
-    # To enable, comment out the line below.
-    #Rare: 1.0
+# The boost multiplier for the "Rare" rarity in the "fishing" region.
+# This means the weight of "Rare" fish will be multiplied by 1.0 (no change).
+# To enable, comment out the line below.
+#Rare: 1.0
 
-    # The boost multiplier for the "Epic" rarity in the "fishing" region.
-    # This means the weight of "Epic" fish will be multiplied by 3.0.
-    # To enable, comment out the line below.
-    #Epic: 3.0
+# The boost multiplier for the "Epic" rarity in the "fishing" region.
+# This means the weight of "Epic" fish will be multiplied by 3.0.
+# To enable, comment out the line below.
+#Epic: 3.0
 
-    # The boost multiplier for the "Legendary" rarity in the "fishing" region.
-    # This means the weight of "Legendary" fish will be multiplied by 15.0.
-    # To enable, comment out the line below.
-    #Legendary: 15.0
+# The boost multiplier for the "Legendary" rarity in the "fishing" region.
+# This means the weight of "Legendary" fish will be multiplied by 15.0.
+# To enable, comment out the line below.
+#Legendary: 15.0
 
 # Prevents mcMMO from overriding fishing loot, this means treasure won't appear when fish can.
 disable-mcmmo-loot: true
@@ -145,12 +170,34 @@ disable-aureliumskills-loot: true
 # When set to true, players won't be able to place fish that are heads, like head-64 or head-uuid.
 place-head-fish: false
 
-# Switch between custom fish or vanilla fishing
-vanilla-fishing: true
-
 # Whether to protect baited fishing rods in an anvil.
 protect-baited-rods: true
 
+# General bait configuration
+bait:
+  # This defines the multiplier for how frequently a rarity/fish appears.
+  # Setting to -1 will mean players are guaranteed to get a fish available from the bait.
+  boost: 1.5
+
+  # Prevents players being able to use their baits during competitions, this is recommended if your rarer rarities are
+  # longer, as players could abuse these baits to get into the leaderboard
+  competition-disable: true
+
+  # When baits are applied to rods, should they show at the bottom of the lore of a fishing rod?
+  # Setting this to false will not affect currently baited rods, and their lore will stop being modified by the plugin.
+  add-to-lore: true
+
+  # As a percentage, how often should baits appear? (The bait will be more likely to be selected if it has a higher catch-weight. It will also
+  # replace any fish that might have been caught in its place.)
+  catch-percentage: 2.5
+
+  # How many types of bait can be applied to each fishing rod.
+  # NOTE: THIS WILL BREAK RODS THAT ALREADY HAVE BAITS APPLIED.
+  baits-per-rod: 7
+
+  # Should unused bait slots show a message in their place?
+  # NOTE: THIS WILL BREAK RODS THAT ALREADY HAVE BAITS APPLIED.
+  show-unused-slots: true
 
 # Requirement configs
 requirements:
@@ -162,16 +209,38 @@ requirements:
 give-straight-to-inventory: false
 
 # Customize the plugin's command. Requires a server restart to take effect.
+# NOTE: All names and aliases must use English letters only, as the command library does not support other characters.
 command:
   # The /emf admin shortcut command
   admin-shortcut:
     enabled: true
-    name: "emfa"
+    name: emfa
   # The plugin's main command
-  main: "emf"
+  main: emf
   # Aliases for the main command
   aliases:
-    - "evenmorefish"
+    - evenmorefish
+
+  # Change the name of the plugin's subcommands
+  subcommands:
+    # The /emf admin command
+    admin: "admin"
+    # The /emf next command
+    next: "next"
+    # The /emf toggle command
+    toggle: "toggle"
+    # The /emf gui command
+    gui: "gui"
+    # The /emf help command
+    help: "help"
+    # The /emf top command
+    top: "top"
+    # The /emf shop command
+    shop: "shop"
+    # The /emf sellall command
+    sellall: "sellall"
+    # The /emf applybaits command
+    applybaits: "applybaits"
 
 # Customizable sets of biomes for fish configuration
 biome-sets:
@@ -187,4 +256,4 @@ biome-sets:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 20
+version: 1

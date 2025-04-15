@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class MoonPhaseRequirementType implements RequirementType {
+public class MoonPhaseRequirementType extends RequirementType {
 
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {

@@ -3,9 +3,8 @@ package com.oheers.fish.commands;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.addons.AddonManager;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.addons.Addon;
-import com.oheers.fish.api.reward.RewardManager;
+import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.baits.BaitNBTManager;
@@ -15,11 +14,15 @@ import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.MessageConfig;
+import com.oheers.fish.config.MessageConfig;
+import com.oheers.fish.database.Database;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.utils.ManifestUtil;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -27,9 +30,10 @@ import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import net.md_5.bungee.api.chat.*;
-import net.md_5.bungee.api.chat.hover.content.Text;
-import org.apache.commons.lang3.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -120,7 +124,7 @@ public class AdminCommand {
 
                     FishUtils.giveItem(fishItem, target);
 
-                    AbstractMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
                     message.setPlayer(target);
                     message.setFishCaught(fish.getName());
                     message.send(sender);
@@ -145,31 +149,35 @@ public class AdminCommand {
                                 ConfigMessage.RARITY_INVALID.getMessage().send(sender);
                                 return;
                             }
-                            BaseComponent[] baseComponent = TextComponent.fromLegacyText(FishUtils.translateColorCodes(rarity.getColour() + rarity.getDisplayName()) + " ");
+                            TextComponent.Builder builder = Component.text();
+                            builder.append(rarity.getDisplayName().getComponentMessage());
+                            builder.append(Component.space());
                             for (Fish fish : rarity.getOriginalFishList()) {
-                                BaseComponent[] textComponent = TextComponent.fromLegacyText(FishUtils.translateColorCodes(rarity.getColour() + "[" + fish.getDisplayName() + rarity.getColour() + "] "));
-                                for (BaseComponent component : textComponent) {
-                                    component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText("Click to receive fish"))));
-                                    component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin fish " + rarity.getId() + " " + fish.getName().replace(" ", "_")));
-                                    baseComponent[0].addExtra(component);
-                                }
+                                TextComponent.Builder fishBuilder = Component.text();
+                                EMFSingleMessage message = EMFSingleMessage.fromString("<gray>[</gray>{fish}<gray>]</gray>");
+                                message.setVariable("{fish}", fish.getDisplayName());
+                                fishBuilder.append(message.getComponentMessage());
+                                fishBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to receive fish")));
+                                fishBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin fish " + rarity.getId() + " " + fish.getName().replace(" ", "_")));
+                                builder.append(fishBuilder);
                             }
-                            sender.spigot().sendMessage(baseComponent);
+                            sender.sendMessage(builder.build());
                         }
                         case "rarities" -> {
-                            BaseComponent[] baseComponent = TextComponent.fromLegacyText("");
+                            TextComponent.Builder builder = Component.text();
                             for (Rarity rarity : FishManager.getInstance().getRarityMap().values()) {
-                                BaseComponent[] textComponent = TextComponent.fromLegacyText(FishUtils.translateColorCodes(rarity.getColour() + "[" + rarity.getDisplayName() + "] "));
-                                for (BaseComponent component : textComponent) {
-                                    component.setHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
-                                            new Text(TextComponent.fromLegacyText("Click to view " + rarity.getDisplayName() + " fish."))
-                                    ));
-                                    component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin list fish " + rarity.getId()));
-                                    baseComponent[0].addExtra(component);
-                                }
+                                TextComponent.Builder rarityBuilder = Component.text();
+                                EMFSingleMessage message = EMFSingleMessage.fromString("<gray>[</gray>{rarity}<gray>]</gray>");
+                                message.setVariable("{rarity}", rarity.getDisplayName());
+                                rarityBuilder.append(message.getComponentMessage());
+                                rarityBuilder.hoverEvent(HoverEvent.hoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    EMFSingleMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
+                                ));
+                                rarityBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin list fish " + rarity.getId()));
+                                builder.append(rarityBuilder);
                             }
-                            sender.spigot().sendMessage(baseComponent);
+                            sender.sendMessage(builder.build());
                         }
                     }
                 });
@@ -202,7 +210,7 @@ public class AdminCommand {
                     }
 
                     FishUtils.giveItems(Collections.singletonList(EvenMoreFish.getInstance().getCustomNBTRod()), player);
-                    AbstractMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
+                    EMFMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
                     giveMessage.setPlayer(player);
                     giveMessage.send(sender);
                 }));
@@ -237,9 +245,9 @@ public class AdminCommand {
                     ItemStack baitItem = bait.create(target);
                     baitItem.setAmount(quantity);
                     FishUtils.giveItems(List.of(baitItem), target);
-                    AbstractMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
+                    EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
                     message.setPlayer(target);
-                    message.setBait(bait.getName());
+                    message.setBait(bait.getId());
                     message.send(sender);
                 });
     }
@@ -279,10 +287,10 @@ public class AdminCommand {
 
                     int totalDeleted = BaitNBTManager.deleteAllBaits(fishingRod);
                     if (totalDeleted > 0) {
-                        FishUtils.editMeta(fishingRod, meta -> meta.setLore(BaitNBTManager.deleteOldLore(fishingRod)));
+                        fishingRod.editMeta(meta -> meta.lore(BaitNBTManager.deleteOldLore(fishingRod)));
                     }
 
-                    AbstractMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
+                    EMFMessage message = ConfigMessage.BAITS_CLEARED.getMessage();
                     message.setAmount(Integer.toString(totalDeleted));
                     message.send(player);
                 }));
@@ -315,10 +323,11 @@ public class AdminCommand {
                         messageList.add(String.format(messageFormat, prefix, addonManager.isLoading(prefix), entry.getValue().getVersion()));
                     }
 
-                    EvenMoreFish.getAdapter().createMessage(StringUtils.join(messageList, "\n")).send(info.sender());
+                    EMFListMessage.fromStringList(messageList).send(info.sender());
                 });
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private CommandAPICommand getVersion() {
         helpMessageBuilder.addUsage(
             "admin version",
@@ -330,35 +339,44 @@ public class AdminCommand {
                     .mapToInt(rarity -> rarity.getFishList().size())
                     .sum();
 
+                String databaseEngine = "N/A";
+                String databaseType = "N/A";
+                final Database database = EvenMoreFish.getInstance().getDatabase();
+                if (database != null) {
+                    databaseEngine = database.getDatabaseVersion();
+                    databaseType = database.getType();
+                }
+
                 final String msgString =
                     """
-                    {prefix} EvenMoreFish by Oheers {version}\s
-                    {prefix} Feature Branch: {branch}\s
-                    {prefix} Feature Build/Date: {build-date}\s
-                    {prefix} MCV: {mcv}\s
-                    {prefix} SSV: {ssv}\s
-                    {prefix} Online: {online}\s
-                    {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
-                    {prefix} Database Engine: {engine}\s
-                    {prefix} Database Type: {type}\s
-                    """
-                        .replace("{prefix}", MessageConfig.getInstance().getSTDPrefix())
-                        .replace("{version}", EvenMoreFish.getInstance().getDescription().getVersion())
-                        .replace("{branch}", getFeatureBranchName())
-                        .replace("{build-date}", getFeatureBranchBuildOrDate())
-                        .replace("{mcv}", Bukkit.getServer().getVersion())
-                        .replace("{ssv}", Bukkit.getServer().getBukkitVersion())
-                        .replace("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()))
-                        .replace("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()))
-                        .replace("{fish}", String.valueOf(fishCount))
-                        .replace("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()))
-                        .replace("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()))
-                        .replace("{engine}", EvenMoreFish.getInstance().getDatabase().getDatabaseVersion())
-                        .replace("{type}", EvenMoreFish.getInstance().getDatabase().getType());
+                        {prefix} EvenMoreFish by Oheers {version}\s
+                        {prefix} Feature Branch: {branch}\s
+                        {prefix} Feature Build/Date: {build-date}\s
+                        {prefix} MCV: {mcv}\s
+                        {prefix} SSV: {ssv}\s
+                        {prefix} Online: {online}\s
+                        {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
+                        {prefix} Database Engine: {engine}\s
+                        {prefix} Database Type: {type}\s
+                        """;
 
+                EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
 
-                AbstractMessage msg = EvenMoreFish.getAdapter().createMessage(msgString);
-                msg.send(info.sender());
+                message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
+                message.setVariable("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion());
+                message.setVariable("{branch}", getFeatureBranchName());
+                message.setVariable("{build-date}", getFeatureBranchBuildOrDate());
+                message.setVariable("{mcv}", Bukkit.getServer().getVersion());
+                message.setVariable("{ssv}", Bukkit.getServer().getBukkitVersion());
+                message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
+                message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
+                message.setVariable("{fish}", String.valueOf(fishCount));
+                message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
+                message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
+                message.setVariable("{engine}", databaseEngine);
+                message.setVariable("{type}", databaseType);
+
+                message.send(info.sender());
             });
     }
 
@@ -377,21 +395,19 @@ public class AdminCommand {
         );
         return new CommandAPICommand("rewardtypes")
                 .executes(info -> {
-                    TextComponent message = new TextComponent(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getLegacyMessage());
-                    ComponentBuilder builder = new ComponentBuilder(message);
+                    TextComponent.Builder builder = Component.text();
+                    builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
+                    RewardType.getLoadedTypes().forEach((string, rewardType) -> {
+                        Component show = EMFSingleMessage.fromString(
+                            "Author: " + rewardType.getAuthor() + "\n" +
+                            "Registered Plugin: " + rewardType.getPlugin().getName()
+                        ).getComponentMessage();
 
-                    RewardManager.getInstance().getRegisteredRewardTypes().forEach(rewardType -> {
-                        TextComponent component = new TextComponent(rewardType.getIdentifier());
-                        component.setHoverEvent(new HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                new Text(TextComponent.fromLegacyText(
-                                        "Author: " + rewardType.getAuthor() + "\n" +
-                                                "Registered Plugin: " + rewardType.getPlugin().getName()
-                                ))
-                        ));
-                        builder.append(component).append(", ");
+                        TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
+                        typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
+                        builder.append(typeBuilder).append(Component.text(", "));
                     });
-                    info.sender().spigot().sendMessage(builder.create());
+                    info.sender().sendMessage(builder.build());
                 });
     }
 
@@ -403,9 +419,8 @@ public class AdminCommand {
         return new CommandAPICommand("migrate")
                 .executes(info -> {
                     if (!MainConfig.getInstance().databaseEnabled()) {
-                        EvenMoreFish.getAdapter()
-                                .createMessage("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
-                                .send(info.sender());
+                        EMFSingleMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
+                            .send(info.sender());
                         return;
                     }
                     EvenMoreFish.getScheduler().runTaskAsynchronously(() -> EvenMoreFish.getInstance().getDatabase().getMigrationManager().migrateLegacy(info.sender()));
@@ -428,12 +443,10 @@ public class AdminCommand {
                     document.set("rawItem", handItemNbt);
                     handItemNbt = document.dump().replaceFirst("rawItem: ", "");
 
-                    TextComponent component = new TextComponent(handItemNbt);
-                    component.setHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText("Click to copy to clipboard."))
-                    ));
-                    component.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, handItemNbt));
-                    info.sender().spigot().sendMessage(component);
+                    TextComponent.Builder builder = Component.text().content(handItemNbt);
+                    builder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to copy to clipboard.")));
+                    builder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, handItemNbt));
+                    info.sender().sendMessage(builder.build());
                 });
 
     }

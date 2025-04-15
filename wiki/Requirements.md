@@ -14,7 +14,7 @@ rarities:
     # How likely is the rarity to be chosen? Having a greater weight means the rarity is more likely to be chosen (the total weights don't have to add to 100)
     weight: 100
     # What colour should the fish's name be?
-    colour: '&7'
+    colour: '<gray>'
     # Prices in /emf shop are calculated by using the calculation "length * worth-multiplier". You can change the worth-multiplier here.
     worth-multiplier: 0.1
     # Should a catch of this fish be broadcasted to everyone (true) or just the fisher (false)?
@@ -157,7 +157,7 @@ A config example of using the weather requirement:
 ```
 
 #### World
-And finally, this limits fish to certain worlds. By default there's only three worlds, `overworld`, `nether` and `end`, but with a plugin like [Multiverse-Core](https://www.spigotmc.org/resources/multiverse-core.390/), you can create worlds to allow fish to only be caught in. There probably isn't much point allowing `nether` since water can't be placed there and lava can't be fished in though.
+And finally, this limits fish to certain worlds. By default there's only three worlds, `overworld`, `nether` and `end`, but with a plugin like [Multiverse-Core](https://modrinth.com/plugin/multiverse-core), you can create worlds to allow fish to only be caught in. There probably isn't much point allowing `nether` since water can't be placed there and lava can't be fished in though.
 
 A config example of using the world requirement:
 ```yaml

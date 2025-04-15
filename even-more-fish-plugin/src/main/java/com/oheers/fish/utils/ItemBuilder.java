@@ -1,7 +1,7 @@
 package com.oheers.fish.utils;
 
-import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -65,12 +65,12 @@ public class ItemBuilder {
             return null;
         }
         ItemStack stack = new ItemStack(this.material);
-        FishUtils.editMeta(stack, meta -> {
+        stack.editMeta(meta -> {
             if (this.display != null) {
-                meta.setDisplayName(EvenMoreFish.getAdapter().createMessage(this.display).getLegacyMessage());
+                meta.displayName(EMFSingleMessage.fromString(this.display).getComponentMessage());
             }
             if (!this.lore.isEmpty()) {
-                meta.setLore(EvenMoreFish.getAdapter().createMessage(this.lore).getLegacyListMessage());
+                meta.lore(EMFListMessage.fromStringList(this.lore).getComponentListMessage());
             }
         });
         if (this.glowing) {

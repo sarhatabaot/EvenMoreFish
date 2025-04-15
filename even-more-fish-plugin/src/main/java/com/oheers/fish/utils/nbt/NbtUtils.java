@@ -38,12 +38,21 @@ public class NbtUtils {
             case NBTAPI -> nbt.hasTag(namespacedKey.toString());
             case LEGACY -> {
                 if (nbt.hasTag(NbtKeys.PUBLIC_BUKKIT_VALUES)) {
-                    yield nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES)
-                            .hasTag(namespacedKey.toString());
+                    ReadableNBT compound = nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES);
+                    if (compound == null) {
+                        yield false;
+                    }
+                    yield compound.hasTag(namespacedKey.toString());
                 }
                 yield false;
             }
-            case COMPAT -> nbt.getCompound(namespacedKey.getNamespace()).hasTag(namespacedKey.getKey());
+            case COMPAT -> {
+                ReadableNBT compound = nbt.getCompound(namespacedKey.getNamespace());
+                if (compound == null) {
+                    yield false;
+                }
+                yield compound.hasTag(namespacedKey.getKey());
+            }
         };
     }
 
@@ -56,7 +65,13 @@ public class NbtUtils {
                 }
                 yield null;
             }
-            case COMPAT -> nbt.getCompound(namespacedKey.getNamespace()).getString(namespacedKey.getKey());
+            case COMPAT -> {
+                ReadableNBT compound = nbt.getCompound(namespacedKey.getNamespace());
+                if (compound == null) {
+                    yield null;
+                }
+                yield compound.getString(namespacedKey.getKey());
+            }
             case LEGACY -> {
                 if (nbt.hasTag(NbtKeys.PUBLIC_BUKKIT_VALUES)) {
                     ReadableNBT publicBukkitValues = nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES);
@@ -96,12 +111,19 @@ public class NbtUtils {
                 }
                 yield null;
             }
-            case COMPAT -> nbt.getCompound(namespacedKey.getNamespace()).getFloat(namespacedKey.getKey());
-            case LEGACY -> {
-                if (nbt.hasTag(NbtKeys.PUBLIC_BUKKIT_VALUES)) {
-                    yield nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES).getFloat(namespacedKey.toString());
+            case COMPAT -> {
+                ReadableNBT compound = nbt.getCompound(namespacedKey.getNamespace());
+                if (compound == null) {
+                    yield null;
                 }
-                yield null;
+                yield compound.getFloat(namespacedKey.getKey());
+            }
+            case LEGACY -> {
+                ReadableNBT compound = nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES);
+                if (compound == null) {
+                    yield null;
+                }
+                yield compound.getFloat(namespacedKey.toString());
             }
         });
     }
@@ -116,12 +138,19 @@ public class NbtUtils {
                 }
                 yield null;
             }
-            case COMPAT -> nbt.getCompound(namespacedKey.getNamespace()).getInteger(namespacedKey.getKey());
-            case LEGACY -> {
-                if (nbt.hasTag(NbtKeys.PUBLIC_BUKKIT_VALUES)) {
-                    yield nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES).getInteger(namespacedKey.toString());
+            case COMPAT -> {
+                ReadableNBT compound = nbt.getCompound(namespacedKey.getNamespace());
+                if (compound == null) {
+                    yield null;
                 }
-                yield null;
+                yield compound.getInteger(namespacedKey.getKey());
+            }
+            case LEGACY -> {
+                ReadableNBT compound = nbt.getCompound(NbtKeys.PUBLIC_BUKKIT_VALUES);
+                if (compound == null) {
+                    yield null;
+                }
+                yield compound.getInteger(namespacedKey.toString());
             }
         });
     }

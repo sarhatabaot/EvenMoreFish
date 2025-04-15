@@ -9,7 +9,7 @@ public class MaxBaitReachedException extends Exception {
     private final ApplicationResult recoveryResult;
 
     public MaxBaitReachedException(@NotNull Bait bait, @NotNull ApplicationResult recoveryResult) {
-        super(bait.getName() + " has reached its maximum number of uses on the fishing rod.");
+        super(bait.getId() + " has reached its maximum number of uses on the fishing rod.");
         this.recoveryResult = recoveryResult;
     }
 

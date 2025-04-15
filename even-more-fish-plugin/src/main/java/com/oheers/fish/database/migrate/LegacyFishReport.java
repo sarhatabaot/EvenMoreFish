@@ -14,9 +14,9 @@ import java.time.Instant;
 public class LegacyFishReport {
     private final String r; //Rarity
     private final String n; //Name
-    private int c; //count
+    private final int c; //count
     private final long t; //time
-    private float l; //length
+    private final float l; //length
 
     public LegacyFishReport(String r, String n, float l, int c, long t) {
         this.r = r;

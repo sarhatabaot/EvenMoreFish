@@ -7,6 +7,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Called when an EMF Fish is caught with a fishing rod
+ */
 public class EMFFishEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -51,4 +54,5 @@ public class EMFFishEvent extends Event implements Cancellable {
     public void setCancelled(boolean cancel) {
         this.cancel = cancel;
     }
+
 }
