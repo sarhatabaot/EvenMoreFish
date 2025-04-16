@@ -7,9 +7,11 @@ import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.requirement.RequirementContext;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.fishing.Processor;
 import com.oheers.fish.fishing.items.config.FishConversions;
 import com.oheers.fish.fishing.items.config.RarityConversions;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -174,7 +176,7 @@ public class FishManager {
         return fishList.get(idx);
     }
 
-    public Fish getFish(Rarity r, Location l, Player p, double boostRate, List<Fish> boostedFish, boolean doRequirementChecks) {
+    public Fish getFish(Rarity r, Location l, Player p, double boostRate, List<Fish> boostedFish, boolean doRequirementChecks, @Nullable Processor<?> processor) {
         if (r == null) return null;
         // will store all the fish that match the player's biome or don't discriminate biomes
 
@@ -183,11 +185,15 @@ public class FishManager {
             r = getRandomWeightedRarity(p, 1, null, Set.copyOf(rarityMap.values()));
         }
 
-        RequirementContext context = new RequirementContext(l.getWorld(), l, p, null, null);
+        World world = l == null ? null : l.getWorld();
+        RequirementContext context = new RequirementContext(world, l, p, null, null);
 
         List<Fish> available = r.getFishList().stream()
             .filter(fish -> {
                 if (!(boostRate != -1 || boostedFish == null || boostedFish.contains(fish))) {
+                    return false;
+                }
+                if (processor != null && !processor.canUseFish(fish)) {
                     return false;
                 }
                 if (doRequirementChecks) {

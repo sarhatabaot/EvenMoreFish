@@ -8,15 +8,20 @@ locale: en
 
 # The decimal format of the plugin
 # Used to change default formatting for numbers, for example: en_US for 1,000.99 or de_DE for 1.000,99
-# Note: all locales supported by the jvm are avaialable.
+# Note: all locales supported by the jvm are available.
 # Only relevant if you use vault
 decimal-locale: en_US
 
 fishing:
+  # Should fish be caught from fishing rods?
+  catch-enabled: true
   # Should EMF fish only be given during a competition?
   catch-only-in-competition: false
+
+  # Should fish be caught by killing fish entities?
+  hunt-enabled: false
   # Should fish hunting only be enabled during a competition?
-  hunt-only-in-competition: true
+  hunt-only-in-competition: false
   # Allows spawner fish to be ignored for hunting
   hunt-ignore-spawner-fish: true
 
@@ -166,9 +171,6 @@ disable-aureliumskills-loot: true
 # When set to true, players won't be able to place fish that are heads, like head-64 or head-uuid.
 place-head-fish: false
 
-# Switch between custom fish or vanilla fishing
-vanilla-fishing: true
-
 # Whether to protect baited fishing rods in an anvil.
 protect-baited-rods: true
 
@@ -255,4 +257,4 @@ biome-sets:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 25
+version: 1

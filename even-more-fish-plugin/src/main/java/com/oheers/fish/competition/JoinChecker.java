@@ -69,10 +69,10 @@ public class JoinChecker implements Listener {
         Competition activeComp = Competition.getCurrentlyActive();
         if (activeComp != null) {
             activeComp.getStatusBar().addPlayer(event.getPlayer());
-            EMFMessage startMessage = activeComp.getStartMessage();
-            if (startMessage != null) {
-                startMessage.setMessage(ConfigMessage.COMPETITION_JOIN.getMessage());
-                EvenMoreFish.getScheduler().runTaskLater(() -> startMessage.send(event.getPlayer()), 20L * 3);
+            if (activeComp.getStartMessage() != null) {
+                EMFMessage competitionJoin = ConfigMessage.COMPETITION_JOIN.getMessage();
+                competitionJoin.setCompetitionType(activeComp.getCompetitionType().getTypeVariable().getMessage());
+                EvenMoreFish.getScheduler().runTaskLater(() -> competitionJoin.send(event.getPlayer()), 20L * 3);
             }
         }
 

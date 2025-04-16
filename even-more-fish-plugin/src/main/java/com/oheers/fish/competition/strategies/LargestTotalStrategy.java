@@ -13,6 +13,11 @@ import org.jetbrains.annotations.NotNull;
 public class LargestTotalStrategy implements CompetitionStrategy {
 
     @Override
+    public boolean randomInit(@NotNull Competition competition) {
+        return true;
+    }
+
+    @Override
     public void applyToLeaderboard(Fish fish, Player fisher, Leaderboard leaderboard, Competition competition) {
         CompetitionEntry entry = leaderboard.getEntry(fisher.getUniqueId());
         float increaseAmount = fish.getLength();
@@ -28,15 +33,15 @@ public class LargestTotalStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
-        message.setMessage(ConfigMessage.LEADERBOARD_LARGEST_TOTAL.getMessage());
+    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull CompetitionEntry entry) {
+        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_TOTAL.getMessage();
         message.setAmount(getDecimalFormat().format(entry.getValue()));
         return message;
     }
 
     @Override
-    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
-        message.setMessage(ConfigMessage.LEADERBOARD_LARGEST_TOTAL.getMessage());
+    public EMFMessage getSinglePlayerLeaderboard(@NotNull CompetitionEntry entry) {
+        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_TOTAL.getMessage();
         message.setAmount(getDecimalFormat().format(entry.getValue()));
         return message;
     }

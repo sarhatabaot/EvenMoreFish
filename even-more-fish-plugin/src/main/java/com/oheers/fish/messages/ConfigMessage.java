@@ -67,6 +67,8 @@ public enum ConfigMessage {
     FISH_CANT_BE_PLACED("<reset>You cannot place this fish.", PrefixType.ERROR, true, true, "place-fish-blocked"),
     FISH_CAUGHT("<reset><b>{player} <reset>has fished a {rarity_colour}{length}cm <b>{rarity} {rarity_colour}{fish}!", PrefixType.NONE, true, true, "fish-caught"),
     FISH_LENGTHLESS_CAUGHT("<reset><b>{player} <reset>has fished a {rarity_colour}<b>{rarity} {rarity_colour}{fish}!", PrefixType.NONE, true, true, "lengthless-fish-caught"),
+    FISH_HUNTED("<bold>{player} <reset>has hunted a {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}!", PrefixType.NONE, true, true, "fish-hunted"),
+    FISH_LENGTHLESS_HUNTED("<bold>{player} <reset>has hunted a {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}!", PrefixType.NONE, true, true, "lengthless-fish-hunted"),
     FISH_LORE(Arrays.asList(
         "{fisherman_lore}",
         "{length_lore}",
@@ -315,7 +317,8 @@ public enum ConfigMessage {
     }
 
     public boolean isListForm() {
-        return !MessageConfig.getInstance().getConfig().getStringList(getId()).isEmpty();
+        List<String> strings = MessageConfig.getInstance().getConfig().getStringList(getId());
+        return normalList != null || !strings.isEmpty();
     }
 
     public PrefixType getPrefixType() {
@@ -325,7 +328,11 @@ public enum ConfigMessage {
     public EMFMessage getMessage() {
         if (isListForm()) {
             EMFListMessage listMessage = EMFListMessage.empty();
+            listMessage.setCanSilent(this.canSilent);
             List<String> list = getStringList(getNormalList(), getId());
+            if (list.isEmpty()) {
+                return listMessage;
+            }
             for (String line : list) {
                 if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
                     listMessage.appendString(line.substring(10));
@@ -335,12 +342,12 @@ public enum ConfigMessage {
                     listMessage.appendMessage(prefix);
                 }
             }
-            listMessage.setCanSilent(this.canSilent);
             return listMessage;
         } else {
             String line = getString(getNormal(), getId());
             EMFSingleMessage singleMessage = EMFSingleMessage.empty();
-            if (line != null) {
+            singleMessage.setCanSilent(this.canSilent);
+            if (line != null && !line.isEmpty()) {
                 if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
                     singleMessage.appendString(line.substring(10));
                 } else {
@@ -349,7 +356,6 @@ public enum ConfigMessage {
                     singleMessage.appendMessage(prefix);
                 }
             }
-            singleMessage.setCanSilent(this.canSilent);
             return singleMessage;
         }
     }

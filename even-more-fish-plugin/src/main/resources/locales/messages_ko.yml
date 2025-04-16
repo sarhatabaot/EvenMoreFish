@@ -2,9 +2,9 @@
 # If a message contains EvenMoreFish placeholders, e.g. {player} or {rarity} it also supports placeholderapi placeholders.
 
 # Sent to players when they fish an EvenMoreFish fish
-fish-caught: <bold>{player} <reset> {rarity_colour}{length}cm <bold>{rarity} {rarity_colour}{fish}낚았습니다!
+fish-caught: <bold>{player} <reset> {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}낚았습니다!
 # By setting a fish's minimum-length to less than 0, you can create a lengthless fish. This is used when a player fishes a lengthless fish.
-lengthless-fish-caught: <bold>{player} <reset> {rarity_colour}<bold>{rarity} {rarity_colour}{fish}낚았습니다!
+lengthless-fish-caught: <bold>{player} <reset> {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}낚았습니다!
 # Sent to a player when they don't have permission to execute a command.
 no-permission: <red>이 명령어를 사용할 권한이 없습니다.
 
@@ -29,7 +29,7 @@ competition-types:
   # LARGEST_FISH
   largest: 가장 큰 물고기 낚기
   # SPECIFIC_FISH
-  specific: '{amount} {rarity_colour}<bold>{rarity} {rarity_colour}{fish}<reset>'
+  specific: '{amount} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>'
 
 # Segments shown in the bossbar when competitions run
 bossbar:
@@ -63,7 +63,7 @@ fish-lore:
 help: /{command} - {description}
 
 # The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
-leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity} {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
 leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} {type}대회에서 우승했습니다!
@@ -122,7 +122,7 @@ emf-competition-size-null: true
 # Should %emf_competition_place_fish_*% contain the above (false) or return null (true).
 emf-competition-fish-null: true
 # How should the %emf_competition_place_fish_*% be formatted?
-emf-competition-fish-format: '{length}cm <bold>{rarity} {fish}'
+emf-competition-fish-format: '{length}cm <bold>{rarity}</bold> {fish}'
 
 # Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: 이 낚싯대의 최대 미끼 유형 수에 도달했습니다.
@@ -133,4 +133,4 @@ bait-use: '{bait_theme}<bold>{bait} <reset>미끼 중 하나를 사용했습니�
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: '28'
+version: 1

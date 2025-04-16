@@ -4,7 +4,6 @@ import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.util.player.UserManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.EMFFishEvent;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
@@ -14,9 +13,7 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -47,8 +44,10 @@ public abstract class Processor<E extends Event> implements Listener {
     }
 
     protected boolean isCustomFishAllowed(Player player) {
-        return MainConfig.getInstance().getEnabled() && (competitionOnlyCheck() || EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) && !EvenMoreFish.getInstance().isCustomFishingDisabled(player);
+        return isEnabled() && MainConfig.getInstance().getEnabled() && (competitionOnlyCheck() || EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) && !EvenMoreFish.getInstance().isCustomFishingDisabled(player);
     }
+
+    protected abstract boolean isEnabled();
 
     /**
      * Chooses a bait without needing to specify a bait to be used. randomWeightedRarity & getFish methods are used to
@@ -68,7 +67,7 @@ public abstract class Processor<E extends Event> implements Listener {
             return null;
         }
 
-        Fish fish = FishManager.getInstance().getFish(fishRarity, location, player, 1, null, true);
+        Fish fish = FishManager.getInstance().getFish(fishRarity, location, player, 1, null, true, this);
         if (fish == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not determine a fish for " + player.getName());
             return null;
@@ -92,7 +91,7 @@ public abstract class Processor<E extends Event> implements Listener {
         }
 
         double baitCatchPercentage = MainConfig.getInstance().getBaitCatchPercentage();
-        if (baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
+        if (shouldCatchBait() && baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
@@ -123,9 +122,10 @@ public abstract class Processor<E extends Event> implements Listener {
 
         fish.init();
 
-        EMFFishEvent cEvent = new EMFFishEvent(fish, player);
-        Bukkit.getPluginManager().callEvent(cEvent);
-        if (cEvent.isCancelled()) return null;
+        // If the event is cancelled
+        if (!fireEvent(fish, player)) {
+            return null;
+        }
 
         fish.checkFishEvent();
 
@@ -135,11 +135,12 @@ public abstract class Processor<E extends Event> implements Listener {
 
         if (!fish.isSilent()) {
             String length = decimalFormat.format(fish.getLength());
-            EMFMessage rarity = EMFSingleMessage.fromString(fish.getRarity().getId());
 
-            EMFMessage message = ConfigMessage.FISH_CAUGHT.getMessage();
+            EMFMessage message = fish.getLength() == -1 ?
+                getLengthlessCaughtMessage().getMessage() :
+                getCaughtMessage().getMessage();
+
             message.setPlayer(player);
-            message.setVariable("{rarity}", rarity);
             message.setLength(length);
 
             EvenMoreFish.getInstance().incrementMetricFishCaught(1);
@@ -147,11 +148,6 @@ public abstract class Processor<E extends Event> implements Listener {
             fish.getDisplayName();
             message.setFishCaught(fish.getDisplayName());
             message.setRarity(fish.getRarity().getDisplayName());
-
-
-            if (fish.getLength() == -1) {
-                message.setMessage(ConfigMessage.FISH_LENGTHLESS_CAUGHT.getMessage());
-            }
 
             if (fish.getRarity().getAnnounce() && Competition.isActive()) {
                 FishUtils.broadcastFishMessage(message, player, false);
@@ -199,5 +195,15 @@ public abstract class Processor<E extends Event> implements Listener {
         }
         active.applyToLeaderboard(fish, fisherman);
     }
+
+    protected abstract boolean fireEvent(@NotNull Fish fish, @NotNull Player player);
+
+    protected abstract ConfigMessage getCaughtMessage();
+
+    protected abstract ConfigMessage getLengthlessCaughtMessage();
+
+    protected abstract boolean shouldCatchBait();
+
+    public abstract boolean canUseFish(@NotNull Fish fish);
 
 }

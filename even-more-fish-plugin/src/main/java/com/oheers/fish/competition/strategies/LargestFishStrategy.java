@@ -14,6 +14,11 @@ import org.jetbrains.annotations.NotNull;
 public class LargestFishStrategy implements CompetitionStrategy {
 
     @Override
+    public boolean randomInit(@NotNull Competition competition) {
+        return true;
+    }
+
+    @Override
     public void applyToLeaderboard(Fish fish, Player fisher, Leaderboard leaderboard, Competition competition) {
         if (fish.getLength() <= 0) return;
 
@@ -30,22 +35,16 @@ public class LargestFishStrategy implements CompetitionStrategy {
     }
 
     @Override
-    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
-        Fish fish = entry.getFish();
+    public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull CompetitionEntry entry) {
+        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
         message.setLength(getDecimalFormat().format(entry.getValue()));
-        message.setRarity(fish.getRarity().getDisplayName());
-        message.setFishCaught(fish.getDisplayName());
-        message.setMessage(ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage());
         return message;
     }
 
     @Override
-    public EMFMessage getSinglePlayerLeaderboard(@NotNull EMFMessage message, @NotNull CompetitionEntry entry) {
-        Fish fish = entry.getFish();
+    public EMFMessage getSinglePlayerLeaderboard(@NotNull CompetitionEntry entry) {
+        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
         message.setLength(getDecimalFormat().format(entry.getValue()));
-        message.setRarity(fish.getRarity().getDisplayName());
-        message.setFishCaught(fish.getDisplayName());
-        message.setMessage(ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage());
         return message;
     }
 }

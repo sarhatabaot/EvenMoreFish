@@ -42,6 +42,9 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(file);
         update();
+
+        getConfig().remove("config-version");
+        save();
     }
 
     public ConfigBase(@NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean configUpdater) {
@@ -52,6 +55,9 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
+
+        getConfig().remove("config-version");
+        save();
     }
 
     /**
@@ -69,7 +75,6 @@ public class ConfigBase {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
     }
 
     public void reload(@NotNull File configFile) {
@@ -144,7 +149,11 @@ public class ConfigBase {
     }
 
     public UpdaterSettings getUpdaterSettings() {
-        return UpdaterSettings.builder().setVersioning(new BasicVersioning("config-version")).setKeepAll(true).setEnableDowngrading(false).build();
+        return UpdaterSettings.builder()
+            .setVersioning(new BasicVersioning("version"))
+            .setKeepAll(true)
+            .setEnableDowngrading(false)
+            .build();
     }
 
     public void save() {
@@ -199,16 +208,21 @@ public class ConfigBase {
      * If the message already contains a MiniMessage tag, this does nothing.
      */
     private String convertLegacyString(@NotNull String message) {
-        // Get MiniMessage serializer
-        final MiniMessage miniMessageSerializer = MiniMessage.builder()
-            .strict(true)
-            .postProcessor(component -> component)
-            .build();
+        // Exclude command reward types
+        if (message.toUpperCase().startsWith("COMMAND:")) {
+            return message;
+        }
 
         // If the message isn't legacy, don't do anything
         if (!FishUtils.isLegacyString(message)) {
             return message;
         }
+
+        // Get MiniMessage serializer
+        final MiniMessage miniMessageSerializer = MiniMessage.builder()
+            .strict(true)
+            .postProcessor(component -> component)
+            .build();
 
         // Get LegacyComponentSerializer
         final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
