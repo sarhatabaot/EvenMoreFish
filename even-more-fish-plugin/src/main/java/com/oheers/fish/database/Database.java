@@ -286,7 +286,7 @@ public class Database implements DatabaseAPI {
                 final int competitionsWon = tableRecord.getValue(Tables.USERS.COMPETITIONS_WON);
                 final int competitionsJoined = tableRecord.getValue(Tables.USERS.COMPETITIONS_JOINED);
                 final String firstFish = tableRecord.getValue(Tables.USERS.FIRST_FISH);
-                final String lastFish = tableRecord.getValue(Tables.USERS.LAST_FISH);
+                final String recentFish = tableRecord.getValue(Tables.USERS.LAST_FISH);
                 final String largestFish = tableRecord.getValue(Tables.USERS.LARGEST_FISH);
                 final float totalFishLength = tableRecord.getValue(Tables.USERS.TOTAL_FISH_LENGTH);
                 final float largestLength = tableRecord.getValue(Tables.USERS.LARGEST_LENGTH);
@@ -299,17 +299,17 @@ public class Database implements DatabaseAPI {
 
                 return new UserReport(
                         id,
+                        UUID.fromString(uuid),
+                        firstFish,
+                        recentFish,
+                        largestFish,
+                        shortestFish,
                         numFishCaught,
                         competitionsWon,
                         competitionsJoined,
-                        firstFish,
-                        lastFish,
-                        largestFish,
-                        shortestFish,
-                        totalFishLength,
                         largestLength,
                         shortestLength,
-                        uuid,
+                        totalFishLength,
                         fishSold,
                         moneyEarned
                 );
@@ -595,22 +595,22 @@ public class Database implements DatabaseAPI {
         return new ExecuteQuery<FishStats>(connectionFactory, settings) {
             @Override
             protected FishStats onRunQuery(DSLContext dslContext) throws Exception {
-                Optional<Record> record = dslContext.select()
+                Optional<Record> optionalRecord = dslContext.select()
                         .from(Tables.FISH)
                         .where(Tables.FISH.FISH_NAME.eq(fishName))
                         .and(Tables.FISH.FISH_RARITY.eq(fishName))
                         .fetchOptional();
 
-                if (record.isEmpty())
+                if (optionalRecord.isEmpty())
                     return empty();
 
-                final LocalDateTime firstCatchTime = record.get().getValue(Tables.FISH.FIRST_CATCH_TIME);
-                final UUID discoverer = UUID.fromString(record.get().get(Tables.FISH.DISCOVERER));
-                final float shortestLength = record.get().getValue(Tables.FISH.SHORTEST_LENGTH);
-                final UUID shortestFisher = UUID.fromString(record.get().getValue(Tables.FISH.SHORTEST_FISHER));
-                final float longestLength = record.get().getValue(Tables.FISH.LARGEST_FISH);
-                final UUID longestFisher = UUID.fromString(record.get().getValue(Tables.FISH.LARGEST_FISHER));
-                final int quantity = record.get().getValue(Tables.FISH.TOTAL_CAUGHT);
+                final LocalDateTime firstCatchTime = optionalRecord.get().getValue(Tables.FISH.FIRST_CATCH_TIME);
+                final UUID discoverer = UUID.fromString(optionalRecord.get().get(Tables.FISH.DISCOVERER));
+                final float shortestLength = optionalRecord.get().getValue(Tables.FISH.SHORTEST_LENGTH);
+                final UUID shortestFisher = UUID.fromString(optionalRecord.get().getValue(Tables.FISH.SHORTEST_FISHER));
+                final float longestLength = optionalRecord.get().getValue(Tables.FISH.LARGEST_FISH);
+                final UUID longestFisher = UUID.fromString(optionalRecord.get().getValue(Tables.FISH.LARGEST_FISHER));
+                final int quantity = optionalRecord.get().getValue(Tables.FISH.TOTAL_CAUGHT);
                 return new FishStats(fishName, fishRarity, firstCatchTime, discoverer, shortestLength,shortestFisher,longestLength,longestFisher,quantity);
             }
 
@@ -695,7 +695,7 @@ public class Database implements DatabaseAPI {
 
     //todo
     public void updateOrCreateUserReport(UserReport report) {
-        new ExecuteUpdate(connectionFactory, report) {
+        new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.insertInto(Tables.USERS)
@@ -725,6 +725,7 @@ public class Database implements DatabaseAPI {
             }
         }.executeUpdate();
     }
+
 
     //todo
     public void batchUpdateUserFishStats(Collection<UserFishStats> userFishStats) {
