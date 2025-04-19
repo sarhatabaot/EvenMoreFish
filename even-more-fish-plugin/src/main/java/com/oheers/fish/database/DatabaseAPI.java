@@ -1,7 +1,6 @@
 package com.oheers.fish.database;
 
 import com.oheers.fish.competition.Competition;
-import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -74,7 +72,7 @@ public interface DatabaseAPI {
     void setFishLogEntry(final FishLog fishLogEntry);
 
     FishStats getFishStats(final String fishName, final String fishRarity);
-    void setFishStats(final FishStats fishStats);
+    void updateFishStats(final FishStats fishStats);
 
 }
 

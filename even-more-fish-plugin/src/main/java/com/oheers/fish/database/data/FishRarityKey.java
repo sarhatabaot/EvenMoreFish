@@ -1,28 +1,28 @@
-package com.oheers.fish.database;
+package com.oheers.fish.database.data;
 
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public class CompositeFishRarityKey{
+//For use with caching only
+public class FishRarityKey {
     private final String fishName;
     private final String fishRarity;
 
-    public CompositeFishRarityKey(final String fishName,final String fishRarity) {
+    public FishRarityKey(final String fishName, final String fishRarity) {
         this.fishName = fishName;
         this.fishRarity = fishRarity;
     }
 
 
     @Contract(value = "_, _ -> new", pure = true)
-    public static @NotNull CompositeFishRarityKey of(final String fishName, final String fishRarity) {
-        return new CompositeFishRarityKey(fishName, fishRarity);
+    public static @NotNull FishRarityKey of(final String fishName, final String fishRarity) {
+        return new FishRarityKey(fishName, fishRarity);
     }
 
-    @Contract("_, _ -> new")
-    public static @NotNull CompositeFishRarityKey of(final @NotNull Fish fish, final @NotNull Rarity rarity) {
-        return new CompositeFishRarityKey(fish.getName(), rarity.getId());
+    public static @NotNull FishRarityKey of(final @NotNull Fish fish) {
+        return new FishRarityKey(fish.getName(), fish.getRarity().getId());
     }
 
 
@@ -32,7 +32,7 @@ public class CompositeFishRarityKey{
     }
 
     public String toStringDefault() {
-        return "CompositeFishRarityKey{" +
+        return "FishRarityKey{" +
                 "fishName='" + fishName + '\'' +
                 ", fishRarity='" + fishRarity + '\'' +
                 '}';

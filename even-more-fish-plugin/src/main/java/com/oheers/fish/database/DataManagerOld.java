@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.database.data.FishRarityKey;
 import com.oheers.fish.database.model.FishReportOld;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
@@ -41,7 +42,7 @@ public class DataManagerOld {
             .build(uuid -> EvenMoreFish.getInstance().getDatabase().readUserReport(uuid));
     //incorrect,
     //maybe UUID > Map<CompositeKey, UserFishStats>
-    private LoadingCache<UUID, Map<CompositeFishRarityKey, UserFishStats>> userFishStatsCache;
+    private LoadingCache<UUID, Map<FishRarityKey, UserFishStats>> userFishStatsCache;
 
     private LoadingCache<String, FishStats> fishStatsCache = Caffeine.newBuilder()
             .build(composite -> {

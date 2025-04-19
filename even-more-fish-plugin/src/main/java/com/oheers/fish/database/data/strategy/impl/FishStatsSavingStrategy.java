@@ -7,6 +7,6 @@ import com.oheers.fish.database.model.fish.FishStats;
 
 public class FishStatsSavingStrategy extends ImmediateSavingStrategy<FishStats> {
     public FishStatsSavingStrategy() {
-        super(fishStats -> EvenMoreFish.getInstance().getDatabase().setFishStats(fishStats));
+        super(fishStats -> EvenMoreFish.getInstance().getDatabase().updateFishStats(fishStats));
     }
 }

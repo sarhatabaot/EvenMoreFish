@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -142,13 +143,13 @@ public class FishingProcessor implements Listener {
         }
 
         if (EvenMoreFish.getInstance().isUsingMcMMO()
-            && ExperienceConfig.getInstance().isFishingExploitingPrevented()
-            && UserManager.getPlayer(player).getFishingManager().isExploitingFishing(location.toVector())) {
+                && ExperienceConfig.getInstance().isFishingExploitingPrevented()
+                && UserManager.getPlayer(player).getFishingManager().isExploitingFishing(location.toVector())) {
             return null;
         }
 
         if (BaitFile.getInstance().getBaitCatchPercentage() > 0
-            && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < BaitFile.getInstance().getBaitCatchPercentage()) {
+                && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < BaitFile.getInstance().getBaitCatchPercentage()) {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 AbstractMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
@@ -179,9 +180,11 @@ public class FishingProcessor implements Listener {
 
         fish.init();
 
-        EMFFishEvent cEvent = new EMFFishEvent(fish, player);
+        EMFFishEvent cEvent = new EMFFishEvent(fish, player, LocalDateTime.now());
         Bukkit.getPluginManager().callEvent(cEvent);
-        if (cEvent.isCancelled()) return null;
+        if (cEvent.isCancelled()) {
+            return null;
+        }
 
         fish.checkFishEvent();
 
@@ -219,22 +222,6 @@ public class FishingProcessor implements Listener {
 
         competitionCheck(fish, player, location);
 
-        if (MainConfig.getInstance().isDatabaseOnline()) {
-            EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
-                if (EvenMoreFish.getInstance().getDatabase().hasFishStats(fish)) {
-                    EvenMoreFish.getInstance().getDatabase().incrementFish(fish);
-
-                    if (EvenMoreFish.getInstance().getDatabase().getLargestFishSize(fish) < fish.getLength()) {
-                        EvenMoreFish.getInstance().getDatabase().updateLargestFish(fish, player.getUniqueId());
-                    }
-                } else {
-                    EvenMoreFish.getInstance().getDatabase().createFishData(fish, player.getUniqueId());
-                }
-
-                DataManagerOld.getInstance().handleFishCatch(player.getUniqueId(), fish);
-            });
-        }
-
         return fish.give(-1);
     }
 
@@ -253,13 +240,10 @@ public class FishingProcessor implements Listener {
             return;
         }
         List<World> competitionWorlds = active.getCompetitionFile().getRequiredWorlds();
-        if (!competitionWorlds.isEmpty()) {
-            if (location.getWorld() != null) {
-                if (!competitionWorlds.contains(location.getWorld())) {
-                    return;
-                }
-            }
+        if (!competitionWorlds.isEmpty() && location.getWorld() != null && !competitionWorlds.contains(location.getWorld())) {
+            return;
         }
+
         active.applyToLeaderboard(fish, fisherman);
     }
 }

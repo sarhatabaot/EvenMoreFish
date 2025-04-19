@@ -32,6 +32,7 @@ public class JoinChecker implements Listener {
 
 
         //cache user reports
+        //This whole section is done automatically now.. todo we do need to add event registration for all relevant stuff
 
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
             List<FishReportOld> fishReports;
@@ -84,8 +85,7 @@ public class JoinChecker implements Listener {
     // Removes the player from the bar list if they leave the server
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-
-        Competition activeComp = Competition.getCurrentlyActive();
+        final Competition activeComp = Competition.getCurrentlyActive();
         if (activeComp != null) {
             activeComp.getStatusBar().removePlayer(event.getPlayer());
         }
@@ -95,7 +95,6 @@ public class JoinChecker implements Listener {
         }
 
         //save non critical data
-
 
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
             UUID userUUID = event.getPlayer().getUniqueId();

@@ -9,7 +9,7 @@ public class CompetitionReport {
 
     private final String competitionConfigId;
     private final String winnerFish;
-    private final UUID winneruuid;
+    private final UUID winnerUuid;
     private final List<UUID> contestants = new ArrayList<>();
 
     private final float winnerScore;
@@ -21,7 +21,7 @@ public class CompetitionReport {
     public CompetitionReport(String competitionConfigID, String winnerFish, String winnerUUIDString, float winnerScore, String contestants, LocalDateTime startTime, LocalDateTime endTime) {
         this.competitionConfigId = competitionConfigID;
         this.winnerFish = winnerFish;
-        this.winneruuid = UUID.fromString(winnerUUIDString);
+        this.winnerUuid = UUID.fromString(winnerUUIDString);
         this.winnerScore = winnerScore;
         for (String contestant : contestants.split(",")) {
             this.contestants.add(UUID.fromString(contestant));
@@ -38,8 +38,8 @@ public class CompetitionReport {
         return winnerFish;
     }
 
-    public UUID getWinneruuid() {
-        return winneruuid;
+    public UUID getWinnerUuid() {
+        return winnerUuid;
     }
 
     public List<UUID> getContestants() {

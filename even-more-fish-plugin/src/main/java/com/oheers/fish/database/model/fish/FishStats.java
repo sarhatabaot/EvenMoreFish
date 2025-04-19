@@ -10,11 +10,11 @@ public class FishStats {
 
     private final LocalDateTime firstCatchTime;
     private final UUID discoverer;
-    private final float shortestLength;
-    private final UUID shortestFisher;
-    private final float longestLength;
-    private final UUID longestFisher;
-    private final int quantity;
+    private float shortestLength;
+    private UUID shortestFisher;
+    private float longestLength;
+    private UUID longestFisher;
+    private int quantity;
 
     public FishStats(String fishName, String fishRarity, LocalDateTime firstCatchTime, UUID discoverer, float shortestLength, UUID shortestFisher, float longestLength, UUID longestFisher, int quantity) {
         this.fishName = fishName;
@@ -62,6 +62,34 @@ public class FishStats {
 
     public UUID getDiscoverer() {
         return discoverer;
+    }
+
+    public void setShortestLength(float shortestLength) {
+        this.shortestLength = shortestLength;
+    }
+
+    public void setShortestFisher(UUID shortestFisher) {
+        this.shortestFisher = shortestFisher;
+    }
+
+    public void setLongestLength(float longestLength) {
+        this.longestLength = longestLength;
+    }
+
+    public void setLongestFisher(UUID longestFisher) {
+        this.longestFisher = longestFisher;
+    }
+
+    public void incrementQuantity() {
+        this.quantity++;
+    }
+
+    public void incrementQuantity(int quantity) {
+        this.quantity += quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override

@@ -29,6 +29,7 @@ import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.data.strategy.impl.*;
+import com.oheers.fish.database.model.CompetitionReport;
 import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
@@ -118,7 +119,7 @@ public class EvenMoreFish extends EMFPlugin {
     private DataManager<FishStats> fishStatsDataManager;
     private DataManager<UserFishStats> userFishStatsDataManager;
     private DataManager<UserReport> userReportDataManager;
-    private DataManager<Competition> competitionDataManager;
+    private DataManager<CompetitionReport> competitionDataManager;
 
     public static EvenMoreFish getInstance() {
         return instance;
@@ -758,4 +759,23 @@ public class EvenMoreFish extends EMFPlugin {
         return firstLoad;
     }
 
+    public DataManager<Collection<FishLog>> getFishLogDataManager() {
+        return fishLogDataManager;
+    }
+
+    public DataManager<FishStats> getFishStatsDataManager() {
+        return fishStatsDataManager;
+    }
+
+    public DataManager<UserFishStats> getUserFishStatsDataManager() {
+        return userFishStatsDataManager;
+    }
+
+    public DataManager<UserReport> getUserReportDataManager() {
+        return userReportDataManager;
+    }
+
+    public DataManager<CompetitionReport> getCompetitionDataManager() {
+        return competitionDataManager;
+    }
 }

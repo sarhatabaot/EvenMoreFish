@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}user_fish_stats` (
     shortest_length REAL,
     longest_length REAL,
     quantity INTEGER,
-    PRIMARY KEY (fish_name, fish_rarity)
+    PRIMARY KEY (fish_name, fish_rarity, user_id)
 )
 
 CREATE TABLE IF NOT EXISTS `${table.prefix}transactions` (

@@ -14,7 +14,8 @@ import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
 import com.oheers.fish.database.generated.mysql.tables.records.FishLogRecord;
-import com.oheers.fish.database.model.FishReportOld;
+import com.oheers.fish.database.generated.mysql.tables.records.UserFishStatsRecord;
+import com.oheers.fish.database.model.CompetitionReport;
 import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
@@ -24,6 +25,7 @@ import com.oheers.fish.fishing.items.Fish;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.HumanEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.conf.*;
@@ -316,7 +318,7 @@ public class Database implements DatabaseAPI {
             }
 
             @Override
-            protected UserReport empty() {
+            protected @Nullable UserReport empty() {
                 DatabaseUtil.writeDbVerbose("User report for (%s) does not exist in the database.".formatted(uuid));
                 return null;
             }
@@ -623,7 +625,7 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void setFishStats(FishStats fishStats) {
+    public void updateFishStats(FishStats fishStats) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
@@ -686,14 +688,13 @@ public class Database implements DatabaseAPI {
                         })
                         .collect(Collectors.toList());
 
-                dslContext.batchInsert(records).execute();
+                dslContext.batchStore(records).execute();
 
-                return records.size(); // Return number of inserted records
+                return records.size();
             }
         }.executeUpdate();
     }
 
-    //todo
     public void updateOrCreateUserReport(UserReport report) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
@@ -727,12 +728,29 @@ public class Database implements DatabaseAPI {
     }
 
 
-    //todo
     public void batchUpdateUserFishStats(Collection<UserFishStats> userFishStats) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
-                return 0;
+                List<UserFishStatsRecord> records = userFishStats.stream()
+                        .map(stats -> {
+                            UserFishStatsRecord userFishStatsRecord = new UserFishStatsRecord();
+                            userFishStatsRecord.setUserId(stats.getUserId());
+                            userFishStatsRecord.setFishName(stats.getFishName());
+                            userFishStatsRecord.setFishRarity(stats.getFishRarity());
+                            userFishStatsRecord.setFirstCatchTime(stats.getFirstCatchTime());
+                            userFishStatsRecord.setLongestLength(stats.getLongestLength());
+                            userFishStatsRecord.setShortestLength(stats.getShortestLength());
+                            userFishStatsRecord.setQuantity(stats.getQuantity());
+
+                            return userFishStatsRecord;
+                        })
+                        .collect(Collectors.toList());
+
+                //upsert
+                dslContext.batchStore(records).execute();
+
+                return records.size();
             }
         }.executeUpdate();
 
@@ -742,26 +760,61 @@ public class Database implements DatabaseAPI {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
-                return 0;
+                return dslContext.update(Tables.USER_FISH_STATS)
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
+                        .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
+                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
+                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
+                        .where(Tables.USER_FISH_STATS.USER_ID.eq(userFishStats.getUserId()))
+                        .execute();
             }
         }.executeUpdate();
 
     }
 
-    public void updateCompetition(Competition competition) {
+    public void updateCompetition(CompetitionReport competition) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
-                return 0;
+                return dslContext.insertInto(Tables.COMPETITIONS)
+                        .set(Tables.COMPETITIONS.COMPETITION_NAME, competition.getCompetitionConfigId())
+                        .set(Tables.COMPETITIONS.WINNER_FISH, competition.getWinnerFish())
+                        .set(Tables.COMPETITIONS.WINNER_UUID, competition.getWinnerUuid().toString())
+                        .set(Tables.COMPETITIONS.WINNER_SCORE, competition.getWinnerScore())
+                        .set(Tables.COMPETITIONS.CONTESTANTS, competition.getContestants().stream().map(UUID::toString).collect(Collectors.joining(", ")))
+                        .set(Tables.COMPETITIONS.START_TIME, competition.getStartTime())
+                        .set(Tables.COMPETITIONS.END_TIME, competition.getEndTime())
+                        .execute();
             }
         }.executeUpdate();
     }
 
-    public void batchUpdateCompetitions(Collection<Competition> competitions) {
+    public void batchUpdateCompetitions(Collection<CompetitionReport> competitions) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
-                return 0;
+                List<CompetitionsRecord> records = competitions.stream()
+                        .map(competition -> {
+                            CompetitionsRecord competitionsRecord = new CompetitionsRecord();
+                            competitionsRecord.setCompetitionName(competition.getCompetitionConfigId());
+                            competitionsRecord.setWinnerFish(competition.getWinnerFish());
+                            competitionsRecord.setWinnerUuid(competition.getWinnerUuid().toString());
+                            competitionsRecord.setWinnerScore(competition.getWinnerScore());
+                            competitionsRecord.setContestants(competition.getContestants().stream().map(UUID::toString).collect(Collectors.joining(", "))); //todo, maybe this should be in it's own db? or too complex??
+                            competitionsRecord.setStartTime(competition.getStartTime());
+                            competitionsRecord.setEndTime(competition.getEndTime());
+
+                            return competitionsRecord;
+                        })
+                        .collect(Collectors.toList());
+
+                //insert, comp are never updated, just inserted
+                dslContext.batchInsert(records).execute();
+
+                return records.size();
             }
         }.executeUpdate();
     }

@@ -4,18 +4,18 @@ package com.oheers.fish.database.model.user;
 import java.time.LocalDateTime;
 
 public class UserFishStats {
-    private final int user;
-    private final String fishName;
-    private final String fishRarity;
+    private final int userId;
+    private String fishName;
+    private String fishRarity;
 
     private final LocalDateTime firstCatchTime;
-    private final float shortestLength;
-    private final float longestLength;
+    private float shortestLength;
+    private float longestLength;
 
-    private final int quantity;
+    private int quantity;
 
-    public UserFishStats(int user, String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, float longestLength, int quantity) {
-        this.user = user;
+    public UserFishStats(int userId, String fishName, String fishRarity, LocalDateTime firstCatchTime, float shortestLength, float longestLength, int quantity) {
+        this.userId = userId;
         this.fishName = fishName;
         this.fishRarity = fishRarity;
         this.firstCatchTime = firstCatchTime;
@@ -24,8 +24,8 @@ public class UserFishStats {
         this.quantity = quantity;
     }
 
-    public int getUser() {
-        return user;
+    public int getUserId() {
+        return userId;
     }
 
     public String getFishName() {
@@ -52,10 +52,37 @@ public class UserFishStats {
         return quantity;
     }
 
+    public void setFishName(String fishName) {
+        this.fishName = fishName;
+    }
+
+    public void setFishRarity(String fishRarity) {
+        this.fishRarity = fishRarity;
+    }
+
+    public void setShortestLength(float shortestLength) {
+        this.shortestLength = shortestLength;
+    }
+
+    public void setLongestLength(float longestLength) {
+        this.longestLength = longestLength;
+    }
+
+    public void incrementQuantity() {
+        this.quantity++;
+    }
+
+    public void incrementQuantity(int quantity) {
+        this.quantity += quantity;
+    }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
     public String toString() {
         return "FishUserStats{" +
-                "user=" + user +
+                "user=" + userId +
                 ", fishName='" + fishName + '\'' +
                 ", fishRarity='" + fishRarity + '\'' +
                 ", firstCatchTime=" + firstCatchTime +
