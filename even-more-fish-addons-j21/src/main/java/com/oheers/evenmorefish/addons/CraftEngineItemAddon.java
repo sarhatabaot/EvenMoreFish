@@ -4,16 +4,14 @@ import com.oheers.fish.api.addons.ItemAddon;
 import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine;
 import net.momirealms.craftengine.core.item.CustomItem;
 import net.momirealms.craftengine.core.util.Key;
-import org.apache.commons.lang3.JavaVersion;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
-public class CraftEngineItemAddon extends ItemAddon implements Listener {
+public class CraftEngineItemAddon extends ItemAddon {
 
     @Override
-    public String getPrefix() {
+    public String getIdentifier() {
         return "craftengine";
     }
 
@@ -25,11 +23,6 @@ public class CraftEngineItemAddon extends ItemAddon implements Listener {
     @Override
     public String getVersion() {
         return "1.0.0";
-    }
-
-    @Override
-    public JavaVersion getRequiredJavaVersion() {
-        return JavaVersion.JAVA_21;
     }
 
     @Override

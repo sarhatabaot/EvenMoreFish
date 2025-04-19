@@ -6,13 +6,12 @@ import com.oheers.fish.api.plugin.EMFPlugin;
 import dev.lone.itemsadder.api.CustomStack;
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemsAdderItemAddon extends ItemAddon implements Listener {
+public class ItemsAdderItemAddon extends ItemAddon {
 
     @Override
-    public String getPrefix() {
+    public String getIdentifier() {
         return "itemsadder";
     }
 
@@ -35,7 +34,11 @@ public class ItemsAdderItemAddon extends ItemAddon implements Listener {
     public ItemStack getItemStack(String id) {
         String[] splitMaterialValue = id.split(":");
         if (!verifyItemsFormat(splitMaterialValue)) {
-            getLogger().severe(() -> String.format("Incorrect format for ItemsAdderItemAddon, use %s:namespace:id. Got %s", getPrefix(), String.join(":", splitMaterialValue)));
+            getLogger().severe(() -> String.format(
+                "Incorrect format for ItemsAdderItemAddon, use %s:namespace:id. Got %s",
+                getIdentifier(),
+                String.join(":", splitMaterialValue))
+            );
             return null;
         }
 
