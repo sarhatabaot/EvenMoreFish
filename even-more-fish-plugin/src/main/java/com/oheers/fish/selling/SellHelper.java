@@ -85,7 +85,8 @@ public class SellHelper {
         economy.deposit(this.player, totalWorth, true);
 
         if (!(inventory instanceof PlayerInventory)) {
-            FishUtils.giveItems(Arrays.stream(inventory.getStorageContents()).filter(Objects::nonNull).toArray(ItemStack[]::new), this.player);
+            FishUtils.giveItems(inventory.getStorageContents(), this.player);
+            inventory.clear();
         }
 
         // sending the sell message to the player
