@@ -311,10 +311,7 @@ public class FishUtils {
 
         // Remove the last space if it exists
         if (!formatted.isEmpty()) {
-            String serializedMessage = EMFMessage.PLAINTEXT_SERIALIZER.serialize(formatted.getComponentMessage());
-            if (serializedMessage.endsWith(" ")) {
-                formatted.setMessage(serializedMessage.trim());
-            }
+            formatted.trim();
         }
 
         return formatted;

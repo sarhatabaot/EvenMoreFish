@@ -135,6 +135,12 @@ public class EMFSingleMessage extends EMFMessage {
         this.message = message.message;
     }
 
+        public void trim() {
+            this.message = formatString(
+                    PLAINTEXT_SERIALIZER.serialize(this.message).stripTrailing()
+            );
+        }
+
     @Override
     public boolean isEmpty() {
         return PLAINTEXT_SERIALIZER.serialize(this.message).isEmpty();
