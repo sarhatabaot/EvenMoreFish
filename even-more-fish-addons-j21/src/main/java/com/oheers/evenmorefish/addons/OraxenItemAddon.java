@@ -6,15 +6,13 @@ import com.oheers.fish.api.plugin.EMFPlugin;
 import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.api.events.OraxenItemsLoadedEvent;
 import io.th0rgal.oraxen.items.ItemBuilder;
-import org.apache.commons.lang3.JavaVersion;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public class OraxenItemAddon extends ItemAddon implements Listener {
+public class OraxenItemAddon extends ItemAddon {
 
     @Override
-    public String getPrefix() {
+    public String getIdentifier() {
         return "oraxen";
     }
 
@@ -31,11 +29,6 @@ public class OraxenItemAddon extends ItemAddon implements Listener {
     @Override
     public String getVersion() {
         return "1.0.0";
-    }
-
-    @Override
-    public JavaVersion getRequiredJavaVersion() {
-        return JavaVersion.JAVA_21;
     }
 
     @Override

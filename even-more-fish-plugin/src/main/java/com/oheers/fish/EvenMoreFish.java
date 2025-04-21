@@ -2,9 +2,11 @@ package com.oheers.fish;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
-import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.addons.DefaultAddons;
+import com.oheers.fish.addons.InternalAddonLoader;
+import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.EMFAPI;
+import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementType;
@@ -17,8 +19,19 @@ import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
-import com.oheers.fish.competition.rewardtypes.*;
-import com.oheers.fish.competition.rewardtypes.external.*;
+import com.oheers.fish.competition.rewardtypes.CommandRewardType;
+import com.oheers.fish.competition.rewardtypes.EXPRewardType;
+import com.oheers.fish.competition.rewardtypes.EffectRewardType;
+import com.oheers.fish.competition.rewardtypes.HealthRewardType;
+import com.oheers.fish.competition.rewardtypes.HungerRewardType;
+import com.oheers.fish.competition.rewardtypes.ItemRewardType;
+import com.oheers.fish.competition.rewardtypes.MessageRewardType;
+import com.oheers.fish.competition.rewardtypes.external.AuraSkillsXPRewardType;
+import com.oheers.fish.competition.rewardtypes.external.GPClaimBlocksRewardType;
+import com.oheers.fish.competition.rewardtypes.external.McMMOXPRewardType;
+import com.oheers.fish.competition.rewardtypes.external.MoneyRewardType;
+import com.oheers.fish.competition.rewardtypes.external.PermissionRewardType;
+import com.oheers.fish.competition.rewardtypes.external.PlayerPointsRewardType;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.GuiFillerConfig;
 import com.oheers.fish.config.MainConfig;
@@ -28,13 +41,28 @@ import com.oheers.fish.database.Database;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
 import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
-import com.oheers.fish.events.*;
+import com.oheers.fish.events.AuraSkillsFishingEvent;
+import com.oheers.fish.events.AureliumSkillsFishingEvent;
+import com.oheers.fish.events.FishEatEvent;
+import com.oheers.fish.events.FishInteractEvent;
+import com.oheers.fish.events.McMMOTreasureEvent;
 import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.requirements.*;
+import com.oheers.fish.requirements.BiomeRequirementType;
+import com.oheers.fish.requirements.BiomeSetRequirementType;
+import com.oheers.fish.requirements.DisabledRequirementType;
+import com.oheers.fish.requirements.GroupRequirementType;
+import com.oheers.fish.requirements.IRLTimeRequirementType;
+import com.oheers.fish.requirements.InGameTimeRequirementType;
+import com.oheers.fish.requirements.MoonPhaseRequirementType;
+import com.oheers.fish.requirements.NearbyPlayersRequirementType;
+import com.oheers.fish.requirements.PermissionRequirementType;
+import com.oheers.fish.requirements.RegionRequirementType;
+import com.oheers.fish.requirements.WeatherRequirementType;
+import com.oheers.fish.requirements.WorldRequirementType;
 import com.oheers.fish.utils.HeadDBIntegration;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemProtectionListener;
@@ -64,7 +92,13 @@ import org.jetbrains.annotations.Nullable;
 import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -133,7 +167,6 @@ public class EvenMoreFish extends EMFPlugin {
     public void onLoad() {
         CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
                 .shouldHookPaperReload(true)
-                .usePluginNamespace()
                 .missingExecutorImplementationMessage("You are not able to use this command!");
         CommandAPI.onLoad(config);
     }
@@ -173,8 +206,7 @@ public class EvenMoreFish extends EMFPlugin {
         new MessageConfig();
 
         saveAdditionalDefaultAddons();
-        this.addonManager = new AddonManager(this);
-        this.addonManager.load();
+        loadAddonManager();
 
         new GuiConfig();
         new GuiFillerConfig();
@@ -193,10 +225,6 @@ public class EvenMoreFish extends EMFPlugin {
         }
 
         setupPermissions();
-
-        // Do this before anything fish or competition related.
-        loadRewardTypes();
-        loadRequirementTypes();
 
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
@@ -284,14 +312,9 @@ public class EvenMoreFish extends EMFPlugin {
         }
     }
 
-    public static void debug(final String message) {
-        debug(Level.INFO, message);
-    }
-
-    public static void debug(final Level level, final String message) {
-        if (MainConfig.getInstance().debugSession()) {
-            getInstance().getLogger().log(level, () -> "DEBUG %s".formatted(message));
-        }
+    @Override
+    public boolean isDebugSession() {
+        return MainConfig.getInstance().debugSession();
     }
 
     public static void dbVerbose(final String message) {
@@ -628,63 +651,13 @@ public class EvenMoreFish extends EMFPlugin {
         }
     }
 
-    private void loadRewardTypes() {
-        // Load RewardTypes
-        new CommandRewardType().register();
-        new EffectRewardType().register();
-        new HealthRewardType().register();
-        new HungerRewardType().register();
-        new ItemRewardType().register();
-        new MessageRewardType().register();
-        new EXPRewardType().register();
-        loadExternalRewardTypes();
-    }
 
-    private void loadRequirementTypes() {
-        // Load RequirementTypes
-        new BiomeRequirementType().register();
-        new BiomeSetRequirementType().register();
-        new DisabledRequirementType().register();
-        new InGameTimeRequirementType().register();
-        new IRLTimeRequirementType().register();
-        new MoonPhaseRequirementType().register();
-        new NearbyPlayersRequirementType().register();
-        new PermissionRequirementType().register();
-        new RegionRequirementType().register();
-        new WeatherRequirementType().register();
-        new WorldRequirementType().register();
+    private void loadAddonManager() {
+        this.addonManager = new AddonManager();
+        this.addonManager.load();
 
-        // Load Group RequirementType
-        if (isUsingVault()) {
-            RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-            if (rsp != null) {
-                new GroupRequirementType(rsp.getProvider()).register();
-            }
-        }
-    }
-
-    private void loadExternalRewardTypes() {
-        PluginManager pm = Bukkit.getPluginManager();
-        if (pm.isPluginEnabled("PlayerPoints")) {
-            new PlayerPointsRewardType().register();
-        }
-        if (pm.isPluginEnabled("GriefPrevention")) {
-            new GPClaimBlocksRewardType().register();
-        }
-        if (pm.isPluginEnabled("AuraSkills")) {
-            new AuraSkillsXPRewardType().register();
-        }
-        if (pm.isPluginEnabled("mcMMO")) {
-            new McMMOXPRewardType().register();
-        }
-        // Only enable the PERMISSION type if Vault perms is found.
-        if (getPermission() != null && getPermission().isEnabled()) {
-            new PermissionRewardType().register();
-        }
-        // Only enable the Money RewardType is Vault is enabled.
-        if (pm.isPluginEnabled("Vault")) {
-            new MoneyRewardType().register();
-        }
+        // Load internal addons
+        new InternalAddonLoader().load();
     }
 
     public List<Player> getVisibleOnlinePlayers() {

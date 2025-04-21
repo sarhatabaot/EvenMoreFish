@@ -24,7 +24,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class SellHelper {
 
@@ -81,7 +85,8 @@ public class SellHelper {
         economy.deposit(this.player, totalWorth, true);
 
         if (!(inventory instanceof PlayerInventory)) {
-            FishUtils.giveItems(Arrays.stream(inventory.getStorageContents()).filter(Objects::nonNull).toArray(ItemStack[]::new), this.player);
+            FishUtils.giveItems(inventory.getStorageContents(), this.player);
+            inventory.clear();
         }
 
         // sending the sell message to the player

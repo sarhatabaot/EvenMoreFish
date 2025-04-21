@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 public class DenizenItemAddon extends ItemAddon {
 
     @Override
-    public String getPrefix() {
+    public String getIdentifier() {
         return "denizen";
     }
 
