@@ -81,12 +81,15 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
 
     @Override
     protected boolean competitionOnlyCheck() {
-        if (MainConfig.getInstance().isFishCatchOnlyInCompetition()) {
-            return Competition.isActive();
-        } else {
-            return true;
+        Competition active = Competition.getCurrentlyActive();
+
+        if (active != null) {
+            return active.getCompetitionFile().isAllowFishing();
         }
+
+        return !MainConfig.getInstance().isFishCatchOnlyInCompetition();
     }
+
 
     @Override
     protected boolean fireEvent(@NotNull Fish fish, @NotNull Player player) {
