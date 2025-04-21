@@ -1,10 +1,12 @@
 rootProject.name = "even-more-fish"
 
 include(":even-more-fish-api")
-include(":even-more-fish-addons-j17")
 include(":even-more-fish-database-extras")
-include(":even-more-fish-addons-j21")
 include(":even-more-fish-plugin")
+
+// Addons
+include(":addons:even-more-fish-addons-j17")
+include(":addons:even-more-fish-addons-j21")
 
 dependencyResolutionManagement {
     versionCatalogs {
