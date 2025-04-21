@@ -6,7 +6,7 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.codemc.org/repository/maven-public/")
+    maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://jitpack.io")
 }
 

@@ -2,7 +2,6 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
@@ -25,7 +24,6 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
@@ -47,7 +45,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

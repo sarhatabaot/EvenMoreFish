@@ -4,7 +4,6 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.addons.InternalAddonLoader;
-import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.EMFAPI;
 import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.api.economy.Economy;
@@ -19,19 +18,6 @@ import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
-import com.oheers.fish.competition.rewardtypes.CommandRewardType;
-import com.oheers.fish.competition.rewardtypes.EXPRewardType;
-import com.oheers.fish.competition.rewardtypes.EffectRewardType;
-import com.oheers.fish.competition.rewardtypes.HealthRewardType;
-import com.oheers.fish.competition.rewardtypes.HungerRewardType;
-import com.oheers.fish.competition.rewardtypes.ItemRewardType;
-import com.oheers.fish.competition.rewardtypes.MessageRewardType;
-import com.oheers.fish.competition.rewardtypes.external.AuraSkillsXPRewardType;
-import com.oheers.fish.competition.rewardtypes.external.GPClaimBlocksRewardType;
-import com.oheers.fish.competition.rewardtypes.external.McMMOXPRewardType;
-import com.oheers.fish.competition.rewardtypes.external.MoneyRewardType;
-import com.oheers.fish.competition.rewardtypes.external.PermissionRewardType;
-import com.oheers.fish.competition.rewardtypes.external.PlayerPointsRewardType;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.GuiFillerConfig;
 import com.oheers.fish.config.MainConfig;
@@ -51,18 +37,6 @@ import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.requirements.BiomeRequirementType;
-import com.oheers.fish.requirements.BiomeSetRequirementType;
-import com.oheers.fish.requirements.DisabledRequirementType;
-import com.oheers.fish.requirements.GroupRequirementType;
-import com.oheers.fish.requirements.IRLTimeRequirementType;
-import com.oheers.fish.requirements.InGameTimeRequirementType;
-import com.oheers.fish.requirements.MoonPhaseRequirementType;
-import com.oheers.fish.requirements.NearbyPlayersRequirementType;
-import com.oheers.fish.requirements.PermissionRequirementType;
-import com.oheers.fish.requirements.RegionRequirementType;
-import com.oheers.fish.requirements.WeatherRequirementType;
-import com.oheers.fish.requirements.WorldRequirementType;
 import com.oheers.fish.utils.HeadDBIntegration;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemProtectionListener;
@@ -301,13 +275,11 @@ public class EvenMoreFish extends EMFPlugin {
                 .toList()) {
             final File addonFile = new File(getDataFolder(), "addons/" + fileName);
             final File jarFile = new File(getDataFolder(), "addons/" + fileName.replace(".addon", ".jar"));
-            if (!jarFile.exists()) {
-                try {
-                    this.saveResource("addons/" + fileName, true);
-                    addonFile.renameTo(jarFile);
-                } catch (IllegalArgumentException e) {
-                    debug(Level.WARNING, String.format("Default addon %s does not exist.", fileName));
-                }
+            try {
+                this.saveResource("addons/" + fileName, true);
+                addonFile.renameTo(jarFile);
+            } catch (IllegalArgumentException e) {
+                debug(Level.WARNING, String.format("Default addon %s does not exist.", fileName));
             }
         }
     }
