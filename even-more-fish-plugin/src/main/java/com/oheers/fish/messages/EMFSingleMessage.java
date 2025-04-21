@@ -137,7 +137,7 @@ public class EMFSingleMessage extends EMFMessage {
 
         public void trim() {
             this.message = formatString(
-                    PLAINTEXT_SERIALIZER.serialize(this.message).stripTrailing()
+                    MINIMESSAGE.serialize(this.message).stripTrailing()
             );
         }
 
