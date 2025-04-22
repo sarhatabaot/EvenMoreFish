@@ -10,18 +10,34 @@ import java.util.function.Function;
 public class DataManager<T> {
     private final Map<String, T> cache = new ConcurrentHashMap<>();
     private final DataSavingStrategy<T> savingStrategy;
+    private final Function<String, T> defaultLoader;
 
-    public DataManager(DataSavingStrategy<T> savingStrategy) {
+    // Constructor with default loader
+    public DataManager(DataSavingStrategy<T> savingStrategy, Function<String, T> defaultLoader) {
         this.savingStrategy = savingStrategy;
+        this.defaultLoader = defaultLoader;
     }
 
-    // Get data (cached or loaded from DB)
+    // Constructor without default loader (for backward compatibility)
+    public DataManager(DataSavingStrategy<T> savingStrategy) {
+        this(savingStrategy, null);
+    }
+
+    // Get data with explicit loader
     public T get(String key, Function<String, T> loader) {
         return cache.computeIfAbsent(key, k -> {
             T data = loader.apply(k);
-            savingStrategy.save(data); // Optional: Save on load if needed
+            savingStrategy.save(data);
             return data;
         });
+    }
+
+    // Get data using default loader
+    public T get(String key) {
+        if (defaultLoader == null) {
+            throw new IllegalStateException("No default loader configured");
+        }
+        return get(key, defaultLoader);
     }
 
     // Update data (marks dirty and triggers save)

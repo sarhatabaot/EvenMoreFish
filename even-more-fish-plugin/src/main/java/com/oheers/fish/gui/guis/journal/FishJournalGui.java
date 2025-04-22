@@ -6,6 +6,8 @@ import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.config.GUIConfig;
 import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.data.FishRarityKey;
+import com.oheers.fish.database.data.UserFishRarityKey;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.fishing.items.Fish;
@@ -76,8 +78,7 @@ public class FishJournalGui implements EMFGUI {
     }
 
     private ItemStack getFishItem(Fish fish, Section section) {
-        Database database = EvenMoreFish.getInstance().getDatabase();
-
+        final Database database = EvenMoreFish.getInstance().getDatabase();
         boolean hideUndiscovered = section.getBoolean("hide-undiscovered-fish", true);
         // If undiscovered fish should be hidden
         if (hideUndiscovered && !database.userHasFish(fish, viewer)) {
@@ -98,13 +99,10 @@ public class FishJournalGui implements EMFGUI {
                 display.setVariable("{fishname}", fish.getDisplayName());
                 meta.setDisplayName(display.getLegacyMessage());
             }
-            /*
-            todo, 3 db calls here, userId should be 100% cached, it's a small thing
-            userfishstats & fishstats? need to think about it
-             */
+            
             final int userId = database.getUserId(viewer.getUniqueId());
-            final UserFishStats userFishStats = database.getUserFishStats(userId,fish.getName(), fish.getRarity().getId());
-            final FishStats fishStats = database.getFishStats(fish.getName(), fish.getRarity().getId());
+            final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId,fish).toString());
+            final FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(FishRarityKey.of(fish).toString());
 
             // Lore
             LocalDateTime discover = fishStats.getFirstCatchTime();

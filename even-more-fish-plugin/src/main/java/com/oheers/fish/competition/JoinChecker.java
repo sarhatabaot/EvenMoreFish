@@ -79,6 +79,7 @@ public class JoinChecker implements Listener {
             }
         }
 
+        //read and cache user report + create one if needed? might not be needed anymore.. .todo
         EvenMoreFish.getScheduler().runTaskAsynchronously(() -> databaseRegistration(event.getPlayer().getUniqueId(), event.getPlayer().getName()));
     }
 

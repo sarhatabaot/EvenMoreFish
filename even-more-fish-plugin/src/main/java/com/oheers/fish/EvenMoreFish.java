@@ -223,9 +223,19 @@ public class EvenMoreFish extends EMFPlugin {
             this.database = new Database();
 
             this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy());
-            this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy());
+            this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy(), key -> {
+                final String fishName = key.split("\\.")[0];
+                final String fishRarity = key.split("\\.")[1];
+                return EvenMoreFish.getInstance().getDatabase().getFishStats(fishName,fishRarity);
+            });
 
-            this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(5L));
+            this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(5L), key -> {
+                final int userId = Integer.parseInt(key.split("\\.")[0]);
+                final String fishName = key.split("\\.")[1];
+                final String fishRarity = key.split("\\.")[2];
+                return EvenMoreFish.getInstance().getDatabase().getUserFishStats(userId, fishName, fishRarity);
+            });
+
             this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy());
 
             this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L));

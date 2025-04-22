@@ -7,6 +7,7 @@ import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.FishRarityKey;
+import com.oheers.fish.database.data.UserFishRarityKey;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.fish.FishStats;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 
 public class EMFFishListener implements Listener {
 
@@ -33,15 +35,14 @@ public class EMFFishListener implements Listener {
 
         final Fish fish = event.getFish();
 
-        handleFishLog(userId, fish, event.getCatchTime()); //todo
-        handleUserFishStats(userId, fish); //todo
-        handleFishStats(fish); //todo
+        handleFishLog(userId, fish, event.getCatchTime());
+        handleUserFishStats(userId, fish);
+        handleFishStats(fish);
     }
 
     private void handleFishStats(final @NotNull Fish fish) {
         final DataManager<FishStats> fishStatsDataManager = EvenMoreFish.getInstance().getFishStatsDataManager();
         final FishRarityKey fishRarityKey = FishRarityKey.of(fish);
-        // composite key todo I don't remember
         final FishStats stats = fishStatsDataManager.get(
                 fishRarityKey.toString(),
                 key -> EvenMoreFish.getInstance().getDatabase().getFishStats(fish.getName(),fish.getRarity().getId())
@@ -65,8 +66,8 @@ public class EMFFishListener implements Listener {
         final DataManager<Collection<FishLog>> fishLogDataManager = EvenMoreFish.getInstance().getFishLogDataManager();
         final String competitionId = Competition.getCurrentlyActive() != null ? Competition.getCurrentlyActive().getCompetitionName() : null;
         final FishLog log = new FishLog(userId, fish, catchTime, competitionId);
-        final String key = ""; //todo
-        fishLogDataManager.update(key, log); //todo, the key here is.. ?
+        final String key = UserFishRarityKey.of(userId,fish).toString();
+        fishLogDataManager.update(key, Collections.singletonList(log)); //todo, what if there are multiple logs? we can fix this later, just don't forget
     }
 
     private void handleUserFishStats(final int userId, final @NotNull Fish fish) {
@@ -86,7 +87,7 @@ public class EMFFishListener implements Listener {
         }
 
         stats.incrementQuantity();
-        //todo, what would be the key here???
-        userFishStatsDataManager.update(String.valueOf(userId), stats);
+        final String key = UserFishRarityKey.of(userId,fish).toString();
+        userFishStatsDataManager.update(key, stats);
     }
 }

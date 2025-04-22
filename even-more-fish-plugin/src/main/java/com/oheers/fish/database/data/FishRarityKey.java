@@ -1,7 +1,6 @@
 package com.oheers.fish.database.data;
 
 import com.oheers.fish.fishing.items.Fish;
-import com.oheers.fish.fishing.items.Rarity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +18,10 @@ public class FishRarityKey {
     @Contract(value = "_, _ -> new", pure = true)
     public static @NotNull FishRarityKey of(final String fishName, final String fishRarity) {
         return new FishRarityKey(fishName, fishRarity);
+    }
+
+    public static @NotNull FishRarityKey from(final String pattern) {
+        return new FishRarityKey(pattern.split("\\.")[0], pattern.split("\\.")[1]);
     }
 
     public static @NotNull FishRarityKey of(final @NotNull Fish fish) {
