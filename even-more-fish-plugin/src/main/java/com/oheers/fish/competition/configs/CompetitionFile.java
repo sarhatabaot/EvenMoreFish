@@ -314,4 +314,11 @@ public class CompetitionFile extends ConfigBase {
         return getConfig().getBoolean("allow-hunting", false);
     }
 
+    /**
+     * @return Whether fishing is allowed.
+     */
+    public boolean isAllowFishing() {
+        return getConfig().getBoolean("allow-fishing", true);
+    }
+
 }

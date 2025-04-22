@@ -302,12 +302,16 @@ public class FishUtils {
             formatted.appendComponent(Component.space());
         }
 
-        // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
             EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
             formatted.appendMessage(message);
             formatted.appendComponent(Component.space());
+        }
+
+        // Remove the last space if it exists
+        if (!formatted.isEmpty()) {
+            formatted.trim();
         }
 
         return formatted;
