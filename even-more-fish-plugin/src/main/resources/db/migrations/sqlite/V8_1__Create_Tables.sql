@@ -1,18 +1,14 @@
 CREATE TABLE IF NOT EXISTS `${table.prefix}competitions` (
-   id INTEGER NOT NULL AUTO_INCREMENT,
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
    competition_name VARCHAR(256) NOT NULL,
    winner_uuid VARCHAR(128) NOT NULL,
    winner_fish VARCHAR(256) NOT NULL,
    winner_score REAL NOT NULL,
    contestants TEXT NOT NULL,
-   start_time TIMESTAMP NOT NULL,
-   end_time TIMESTAMP NOT NULL,
-   PRIMARY KEY (id)
+   start_time DATETIME NOT NULL,
+   end_time DATETIME NOT NULL
 );
 
--- global stats for fish, -- per fish global stats todo not great since there may be multiple fish with same name and different rarity, maybe we just increment an integer?
--- todo we could also create a composite key "rarity.name"
--- this used to be the "fish" table
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    fish_name VARCHAR(256) NOT NULL,
    fish_rarity VARCHAR(256) NOT NULL,
@@ -22,13 +18,13 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    largest_fisher VARCHAR(36) NOT NULL,
    shortest_length REAL NOT NULL,
    shortest_fisher VARCHAR(36) NOT NULL,
-   first_catch_time TIMESTAMP NOT NULL,
+   first_catch_time DATETIME NOT NULL,
    discoverer VARCHAR(128),
-   PRIMARY KEY (fish_name, fish_rarity) --todo update primary key, with migrations, we may need to copy the tabnle
+   PRIMARY KEY (fish_name, fish_rarity)
 );
--- user reports (stats)
+
 CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
-   id INTEGER NOT NULL AUTO_INCREMENT, -- user_id
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
    uuid VARCHAR(128) NOT NULL,
    first_fish VARCHAR(256) NOT NULL,
    last_fish VARCHAR(256) NOT NULL,
@@ -41,32 +37,28 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
    competitions_won INTEGER NOT NULL,
    competitions_joined INTEGER NOT NULL,
    fish_sold INTEGER DEFAULT 0,
-   money_earned DOUBLE DEFAULT 0,
-   PRIMARY KEY (id)
+   money_earned DOUBLE DEFAULT 0
 );
 
--- log every player catch
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish_log` (
-   id INTEGER NOT NULL AUTO_INCREMENT,
-   user_id INTEGER NOT NULL, -- user id
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   user_id INTEGER NOT NULL,
    fish_rarity VARCHAR(256) NOT NULL,
    fish_name VARCHAR(256) NOT NULL,
    fish_length REAL NOT NULL,
-   catch_time TIMESTAMP NOT NULL,
-   competition_id VARCHAR(256), -- can be null
+   catch_time DATETIME NOT NULL,
+   competition_id VARCHAR(256),
    CONSTRAINT FK_FishLog_User
    -- [jooq ignore start]
-   FOREIGN KEY (user_id) REFERENCES `${table.prefix}users`(id),
+   FOREIGN KEY (user_id) REFERENCES `${table.prefix}users`(id)
    -- [jooq ignore stop]
-   PRIMARY KEY (id)
 );
 
--- per fish & user stats
 CREATE TABLE IF NOT EXISTS `${table.prefix}user_fish_stats` (
     fish_name VARCHAR(256) NOT NULL,
     fish_rarity VARCHAR(256) NOT NULL,
     user_id INTEGER NOT NULL,
-    first_catch_time TIMESTAMP NOT NULL,
+    first_catch_time DATETIME NOT NULL,
     shortest_length REAL,
     longest_length REAL,
     quantity INTEGER,
@@ -76,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}user_fish_stats` (
 CREATE TABLE IF NOT EXISTS `${table.prefix}transactions` (
   id VARCHAR(22) NOT NULL,
   user_id INTEGER NOT NULL,
-  timestamp TIMESTAMP NOT NULL,
+  timestamp DATETIME NOT NULL,
   CONSTRAINT FK_Transactions_User
   -- [jooq ignore start]
   FOREIGN KEY (user_id) REFERENCES `${table.prefix}users`(id),
@@ -85,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}transactions` (
 );
 
 CREATE TABLE IF NOT EXISTS `${table.prefix}users_sales` (
-  id INTEGER NOT NULL AUTO_INCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   transaction_id VARCHAR(22) NOT NULL,
   fish_name VARCHAR(256) NOT NULL,
   fish_rarity VARCHAR(256) NOT NULL,
@@ -94,7 +86,6 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}users_sales` (
   price_sold DOUBLE NOT NULL,
   CONSTRAINT FK_UsersSales_Transaction
   -- [jooq ignore start]
-  FOREIGN KEY (transaction_id) REFERENCES `${table.prefix}transactions`(id),
+  FOREIGN KEY (transaction_id) REFERENCES `${table.prefix}transactions`(id)
   -- [jooq ignore stop]
-  PRIMARY KEY (id)
 );
