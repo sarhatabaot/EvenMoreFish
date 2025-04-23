@@ -118,4 +118,5 @@ build
 
 *.addon
 
+.settings
 !gradle/*
