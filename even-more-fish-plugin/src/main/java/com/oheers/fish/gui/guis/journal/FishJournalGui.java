@@ -99,7 +99,7 @@ public class FishJournalGui implements EMFGUI {
                 display.setVariable("{fishname}", fish.getDisplayName());
                 meta.setDisplayName(display.getLegacyMessage());
             }
-            
+
             final int userId = database.getUserId(viewer.getUniqueId());
             final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId,fish).toString());
             final FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(FishRarityKey.of(fish).toString());

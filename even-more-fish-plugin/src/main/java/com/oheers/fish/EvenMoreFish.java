@@ -25,7 +25,6 @@ import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
-import com.oheers.fish.database.DataManagerOld;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.data.strategy.impl.*;
@@ -264,7 +263,10 @@ public class EvenMoreFish extends EMFPlugin {
 
         terminateGUIS();
         // Don't use the scheduler here because it will throw errors on disable
-        saveUserData(false);
+        EvenMoreFish.getInstance().getUserReportDataManager().flush();
+        EvenMoreFish.getInstance().getUserFishStatsDataManager().flush();
+        EvenMoreFish.getInstance().getFishStatsDataManager().flush();
+        EvenMoreFish.getInstance().getCompetitionDataManager().flush();
 
         // Ends the current competition in case the plugin is being disabled when the server will continue running
         Competition active = Competition.getCurrentlyActive();
@@ -420,23 +422,23 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Deprecated
     //we use datamanagers now
-    private void saveUserData(boolean scheduler) {
-        Runnable save = () -> {
-            if (!(MainConfig.getInstance().isDatabaseOnline())) {
-                return;
-            }
-
-            DataManagerOld.getInstance().saveFishReports();
-            DataManagerOld.getInstance().saveUserReports();
-
-            DataManagerOld.getInstance().uncacheAll();
-        };
-        if (scheduler) {
-            getScheduler().runTask(save);
-        } else {
-            save.run();
-        }
-    }
+//    private void saveUserData(boolean scheduler) {
+//        Runnable save = () -> {
+//            if (!(MainConfig.getInstance().isDatabaseOnline())) {
+//                return;
+//            }
+//
+//            DataManagerOld.getInstance().saveFishReports();
+//            DataManagerOld.getInstance().saveUserReports();
+//
+//            DataManagerOld.getInstance().uncacheAll();
+//        };
+//        if (scheduler) {
+//            getScheduler().runTask(save);
+//        } else {
+//            save.run();
+//        }
+//    }
 
 
     public ItemStack createCustomNBTRod() {

@@ -8,7 +8,7 @@ import com.oheers.fish.database.generated.mysql.tables.UserFishStats;
 
 import java.time.LocalDateTime;
 
-import org.jooq.Record2;
+import org.jooq.Record3;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -123,8 +123,8 @@ public class UserFishStatsRecord extends UpdatableRecordImpl<UserFishStatsRecord
     // -------------------------------------------------------------------------
 
     @Override
-    public Record2<String, String> key() {
-        return (Record2) super.key();
+    public Record3<String, String, Integer> key() {
+        return (Record3) super.key();
     }
 
     // -------------------------------------------------------------------------
