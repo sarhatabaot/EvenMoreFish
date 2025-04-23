@@ -44,7 +44,7 @@ public class MigrationManager {
         this.connectionFactory = connectionFactory;
         this.baseFlywayConfiguration = getBaseFlywayConfiguration(connectionFactory);
         this.defaultFlyway = this.baseFlywayConfiguration.load();
-        this.latestBaselineVersion = ManifestUtil.getAttributeFromManifest("Database-Baseline-Version", "7.0");
+        this.latestBaselineVersion = ManifestUtil.getAttributeFromManifest("Database-Baseline-Version", "8.1");
     }
 
     public void migrateFromVersion(String currentDbVersion, boolean baseline) {
