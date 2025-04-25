@@ -16,18 +16,6 @@ tasks {
         jar {
             archiveFileName.set(addonName)
         }
-        build {
-            doLast {
-                copy {
-
-                    val sourceFolder = project.layout.buildDirectory.dir("libs/${addonName}").get()
-                    val targetFolder = File(rootProject.project(":even-more-fish-plugin").projectDir, "src/main/resources/addons")
-                    from(sourceFolder)
-                    into(targetFolder)
-                    logger.lifecycle("Copying $addonName from $sourceFolder to $targetFolder")
-                }
-            }
-        }
     }
 }
 

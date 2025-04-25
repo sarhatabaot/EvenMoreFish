@@ -229,6 +229,20 @@ tasks.named("compileJava") {
     dependsOn(":even-more-fish-plugin:generateMysqlJooq")
 }
 
+val copyAddons by tasks.registering(Copy::class) {
+    // Make sure the plugin waits for the addons to be built first
+    dependsOn(":addons:even-more-fish-addons-j17:build", ":addons:even-more-fish-addons-j21:build")
+
+    from(project(":addons:even-more-fish-addons-j17").layout.buildDirectory.dir("libs"))
+    from(project(":addons:even-more-fish-addons-j21").layout.buildDirectory.dir("libs"))
+
+    into(file("src/main/resources/addons"))
+}
+
+tasks.named("processResources") {
+    dependsOn(copyAddons)
+}
+
 tasks {
     build {
         dependsOn(
