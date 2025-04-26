@@ -17,21 +17,14 @@ import com.oheers.fish.commands.MainCommand;
 import com.oheers.fish.competition.*;
 import com.oheers.fish.competition.rewardtypes.*;
 import com.oheers.fish.competition.rewardtypes.external.*;
-import com.oheers.fish.config.BaitFile;
-import com.oheers.fish.config.GUIConfig;
-import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
-import com.oheers.fish.config.messages.MessageConfig;
 import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.GuiFillerConfig;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
-import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.FishLogKey;
 import com.oheers.fish.database.data.manager.DataManager;
@@ -80,16 +73,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-//import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -337,7 +323,7 @@ public class EvenMoreFish extends EMFPlugin {
     private void listeners() {
         PluginManager pm = getServer().getPluginManager();
 
-        pm.registerEvents(new JoinChecker(), this);
+        pm.registerEvents(new JoinChecker(database), this);
         pm.registerEvents(new FishingProcessor(), this);
         pm.registerEvents(new HuntingProcessor(), this);
         pm.registerEvents(new UpdateNotify(), this);

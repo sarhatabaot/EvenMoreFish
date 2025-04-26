@@ -7,6 +7,7 @@ import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.CatchType;
 import com.oheers.fish.fishing.items.config.RarityFileUpdates;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.utils.ItemUtils;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;

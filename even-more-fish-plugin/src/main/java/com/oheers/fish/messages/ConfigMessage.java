@@ -15,11 +15,11 @@ public enum ConfigMessage {
     ADMIN_GIVE_PLAYER_FISH("<reset>You have given {player} a {fish}.", PrefixType.ADMIN, true, true, "admin.given-player-fish"),
     ADMIN_OPEN_FISH_SHOP("<reset>Opened a shop inventory for {player}.", PrefixType.ADMIN, true, true, "admin.open-fish-shop"),
     ADMIN_NBT_ROD_GIVEN(
-        "<reset>You have given {player} a NBT rod, make sure \"require-nbt-rod\" is set to <green>true <reset>for this to be different from any other fishing rod.",
-        PrefixType.ADMIN,
-        true,
-        true,
-        "admin.nbt-rod-given"
+            "<reset>You have given {player} a NBT rod, make sure \"require-nbt-rod\" is set to <green>true <reset>for this to be different from any other fishing rod.",
+            PrefixType.ADMIN,
+            true,
+            true,
+            "admin.nbt-rod-given"
     ),
     ADMIN_NBT_NOT_REQUIRED("<reset>Change \"require-nbt-rod\" to true in order to use this feature.", PrefixType.ERROR, false, true, "admin.nbt-not-required"),
     ADMIN_NO_BAIT_SPECIFIED("<reset>You must specify a bait name.", PrefixType.ERROR, false, true, "admin.no-bait-specified"),
@@ -29,6 +29,7 @@ public enum ConfigMessage {
     ADMIN_UNKNOWN_PLAYER("<reset>{player} could not be found.", PrefixType.ERROR, false, true, "admin.player-not-found"),
     ADMIN_UPDATE_AVAILABLE("<reset>There is an update available: " + "https://modrinth.com/plugin/evenmorefish/versions?l=paper", PrefixType.ADMIN, false, false, "admin.update-available"),
     ADMIN_LIST_ADDONS("<reset>Registered {addon-type}s: ", PrefixType.ADMIN, false, false, "admin.list-addons"),
+    ADMIN_LIST_REWARD_TYPES("<reset>Registered Reward Types: ", PrefixType.ADMIN, false, false, "admin.list-reward-types"),
 
     BAITS_CLEARED("<reset>You have removed all {amount} baits from your fishing rod.", PrefixType.ADMIN, true, true, "admin.all-baits-cleared"),
     BAIT_CAUGHT("<reset><b>{player} <reset>has caught a {bait_theme}<b>{bait} <reset>bait!", PrefixType.NONE, true, true, "bait-catch"),
@@ -70,32 +71,32 @@ public enum ConfigMessage {
     FISH_HUNTED("<bold>{player} <reset>has hunted a {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}!", PrefixType.NONE, true, true, "fish-hunted"),
     FISH_LENGTHLESS_HUNTED("<bold>{player} <reset>has hunted a {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}!", PrefixType.NONE, true, true, "lengthless-fish-hunted"),
     FISH_LORE(Arrays.asList(
-        "{fisherman_lore}",
-        "{length_lore}",
-        "",
-        "{fish_lore}",
-        "{rarity_colour}<b>{rarity}"
+            "{fisherman_lore}",
+            "{length_lore}",
+            "",
+            "{fish_lore}",
+            "{rarity_colour}<b>{rarity}"
     ), PrefixType.NONE, false, true, "fish-lore"),
     FISHERMAN_LORE(Collections.singletonList(
-        "<white>Caught by {player}"
+            "<white>Caught by {player}"
     ), PrefixType.NONE, false, true, "fisherman-lore"),
     LENGTH_LORE(Collections.singletonList(
-        "<white>Measures {length}cm"
+            "<white>Measures {length}cm"
     ), PrefixType.NONE, false, true, "length-lore"),
     FISH_SALE("<reset>You've sold <green>{amount} <white>fish for <green>{sell-price}<white>.", PrefixType.DEFAULT, true, true, "fish-sale"),
     HELP_FORMAT(
-        "[noPrefix]<aqua>{command} <yellow>- {description}",
-        PrefixType.DEFAULT,
-        false,
-        true,
-        "help-format"
+            "[noPrefix]<aqua>{command} <yellow>- {description}",
+            PrefixType.DEFAULT,
+            false,
+            true,
+            "help-format"
     ),
     HELP_GENERAL_TITLE(
-        "[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><bold><green>EvenMoreFish</green></bold><st><gradient:#73ff6b:#f1ffed>         ",
-        PrefixType.DEFAULT,
-        false,
-        true,
-        "help-general.title"
+            "[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><bold><green>EvenMoreFish</green></bold><st><gradient:#73ff6b:#f1ffed>         ",
+            PrefixType.DEFAULT,
+            false,
+            true,
+            "help-general.title"
     ),
     HELP_GENERAL_TOP("[noPrefix]Shows an ongoing competition's leaderboard.", PrefixType.DEFAULT, false, true, "help-general.top"),
     HELP_GENERAL_HELP("[noPrefix]Shows you this page.", PrefixType.DEFAULT, false, true, "help-general.help"),
@@ -106,12 +107,13 @@ public enum ConfigMessage {
     HELP_GENERAL_NEXT("[noPrefix]Show how much time is until the next competition.", PrefixType.DEFAULT, false, true, "help-general.next"),
     HELP_GENERAL_SELLALL("[noPrefix]Sell all the fish in your inventory.", PrefixType.DEFAULT, false, true, "help-general.sellall"),
     HELP_GENERAL_APPLYBAITS("[noPrefix]Apply baits to your fishing rod.", PrefixType.DEFAULT, false, true, "help-general.applybaits"),
+    HELP_GENERAL_JOURNAL("[noPrefix]View a journal of caught fish and their stats.", PrefixType.DEFAULT, false, true, "help-general.journal"),
     HELP_ADMIN_TITLE(
-        "[noPrefix]<white><st> <#ffedeb><st> <#ffdcd7><st> <#ffcac3><st> <#ffb8b0><st> <#ffa69d><st> <#ff948a><st> <#ff8078><st> <#ff6c66><st> <red><st> <white> <red><b>EvenMoreFish <red><st> <#ff6c66><st><st> <#ff8078><st> <#ff948a><st> <#ffa69d><st> <#ffb8b0><st> <#ffcac3><st> <#ffdcd7><st> <#ffedeb><st> <white><st> <white>",
-        PrefixType.ADMIN,
-        false,
-        true,
-        "help-admin.title"
+            "[noPrefix]<white><st> <#ffedeb><st> <#ffdcd7><st> <#ffcac3><st> <#ffb8b0><st> <#ffa69d><st> <#ff948a><st> <#ff8078><st> <#ff6c66><st> <red><st> <white> <red><b>EvenMoreFish <red><st> <#ff6c66><st><st> <#ff8078><st> <#ff948a><st> <#ffa69d><st> <#ffb8b0><st> <#ffcac3><st> <#ffdcd7><st> <#ffedeb><st> <white><st> <white>",
+            PrefixType.ADMIN,
+            false,
+            true,
+            "help-admin.title"
     ),
     HELP_ADMIN_BAIT("[noPrefix]Gives baits to a player.", PrefixType.ADMIN, false, true, "help-admin.bait"),
     HELP_ADMIN_COMPETITION("[noPrefix]Starts or stops a competition", PrefixType.ADMIN, false, true, "help-admin.competition"),
@@ -132,21 +134,21 @@ public enum ConfigMessage {
     INVALID_COMPETITION_ID("<reset>That isn't a valid competition id.", PrefixType.ADMIN, false, false, "admin.competition-id-invalid"),
 
     LEADERBOARD_LARGEST_FISH(
-        "<reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<b>{rarity} {rarity_colour}{fish}<reset>, {length}cm<reset>)",
-        PrefixType.DEFAULT,
-        false,
-        true,
-        "leaderboard-largest-fish"
+            "<reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<b>{rarity} {rarity_colour}{fish}<reset>, {length}cm<reset>)",
+            PrefixType.DEFAULT,
+            false,
+            true,
+            "leaderboard-largest-fish"
     ),
     LEADERBOARD_LARGEST_TOTAL("<reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount}cm<reset>)", PrefixType.DEFAULT, false, true, "leaderboard-largest-total"),
     LEADERBOARD_MOST_FISH("<reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)", PrefixType.DEFAULT, false, true, "leaderboard-most-fish"),
     LEADERBOARD_TOTAL_PLAYERS("<reset>There are a total of {amount} player(s) in the leaderboard.", PrefixType.DEFAULT, true, true, "total-players"),
     LEADERBOARD_SHORTEST_FISH(
-        "<reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<b>{rarity} {rarity_colour}{fish}<reset>, {length}cm<reset>)",
-        PrefixType.DEFAULT,
-        false,
-        true,
-        "leaderboard-shortest-fish"
+            "<reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<b>{rarity} {rarity_colour}{fish}<reset>, {length}cm<reset>)",
+            PrefixType.DEFAULT,
+            false,
+            true,
+            "leaderboard-shortest-fish"
     ),
     LEADERBOARD_SHORTEST_TOTAL("<reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount}cm<reset>)", PrefixType.DEFAULT, false, true, "leaderboard-shortest-total"),
 
@@ -189,61 +191,61 @@ public enum ConfigMessage {
     WORTH_GUI_CONFIRM_BUTTON_NAME("<gold><b>CONFIRM", PrefixType.NONE, false, false, "confirm-gui-name"),
     WORTH_GUI_NO_VAL_BUTTON_NAME("<red><b>Can't Sell", PrefixType.NONE, false, false, "error-gui-name"),
     WORTH_GUI_NO_VAL_BUTTON_LORE(Arrays.asList(
-        "<dark_gray>Fish Shop",
-        "",
-        "<gray>Total Value » <red>{sell-price}",
-        "",
-        "<gray>Sell your fish here to make",
-        "<gray>some extra money.",
-        "",
-        "<red>» (Left-click) sell the fish.",
-        "<gray>» (Right-click) cancel."
+            "<dark_gray>Fish Shop",
+            "",
+            "<gray>Total Value » <red>{sell-price}",
+            "",
+            "<gray>Sell your fish here to make",
+            "<gray>some extra money.",
+            "",
+            "<red>» (Left-click) sell the fish.",
+            "<gray>» (Right-click) cancel."
     ), PrefixType.NONE, false, false, "error-gui-lore"),
     WORTH_GUI_NO_VAL_ALL_BUTTON_NAME("<red><b>Can't Sell", PrefixType.NONE, false, false, "error-sell-all-gui-name"),
     WORTH_GUI_SELL_ALL_BUTTON_NAME("<gold><b>SELL ALL", PrefixType.NONE, false, false, "sell-all-name"),
     WORTH_GUI_SELL_ALL_BUTTON_LORE(Arrays.asList(
-        "<yellow><b>Value: <yellow>${sell-price}", "<gray>LEFT CLICK to sell all fish in your inventory."
+            "<yellow><b>Value: <yellow>${sell-price}", "<gray>LEFT CLICK to sell all fish in your inventory."
     ), PrefixType.NONE, false, false, "sell-all-lore"),
     WORTH_GUI_SELL_BUTTON_NAME("<gold><b>SELL", PrefixType.NONE, false, false, "sell-gui-name"),
     WORTH_GUI_SELL_BUTTON_LORE(Arrays.asList(
-        "<dark_gray>Inventory",
-        "",
-        "<gray>Total Value » <red>{sell-price}",
-        "",
-        "<gray>Click this button to sell",
-        "<gray>the fish in your inventory to",
-        "<gray>make some extra money.",
-        "",
-        "<red>» (Left-click) sell the fish."
+            "<dark_gray>Inventory",
+            "",
+            "<gray>Total Value » <red>{sell-price}",
+            "",
+            "<gray>Click this button to sell",
+            "<gray>the fish in your inventory to",
+            "<gray>make some extra money.",
+            "",
+            "<red>» (Left-click) sell the fish."
     ), PrefixType.NONE, false, false, "error-sell-all-gui-lore"),
     WORTH_GUI_SELL_LORE(Arrays.asList(
-        "<dark_gray>Fish Shop",
-        "",
-        "<gray>Total Value » <yellow>{sell-price}",
-        "",
-        "<gray>Sell your fish here to make",
-        "<gray>some extra money.",
-        "",
-        "<yellow>» (Left-click) sell the fish.",
-        "<gray>» (Right-click) cancel."
+            "<dark_gray>Fish Shop",
+            "",
+            "<gray>Total Value » <yellow>{sell-price}",
+            "",
+            "<gray>Sell your fish here to make",
+            "<gray>some extra money.",
+            "",
+            "<yellow>» (Left-click) sell the fish.",
+            "<gray>» (Right-click) cancel."
     ), PrefixType.NONE, false, false, "sell-gui-lore"),
     RARITY_INVALID("<reset>That is not a valid rarity!", PrefixType.ERROR, false, true, "rarity-invalid"),
     BAIT_ROD_LORE(List.of(
-        "<white>",
-        "<gray>Bait Slots: <yellow>({current_baits}/{max_baits})",
-        "<white>",
-        "{baits}",
-        "<white>"
+            "<white>",
+            "<gray>Bait Slots: <yellow>({current_baits}/{max_baits})",
+            "<white>",
+            "{baits}",
+            "<white>"
     ), PrefixType.NONE, false, false, "bait.rod-lore"),
     BAIT_BAIT_LORE(List.of(
-        "<white>",
-        "{bait_theme}Increases the catch rates for:",
-        "{boosts}",
-        "{lore}",
-        "<white>",
-        "<#dadada>Drop onto a fishing rod to apply,",
-        "<#dadada>or hold <u>SHIFT<#dadada> to apply all.",
-        "<white>"
+            "<white>",
+            "{bait_theme}Increases the catch rates for:",
+            "{boosts}",
+            "{lore}",
+            "<white>",
+            "<#dadada>Drop onto a fishing rod to apply,",
+            "<#dadada>or hold <u>SHIFT<#dadada> to apply all.",
+            "<white>"
     ), PrefixType.NONE, false, false, "bait.bait-lore"),
     BAIT_BAITS("<gold>► {amount} {bait}", PrefixType.NONE, false, false, "bait.baits"),
     BAIT_BOOSTS_RARITY("{bait_theme}► <white>1 {bait_theme}Rarity", PrefixType.NONE, false, false, "bait.boosts-rarity"),
@@ -400,4 +402,3 @@ public enum ConfigMessage {
     }
 
 }
-
