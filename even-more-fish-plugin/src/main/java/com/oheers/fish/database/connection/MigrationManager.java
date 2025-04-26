@@ -11,15 +11,6 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfoService;
 import org.flywaydb.core.api.MigrationVersion;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +23,14 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class MigrationManager {
     private final String latestBaselineVersion;
@@ -131,7 +130,7 @@ public class MigrationManager {
         final MigrationVersion latestBaseVersion = MigrationVersion.fromVersion(latestBaselineVersion);
         try (Connection ignored = connectionFactory.getConnection()) {
             // This will create the database file if it doesn't exist
-            EvenMoreFish.debug("Attempting first connection to database...");
+            EvenMoreFish.getInstance().debug("Attempting first connection to database...");
         } catch (SQLException e) {
             return latestBaseVersion;
         }

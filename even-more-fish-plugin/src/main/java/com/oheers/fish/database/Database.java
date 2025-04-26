@@ -1,6 +1,5 @@
 package com.oheers.fish.database;
 
-
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.annotations.NeedsTesting;
 import com.oheers.fish.api.annotations.TestType;
@@ -8,7 +7,11 @@ import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.database.connection.*;
+import com.oheers.fish.database.connection.ConnectionFactory;
+import com.oheers.fish.database.connection.H2ConnectionFactory;
+import com.oheers.fish.database.connection.MigrationManager;
+import com.oheers.fish.database.connection.MySqlConnectionFactory;
+import com.oheers.fish.database.connection.SqliteConnectionFactory;
 import com.oheers.fish.database.execute.ExecuteQuery;
 import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
@@ -28,7 +31,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.*;
 import org.jooq.Record;
-import org.jooq.conf.*;
+import org.jooq.Result;
+import org.jooq.conf.MappedSchema;
+import org.jooq.conf.MappedTable;
+import org.jooq.conf.RenderMapping;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
 import java.sql.Connection;
@@ -362,7 +369,7 @@ public class Database implements DatabaseAPI {
                         .set(Tables.FISH.FISH_RARITY, fish.getRarity().getId())
                         .set(Tables.FISH.FIRST_FISHER, uuid.toString())
                         .set(Tables.FISH.TOTAL_CAUGHT, 1)
-                        .set(Tables.FISH.LARGEST_FISH, Math.round(fish.getLength() * 10f) / 10f)
+                        .set(Tables.FISH.LARGEST_FISH, fish.getLength())
                         .set(Tables.FISH.FIRST_FISHER, uuid.toString())
                         .set(Tables.FISH.LARGEST_FISHER, uuid.toString())
                         .set(Tables.FISH.FIRST_CATCH_TIME, LocalDateTime.now())
@@ -437,7 +444,7 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS_SALES.FISH_RARITY, fishRarity)
                         .set(Tables.USERS_SALES.FISH_AMOUNT, fishAmount)
                         .set(Tables.USERS_SALES.FISH_LENGTH, fishLength)
-                        .set(Tables.USERS_SALES.PRICE_SOLD, Math.round(priceSold * 10) / 10.0) //todo use decimal format, or a util command
+                        .set(Tables.USERS_SALES.PRICE_SOLD, priceSold)
                         .execute();
             }
         }.executeUpdate();

@@ -2,16 +2,14 @@ package com.oheers.fish;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
-import com.oheers.fish.adapter.PaperAdapter;
-import com.oheers.fish.adapter.SpigotAdapter;
-import com.oheers.fish.addons.AddonManager;
 import com.oheers.fish.addons.DefaultAddons;
+import com.oheers.fish.addons.InternalAddonLoader;
 import com.oheers.fish.api.EMFAPI;
-import com.oheers.fish.api.adapter.PlatformAdapter;
+import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
-import com.oheers.fish.api.requirement.RequirementManager;
-import com.oheers.fish.api.reward.RewardManager;
+import com.oheers.fish.api.requirement.RequirementType;
+import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
@@ -25,6 +23,15 @@ import com.oheers.fish.config.GUIFillerConfig;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
+import com.oheers.fish.competition.AutoRunner;
+import com.oheers.fish.competition.Competition;
+import com.oheers.fish.competition.CompetitionQueue;
+import com.oheers.fish.competition.JoinChecker;
+import com.oheers.fish.config.GuiConfig;
+import com.oheers.fish.config.GuiFillerConfig;
+import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.config.MessageConfig;
+import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.FishLogKey;
 import com.oheers.fish.database.data.manager.DataManager;
@@ -37,14 +44,19 @@ import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
 import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
-import com.oheers.fish.events.*;
+import com.oheers.fish.events.AuraSkillsFishingEvent;
+import com.oheers.fish.events.AureliumSkillsFishingEvent;
+import com.oheers.fish.events.FishEatEvent;
+import com.oheers.fish.events.FishInteractEvent;
+import com.oheers.fish.events.McMMOTreasureEvent;
 import com.oheers.fish.fishing.FishingProcessor;
+import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
-import com.oheers.fish.requirements.*;
-import com.oheers.fish.utils.AntiCraft;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.utils.HeadDBIntegration;
 import com.oheers.fish.utils.ItemFactory;
+import com.oheers.fish.utils.ItemProtectionListener;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -71,13 +83,24 @@ import org.jetbrains.annotations.Nullable;
 //import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.oheers.fish.FishUtils.classExists;
 
 public class EvenMoreFish extends EMFPlugin {
 
     private final Random random = new Random();
+    private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
+        || classExists("io.papermc.paper.configuration.Configuration");
 
     private Permission permission = null;
     private ItemStack customNBTRod;
@@ -109,11 +132,9 @@ public class EvenMoreFish extends EMFPlugin {
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
-    private static PlatformAdapter platformAdapter;
     private EMFAPI api;
 
     private AddonManager addonManager;
-    private Map<String, String> commandUsages = new HashMap<>();
 
     private DataManager<Collection<FishLog>> fishLogDataManager;
     private DataManager<FishStats> fishStatsDataManager;
@@ -125,7 +146,9 @@ public class EvenMoreFish extends EMFPlugin {
         return instance;
     }
 
-    public static TaskScheduler getScheduler() {return scheduler;}
+    public static TaskScheduler getScheduler() {
+        return scheduler;
+    }
 
     public AddonManager getAddonManager() {
         return addonManager;
@@ -135,29 +158,29 @@ public class EvenMoreFish extends EMFPlugin {
     public void onLoad() {
         CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
                 .shouldHookPaperReload(true)
-                .usePluginNamespace()
                 .missingExecutorImplementationMessage("You are not able to use this command!");
         CommandAPI.onLoad(config);
     }
 
     @Override
     public void onEnable() {
+        // Don't enable if the server is not using Paper.
+        if (!isPaper) {
+            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, we recommend updating to Paper instead. https://papermc.io/downloads/paper");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         if (!NBT.preloadApi()) {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
-
-        // This should only ever be done once.
-        EMFPlugin.setInstance(this);
 
         CommandAPI.onEnable();
 
         // If EMF folder does not exist, this is the first load.
         firstLoad = !getDataFolder().exists();
 
-        instance = this;
         scheduler = UniversalScheduler.getScheduler(this);
-        platformAdapter = loadAdapter();
 
         this.api = new EMFAPI();
 
@@ -174,13 +197,10 @@ public class EvenMoreFish extends EMFPlugin {
         new MessageConfig();
 
         saveAdditionalDefaultAddons();
-        this.addonManager = new AddonManager(this);
-        this.addonManager.load();
+        loadAddonManager();
 
-        new BaitFile();
-
-        new GUIConfig();
-        new GUIFillerConfig();
+        new GuiConfig();
+        new GuiFillerConfig();
 
         checkPapi();
 
@@ -197,19 +217,16 @@ public class EvenMoreFish extends EMFPlugin {
 
         setupPermissions();
 
-        loadRequirementManager();
-
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
-
-        // Do this before anything competition related.
-        loadRewardManager();
 
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
 
-        // async check for updates on the spigot page
-        getScheduler().runTaskAsynchronously(() -> isUpdateAvailable = checkUpdate());
+        // check for updates on the modrinth page
+        checkUpdate().thenAccept(available ->
+            isUpdateAvailable = available
+        );
 
 
 
@@ -254,15 +271,14 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onDisable() {
-
-        // Prevent issues when NBT preload fails.
-        if (instance == null) {
+        // If the server is not using Paper, the plugin won't have enabled in the first place.
+        if (!isPaper) {
             return;
         }
 
         CommandAPI.onDisable();
 
-        terminateGUIS();
+        terminateGuis();
         // Don't use the scheduler here because it will throw errors on disable
         EvenMoreFish.getInstance().getUserReportDataManager().flush();
         EvenMoreFish.getInstance().getUserFishStatsDataManager().flush();
@@ -275,7 +291,8 @@ public class EvenMoreFish extends EMFPlugin {
             active.end(false);
         }
 
-        RewardManager.getInstance().unload();
+        RewardType.unregisterAll();
+        RequirementType.unregisterAll();
 
         if (MainConfig.getInstance().databaseEnabled()) {
             database.shutdown();
@@ -297,25 +314,18 @@ public class EvenMoreFish extends EMFPlugin {
                 .toList()) {
             final File addonFile = new File(getDataFolder(), "addons/" + fileName);
             final File jarFile = new File(getDataFolder(), "addons/" + fileName.replace(".addon", ".jar"));
-            if (!jarFile.exists()) {
-                try {
-                    this.saveResource("addons/" + fileName, true);
-                    addonFile.renameTo(jarFile);
-                } catch (IllegalArgumentException e) {
-                    debug(Level.WARNING, String.format("Default addon %s does not exist.", fileName));
-                }
+            try {
+                this.saveResource("addons/" + fileName, true);
+                addonFile.renameTo(jarFile);
+            } catch (IllegalArgumentException e) {
+                debug(Level.WARNING, String.format("Default addon %s does not exist.", fileName));
             }
         }
     }
 
-    public static void debug(final String message) {
-        debug(Level.INFO, message);
-    }
-
-    public static void debug(final Level level, final String message) {
-        if (MainConfig.getInstance().debugSession()) {
-            getInstance().getLogger().log(level, () -> "DEBUG %s".formatted(message));
-        }
+    @Override
+    public boolean isDebugSession() {
+        return MainConfig.getInstance().debugSession();
     }
 
     public static void dbVerbose(final String message) {
@@ -325,49 +335,50 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     private void listeners() {
+        PluginManager pm = getServer().getPluginManager();
 
-        getServer().getPluginManager().registerEvents(new JoinChecker(database), this);
-        getServer().getPluginManager().registerEvents(new FishingProcessor(), this);
-        getServer().getPluginManager().registerEvents(new UpdateNotify(), this);
-        getServer().getPluginManager().registerEvents(new SkullSaver(), this);
-        getServer().getPluginManager().registerEvents(new BaitListener(), this);
+        pm.registerEvents(new JoinChecker(), this);
+        pm.registerEvents(new FishingProcessor(), this);
+        pm.registerEvents(new HuntingProcessor(), this);
+        pm.registerEvents(new UpdateNotify(), this);
+        pm.registerEvents(new SkullSaver(), this);
+        pm.registerEvents(new BaitListener(), this);
+        pm.registerEvents(new ItemProtectionListener(), this);
 
         optionalListeners();
     }
 
     private void optionalListeners() {
+        PluginManager pm = getServer().getPluginManager();
+
         if (checkingEatEvent) {
-            getServer().getPluginManager().registerEvents(FishEatEvent.getInstance(), this);
+            pm.registerEvents(FishEatEvent.getInstance(), this);
         }
 
         if (checkingIntEvent) {
-            getServer().getPluginManager().registerEvents(FishInteractEvent.getInstance(), this);
-        }
-
-        if (MainConfig.getInstance().blockCrafting()) {
-            getServer().getPluginManager().registerEvents(new AntiCraft(), this);
+            pm.registerEvents(FishInteractEvent.getInstance(), this);
         }
 
         if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
             usingMcMMO = true;
             if (MainConfig.getInstance().disableMcMMOTreasure()) {
-                getServer().getPluginManager().registerEvents(McMMOTreasureEvent.getInstance(), this);
+                pm.registerEvents(McMMOTreasureEvent.getInstance(), this);
             }
         }
 
         if (Bukkit.getPluginManager().isPluginEnabled("HeadDatabase")) {
             usingHeadsDB = true;
-            getServer().getPluginManager().registerEvents(new HeadDBIntegration(), this);
+            pm.registerEvents(new HeadDBIntegration(), this);
         }
 
         if (Bukkit.getPluginManager().isPluginEnabled("AureliumSkills")) {
             if (MainConfig.getInstance().disableAureliumSkills()) {
-                getServer().getPluginManager().registerEvents(new AureliumSkillsFishingEvent(), this);
+                pm.registerEvents(new AureliumSkillsFishingEvent(), this);
             }
         }
         if (Bukkit.getPluginManager().isPluginEnabled("AuraSkills")) {
             if (MainConfig.getInstance().disableAureliumSkills()) {
-                getServer().getPluginManager().registerEvents(new AuraSkillsFishingEvent(), this);
+                pm.registerEvents(new AuraSkillsFishingEvent(), this);
             }
         }
     }
@@ -395,11 +406,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
 
-        metrics.addCustomChart(new SimplePie("paper-adapter", () -> (platformAdapter instanceof PaperAdapter) ? "true" : "false"));
-    }
-
-    public Map<String, String> getCommandUsages() {
-        return commandUsages;
+        metrics.addCustomChart(new SimplePie("paper-adapter", () -> "true"));
     }
 
     private boolean setupPermissions() {
@@ -411,8 +418,8 @@ public class EvenMoreFish extends EMFPlugin {
         return permission != null;
     }
 
-    // gets called on server shutdown to simulate all players closing their GUIs
-    private void terminateGUIS() {
+    // gets called on server shutdown to simulate all players closing their Guis
+    private void terminateGuis() {
         getServer().getOnlinePlayers().forEach(player -> {
             InventoryGui inventoryGui = InventoryGui.getOpen(player);
             if (inventoryGui != null) {
@@ -445,21 +452,21 @@ public class EvenMoreFish extends EMFPlugin {
         });
     }
 
+    @Override
     public void reload(@Nullable CommandSender sender) {
 
         // If EMF folder does not exist, assume first load again.
         firstLoad = !getDataFolder().exists();
 
-        terminateGUIS();
+        terminateGuis();
 
         reloadConfig();
         saveDefaultConfig();
 
         MainConfig.getInstance().reload();
         MessageConfig.getInstance().reload();
-        GUIConfig.getInstance().reload();
-        GUIFillerConfig.getInstance().reload();
-        BaitFile.getInstance().reload();
+        GuiConfig.getInstance().reload();
+        GuiFillerConfig.getInstance().reload();
 
         FishManager.getInstance().reload();
         BaitManager.getInstance().reload();
@@ -495,10 +502,13 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // Checks for updates, surprisingly
-    private boolean checkUpdate() {
-        ComparableVersion spigotVersion = new ComparableVersion(new UpdateChecker(this, 91310).getVersion());
-        ComparableVersion serverVersion = new ComparableVersion(getDescription().getVersion());
-        return spigotVersion.compareTo(serverVersion) > 0;
+    @SuppressWarnings("UnstableApiUsage")
+    private CompletableFuture<Boolean> checkUpdate() {
+        return CompletableFuture.supplyAsync(() -> {
+            ComparableVersion modrinthVersion = new ComparableVersion(new UpdateChecker(this).getVersion());
+            ComparableVersion serverVersion = new ComparableVersion(getPluginMeta().getVersion());
+            return modrinthVersion.compareTo(serverVersion) > 0;
+        });
     }
 
     private void checkPapi() {
@@ -634,71 +644,13 @@ public class EvenMoreFish extends EMFPlugin {
         }
     }
 
-    private void loadRewardManager() {
-        // Load RewardManager
-        RewardManager.getInstance().load();
-        getServer().getPluginManager().registerEvents(RewardManager.getInstance(), this);
 
-        // Load RewardTypes
-        new CommandRewardType().register();
-        new EffectRewardType().register();
-        new HealthRewardType().register();
-        new HungerRewardType().register();
-        new ItemRewardType().register();
-        new MessageRewardType().register();
-        new EXPRewardType().register();
-        loadExternalRewardTypes();
-    }
+    private void loadAddonManager() {
+        this.addonManager = new AddonManager();
+        this.addonManager.load();
 
-    private void loadRequirementManager() {
-        // Load RequirementManager
-        RequirementManager.getInstance().load();
-        getServer().getPluginManager().registerEvents(RequirementManager.getInstance(), this);
-
-        // Load RequirementTypes
-        new BiomeRequirementType().register();
-        new BiomeSetRequirementType().register();
-        new DisabledRequirementType().register();
-        new InGameTimeRequirementType().register();
-        new IRLTimeRequirementType().register();
-        new MoonPhaseRequirementType().register();
-        new NearbyPlayersRequirementType().register();
-        new PermissionRequirementType().register();
-        new RegionRequirementType().register();
-        new WeatherRequirementType().register();
-        new WorldRequirementType().register();
-
-        // Load Group RequirementType
-        if (isUsingVault()) {
-            RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-            if (rsp != null) {
-                new GroupRequirementType(rsp.getProvider()).register();
-            }
-        }
-    }
-
-    private void loadExternalRewardTypes() {
-        PluginManager pm = Bukkit.getPluginManager();
-        if (pm.isPluginEnabled("PlayerPoints")) {
-            new PlayerPointsRewardType().register();
-        }
-        if (pm.isPluginEnabled("GriefPrevention")) {
-            new GPClaimBlocksRewardType().register();
-        }
-        if (pm.isPluginEnabled("AuraSkills")) {
-            new AuraSkillsXPRewardType().register();
-        }
-        if (pm.isPluginEnabled("mcMMO")) {
-            new McMMOXPRewardType().register();
-        }
-        // Only enable the PERMISSION type if Vault perms is found.
-        if (getPermission() != null && getPermission().isEnabled()) {
-            new PermissionRewardType().register();
-        }
-        // Only enable the Money RewardType is Vault is enabled.
-        if (pm.isPluginEnabled("Vault")) {
-            new MoneyRewardType().register();
-        }
+        // Load internal addons
+        new InternalAddonLoader().load();
     }
 
     public List<Player> getVisibleOnlinePlayers() {
@@ -707,45 +659,26 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     // FISH TOGGLE METHODS
-    // We use Strings here because Spigot 1.16.5 does not have PersistentDataType.BOOLEAN.
 
     public void performFishToggle(@NotNull Player player) {
-        NamespacedKey key = new NamespacedKey(this, "fish-enabled");
+        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        // If it is enabled, disable it
-        if (isCustomFishing(player)) {
-            pdc.set(key, PersistentDataType.STRING, "false");
-            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
-            // If it is disabled, enable it
-        } else {
-            pdc.set(key, PersistentDataType.STRING, "true");
+        // If custom fishing is disabled
+        if (isCustomFishingDisabled(player)) {
+            // Set fish-disabled to false
+            pdc.set(key, PersistentDataType.BOOLEAN, false);
             ConfigMessage.TOGGLE_ON.getMessage().send(player);
+        } else {
+            // Set fish-disabled to true
+            pdc.set(key, PersistentDataType.BOOLEAN, true);
+            ConfigMessage.TOGGLE_OFF.getMessage().send(player);
         }
     }
 
-    public boolean isCustomFishing(@NotNull Player player) {
+    public boolean isCustomFishingDisabled(@NotNull Player player) {
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(this, "fish-enabled");
-        String toggleValue = pdc.getOrDefault(key, PersistentDataType.STRING, "true");
-        return toggleValue.equals("true");
-    }
-
-    private static PlatformAdapter loadAdapter() {
-        // Class names taken from PaperLib's initialize method
-        if (FishUtils.classExists(("com.destroystokyo.paper.PaperConfig"))) {
-            return new PaperAdapter();
-        } else if (FishUtils.classExists("io.papermc.paper.configuration.Configuration")) {
-            return new PaperAdapter();
-        }
-        return new SpigotAdapter();
-    }
-
-    public static @NotNull PlatformAdapter getAdapter() {
-        if (platformAdapter == null) {
-            instance.getLogger().warning("No PlatformAdapter found! Defaulting to SpigotAdapter.");
-            platformAdapter = new SpigotAdapter();
-        }
-        return platformAdapter;
+        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
+        return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, false);
     }
 
     public boolean isFirstLoad() {

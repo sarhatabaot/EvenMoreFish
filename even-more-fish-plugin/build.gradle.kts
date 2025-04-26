@@ -10,10 +10,11 @@ import java.util.*
 plugins {
     `java-library`
     `maven-publish`
-    alias(libs.plugins.bukkit.yml)
+    alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
+    id("org.sonarqube") version "6.0.1.5171"
 }
 
 group = "com.oheers.evenmorefish"
@@ -24,7 +25,7 @@ description = "A fishing extension bringing an exciting new experience to fishin
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // Adventure Snapshots
-    maven("https://hub.spigotmc.org/nexus/content/groups/public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://github.com/deanveloper/SkullCreator/raw/mvn-repo/")
     maven("https://jitpack.io")
     maven("https://maven.enginehub.org/repo/")
@@ -38,16 +39,15 @@ repositories {
     maven("https://repo.auxilor.io/repository/maven-public/")
     maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://repo.minebench.de/")
-//    maven("https://repo.firedev.uk/repository/maven-public/")
+    maven("https://repo.codemc.io/repository/FireML/")
     maven("https://repo.essentialsx.net/releases/")
     maven("https://repo.aikar.co/content/groups/aikar/")
 }
 
 dependencies {
     api(project(":even-more-fish-api"))
-    implementation(project(":even-more-fish-paper"))
 
-    compileOnly(libs.spigot.api)
+    compileOnly(libs.paper.api)
     compileOnly(libs.vault.api)
     compileOnly(libs.placeholder.api)
 
@@ -85,11 +85,11 @@ dependencies {
 
     implementation(libs.nbt.api)
     implementation(libs.bstats)
-    implementation(libs.universalscheduler)
     implementation(libs.commandapi)
     implementation(libs.inventorygui)
-//    implementation(libs.vanishchecker)
     implementation(libs.boostedyaml)
+    implementation(libs.vanishchecker)
+    implementation(libs.universalscheduler)
 
     library(libs.friendlyid)
     library(libs.flyway.core)
@@ -99,12 +99,10 @@ dependencies {
     library(libs.commons.lang3)
     library(libs.commons.codec)
     library(libs.json.simple)
-
     library(libs.jooq)
     library(libs.jooq.codegen)
     library(libs.jooq.meta)
     library(libs.connectors.h2)
-
     library(libs.maven.artifact)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
@@ -115,10 +113,16 @@ dependencies {
 bukkit {
     name = "EvenMoreFish"
     author = "Oheers"
+    // This is being used for developers instead of contributors
+    contributors = listOf(
+        "FireML",
+        "sarhatabaot"
+    )
     main = "com.oheers.fish.EvenMoreFish"
     version = project.version.toString()
     description = project.description.toString()
-    website = "https://github.com/Oheers/EvenMoreFish"
+    website = "https://github.com/EvenMoreFish/EvenMoreFish"
+    apiVersion = "1.20"
     foliaSupported = true
 
     depend = listOf()
@@ -140,7 +144,6 @@ bukkit {
         "GriefPrevention"
     )
     loadBefore = listOf("AntiAC")
-    apiVersion = "1.18"
 
     permissions {
         register("emf.*") {
@@ -209,6 +212,15 @@ bukkit {
 
     }
 }
+
+sonar {
+  properties {
+    property("sonar.projectKey", "EvenMoreFish_EvenMoreFish")
+    property("sonar.organization", "evenmorefish")
+    property("sonar.host.url", "https://sonarcloud.io")
+  }
+}
+
 sourceSets {
     main {
         java.srcDirs.add(File("src/main/generated"))
@@ -216,6 +228,20 @@ sourceSets {
 }
 tasks.named("compileJava") {
     dependsOn(":even-more-fish-plugin:generateMysqlJooq")
+}
+
+val copyAddons by tasks.registering(Copy::class) {
+    // Make sure the plugin waits for the addons to be built first
+    dependsOn(":addons:even-more-fish-addons-j17:build", ":addons:even-more-fish-addons-j21:build")
+
+    from(project(":addons:even-more-fish-addons-j17").layout.buildDirectory.dir("libs"))
+    from(project(":addons:even-more-fish-addons-j21").layout.buildDirectory.dir("libs"))
+
+    into(file("src/main/resources/addons"))
+}
+
+tasks.named("processResources") {
+    dependsOn(copyAddons)
 }
 
 tasks {
@@ -269,10 +295,9 @@ tasks {
             attributes["Database-Baseline-Version"] = "8.0"
         }
 
-        minimize {
-            exclude(dependency("net.kyori:.*"))
-        }
+        minimize()
 
+        exclude("LICENSE")
         exclude("META-INF/**")
 
         archiveFileName.set("even-more-fish-${project.version}-${buildNumberOrDate}.jar")
@@ -297,7 +322,7 @@ tasks {
 publishing {
     repositories { // Copied directly from CodeMC's docs
         maven {
-            url = uri("https://repo.codemc.io/repository/Oheers/")
+            url = uri("https://repo.codemc.io/repository/EvenMoreFish/")
 
             val mavenUsername = System.getenv("JENKINS_USERNAME")
             val mavenPassword = System.getenv("JENKINS_PASSWORD")

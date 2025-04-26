@@ -2,13 +2,13 @@ package com.oheers.fish.competition.configs;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.competition.Bar;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -20,7 +20,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class CompetitionFile extends ConfigBase {
@@ -153,7 +157,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The number of fish needed for SPECIFIC_* competition types.
      */
     public int getNumberNeeded() {
-        return Math.max(1, getConfig().getInt("number-needed", 1));
+        return Math.max(1, getConfig().getInt("number-needed", 0));
     }
 
     /**
@@ -174,7 +178,7 @@ public class CompetitionFile extends ConfigBase {
      * @return The colours to show for each winning position, if the {pos_colour} variable is used.
      */
     public @NotNull List<String> getPositionColours() {
-        return getConfig().getStringList("leaderboard.position-colours", List.of("&6", "&e", "&7", "&7", "&#888888"));
+        return getConfig().getStringList("leaderboard.position-colours", List.of("<gold>", "<yellow>", "<gray>", "<gray>", "<#888888>"));
     }
 
     public @NotNull List<Long> getAlertTimes() {
@@ -191,7 +195,7 @@ public class CompetitionFile extends ConfigBase {
                 seconds += (Long.parseLong(split[0]) * 60);
                 finalTimes.add(seconds);
             } catch (NumberFormatException exception) {
-                logger.severe("Could not turn " + time + " into an alert time. If you need support, feel free to join the discord server: https://discord.gg/Hb9cj3tNbb");
+                logger.severe("Could not turn " + time + " into an alert time. If you need support, feel free to join the discord server: https://discord.gg/9fRbqWTnHS");
             }
         }
         return finalTimes;
@@ -254,9 +258,9 @@ public class CompetitionFile extends ConfigBase {
     /**
      * @return The prefix for this competition's bossbar.
      */
-    public AbstractMessage getBossbarPrefix() {
-        String prefix = getConfig().getString("bossbar-prefix", "&a&lFishing Contest: ");
-        return EvenMoreFish.getAdapter().createMessage(prefix);
+    public EMFSingleMessage getBossbarPrefix() {
+        String prefix = getConfig().getString("bossbar-prefix", "<green><bold>Fishing Contest: ");
+        return EMFSingleMessage.fromString(prefix);
     }
 
     /**
@@ -266,7 +270,7 @@ public class CompetitionFile extends ConfigBase {
         Bar bar = new Bar();
         bar.setShouldShow(shouldShowBossbar());
         bar.setColour(getBossbarColour());
-        bar.setPrefix(getBossbarPrefix().getLegacyMessage());
+        bar.setPrefix(getBossbarPrefix(), getType());
         return bar;
     }
 
@@ -301,6 +305,20 @@ public class CompetitionFile extends ConfigBase {
                 .map(Bukkit::getWorld)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    /**
+     * @return Whether hunting is enabled.
+     */
+    public boolean isAllowHunting() {
+        return getConfig().getBoolean("allow-hunting", false);
+    }
+
+    /**
+     * @return Whether fishing is allowed.
+     */
+    public boolean isAllowFishing() {
+        return getConfig().getBoolean("allow-fishing", true);
     }
 
 }

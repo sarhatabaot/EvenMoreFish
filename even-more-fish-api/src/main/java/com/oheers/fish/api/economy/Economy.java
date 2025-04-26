@@ -1,11 +1,16 @@
 package com.oheers.fish.api.economy;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class Economy {
 
@@ -60,11 +65,12 @@ public class Economy {
         return null;
     }
 
-    public @NotNull String getWorthFormat(double value, boolean applyMultiplier) {
-        return registeredEconomies.stream()
+    public @NotNull Component getWorthFormat(double value, boolean applyMultiplier) {
+        List<Component> components = registeredEconomies.stream()
                 .map(type -> type.formatWorth(value, applyMultiplier))
                 .filter(Objects::nonNull)
-                .collect(Collectors.joining(", "));
+                .toList();
+        return Component.join(JoinConfiguration.commas(true), components);
     }
 
     public boolean registerEconomyType(@NotNull EconomyType economyType) {

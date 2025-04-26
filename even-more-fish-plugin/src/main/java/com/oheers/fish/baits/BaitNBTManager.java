@@ -1,15 +1,18 @@
 package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
-import com.oheers.fish.config.BaitFile;
+import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,8 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 public class BaitNBTManager {
+
+    // Our line identifier. This is U+200C ZERO WIDTH NON-JOINER and is invisible
+    public static final String LINE_IDENTIFIER = "\u200C";
 
     private BaitNBTManager() {
         throw new UnsupportedOperationException();
@@ -109,7 +116,7 @@ public class BaitNBTManager {
      * @throws MaxBaitReachedException  When one of the baits has hit maximum set by max-baits in baits.yml
      */
     public static ApplicationResult applyBaitedRodNBT(ItemStack item, Bait bait, int quantity) throws MaxBaitsReachedException, MaxBaitReachedException {
-        boolean doingLoreStuff = BaitFile.getInstance().doRodLore();
+        boolean doingLoreStuff = MainConfig.getInstance().getBaitAddToLore();
         AtomicBoolean maxBait = new AtomicBoolean(false);
         AtomicInteger cursorModifier = new AtomicInteger();
 
@@ -117,12 +124,12 @@ public class BaitNBTManager {
         if (isBaitedRod(item)) {
             try {
                 if (doingLoreStuff) {
-                    FishUtils.editMeta(item, meta -> meta.setLore(deleteOldLore(item)));
+                    item.editMeta(meta -> meta.lore(deleteOldLore(item)));
                 }
             } catch (IndexOutOfBoundsException exception) {
                 EvenMoreFish.getInstance()
                         .getLogger()
-                        .severe("Failed to apply bait: " + bait.getName() + " to a user's fishing rod. This is likely caused by a change in format in the baits.yml config.");
+                        .severe("Failed to apply bait: " + bait.getId() + " to a user's fishing rod. This is likely caused by a change in format in the baits.yml config.");
                 return null;
             }
 
@@ -131,7 +138,7 @@ public class BaitNBTManager {
             boolean foundBait = false;
 
             for (String baitName : baitList) {
-                if (baitName.split(":")[0].equals(bait.getName())) {
+                if (baitName.split(":")[0].equals(bait.getId())) {
                     if (bait.isInfinite()) {
                         combined.append(baitName.split(":")[0]).append(":∞,");
                     } else {
@@ -155,20 +162,20 @@ public class BaitNBTManager {
             // We can manage the last character not being a colon if we have to add it in ourselves.
             if (!foundBait) {
 
-                if (getNumBaitsApplied(item) >= BaitFile.getInstance().getMaxBaits()) {
+                if (getNumBaitsApplied(item) >= MainConfig.getInstance().getBaitsPerRod()) {
                     // the lore's been taken out, we're not going to be doing anymore here, so we're just re-adding it now.
                     if (doingLoreStuff) {
-                        FishUtils.editMeta(item, meta -> meta.setLore(newApplyLore(item)));
+                        item.editMeta(meta -> meta.lore(newApplyLore(item)));
                     }
                     throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
                 }
 
                 if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
                     cursorModifier.set(-bait.getMaxApplications());
-                    combined.append(bait.getName()).append(":").append(bait.getMaxApplications());
+                    combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
                     maxBait.set(true);
                 } else {
-                    combined.append(bait.getName()).append(":").append(quantity);
+                    combined.append(bait.getId()).append(":").append(quantity);
                     cursorModifier.set(-quantity);
                 }
             } else {
@@ -188,12 +195,12 @@ public class BaitNBTManager {
             NBT.modify(item, nbt -> {
                 ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
                 if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
-                    combined.append(bait.getName()).append(":").append(bait.getMaxApplications());
+                    combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
                     compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
                     cursorModifier.set(-bait.getMaxApplications());
                     maxBait.set(true);
                 } else {
-                    combined.append(bait.getName()).append(":").append(quantity);
+                    combined.append(bait.getId()).append(":").append(quantity);
                     compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
                     cursorModifier.set(-quantity);
                 }
@@ -201,7 +208,7 @@ public class BaitNBTManager {
         }
 
         if (doingLoreStuff && !combined.isEmpty()) {
-            FishUtils.editMeta(item, meta -> meta.setLore(newApplyLore(item)));
+            item.editMeta(meta -> meta.lore(newApplyLore(item)));
         }
 
         if (maxBait.get()) {
@@ -261,8 +268,10 @@ public class BaitNBTManager {
     public static @Nullable Bait randomBaitCatch() {
 
         Map<String, Bait> baitMap = BaitManager.getInstance().getBaitMap();
-        List<Bait> baitList = new ArrayList<>(baitMap.values());
-
+        List<Bait> baitList = baitMap.values().stream()
+            .filter(Bait::getCanBeCaught)
+            .toList();
+        
         // Fix IndexOutOfBoundsException caused by the list being empty.
         if (baitList.isEmpty()) {
             return null;
@@ -339,53 +348,69 @@ public class BaitNBTManager {
         return totalDeleted;
     }
 
-    public static List<String> newApplyLore(ItemStack itemStack) {
+    public static List<Component> newApplyLore(ItemStack itemStack) {
+        // Mark this item as having reformatted lore
+        NBT.modify(itemStack, nbt -> {
+            ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+            compound.setBoolean(NbtKeys.EMF_BAIT_REFORMATTED, true);
+        });
+
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             return Collections.emptyList();
         }
 
-        List<String> lore = meta.getLore();
+        List<Component> lore = meta.lore();
+
         if (lore == null) {
             lore = new ArrayList<>();
         }
 
-        List<String> format = BaitFile.getInstance().getRodLoreFormat();
-        for (String lineAddition : format) {
-            if (lineAddition.equals("{baits}")) {
-                String rodNBT = NbtUtils.getString(itemStack, NbtKeys.EMF_APPLIED_BAIT);
+        EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
 
-                if (rodNBT == null || rodNBT.isEmpty()) {
-                    return lore;
-                }
+        Supplier<EMFListMessage> baitVariable = () -> {
+            EMFListMessage message = EMFListMessage.empty();
 
-                int baitCount = 0;
+            String rodNBT = NbtUtils.getString(itemStack, NbtKeys.EMF_APPLIED_BAIT);
 
-                for (String bait : rodNBT.split(",")) {
-                    baitCount++;
-                    AbstractMessage message = EvenMoreFish.getAdapter().createMessage(BaitFile.getInstance().getBaitFormat());
-                    // TODO this is to prevent an ArrayIndexOutOfBoundsException, but it should be handled in a better way.
-                    try {
-                        message.setAmount(bait.split(":")[1]);
-                    } catch (ArrayIndexOutOfBoundsException exception) {
-                        message.setAmount("N/A");
-                    }
-                    message.setBait(getBaitFormatted(bait.split(":")[0]));
-                    lore.add(message.getLegacyMessage());
-                }
-
-                if (BaitFile.getInstance().showUnusedBaitSlots()) {
-                    for (int i = baitCount; i < BaitFile.getInstance().getMaxBaits(); i++) {
-                        lore.add(FishUtils.translateColorCodes(BaitFile.getInstance().unusedBaitSlotFormat()));
-                    }
-                }
-            } else {
-                AbstractMessage message = EvenMoreFish.getAdapter().createMessage(lineAddition);
-                message.setCurrentBaits(Integer.toString(getNumBaitsApplied(itemStack)));
-                message.setMaxBaits(Integer.toString(BaitFile.getInstance().getMaxBaits()));
-                lore.add(message.getLegacyMessage());
+            if (rodNBT == null || rodNBT.isEmpty()) {
+                return message;
             }
-        }
+
+            int baitCount = 0;
+
+            for (String bait : rodNBT.split(",")) {
+                baitCount++;
+                EMFMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
+                // TODO this is to prevent an ArrayIndexOutOfBoundsException, but it should be handled in a better way.
+                try {
+                    baitFormat.setAmount(bait.split(":")[1]);
+                } catch (ArrayIndexOutOfBoundsException exception) {
+                    baitFormat.setAmount("N/A");
+                }
+                baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
+                message.appendMessage(baitFormat);
+            }
+
+            if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
+                for (int i = baitCount; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
+                    message.appendMessage(ConfigMessage.BAIT_UNUSED_SLOT.getMessage());
+                }
+            }
+
+            return message;
+        };
+        format.setVariable("{baits}", baitVariable.get());
+
+        format.setCurrentBaits(Integer.toString(getNumBaitsApplied(itemStack)));
+        format.setMaxBaits(Integer.toString(MainConfig.getInstance().getBaitsPerRod()));
+
+        // Add the lore with the line identifier added to the start of each line
+        lore.addAll(
+            format.getComponentListMessage().stream()
+                .map(component -> Component.text(LINE_IDENTIFIER).append(component))
+                .toList()
+        );
 
         return lore;
     }
@@ -395,37 +420,22 @@ public class BaitNBTManager {
      * format had lines added/removed this will break the old rods.
      *
      * @param itemStack The lore of the itemstack having the bait section of its lore removed.
-     * @throws IndexOutOfBoundsException When the fishing rod doesn't have enough lines of lore to delete, this could be
-     *                                   caused by a modification to the format in the baits.yml config.
      */
-    public static List<String> deleteOldLore(ItemStack itemStack) throws IndexOutOfBoundsException {
-        if (!itemStack.hasItemMeta() || itemStack.getItemMeta() == null || !itemStack.getItemMeta().hasLore()) {
-            return Collections.emptyList();
+    public static List<Component> deleteOldLore(ItemStack itemStack) {
+        // Removes old lore from the rod
+        if (removeOldLoreFormat(itemStack)) {
+            return itemStack.lore();
         }
 
-        List<String> lore = itemStack.getItemMeta().getLore();
+        List<Component> lore = itemStack.lore();
         if (lore == null || lore.isEmpty()) {
             return Collections.emptyList();
         }
 
-        if (BaitFile.getInstance().showUnusedBaitSlots()) {
-            // starting at 1, because at least one bait replacing {baits} is repeated.
-            int maxBaits = BaitFile.getInstance().getMaxBaits() + BaitFile.getInstance().getRodLoreFormat().size();
-            //todo, to help this be compliant with java:S5413, we should iterate in reverse order, this should be done in another pr, left here for reference
-            //compliant version
-            for (int i = 1; i < maxBaits; i++) {
-                lore.remove(lore.size() - 1);
-            }
-        } else {
-            // starting at 1, because at least one bait replacing {baits} is repeated.
-            int numBaitsApplied = getNumBaitsApplied(itemStack) + BaitFile.getInstance().getRodLoreFormat().size();
-            //compliant version
-            for (int i = 1; i < numBaitsApplied; i++) {
-                lore.remove(lore.size() - 1);
-            }
-        }
-
-        return lore;
+        // Return the lore with all bait lines removed from the rod
+        return lore.stream().filter(component ->
+            !EMFSingleMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER)
+        ).toList();
     }
 
     /**
@@ -450,13 +460,64 @@ public class BaitNBTManager {
      * @param baitID The baitID the bait is registered under in baits.yml
      * @return How the bait should look in the lore of the fishing rod, for example.
      */
-    private static String getBaitFormatted(String baitID) {
+    private static EMFSingleMessage getBaitFormatted(String baitID) {
         Bait bait = BaitManager.getInstance().getBait(baitID);
         if (bait == null) {
             EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
-            return "Invalid Bait";
+            return EMFSingleMessage.fromString("Invalid Bait");
         }
-        return FishUtils.translateColorCodes(bait.getDisplayName());
+        return EMFSingleMessage.fromString(bait.getDisplayName());
+    }
+
+    // Conversion methods
+
+    /**
+     * Removes all lore from the fishing rod
+     */
+    private static boolean removeOldLoreFormat(@NotNull ItemStack item) {
+        if (NbtUtils.hasKey(item, NbtKeys.EMF_BAIT_REFORMATTED)) {
+            return false;
+        }
+
+        if (!item.hasItemMeta() || item.getItemMeta() == null || !item.getItemMeta().hasLore()) {
+            return true;
+        }
+
+        List<Component> lore = item.lore();
+        if (lore == null || lore.isEmpty()) {
+            return true;
+        }
+
+        if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
+            // starting at 1, because at least one bait replacing {baits} is repeated.
+            int maxBaits = MainConfig.getInstance().getBaitsPerRod() + ConfigMessage.BAIT_ROD_LORE.getMessage().getPlainTextListMessage().size();
+            for (int i = 1; i < maxBaits; i++) {
+                try {
+                    lore.remove(lore.size() - 1);
+                } catch (IndexOutOfBoundsException exception) {
+                    break;
+                }
+            }
+        } else {
+            // starting at 1, because at least one bait replacing {baits} is repeated.
+            int numBaitsApplied = getNumBaitsApplied(item) + ConfigMessage.BAIT_ROD_LORE.getMessage().getPlainTextListMessage().size();
+            //compliant version
+            for (int i = 1; i < numBaitsApplied; i++) {
+                try {
+                lore.remove(lore.size() - 1);
+                } catch (IndexOutOfBoundsException exception) {
+                    break;
+                }
+            }
+        }
+
+        item.lore(lore);
+        NBT.modify(item, nbt -> {
+            ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+            compound.setBoolean(NbtKeys.EMF_BAIT_REFORMATTED, true);
+        });
+
+        return true;
     }
 
 }

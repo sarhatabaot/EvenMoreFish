@@ -6,16 +6,16 @@
 button-example:
   item:
     material: diamond
-    displayname: "&6Example Button"
+    displayname: <gold>Example Button
   lore:
-    - "This is customizable lore."
-    - "Add whatever you want in here."
-  character: "c" # The character to use inside the GUI layout configs.
+    - This is customizable lore.
+    - Add whatever you want in here.
+  character: c # The character to use inside the GUI layout configs.
   click-action:
-    left: "fish-toggle" # The click action to execute on left click.
-    right: "full-exit" # The click action to execute on right click.
+    left: fish-toggle # The click action to execute on left click.
+    right: full-exit # The click action to execute on right click.
   click-commands: # Optional commands for the player to execute on either click.
-    - "emf help"
+    - emf help
 
 # These elements are available in every gui.
 # They will only show up when pages are needed.
@@ -24,266 +24,263 @@ general:
   first-page:
     item:
       material: arrow
-    displayname: "&bFirst Page"
+      displayname: <aqua>First Page
     lore:
-      - "&eGo to the first page"
+      - <yellow>Go to the first page
   # Character: p
   previous-page:
     item:
       material: paper
-    displayname: "&bPrevious Page"
+      displayname: <aqua>Previous Page
     lore:
-      - "&eGo to the previous page"
+      - <yellow>Go to the previous page
   # Character: n
   next-page:
     item:
       material: paper
-    displayname: "&bNext Page"
+      displayname: <aqua>Next Page
     lore:
-      - "&eGo to the next page"
+      - <yellow>Go to the next page
   # Character: l
   last-page:
     item:
       material: arrow
-    displayname: "&bLast Page"
+      displayname: <aqua>Last Page
     lore:
-      - "&eGo to the last page"
+      - <yellow>Go to the last page
 
 main-menu:
-  title: "&1EvenMoreFish"
+  title: <dark_blue>EvenMoreFish
   layout:
-    - "126515621"
-    - "23     32"
-    - "4 t s h 4"
-    - "4  j b  4"
-    - "23     32"
-    - "1265x5621"
+    - '126515621'
+    - 23     32
+    - 4 t s h 4
+    - 4  j b  4
+    - 23     32
+    - 1265x5621
   # This should be the most used filler item.
   filler: black_stained_glass_pane
 
   fish-toggle:
     item:
       material: tropical_fish
-      displayname: "&6»     Toggle Custom Fish"
+      displayname: <gold>»     Toggle Custom Fish
     lore:
-      - "&f&m                                 "
-      - "&7Click this button to"
-      - "&7toggle custom fish."
-      - "&f&m                                 "
-    character: "t"
-    click-action: "fish-toggle"
+      - '<strikethrough><white>                                 '
+      - <gray>Click this button to
+      - <gray>toggle custom fish.
+      - '<strikethrough><white>                                 '
+    character: t
+    click-action: fish-toggle
 
   open-shop:
     item:
       material: gold_ingot
-      displayname: "&6»     Open Fish Shop"
+      displayname: <gold>»     Open Fish Shop
     lore:
-      - "&f&m                                 "
-      - "&7Sell the fish you catch to"
-      - "&7earn a bit of extra money."
-      - "&f&m                                 "
-    character: "s"
-    click-action: "open-shop"
+      - '<strikethrough><white>                                 '
+      - <gray>Sell the fish you catch to
+      - <gray>earn a bit of extra money.
+      - '<strikethrough><white>                                 '
+    character: s
+    click-action: open-shop
 
   help-button:
     item:
       material: COMPASS
-      displayname: "&6»           Command Help"
+      displayname: <gold>»           Command Help
     lore:
-      - "&f&m                                 "
-      - "&7Shows a list of commands"
-      - "&7that can be used to use"
-      - "&7this plugin."
-      - "&f&m                                 "
-    character: "h"
-    click-action: "show-command-help"
+      - '<strikethrough><white>                                 '
+      - <gray>Shows a list of commands
+      - <gray>that can be used to use
+      - <gray>this plugin.
+      - '<strikethrough><white>                                 '
+    character: h
+    click-action: show-command-help
 
   open-baits:
     item:
       material: nautilus_shell
-      displayname: "&6»           View Baits"
+      displayname: <gold>»           View Baits
     lore:
-      - "&f&m                                 "
-      - "&7Shows all loaded baits"
-      - "&f&m                                 "
-    character: "b"
-    click-action: "open-baits-menu"
+      - '<strikethrough><white>                                 '
+      - <gray>Shows all loaded baits
+      - '<strikethrough><white>                                 '
+    character: b
+    click-action: open-baits-menu
 
   open-journal:
     item:
-      material: writable_book
-      displayname: "&6»           Fish Journal"
+      material: barrier
+      displayname: <red>Coming Soon!
     lore:
-      - "&f&m                                 "
-      - "&7Shows a journal of caught fish"
-      - "&f&m                                 "
-    character: "j"
-    click-action: "open-journal-menu"
+      - <gray>This menu is still being worked on!
+    character: j
 
   exit:
     item:
       material: pufferfish
-      displayname: "&cExit"
+      displayname: <red>Exit
     lore:
-      - "&eExit to the Menu"
+      - <yellow>Exit to the Menu
     glowing: true
-    character: "x"
-    click-action: "full-exit"
+    character: x
+    click-action: full-exit
 
 sell-menu-normal:
-  title: "&1&lSell Fish"
+  title: <bold><dark_blue>Sell Fish
   layout:
-    - "iiiiiiiii"
-    - "iiiiiiiii"
-    - "iiiiiiiii"
-    - "   s a   "
+    - iiiiiiiii
+    - iiiiiiiii
+    - iiiiiiiii
+    - '   s a   '
   filler: gray_stained_glass_pane
   # The character to use for the slots where players can place fish.
-  deposit-character: "i"
+  deposit-character: i
 
   sell-item:
     item:
       material: GOLD_INGOT
-      displayname: "&6&lSELL"
+      displayname: <bold><gold>SELL
     lore:
-      - "&8Fish Shop"
-      - ""
-      - "&7Total Value » &e{sell-price}"
-      - ""
-      - "&7Sell your fish here to make"
-      - "&7some extra money."
-      - ""
-      - "&e» (Left-click) sell the fish."
-      - "&7» (Right-click) cancel."
-    character: "s"
+      - <dark_gray>Fish Shop
+      - ''
+      - <gray>Total Value » </gray><yellow>{sell-price}
+      - ''
+      - <gray>Sell your fish here to make
+      - <gray>some extra money.
+      - ''
+      - <yellow>» (Left-click) sell the fish.
+      - <gray>» (Right-click) cancel.
+    character: s
     click-action:
-      left: "sell-shop"
-      right: "full-exit"
+      left: sell-shop
+      right: full-exit
 
   sell-all-item:
     item:
       material: COD_BUCKET
-      displayname: "&6&lSELL ALL"
+      displayname: <bold><gold>SELL ALL
     lore:
-      - "&8Inventory"
-      - ""
-      - "&7Total Value » &e{sell-all-price}"
-      - ""
-      - "&7Click this button to sell"
-      - "&7the fish in your inventory to"
-      - "&7make some extra money."
-      - ""
-      - "&e» (Left-click) sell the fish."
-    character: "a"
-    click-action: "sell-inventory"
+      - <dark_gray>Inventory
+      - ''
+      - <gray>Total Value » </gray><yellow>{sell-all-price}
+      - ''
+      - <gray>Click this button to sell
+      - <gray>the fish in your inventory to
+      - <gray>make some extra money.
+      - ''
+      - <yellow>» (Left-click) sell the fish.
+    character: a
+    click-action: sell-inventory
 
 sell-menu-confirm:
-  title: "&a&lConfirm"
+  title: <bold><green>Confirm
   layout:
-    - "iiiiiiiii"
-    - "iiiiiiiii"
-    - "iiiiiiiii"
-    - "   s a   "
+    - iiiiiiiii
+    - iiiiiiiii
+    - iiiiiiiii
+    - '   s a   '
   filler: lime_stained_glass_pane
   # The character to use for the slots where players can place fish.
-  deposit-character: "i"
+  deposit-character: i
 
   sell-item:
     item:
       material: GOLD_INGOT
-      displayname: "&6&lCONFIRM SELL"
+      displayname: <bold><gold>CONFIRM SELL
     lore:
-      - "&8Fish Shop"
-      - ""
-      - "&7Total Value » &e{sell-price}"
-      - ""
-      - "&7Sell your fish here to make"
-      - "&7some extra money."
-      - ""
-      - "&e» (Left-click) sell the fish."
-      - "&7» (Right-click) cancel."
-    character: "s"
+      - <dark_gray>Fish Shop
+      - ''
+      - <gray>Total Value » </gray><yellow>{sell-price}
+      - ''
+      - <gray>Sell your fish here to make
+      - <gray>some extra money.
+      - ''
+      - <yellow>» (Left-click) sell the fish.
+      - <gray>» (Right-click) cancel.
+    character: s
     click-action:
-      left: "sell-shop-confirm"
-      right: "full-exit"
+      left: sell-shop-confirm
+      right: full-exit
 
   sell-all-item:
     item:
       material: COD_BUCKET
-      displayname: "&6&lCONFIRM SELL ALL"
+      displayname: <bold><gold>CONFIRM SELL ALL
     lore:
-      - "&8Inventory"
-      - ""
-      - "&7Total Value » &e{sell-all-price}"
-      - ""
-      - "&7Click this button to sell"
-      - "&7the fish in your inventory to"
-      - "&7make some extra money."
-      - ""
-      - "&e» (Left-click) sell the fish."
-    character: "a"
-    click-action: "sell-inventory-confirm"
+      - <dark_gray>Inventory
+      - ''
+      - <gray>Total Value » </gray><yellow>{sell-all-price}
+      - ''
+      - <gray>Click this button to sell
+      - <gray>the fish in your inventory to
+      - <gray>make some extra money.
+      - ''
+      - <yellow>» (Left-click) sell the fish.
+    character: a
+    click-action: sell-inventory-confirm
 
 baits-menu:
-  title: "&1View Loaded Baits"
+  title: <dark_blue>View Loaded Baits
   layout:
-    - "  23232  "
-    - "23 4 4 32"
-    - "4 bbbbb 4"
-    - "23 4 4 32"
-    - "p 23x32 n"
+    - '  23232  '
+    - 23 4 4 32
+    - 4 bbbbb 4
+    - 23 4 4 32
+    - p 23x32 n
   filler: black_stained_glass_pane
   # The character to use for the bait items.
-  bait-character: "b"
+  bait-character: b
 
   exit:
     item:
       material: pufferfish
-      displayname: "&cExit"
+      displayname: <red>Exit
     lore:
-      - "&eExit to the Menu"
+      - <yellow>Exit to the Menu
     glowing: true
-    character: "x"
-    click-action: "open-main-menu"
+    character: x
+    click-action: open-main-menu
 
   next-page:
     item:
       material: paper
-      displayname: "&eNext Page"
+      displayname: <yellow>Next Page
     lore:
-      - "&eNavigate to the next page"
-    character: "n"
-    click-action: "next-page"
+      - <yellow>Navigate to the next page
+    character: n
+    click-action: next-page
 
   previous-page:
     item:
       material: paper
-      displayname: "&ePrevious Page"
+      displayname: <yellow>Previous Page
     lore:
-      - "&eNavigate to the previous page"
-    character: "p"
-    click-action: "previous-page"
+      - <yellow>Navigate to the previous page
+    character: p
+    click-action: previous-page
 
 apply-baits-menu:
-  title: "&1&lApply Baits"
+  title: <bold><dark_blue>Apply Baits
   layout:
-    - "bbbbbbbbb"
-    - "bbbbbbbbb"
-    - "bbbbbbbbb"
-    - "    x   "
+    - bbbbbbbbb
+    - bbbbbbbbb
+    - bbbbbbbbb
+    - '    x   '
   filler: gray_stained_glass_pane
   # The character to use for the bait slots.
-  bait-character: "b"
+  bait-character: b
 
   exit:
     item:
       material: pufferfish
-      displayname: "&cExit"
+      displayname: <red>Exit
     lore:
-      - "&eExit to the Menu"
+      - <yellow>Exit to the Menu
     glowing: true
-    character: "x"
-    click-action: "full-exit"
+    character: x
+    click-action: full-exit
 
 # FISH JOURNAL
 
@@ -379,4 +376,4 @@ journal-rarity:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 6
+version: 1

@@ -1,9 +1,9 @@
 package com.oheers.fish;
 
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.items.Fish;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.selling.WorthNBT;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -37,6 +37,7 @@ public class SkullSaver implements Listener {
         
         ItemStack stack = block.getDrops().iterator().next().clone();
         event.setCancelled(true);
+        event.setDropItems(false);
         
         try {
             Fish f = FishUtils.getFish(skullMeta, event.getPlayer());

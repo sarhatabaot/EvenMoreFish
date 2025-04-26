@@ -8,8 +8,8 @@ id: exampleRarity
 # Should this rarity be disabled?
 disabled: false
 
-# What colour should the fish's name be?
-colour: "&d"
+# How should the rarity be formatted in messages?
+format: <light_purple>{name}
 
 # The material to represent this rarity in GUIs. Defaults to iron_bars if missing.
 material: magenta_concrete_powder
@@ -24,12 +24,16 @@ broadcast: true
 use-this-casing: false
 
 # Changes how this rarity is displayed to players, this overrides `use-this-casing`.
-displayname: "&eExample Rarity"
+displayname: <yellow>Example Rarity
 
 # The permission required to fish this rarity.
-permission: "emf.rarity.example"
+permission: emf.rarity.example
 
-# You can set custom requirements for this rarity to appear, all possible requirements are on the wiki: https://github.com/Oheers/EvenMoreFish/wiki/Requirements
+# The catch type for this rarity. Defaults to BOTH if missing.
+# Current supported values: CATCH, HUNT, BOTH
+catch-type: BOTH
+
+# You can set custom requirements for this rarity to appear, all possible requirements are on the wiki: https://github.com/EvenMoreFish/EvenMoreFish/wiki/Requirements
 requirements:
   biome:
     - OCEAN
@@ -80,13 +84,16 @@ fish:
       durability: 50
 
       # Customize dye colour if the item supports it.
-      dye-colour: "#888877"
+      dye-colour: '#888877'
 
       # Should the item have the enchant glint? This applies unbreaking to the item and hides it.
       glowing: true
 
     # Lets you set a custom displayname for the fish, this replaces the {fish} in "You have caught a {rarity} {fish}" and the fish name in the item.
-    displayname: "&#ff5555Example Fish"
+    displayname: <red>Example Fish
+
+    # The catch type for this fish. This overrides the rarity's value.
+    catch-type: BOTH
 
     # Should the fisherman be removed from the fish lore?
     # This overrides the rarity's setting.
@@ -103,19 +110,19 @@ fish:
 
     # A list of rewards to give when this fish is eaten.
     eat-event:
-      - "MONEY:50"
+      - MONEY:50
 
     # A list of rewards to give when a player right clicks with this fish.
     interact-event:
-      - "ITEM:cobblestone,1"
+      - ITEM:cobblestone,1
 
     # A list of rewards to give when a player sells this fish.
     sell-event:
-      - "EXP:100"
+      - EXP:100
 
     # A list of rewards to give when a player catches this fish.
     catch-event:
-      - "HEALTH:10"
+      - HEALTH:10
 
     # Change the sizing ranges of this fish.
     # This overrides the rarity's setting.
@@ -130,9 +137,9 @@ fish:
 
     # Add one or more lines of lore to your fish, these replace the {fish_lore} variable defined in your fish-lore setting in messages.yml
     lore:
-      - "&7Hola!"
+      - <gray>Hola!
 
-    # You can set custom requirements for this fish to appear, all possible requirements are on the wiki: https://github.com/Oheers/EvenMoreFish/wiki/Requirements
+    # You can set custom requirements for this fish to appear, all possible requirements are on the wiki: https://github.com/EvenMoreFish/EvenMoreFish/wiki/Requirements
     requirements:
       biome:
         - COLD_OCEAN

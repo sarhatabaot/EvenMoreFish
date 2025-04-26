@@ -1,20 +1,20 @@
 # Если сообщение содержит заполнители EvenMoreFish, например {player} или {rarity}, оно также поддерживает заполнители placeholderapi.
 
 # Отправляется игрокам, когда они ловят рыбу EvenMoreFish
-fish-caught: "&l{player} &rвыловил рыбу {rarity_colour}{length}cm &l{rarity} {rarity_colour}{fish}!"
+fish-caught: <bold>{player} <reset>выловил рыбу {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}!
 # Установив минимальную длину рыбы меньше 0, вы можете создать рыбу меньшей длины. Это используется, когда игрок ловит рыбу без длины.
-lengthless-fish-caught: "&l{player} &rвыловил рыбу {rarity_colour}&l{rarity} {rarity_colour}{fish}!"
+lengthless-fish-caught: <bold>{player} <reset>выловил рыбу {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}!
 # Отправляется игроку, когда у него нет разрешения на выполнение команды.
-no-permission: "&cУ вас нет разрешения на выполнение этой команды."
+no-permission: <red>У вас нет разрешения на выполнение этой команды.
 
 # Сообщение, которое будет отправлено при начале и окончании соревнования
-contest-start: "&rНачалось соревнование по рыбной ловле в категории {type}."
-contest-end: "&rСоревнование по рыбной ловле закончилось."
+contest-start: <reset>Началось соревнование по рыбной ловле в категории {type}.
+contest-end: <reset>Соревнование по рыбной ловле закончилось.
 # Сообщение, которое отправляется, когда игрок присоединяется во время соревнования
-contest-join: "&rПроисходит соревнование по ловле рыбы в категории {type}."
+contest-join: <reset>Происходит соревнование по ловле рыбы в категории {type}.
 
 # Показывается игрокам, когда новый игрок занимает место №1. Удалите это значение или установите для него значение "", чтобы отключить это сообщение
-new-first: "&r{player} теперь №1"
+new-first: <reset>{player} теперь №1
 # Should this message appear in chat (false) or above the exp bar (true)
 action-bar-message: true
 # What competition types should the action bar be used for? (recommended: MOST_FISH)
@@ -24,97 +24,97 @@ action-bar-types:
 # Что должно заменить переменную {type} для каждого типа соревнования?
 competition-types:
   # MOST_FISH
-  most: "самая большая рыба"
+  most: самая большая рыба
   # LARGEST_FISH
-  largest: "самая крупная рыба"
+  largest: самая крупная рыба
   # SPECIFIC_FISH
-  specific: "{amount} {rarity_colour}&l{rarity} {rarity_colour}{fish}&r"
+  specific: '{amount} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>'
 
 # Segments shown in the bossbar when competitions run
 bossbar:
-  layout: "{prefix}&r{time-formatted}&r{remaining}"
+  layout: '{prefix}<reset>{time-formatted}<reset>{remaining}'
   # The abbreviations used for different units of time
-  hour: "&r{hour}ч"
-  minute: "&r{minute}м"
-  second: "&r{second}с"
+  hour: <reset>{hour}ч
+  minute: <reset>{minute}м
+  second: <reset>{second}с
   # Для перевода "left" в конце, например, "5с осталось" -> "5с до конца"
-  remaining: "осталось"
+  remaining: осталось
 
 # Цвет префикса [EvenMoreFish] в командах (для случаев, когда у вашего префикса нет цветов)
-prefix-regular: "&a[EvenMoreFish] "
+prefix-regular: '<green>[EvenMoreFish] '
 # Цвет префикса [EvenMoreFish] в командах администратора (для случаев, когда у вашего префикса нет цветов)
-prefix-admin: "&c[EvenMoreFish] "
+prefix-admin: '<red>[EvenMoreFish] '
 # Цвет префикса [EvenMoreFish] при возникновении ошибок, например, нет разрешения на выполнение команды (для случаев, когда ваш префикс не имеет цветов)
-prefix-error: "&c[EvenMoreFish] "
+prefix-error: '<red>[EvenMoreFish] '
 
 # Это формат сведений, которые даются рыбе, когда она поймана.
 # {custom-lore} указывается в файле fish.yml в разделе lore:, если у рыбы есть сведения, строки знаний будут
 # замените {fish_lore}, однако, если он пуст, строка будет удалена. НЕ ДОБАВЛЯЙТЕ НИЧЕГО, КРОМЕ ЭТОЙ ПЕРЕМЕННОЙ
 # К ЭТОЙ СТРОКЕ.
 fish-lore:
-  - "&fПоймал: {player}"
-  - "&fРазмер: {length}см"
-  - ""
-  - "{fish_lore}"
-  - "{rarity_colour}&l{rarity}"
+  - '<white>Поймал: {player}'
+  - '<white>Размер: {length}см'
+  - ''
+  - '{fish_lore}'
+  - '{rarity_colour}<bold>{rarity}'
 
 # Формат команд в справке /emf help (это сообщение не поддерживает заполнители papi)
-help: "/{command} - {description}"
+help: /{command} - {description}
 
 # Формат таблицы лидеров после окончания соревнования (это сообщение не поддерживает заполнители papi)
-leaderboard-largest-fish: "&r#{position} | {pos_colour}{player} &r({rarity_colour}&l{rarity} {rarity_colour}{fish}&r, {length}cm&r)"
-leaderboard-most-fish: "&r#{position} | {pos_colour}{player} &r({pos_colour}{amount} &rfish)"
+leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
 # Если вы проводите соревнование, в котором нет таблицы лидеров, это сообщение отправляется при определении победителя
-single-winner: "&r{player} выиграл в соревнование в категории {type}. Поздравляю!"
+single-winner: <reset>{player} выиграл в соревнование в категории {type}. Поздравляю!
 # Это показывает количество игроков, участвующих в соревновании в данный момент, для отключения установлено значение "".
-total-players: "&rВ таблице лидеров всего {amount} игроков."
+total-players: <reset>В таблице лидеров всего {amount} игроков.
 # Количество позиций, показанных в таблице лидеров, не может быть меньше 1.
 leaderboard-count: 5
 # Если игрок не отображается в / emf top, должна ли его позиция отображаться внизу?
 always-show-pos: true
 # Отправляется игрокам, когда никто не установил рекорд во время соревнования
-no-winners: "&rРекорда в рыбалке не было."
+no-winners: <reset>Рекорда в рыбалке не было.
 # Когда отдельный игрок не поставил рекорд
-no-record: "&rТы не поймал ни одной рыбы."
+no-record: <reset>Ты не поймал ни одной рыбы.
 # Отправляется, когда администратор пытается запустить соревнование, в котором тип не существует, например /emf admin competition start 600 ABCDEFGH
-invalid-type: "&rЭто не тип типа конкуренции, доступные типы: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH"
+invalid-type: '<reset>Это не тип типа конкуренции, доступные типы: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH'
 # Sent to all online players when not enough players are on to start a competition
-not-enough-players: "&rВ сети недостаточно игроков, чтобы начать запланированное соревнование по рыбной ловле."
+not-enough-players: <reset>В сети недостаточно игроков, чтобы начать запланированное соревнование по рыбной ловле.
 # Отправляется всем игрокам в определенное время, чтобы показать оставшееся время
 # {time_formatted} показывает время (например, осталось 5 м, осталось 10 м 30 секунд)
 # {time_raw} - это то, что вы вводите в competitions.yml
-time-alert: "&rДо оконцания соревнования в категории {type} осталось {time_formatted}"
+time-alert: <reset>До оконцания соревнования в категории {type} осталось {time_formatted}
 
 # Сообщение, отправляемое игрокам, когда они продали свою рыбу в магазине /emf shop
-fish-sale: "&fВы продали &a{amount} &fрыбы за &a{sell-price}&f."
+fish-sale: <white>Вы продали </white><green>{amount} </green><white>рыбы за </white><green>{sell-price}</green><white>.
 
 # Справочные сообщения
 # Общая справка (/emf help) - команды, зависящие от узла разрешений, будут отображаться только в том случае, если они отформатированы с помощью косой черты.
 help-general:
-  - "&f&m &#f1ffed&m &#e2ffdb&m &#d3ffc9&m &#c3ffb7&m &#b2ffa5&m &#9fff92&m &#8bff7f&m &#73ff6b&m &a&m &f &a&lEvenMoreFish &a&m &#73ff6b&m&m &#8bff7f&m &#9fff92&m &#b2ffa5&m &#c3ffb7&m &#d3ffc9&m &#f1ffed&m &f&m &f"
-  - "/emf top - Показывает таблицу лидеров текущего соревнования."
-  - "/emf help - Показывает вам эту страницу."
-  - "/emf shop - Открывает магазин по продаже вашей рыбы."
-  - "/emf toggle - Переключает, получаете ли вы кастомную рыбу или нет."
-  - "/emf admin - Страница справки команды администратора."
+  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
+  - /emf top - Показывает таблицу лидеров текущего соревнования.
+  - /emf help - Показывает вам эту страницу.
+  - /emf shop - Открывает магазин по продаже вашей рыбы.
+  - /emf toggle - Переключает, получаете ли вы кастомную рыбу или нет.
+  - /emf admin - Страница справки команды администратора.
 
 # Справка по соревнованиям (/emf admin competition help)
 help-competition:
-  - "&f&m &#f1ffed&m &#e2ffdb&m &#d3ffc9&m &#c3ffb7&m &#b2ffa5&m &#9fff92&m &#8bff7f&m &#73ff6b&m &a&m &f &a&lEvenMoreFish &a&m &#73ff6b&m&m &#8bff7f&m &#9fff92&m &#b2ffa5&m &#c3ffb7&m &#d3ffc9&m &#f1ffed&m &f&m &f"
-  - "/emf admin competition start <duration> <type> - Запускает соревнование определенной продолжительности"
-  - "/emf admin competition end - Завершает текущее соревнование (если оно есть)"
+  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
+  - /emf admin competition start \<duration> \<type> - Запускает соревнование определенной продолжительности
+  - /emf admin competition end - Завершает текущее соревнование (если оно есть)
 
 # Справка администратора (/emf admin help)
 help-admin:
-  - "&f&m &#f1ffed&m &#e2ffdb&m &#d3ffc9&m &#c3ffb7&m &#b2ffa5&m &#9fff92&m &#8bff7f&m &#73ff6b&m &a&m &f &a&lEvenMoreFish &a&m &#73ff6b&m&m &#8bff7f&m &#9fff92&m &#b2ffa5&m &#c3ffb7&m &#d3ffc9&m &#f1ffed&m &f&m &f"
-  - "/emf admin competition <start/end> <duration> <type> - Запускает или останавливает соревнование"
-  - "/emf admin reload - Перезагружает конфигурационные файлы плагина"
-  - "/emf admin version - Отображает информацию о плагине."
+  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
+  - /emf admin competition \<start/end> \<duration> \<type> - Запускает или останавливает соревнование
+  - /emf admin reload - Перезагружает конфигурационные файлы плагина
+  - /emf admin version - Отображает информацию о плагине.
 
 # Отображается, когда заполнители соревнований emf запрашивают позицию в таблице лидеров, которая не существует
-no-player-in-place: "Начните ловить рыбу, чтобы занять это место"
+no-player-in-place: Начните ловить рыбу, чтобы занять это место
 # Отображается, когда заполнители соревнований emf используются, когда соревнования не проводятся
-no-competition-running: "Прямо сейчас никаких соревнований не проводится."
+no-competition-running: Прямо сейчас никаких соревнований не проводится.
 # Должен ли %emf_competition_place_player_*% содержать указанное выше значение (false) или возвращать значение null (true).
 emf-competition-player-null: false
 # Должен ли %emf_competition_place_size_*% содержать указанное выше значение (false) или возвращать значение null (true).
@@ -122,21 +122,21 @@ emf-competition-size-null: true
 # Должен ли %emf_competition_place_fish_*% содержать указанное выше значение (false) или возвращать значение null (true).
 emf-competition-fish-null: true
 # Как следует форматировать %emf_competition_place_fish_*%?
-emf-competition-fish-format: "{length}cm &l{rarity} {fish}"
+emf-competition-fish-format: '{length}cm <bold>{rarity}</bold> {fish}'
 
 # Отправляется, когда игрок пытается применить слишком много типов приманок к удочке, установленных в общем разделе baits.yml
-max-baits-reached: "Вы достигли максимального количества типов приманок для этой удочки."
+max-baits-reached: Вы достигли максимального количества типов приманок для этой удочки.
 # Не следует путать с вышеизложенным, это отправляется, когда достигается максимум конкретной приманки. Определите это в baits.yml с использованием "max-baits".
-max-bait-reached: "Вы достигли максимального количества {bait_theme}{bait} &r приманки, которое может быть применено к одной удочке."
+max-bait-reached: Вы достигли максимального количества {bait_theme}{bait} <reset> приманки, которое может быть применено к одной удочке.
 # Отправляется, когда игрок ловит приманку во время рыбалки (это можно отключить, установив процент улова равным 0 в baits.yml
-bait-catch: "&l{player} &rhas caught a {bait_theme}&l{bait} &rbait!"
+bait-catch: <bold>{player} <reset>has caught a {bait_theme}<bold>{bait} <reset>bait!
 # Отправляется, когда наживка применена и рыба поймана.
-bait-use: "You have used one of your rod's {bait_theme}&l{bait} &rbait."
+bait-use: You have used one of your rod's {bait_theme}<bold>{bait} <reset>bait.
 
 # Отображается при включении переключателя /emf toggle для выключения и включения соответственно.
-toggle-off: "Вы больше не будете ловить кастомную рыбу."
-toggle-on: "Теперь вы будете ловить кастомную рыбу."
+toggle-off: Вы больше не будете ловить кастомную рыбу.
+toggle-on: Теперь вы будете ловить кастомную рыбу.
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-config-version: 8
+version: 1

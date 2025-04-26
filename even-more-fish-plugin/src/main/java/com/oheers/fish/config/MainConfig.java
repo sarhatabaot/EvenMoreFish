@@ -3,29 +3,58 @@ package com.oheers.fish.config;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.economy.EconomyType;
-import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import dev.dejvokep.boostedyaml.route.Route;
+import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.block.Biome;
 import org.bukkit.boss.BarStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class MainConfig extends ConfigBase {
 
     private static MainConfig instance = null;
 
     // Cache these so we don't have a mismatch after reload.
-    private String mainCommandName = null;
-    private List<String> mainCommandAliases = null;
+    private final boolean adminShortcutEnabled;
+    private final String adminShortcutName;
+    private final String mainCommandName;
+    private final List<String> mainCommandAliases;
+    private final String adminSubCommandName;
+    private final String nextSubCommandName;
+    private final String toggleSubCommandName;
+    private final String guiSubCommandName;
+    private final String helpSubCommandName;
+    private final String topSubCommandName;
+    private final String shopSubCommandName;
+    private final String sellAllSubCommandName;
+    private final String applyBaitsSubCommandName;
 
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
-        applyOneTimeConversions();
+
+        // Command caching
+        this.mainCommandName = getConfig().getString("command.main", "emf");
+        this.mainCommandAliases = getConfig().getStringList("command.aliases");
+        this.adminShortcutEnabled = getConfig().getBoolean("command.admin-shortcut.enabled", true);
+        this.adminShortcutName = getConfig().getString("command.admin-shortcut.name", "emfa");
+        this.adminSubCommandName = getConfig().getString("command.subcommands.admin", "admin");
+        this.nextSubCommandName = getConfig().getString("command.subcommands.next", "next");
+        this.toggleSubCommandName = getConfig().getString("command.subcommands.toggle", "toggle");
+        this.guiSubCommandName = getConfig().getString("command.subcommands.gui", "gui");
+        this.helpSubCommandName = getConfig().getString("command.subcommands.help", "help");
+        this.topSubCommandName = getConfig().getString("command.subcommands.top", "top");
+        this.shopSubCommandName = getConfig().getString("command.subcommands.shop", "shop");
+        this.sellAllSubCommandName = getConfig().getString("command.subcommands.sellall", "sellall");
+        this.applyBaitsSubCommandName = getConfig().getString("command.subcommands.applybaits", "applybaits");
     }
 
     public static MainConfig getInstance() {
@@ -42,6 +71,26 @@ public class MainConfig extends ConfigBase {
 
     public boolean isDatabaseOnline() {
         return databaseEnabled() && !EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2();
+    }
+
+    public boolean isCatchEnabled() {
+        return getConfig().getBoolean("fishing.catch-enabled", true);
+    }
+
+    public boolean isFishCatchOnlyInCompetition() {
+        return getConfig().getBoolean("fishing.catch-only-in-competition", false);
+    }
+
+    public boolean isHuntEnabled() {
+        return getConfig().getBoolean("fishing.hunt-enabled", false);
+    }
+
+    public boolean isFishHuntOnlyInCompetition() {
+        return getConfig().getBoolean("fishing.hunt-only-in-competition", true);
+    }
+
+    public boolean isFishHuntIgnoreSpawnerFish() {
+        return getConfig().getBoolean("fishing.hunt-ignore-spawner-fish", true);
     }
 
     public boolean isCompetitionUnique() {
@@ -67,10 +116,6 @@ public class MainConfig extends ConfigBase {
     public boolean shouldRespectVanish() { return getConfig().getBoolean("respect-vanished", true); }
 
     public boolean shouldProtectBaitedRods() { return getConfig().getBoolean("protect-baited-rods", true); }
-    
-    public boolean isVanillaFishing() {
-        return getConfig().getBoolean("vanilla-fishing", true);
-    }
 
     public BarStyle getBarStyle() {
         BarStyle barStyle;
@@ -94,36 +139,9 @@ public class MainConfig extends ConfigBase {
         return getConfig().getBoolean("disable-aureliumskills-loot", true);
     }
 
-    public String rewardEffect() {
-        return getConfig().getString("reward-gui.reward-effect");
-    }
-
-    public String rewardItem() {
-        return getConfig().getString("reward-gui.reward-item");
-    }
-
-    public String rewardMoney() {
-        return getConfig().getString("reward-gui.reward-money");
-    }
-
-    public String rewardHealth() {
-        return getConfig().getString("reward-gui.reward-health");
-    }
-
-    public String rewardHunger() {
-        return getConfig().getString("reward-gui.reward-hunger");
-    }
-
-    public String rewardCommand(String command) {
-        return getConfig().getString("reward-gui.command-override." + command);
-    }
-
-
     public boolean doDBVerbose() {
         return !getConfig().getBoolean("disable-db-verbose", false);
     }
-
-
 
     public boolean blockPlacingHeads() {
         return getConfig().getBoolean("place-head-fish", false);
@@ -138,8 +156,25 @@ public class MainConfig extends ConfigBase {
     }
 
     public boolean blockCrafting() {
-        return getConfig().getBoolean("block-crafting", false);
+        return getConfig().getBoolean("item-protection.block-crafting", true);
     }
+
+    public boolean blockConsume() {
+        return getConfig().getBoolean("item-protection.block-consume", true);
+    }
+
+    public boolean blockFurnaceBurn() {
+        return getConfig().getBoolean("item-protection.block-furnace-burn", true);
+    }
+
+    public boolean blockCooking() {
+        return getConfig().getBoolean("item-protection.block-cooking", true);
+    }
+
+    public boolean blockPlacing() {
+        return getConfig().getBoolean("item-protection.block-placing", true);
+    }
+
     public boolean debugSession() {
         return getConfig().getBoolean("debug-session", false);
     }
@@ -186,25 +221,55 @@ public class MainConfig extends ConfigBase {
     public int getNearbyPlayersRequirementRange() { return getConfig().getInt("requirements.nearby-players.range", 0); }
 
     public boolean isAdminShortcutCommandEnabled() {
-        return getConfig().getBoolean("command.admin-shortcut.enabled", true);
+        return adminShortcutEnabled;
     }
 
     public String getAdminShortcutCommandName() {
-        return getConfig().getString("command.admin-shortcut.name", "emfa");
+        return adminShortcutName;
     }
 
     public String getMainCommandName() {
-        if (mainCommandName == null) {
-            mainCommandName = getConfig().getString("command.main", "emf");
-        }
         return mainCommandName;
     }
 
     public List<String> getMainCommandAliases() {
-        if (mainCommandAliases == null) {
-            mainCommandAliases = getConfig().getStringList("command.aliases");
-        }
         return mainCommandAliases;
+    }
+
+    public String getAdminSubCommandName() {
+        return adminSubCommandName;
+    }
+
+    public String getNextSubCommandName() {
+        return nextSubCommandName;
+    }
+
+    public String getToggleSubCommandName() {
+        return toggleSubCommandName;
+    }
+
+    public String getGuiSubCommandName() {
+        return guiSubCommandName;
+    }
+
+    public String getHelpSubCommandName() {
+        return helpSubCommandName;
+    }
+
+    public String getTopSubCommandName() {
+        return topSubCommandName;
+    }
+
+    public String getShopSubCommandName() {
+        return shopSubCommandName;
+    }
+
+    public String getSellAllSubCommandName() {
+        return sellAllSubCommandName;
+    }
+
+    public String getApplyBaitsSubCommandName() {
+        return applyBaitsSubCommandName;
     }
 
     public boolean giveStraightToInventory() {
@@ -265,21 +330,33 @@ public class MainConfig extends ConfigBase {
         return getConfig().getString("economy." + type.getIdentifier().toLowerCase() + ".display");
     }
 
-    private void applyOneTimeConversions() {
-        YamlDocument yamlDocument = getConfig();
-
-        // Economy Rework - Requires the config to contain the new format first.
-        String economyType = yamlDocument.getString("economy-type");
-        if (economyType != null) {
-            yamlDocument.remove("enable-economy");
-            yamlDocument.remove("economy-type");
-            if (!economyType.equalsIgnoreCase("NONE")) {
-                String path = "economy." + economyType.toLowerCase();
-                yamlDocument.set(path + ".enabled", true);
-            }
-        }
-
-        save();
+    @Override
+    public UpdaterSettings getUpdaterSettings() {
+        return UpdaterSettings.builder(super.getUpdaterSettings())
+            // Config Version 1 - Economy Rework
+            .addCustomLogic("1", document -> {
+                String economyType = document.getString("economy-type");
+                document.remove("enable-economy");
+                document.remove("economy-type");
+                if (economyType != null && !economyType.equalsIgnoreCase("NONE")) {
+                    String path = "economy." + economyType.toLowerCase();
+                    document.set(path + ".enabled", true);
+                }
+            })
+            // Config Version 1 - Add item protection configs
+            .addRelocation("1", "block-crafting", "item-protection.block-crafting", '.')
+            // Config Version 1 - Update fishing section of the config
+            .addRelocation("1", "fish-only-in-competition", "fishing.catch-only-in-competition", '.')
+            // Config Version 1 - Add fishing.catch-enabled config
+            .addCustomLogic("1", document -> {
+                if (!document.contains("vanilla-fishing")) {
+                    return;
+                }
+                boolean vanillaFishing = document.getBoolean("vanilla-fishing");
+                document.set("fishing.catch-enabled", !vanillaFishing);
+                document.remove("vanilla-fishing");
+            })
+            .build();
     }
 
     public boolean hasCredentials() {
@@ -287,6 +364,32 @@ public class MainConfig extends ConfigBase {
                 MainConfig.getInstance().getPassword() != null &&
                 MainConfig.getInstance().getAddress() != null &&
                 MainConfig.getInstance().getDatabase() != null;
+    }
+
+    // Bait configs
+
+    public double getBaitBoostRate() {
+        return getConfig().getDouble("bait.boost", 1.5);
+    }
+
+    public boolean getBaitCompetitionDisable() {
+        return getConfig().getBoolean("bait.competition-disable", true);
+    }
+
+    public boolean getBaitAddToLore() {
+        return getConfig().getBoolean("bait.add-to-lore", true);
+    }
+
+    public double getBaitCatchPercentage() {
+        return getConfig().getDouble("bait.catch-percentage", 2.5);
+    }
+
+    public int getBaitsPerRod() {
+        return getConfig().getInt("bait.baits-per-rod", 7);
+    }
+
+    public boolean getBaitShowUnusedSlots() {
+        return getConfig().getBoolean("bait.show-unused-slots", true);
     }
 
 }

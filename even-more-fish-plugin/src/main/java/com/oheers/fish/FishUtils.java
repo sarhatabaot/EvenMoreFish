@@ -2,15 +2,20 @@ package com.oheers.fish;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
-import com.oheers.fish.api.adapter.AbstractMessage;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
+import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
+import com.oheers.fish.utils.ItemUtils;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -20,29 +25,42 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Registry;
+import org.bukkit.Sound;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.DayOfWeek;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 
 public class FishUtils {
-    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.0");
 
     private FishUtils() {
         throw new UnsupportedOperationException();
@@ -213,7 +231,7 @@ public class FishUtils {
 
     public static @Nullable String getRegionName(Location location) {
         if (!MainConfig.getInstance().isRegionBoostsEnabled()) {
-            EvenMoreFish.debug("Region boosts are disabled.");
+            EvenMoreFish.getInstance().debug("Region boosts are disabled.");
             return null;
         }
 
@@ -226,7 +244,7 @@ public class FishUtils {
             ApplicableRegionSet set = container.createQuery().getApplicableRegions(BukkitAdapter.adapt(location));
 
             if (set.getRegions().isEmpty()) {
-                EvenMoreFish.debug("Could not find any regions with WorldGuard");
+                EvenMoreFish.getInstance().debug("Could not find any regions with WorldGuard");
                 return null;
             }
 
@@ -236,7 +254,7 @@ public class FishUtils {
         if (pluginManager.isPluginEnabled("RedProtect")) {
             Region region = RedProtect.get().getAPI().getRegion(location);
             if (region == null) {
-                EvenMoreFish.debug("Could not find any regions with RedProtect");
+                EvenMoreFish.getInstance().debug("Could not find any regions with RedProtect");
                 return null;
             }
 
@@ -263,91 +281,40 @@ public class FishUtils {
         return whitelistedWorlds.contains(l.getWorld().getName());
     }
 
-    public static @NotNull String translateColorCodes(String message) {
-        return EvenMoreFish.getAdapter().translateColorCodes(message);
-    }
-
-    //gets the item with a custom texture
-    public static @NotNull ItemStack getSkullFromBase64(String base64EncodedString) {
-        final ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-        UUID headUuid = UUID.randomUUID();
-        // 1.20.5+ handling
-        if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_20_R3)) {
-            NBT.modifyComponents(
-                    skull, nbt -> {
-                        ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                        profileNbt.setUUID("id", headUuid);
-                        ReadWriteNBT propertiesNbt = profileNbt.getCompoundList("properties").addCompound();
-                        // This key is required, so we set it to an empty string.
-                        propertiesNbt.setString("name", "textures");
-                        propertiesNbt.setString("value", base64EncodedString);
-                    }
-            );
-            // 1.20.4 and below handling
-        } else {
-            NBT.modify(
-                    skull, nbt -> {
-                        ReadWriteNBT skullOwnerCompound = nbt.getOrCreateCompound("SkullOwner");
-                        skullOwnerCompound.setUUID("Id", headUuid);
-                        skullOwnerCompound.getOrCreateCompound("Properties")
-                                .getCompoundList("textures")
-                                .addCompound()
-                                .setString("Value", base64EncodedString);
-                    }
-            );
-        }
-        return skull;
-    }
-
-    //gets the item with a custom uuid
-    public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
-        final ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-        // 1.20.5+ handling
-        if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_20_R3)) {
-            NBT.modifyComponents(
-                    skull, nbt -> {
-                        ReadWriteNBT profileNbt = nbt.getOrCreateCompound("minecraft:profile");
-                        profileNbt.setUUID("id", uuid);
-                    }
-            );
-            // 1.20.4 and below handling
-        } else {
-            NBT.modify(
-                    skull, nbt -> {
-                        ReadWriteNBT skullOwnerCompound = nbt.getOrCreateCompound("SkullOwner");
-                        skullOwnerCompound.setUUID("Id", uuid);
-                    }
-            );
-        }
-        return skull;
-    }
-
-    public static @NotNull String timeFormat(long timeLeft) {
-        String returning = "";
+    public static @NotNull EMFMessage timeFormat(long timeLeft) {
         long hours = timeLeft / 3600;
         long minutes = (timeLeft % 3600) / 60;
         long seconds = timeLeft % 60;
 
+        EMFSingleMessage formatted = EMFSingleMessage.empty();
+
         if (hours > 0) {
-            AbstractMessage message = ConfigMessage.BAR_HOUR.getMessage();
+            EMFMessage message = ConfigMessage.BAR_HOUR.getMessage();
             message.setVariable("{hour}", String.valueOf(hours));
-            returning += message.getLegacyMessage() + " ";
+            formatted.appendMessage(message);
+            formatted.appendComponent(Component.space());
         }
 
         if (minutes > 0) {
-            AbstractMessage message = ConfigMessage.BAR_MINUTE.getMessage();
+            EMFMessage message = ConfigMessage.BAR_MINUTE.getMessage();
             message.setVariable("{minute}", String.valueOf(minutes));
-            returning += message.getLegacyMessage() + " ";
+            formatted.appendMessage(message);
+            formatted.appendComponent(Component.space());
         }
 
-        // Shows remaining seconds if seconds > 0 or hours and minutes are 0, e.g. "1 minutes and 0 seconds left" and "5 seconds left"
         if (seconds > 0 || (minutes == 0 && hours == 0)) {
-            AbstractMessage message = ConfigMessage.BAR_SECOND.getMessage();
+            EMFMessage message = ConfigMessage.BAR_SECOND.getMessage();
             message.setVariable("{second}", String.valueOf(seconds));
-            returning += message.getLegacyMessage() + " ";
+            formatted.appendMessage(message);
+            formatted.appendComponent(Component.space());
         }
 
-        return returning.trim();
+        // Remove the last space if it exists
+        if (!formatted.isEmpty()) {
+            formatted.trim();
+        }
+
+        return formatted;
     }
 
     public static @NotNull String timeRaw(long timeLeft) {
@@ -367,19 +334,19 @@ public class FishUtils {
         return returning;
     }
 
-    public static void broadcastFishMessage(AbstractMessage message, Player referencePlayer, boolean actionBar) {
-        String formatted = message.getLegacyMessage();
+    public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
+        String plain = message.getPlainTextMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
-        if (formatted.isEmpty() || activeComp == null) {
-            EvenMoreFish.debug("Formatted (Empty Message) " + formatted.isEmpty());
-            EvenMoreFish.debug("Active Comp is null? " + (activeComp == null));
+        if (plain.isEmpty() || activeComp == null) {
+            EvenMoreFish.getInstance().debug("Formatted (Empty Message) " + plain.isEmpty());
+            EvenMoreFish.getInstance().debug("Active Comp is null? " + (activeComp == null));
             return;
         }
 
         List<? extends Player> validPlayers = getValidPlayers(referencePlayer, activeComp);
         List<String> playerNames = validPlayers.stream().map(Player::getName).toList();
-        EvenMoreFish.debug("Valid players: " + StringUtils.join(playerNames, ","));
+        EvenMoreFish.getInstance().debug("Valid players: " + StringUtils.join(playerNames, ","));
 
         if (actionBar) {
             validPlayers.forEach(message::sendActionBar);
@@ -526,40 +493,166 @@ public class FishUtils {
         }
     }
 
-    public static String getPlayerName(@Nullable UUID uuid) {
-        if (uuid == null) {
-            return null;
-        }
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        return player.getName();
-    }
-
-    public static String getPlayerName(@Nullable String uuidString) {
-        if (uuidString == null) {
+    public static @Nullable ItemStack getCustomItem(@NotNull String materialString) {
+        if (!materialString.contains(":")) {
             return null;
         }
         try {
-            UUID uuid = UUID.fromString(uuidString);
-            return getPlayerName(uuid);
-        } catch (IllegalArgumentException exception) {
+            final String[] split = materialString.split(":", 2);
+            final String prefix = split[0];
+            final String id = split[1];
+            EvenMoreFish.getInstance().debug("GET ITEM for Addon(%s) Id(%s)".formatted(prefix, id));
+            return ItemAddon.getItem(prefix, id);
+        } catch (ArrayIndexOutOfBoundsException exception) {
             return null;
         }
     }
 
-    // #editMeta methods. These can be safely replaced with Paper's API once we drop Spigot.
-    public static boolean editMeta(@NotNull ItemStack item, @NotNull Consumer<ItemMeta> consumer) {
-        return editMeta(item, ItemMeta.class, consumer);
-    }
-
-    public static <M extends ItemMeta> boolean editMeta(@NotNull ItemStack item, @NotNull Class<M> metaClass, @NotNull Consumer<M> consumer) {
-        ItemMeta meta = item.getItemMeta();
-        if (!metaClass.isInstance(meta)) {
-            return false;
+    /**
+     * Gets an ItemStack from a string. If the string contains a colon, it is assumed to be an addon string.
+     * @param materialString The string to parse.
+     * @return The ItemStack, or null if the material is invalid.
+     */
+    public static @Nullable ItemStack getItem(@NotNull final String materialString) {
+        // Colon assumes an addon item
+        if (materialString.contains(":")) {
+            return getCustomItem(materialString);
         }
 
-        M checked = metaClass.cast(meta);
-        consumer.accept(checked);
-        item.setItemMeta(checked);
-        return true;
+        Material material = ItemUtils.getMaterial(materialString);
+        if (material == null) {
+            return null;
+        }
+
+        return new ItemStack(material);
     }
+
+    public static @NotNull ItemStack getSkullFromBase64(String base64) {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        skull.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), "EMFSkull");
+            profile.setProperty(new ProfileProperty("textures", base64));
+            meta.setPlayerProfile(profile);
+        });
+        return skull;
+    }
+
+    public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        skull.editMeta(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createProfile(uuid, "EMFSkull");
+            meta.setPlayerProfile(profile);
+        });
+        return skull;
+    }
+
+    /**
+     * Sorts a double value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The double value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded double value with the provided amount of decimal places.
+     */
+    public static double roundDouble(final double value, final int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .doubleValue();
+    }
+
+    /**
+     * Formats a double value by applying the configured decimal format.
+     *
+     * @param value The double value to be formatted.
+     * @return The formatted double
+     */
+    public static Component formatDouble(@NotNull final String formatStr, final double value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
+        return Component.text(format.format(value));
+    }
+
+    /**
+     * Sorts a float value by rounding it to the provided amount of decimal places.
+     *
+     * @param value The float value to be sorted.
+     * @param places The amount of decimal places to round to.
+     * @return The rounded float value with the provided amount of decimal places.
+     */
+    public static float roundFloat(final float value, int places) {
+        return new BigDecimal(value)
+            .setScale(places, RoundingMode.HALF_UP)
+            .floatValue();
+    }
+
+    /**
+     * Formats a float value by applying the configured decimal format.
+     *
+     * @param value The float value to be formatted.
+     * @return The formatted float
+     */
+    public static String formatFloat(@NotNull final String formatStr, final float value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
+        DecimalFormat format = new DecimalFormat(formatStr, symbols);
+        return format.format(value);
+    }
+
+    /**
+     * Checks if a provided String is a legacy string by stripping MiniMessage tags and seeing if the String is the same.
+     * @return Whether this String is using legacy color codes.
+     */
+    public static boolean isLegacyString(@NotNull String string) {
+        String stripped = EMFMessage.MINIMESSAGE.stripTags(string);
+        return string.equals(stripped);
+    }
+
+    public static @NotNull Component parsePlaceholderAPI(@NotNull Component component, @Nullable OfflinePlayer target) {
+        if (!EvenMoreFish.getInstance().isUsingPAPI()) {
+            return component;
+        }
+        TextReplacementConfig trc = TextReplacementConfig.builder()
+            .match(PlaceholderAPI.getPlaceholderPattern())
+            .replacement((matchResult, builder) -> {
+                String matched = matchResult.group();
+                Component parsed = EMFMessage.LEGACY_SERIALIZER.deserialize(
+                    PlaceholderAPI.setPlaceholders(target, matched)
+                );
+                return builder.append(parsed);
+            })
+            .build();
+        return component.replaceText(trc);
+    }
+
+    public static boolean componentContainsString(@NotNull Component component, @NotNull String string) {
+        return EMFMessage.PLAINTEXT_SERIALIZER.serialize(component).contains(string);
+    }
+
+    public static @NotNull Component decorateIfAbsent(@NotNull Component component, @NotNull TextDecoration decoration, @NotNull TextDecoration.State state) {
+        TextDecoration.State oldState = component.decoration(decoration);
+        if (oldState == TextDecoration.State.NOT_SET) {
+            return component.decoration(decoration, state);
+        }
+        return component;
+    }
+
+    /**
+     * @param colour The original colour
+     * @return A MiniMessage string turned into a format key for use in configs.
+     */
+    public static @NotNull String getFormat(@NotNull String colour) {
+        int openingTagEnd = colour.indexOf(">");
+
+        if (openingTagEnd == -1) {
+            return colour + "{name}";  // No tags at all
+        }
+
+        // At least one opening tag exists
+        if (colour.contains("</")) {
+            // Case: <tag>content</tag> → <tag>{name}content</tag>
+            return colour.substring(0, openingTagEnd + 1) + "{name}" + colour.substring(openingTagEnd + 1);
+        }
+
+        // Case: <tag> → <tag>{name}
+        return colour.substring(0, openingTagEnd + 1) + "{name}";
+    }
+
 }

@@ -1,27 +1,28 @@
 rootProject.name = "even-more-fish"
 
+// Addons
+include(":addons:even-more-fish-addons-j17")
+include(":addons:even-more-fish-addons-j21")
+
+// Plugin Stuff
 include(":even-more-fish-api")
-include(":even-more-fish-addons-j17")
 include(":even-more-fish-database-extras")
-include(":even-more-fish-addons-j21")
 include(":even-more-fish-plugin")
-include(":even-more-fish-paper")
 
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("spigot-api", "org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
-            library("paper-api", "io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+            library("paper-api", "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
             library("vault-api", "com.github.MilkBowl:VaultAPI:1.7.1")
             library("placeholder-api", "me.clip:placeholderapi:2.11.6")
             library("bstats", "org.bstats:bstats-bukkit:3.1.0")
 
-            version("worldguard", "7.0.5") //We must use 7.0.5 until we compile against a newer Minecraft version
+            version("worldguard", "7.0.9") // 7.0.9 is the last version that supports 1.20.1
             library("worldguard-core", "com.sk89q.worldguard","worldguard-core").versionRef("worldguard")
             library("worldguard-bukkit", "com.sk89q.worldguard","worldguard-bukkit").versionRef("worldguard")
             bundle("worldguard", listOf("worldguard-core", "worldguard-bukkit"))
 
-            version("worldedit", "7.2.17") //We must use 7.2.17 until we compile against a newer Minecraft version
+            version("worldedit", "7.3.0") // 7.3.0 is the last version that supports 1.20.1 and Java 17
             library("worldedit-core", "com.sk89q.worldedit","worldedit-core").versionRef("worldedit")
             library("worldedit-bukkit", "com.sk89q.worldedit","worldedit-bukkit").versionRef("worldedit")
             bundle("worldedit", listOf("worldedit-core", "worldedit-bukkit"))
@@ -38,10 +39,15 @@ dependencyResolutionManagement {
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.17.1")
 
             library("itemsadder-api", "com.github.LoneDev6:API-ItemsAdder:3.6.1")
-            library("nbt-api", "de.tr7zw:item-nbt-api:2.14.1")
+            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.0")
             library("denizen-api", "com.denizenscript:denizen:1.3.1-SNAPSHOT")
             library("oraxen", "io.th0rgal:oraxen:1.188.0")
-            library("nexo", "com.nexomc:nexo:0.9.0-dev.9")
+            library("nexo", "com.nexomc:nexo:1.0.0")
+
+            version("craftengine", "0.0.25")
+            library("craftengine-core", "net.momirealms", "craft-engine-core").versionRef("craftengine")
+            library("craftengine-bukkit", "net.momirealms", "craft-engine-bukkit").versionRef("craftengine")
+            bundle("craftengine", listOf("craftengine-core", "craftengine-bukkit"))
 
             library("ecoitems-api", "com.willfp:EcoItems:5.6.1")
             library("ecoitems-libreforge", "com.willfp:libreforge:4.21.1")
@@ -65,17 +71,17 @@ dependencyResolutionManagement {
             library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.6")
             library("playerpoints", "org.black_ixx:playerpoints:3.2.7")
 
-            library("vanishchecker", "uk.firedev:VanishChecker:1.0.4")
+            library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
-            library("commandapi", "dev.jorel:commandapi-bukkit-shade:9.7.0")
+            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.0.0")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
-            plugin("shadow", "com.gradleup.shadow").version("8.3.3")
-            plugin("bukkit-yml", "net.minecrell.plugin-yml.bukkit").version("0.6.0")
+            plugin("shadow", "com.gradleup.shadow").version("9.0.0-beta12")
+            plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.7.1")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
 
-            plugin("grgit", "org.ajoberstar.grgit").version("5.2.2")
+            plugin("grgit", "org.ajoberstar.grgit").version("5.3.0")
 
             version("jooq", "3.19.18")
             library("jooq", "org.jooq","jooq").versionRef("jooq")
@@ -88,7 +94,7 @@ dependencyResolutionManagement {
             library("connectors-sqlite", "org.xerial:sqlite-jdbc:3.47.1.0")
             library("connectors-h2", "com.h2database:h2:2.3.232")
 
-            library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-2")
+            library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-3")
         }
     }
 }

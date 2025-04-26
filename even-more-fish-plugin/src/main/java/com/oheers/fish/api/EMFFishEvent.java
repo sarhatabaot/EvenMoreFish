@@ -56,7 +56,9 @@ public class EMFFishEvent extends Event implements Cancellable {
         this.cancel = cancel;
     }
 
+
     public LocalDateTime getCatchTime() {
         return catchTime;
     }
 }
+

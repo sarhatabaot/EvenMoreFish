@@ -1,23 +1,23 @@
 package com.oheers.fish.fishing.items;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.adapter.AbstractMessage;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
-import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.fishing.CatchType;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.selling.WorthNBT;
 import com.oheers.fish.utils.ItemFactory;
-import de.tr7zw.changeme.nbtapi.NBT;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
-import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -28,14 +28,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
-public class Fish implements Cloneable {
+public class Fish {
 
     private final @NotNull Section section;
     private final String name;
     private final Rarity rarity;
-    private ItemFactory factory;
+    private final ItemFactory factory;
     private UUID fisherman;
     private Float length;
 
@@ -145,26 +144,21 @@ public class Fish implements Cloneable {
      * @return An ItemStack version of the fish.
      */
     public ItemStack give(int randomIndex) {
-
         ItemStack fish = factory.createItem(getFishermanPlayer(), randomIndex);
-        if (factory.isRawMaterial()) return fish;
-        ItemMeta fishMeta = fish.getItemMeta();
-
-        if (fishMeta != null) {
-            NBT.modify(fish, nbt -> {
-                nbt.modifyMeta((readOnlyNbt, meta) -> {
-                    meta.setDisplayName(FishUtils.translateColorCodes(getDisplayName()));
-                    if (!section.getBoolean("disable-lore", false)) {
-                        meta.setLore(getFishLore());
-                    }
-                    meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                });
-            });
-
-            WorthNBT.setNBT(fish, this);
+        if (factory.isRawMaterial()) {
+            return fish;
         }
+
+        fish.editMeta(meta -> {
+            meta.displayName(getDisplayName().getComponentMessage());
+            if (!section.getBoolean("disable-lore", false)) {
+                meta.lore(getFishLore());
+            }
+            meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        });
+        WorthNBT.setNBT(fish, this);
 
         return fish;
     }
@@ -245,7 +239,7 @@ public class Fish implements Cloneable {
         }
         Player player = Bukkit.getPlayer(fisherman);
         if (player != null) {
-            player.sendMessage(FishUtils.translateColorCodes(msg));
+            EMFSingleMessage.fromString(msg).send(player);
         }
     }
 
@@ -317,48 +311,42 @@ public class Fish implements Cloneable {
      *
      * @return A lore to be used by fetching data from the old messages.yml set-up.
      */
-    private List<String> getFishLore() {
+    private List<Component> getFishLore() {
         List<String> loreOverride = section.getStringList("lore-override");
-        AbstractMessage newLoreLine;
+        EMFMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
-            newLoreLine = EvenMoreFish.getAdapter().createMessage(loreOverride);
+            newLoreLine = EMFListMessage.fromStringList(loreOverride);
         } else {
             newLoreLine = ConfigMessage.FISH_LORE.getMessage();
         }
-        newLoreLine.setRarityColour(rarity.getColour());
 
         List<String> fishLore = section.getStringList("lore");
-        String replacement = fishLore.isEmpty() ? "" : String.join("\n", fishLore);
+        EMFListMessage fishLoreReplacement = fishLore.isEmpty() ? EMFListMessage.empty() : EMFListMessage.fromStringList(fishLore);
+        newLoreLine.setVariable("{fish_lore}", fishLoreReplacement);
 
-        newLoreLine.setVariable(
-                "\n{fish_lore}",
-                replacement
-        );
+        if (!disableFisherman && getFishermanPlayer() != null) {
+            newLoreLine.setVariable("{fisherman_lore}", ConfigMessage.FISHERMAN_LORE.getMessage().toListMessage());
+            newLoreLine.setPlayer(getFishermanPlayer());
+        } else {
+            newLoreLine.setVariable("{fisherman_lore}", EMFListMessage.empty());
+        }
 
-        newLoreLine.setVariable("{fisherman_lore}",
-                !disableFisherman && getFishermanPlayer() != null ?
-                        (ConfigMessage.FISHERMAN_LORE.getMessage()).getLegacyMessage()
-                        : ""
-        );
-
-        if (!disableFisherman && getFishermanPlayer() != null) newLoreLine.setPlayer(getFishermanPlayer());
-
-        newLoreLine.setVariable("{length_lore}",
-                length > 0 ?
-                        ConfigMessage.LENGTH_LORE.getMessage().getLegacyMessage()
-                        : ""
-        );
-
-        if (length > 0) newLoreLine.setLength(Float.toString(length));
+        if (length > 0) {
+            newLoreLine.setVariable("{length_lore}", ConfigMessage.LENGTH_LORE.getMessage().toListMessage());
+            newLoreLine.setLength(Float.toString(length));
+        } else {
+            newLoreLine.setVariable("{length_lore}", EMFListMessage.empty());
+        }
 
         newLoreLine.setRarity(this.rarity.getLorePrep());
 
-        List<String> newLore = newLoreLine.getLegacyListMessage();
-        if (getFishermanPlayer() != null && EvenMoreFish.getInstance().isUsingPAPI()) {
-            return newLore.stream().map(l -> PlaceholderAPI.setPlaceholders(getFishermanPlayer(), l)).collect(Collectors.toList());
+        OfflinePlayer fisherman = getFishermanPlayer();
+        if (fisherman != null) {
+            newLoreLine.setPlayer(fisherman);
+            newLoreLine.formatPlaceholderAPI();
         }
 
-        return newLore;
+        return newLoreLine.getComponentListMessage();
     }
 
     public void checkDisplayName() {
@@ -429,8 +417,7 @@ public class Fish implements Cloneable {
         this.silent = section.getBoolean("silent", false);
     }
 
-    @Override
-    public Fish clone() {
+    public Fish createCopy() {
         return create(rarity, section);
     }
 
@@ -493,11 +480,11 @@ public class Fish implements Cloneable {
     }
 
     @NotNull
-    public String getDisplayName() {
+    public EMFSingleMessage getDisplayName() {
         if (displayName == null) {
-            return rarity.getColour() + name;
+            return rarity.format(name);
         }
-        return rarity.getColour() + displayName;
+        return rarity.format(displayName);
     }
 
     public ItemFactory getFactory() {
@@ -563,6 +550,36 @@ public class Fish implements Cloneable {
         rewardString = rewardString.replace("{name}", nameReplacement);
 
         return rewardString;
+    }
+
+    public @NotNull CatchType getCatchType() {
+        String typeStr = section.getString("catch-type");
+        if (typeStr == null) {
+            return rarity.getCatchType();
+        }
+        try {
+            return CatchType.valueOf(typeStr.toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            EvenMoreFish.getInstance().getLogger().warning("Fish " + getName() + " has an incorrect catch-type. Defaulting to its rarity's catch-type.");
+            return rarity.getCatchType();
+        }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Fish fish)) {
+            return false;
+        }
+        // Check if the rarity and name match.
+        return this.getRarity().equals(fish.getRarity()) && this.getName().equals(fish.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRarity(), getName());
     }
 
 }
