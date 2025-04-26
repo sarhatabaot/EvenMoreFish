@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class UserReport {
 
-    private final int id;
+    private int id;
     private final UUID uuid;
     private String firstFish;
     private String recentFish;
@@ -23,6 +23,22 @@ public class UserReport {
 
     public UserReport(int id, UUID uuid, String firstFish, String recentFish, String largestFish, String shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
         this.id = id;
+        this.uuid = uuid;
+        this.firstFish = firstFish;
+        this.recentFish = recentFish;
+        this.largestFish = largestFish;
+        this.shortestFish = shortestFish;
+        this.numFishCaught = numFishCaught;
+        this.competitionsWon = competitionsWon;
+        this.competitionsJoined = competitionsJoined;
+        this.largestLength = largestLength;
+        this.shortestLength = shortestLength;
+        this.totalFishLength = totalFishLength;
+        this.fishSold = fishSold;
+        this.moneyEarned = moneyEarned;
+    }
+
+    public UserReport(UUID uuid, String firstFish, String recentFish, String largestFish, String shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
         this.uuid = uuid;
         this.firstFish = firstFish;
         this.recentFish = recentFish;

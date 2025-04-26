@@ -12,6 +12,7 @@ import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
+import com.oheers.fish.database.model.CompetitionReport;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
@@ -23,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -42,6 +45,7 @@ public class Competition {
     private long timeLeft;
     private Bar statusBar;
     private long epochStartTime;
+    private LocalDateTime startTime;
     private final List<Long> alertTimes;
     private final Map<Integer, List<Reward>> rewards;
     private int playersNeeded;
@@ -109,7 +113,7 @@ public class Competition {
 
             this.timeLeft = this.maxDuration;
 
-            leaderboard = new Leaderboard(competitionType);
+            this.leaderboard = new Leaderboard(competitionType);
 
             statusBar.show();
 
@@ -117,7 +121,10 @@ public class Competition {
             announceBegin();
             EMFCompetitionStartEvent startEvent = new EMFCompetitionStartEvent(this);
             Bukkit.getServer().getPluginManager().callEvent(startEvent);
-            epochStartTime = Instant.now().getEpochSecond();
+
+            final Instant now = Instant.now();
+            this.epochStartTime = now.getEpochSecond();
+            this.startTime = LocalDateTime.ofInstant(now, ZoneId.systemDefault());
 
             // Execute start commands
             getCompetitionFile().getStartCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
@@ -148,15 +155,13 @@ public class Competition {
                 if (originallyRandom) {
                     competitionType = CompetitionType.RANDOM;
                 }
+
                 if (MainConfig.getInstance().databaseEnabled()) {
                     Competition competitionRef = this;
-                    EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
-                        EvenMoreFish.getInstance().getDatabase().createCompetitionReport(competitionRef);
-                        leaderboard.clear();
-                    });
-                } else {
-                    leaderboard.clear();
+                    EvenMoreFish.getInstance().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(this, this.startTime, LocalDateTime.now()));
                 }
+
+                leaderboard.clear();
             }
         } catch (Exception exception) {
             EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, "An exception was thrown while the competition was being ended!", exception);

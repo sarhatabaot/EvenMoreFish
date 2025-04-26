@@ -1,5 +1,9 @@
 package com.oheers.fish.database.model;
 
+import com.oheers.fish.competition.Competition;
+import com.oheers.fish.competition.CompetitionEntry;
+import com.oheers.fish.database.data.FishRarityKey;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +14,7 @@ public class CompetitionReport {
     private final String competitionConfigId;
     private final String winnerFish;
     private final UUID winnerUuid;
-    private final List<UUID> contestants = new ArrayList<>();
+    private final List<UUID> contestants;
 
     private final float winnerScore;
 
@@ -23,9 +27,20 @@ public class CompetitionReport {
         this.winnerFish = winnerFish;
         this.winnerUuid = UUID.fromString(winnerUUIDString);
         this.winnerScore = winnerScore;
+        this.contestants = new ArrayList<>();
         for (String contestant : contestants.split(",")) {
             this.contestants.add(UUID.fromString(contestant));
         }
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public CompetitionReport(Competition competition, LocalDateTime startTime, LocalDateTime endTime) {
+        this.competitionConfigId = competition.getCompetitionName();
+        this.winnerFish = FishRarityKey.of(competition.getLeaderboard().getEntry(0).getFish()).toString(); //could just be the fish here todo
+        this.winnerScore = competition.getLeaderboard().getTopEntry().getValue();
+        this.winnerUuid = competition.getLeaderboard().getTopEntry().getPlayer();
+        this.contestants = competition.getLeaderboard().getEntries().stream().map(CompetitionEntry::getPlayer).toList();
         this.startTime = startTime;
         this.endTime = endTime;
     }

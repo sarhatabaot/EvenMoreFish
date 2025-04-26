@@ -18,11 +18,6 @@ public class DataManager<T> {
         this.defaultLoader = defaultLoader;
     }
 
-    // Constructor without default loader (for backward compatibility)
-    public DataManager(DataSavingStrategy<T> savingStrategy) {
-        this(savingStrategy, null);
-    }
-
     // Get data with explicit loader
     public T get(String key, Function<String, T> loader) {
         return cache.computeIfAbsent(key, k -> {

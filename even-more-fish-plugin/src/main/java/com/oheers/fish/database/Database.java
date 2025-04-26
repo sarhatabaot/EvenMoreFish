@@ -234,10 +234,16 @@ public class Database implements DatabaseAPI {
         return new ExecuteQuery<Integer>(connectionFactory, settings) {
             @Override
             protected Integer onRunQuery(DSLContext dslContext) {
-                return dslContext.select()
+                Integer id = dslContext.select()
                         .from(Tables.USERS)
                         .where(Tables.USERS.UUID.eq(uuid.toString()))
                         .fetchOne(Tables.USERS.ID);
+
+                if (id == null) {
+                    return empty();
+                }
+
+                return id;
             }
 
             @Override
@@ -700,7 +706,7 @@ public class Database implements DatabaseAPI {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.insertInto(Tables.USERS)
-                        .set(Tables.USERS.ID, report.getId())
+                        .set(Tables.USERS.UUID, report.getUUID().toString())
                         .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
                         .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
                         .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
@@ -709,6 +715,7 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.FISH_SOLD, report.getFishSold())
                         .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
                         .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
+                        .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
                         .set(Tables.USERS.LAST_FISH, report.getLargestFish())
                         .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish())
                         .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
@@ -716,12 +723,14 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
                         .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
                         .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
-                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish())
                         .set(Tables.USERS.MONEY_EARNED, report.getMoneyEarned())
                         .set(Tables.USERS.FISH_SOLD, report.getFishSold())
                         .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
                         .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
+                        .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
                         .set(Tables.USERS.LAST_FISH, report.getLargestFish())
+                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish())
+                        .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
                         .execute();
             }
         }.executeUpdate();
@@ -790,6 +799,34 @@ public class Database implements DatabaseAPI {
                         .execute();
             }
         }.executeUpdate();
+    }
+
+    public CompetitionReport getCompetitionReport(int id) {
+        return new ExecuteQuery<CompetitionReport>(connectionFactory, settings) {
+            @Override
+            protected CompetitionReport onRunQuery(DSLContext dslContext) throws Exception {
+                Record result = dslContext.select(Tables.COMPETITIONS)
+                        .where(Tables.COMPETITIONS.ID.eq(id))
+                        .fetchOne();
+                if (result == null) {
+                    return empty();
+                }
+
+                return new CompetitionReport(
+                        result.getValue(Tables.COMPETITIONS.COMPETITION_NAME),
+                        result.getValue(Tables.COMPETITIONS.WINNER_FISH),
+                        result.getValue(Tables.COMPETITIONS.WINNER_UUID),
+                        result.getValue(Tables.COMPETITIONS.WINNER_SCORE),
+                        result.getValue(Tables.COMPETITIONS.CONTESTANTS),
+                                result.getValue(Tables.COMPETITIONS.START_TIME),
+                        result.getValue(Tables.COMPETITIONS.END_TIME));
+            }
+
+            @Override
+            protected CompetitionReport empty() {
+                return null;
+            }
+        }.prepareAndRunQuery();
     }
 
     public void batchUpdateCompetitions(Collection<CompetitionReport> competitions) {

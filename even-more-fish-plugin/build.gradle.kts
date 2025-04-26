@@ -266,7 +266,7 @@ tasks {
             attributes["Specification-Version"] = project.version
             attributes["Implementation-Title"] = grgit.branch.current().name
             attributes["Implementation-Version"] = buildNumberOrDate
-            attributes["Database-Baseline-Version"] = "8.1"
+            attributes["Database-Baseline-Version"] = "8.0"
         }
 
         minimize {

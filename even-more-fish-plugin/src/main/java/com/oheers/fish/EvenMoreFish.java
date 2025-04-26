@@ -26,6 +26,7 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.messages.ConfigMessage;
 import com.oheers.fish.config.messages.MessageConfig;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.data.FishLogKey;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.data.strategy.impl.*;
 import com.oheers.fish.database.model.CompetitionReport;
@@ -210,7 +211,7 @@ public class EvenMoreFish extends EMFPlugin {
         // async check for updates on the spigot page
         getScheduler().runTaskAsynchronously(() -> isUpdateAvailable = checkUpdate());
 
-        listeners();
+
 
         if (!MainConfig.getInstance().debugSession()) {
             metrics();
@@ -221,7 +222,10 @@ public class EvenMoreFish extends EMFPlugin {
         if (MainConfig.getInstance().databaseEnabled()) {
             this.database = new Database();
 
-            this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy());
+            this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy(), key -> {
+                FishLogKey logKey = FishLogKey.from(key);
+                return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime())); //todo temp
+            });
             this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy(), key -> {
                 final String fishName = key.split("\\.")[0];
                 final String fishRarity = key.split("\\.")[1];
@@ -235,14 +239,11 @@ public class EvenMoreFish extends EMFPlugin {
                 return EvenMoreFish.getInstance().getDatabase().getUserFishStats(userId, fishName, fishRarity);
             });
 
-            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy());
-
-            this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L));
-
-
-
+            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), id -> EvenMoreFish.getInstance().getDatabase().readUserReport(UUID.fromString(id)));
+            this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L), key -> database.getCompetitionReport(Integer.parseInt(key)));
         }
 
+        listeners();
         registerCommands();
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");
@@ -325,7 +326,7 @@ public class EvenMoreFish extends EMFPlugin {
 
     private void listeners() {
 
-        getServer().getPluginManager().registerEvents(new JoinChecker(), this);
+        getServer().getPluginManager().registerEvents(new JoinChecker(database), this);
         getServer().getPluginManager().registerEvents(new FishingProcessor(), this);
         getServer().getPluginManager().registerEvents(new UpdateNotify(), this);
         getServer().getPluginManager().registerEvents(new SkullSaver(), this);
@@ -419,26 +420,6 @@ public class EvenMoreFish extends EMFPlugin {
             }
         });
     }
-
-    @Deprecated
-    //we use datamanagers now
-//    private void saveUserData(boolean scheduler) {
-//        Runnable save = () -> {
-//            if (!(MainConfig.getInstance().isDatabaseOnline())) {
-//                return;
-//            }
-//
-//            DataManagerOld.getInstance().saveFishReports();
-//            DataManagerOld.getInstance().saveUserReports();
-//
-//            DataManagerOld.getInstance().uncacheAll();
-//        };
-//        if (scheduler) {
-//            getScheduler().runTask(save);
-//        } else {
-//            save.run();
-//        }
-//    }
 
 
     public ItemStack createCustomNBTRod() {
