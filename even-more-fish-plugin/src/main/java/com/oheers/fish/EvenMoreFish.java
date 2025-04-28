@@ -161,6 +161,8 @@ public class EvenMoreFish extends EMFPlugin {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
 
+        instance = this;
+
         CommandAPI.onEnable();
 
         // If EMF folder does not exist, this is the first load.
