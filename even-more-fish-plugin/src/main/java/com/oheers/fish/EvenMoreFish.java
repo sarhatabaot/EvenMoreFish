@@ -227,7 +227,7 @@ public class EvenMoreFish extends EMFPlugin {
 
             this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy(), key -> {
                 FishLogKey logKey = FishLogKey.from(key);
-                return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime())); //todo temp
+                return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime()));
             });
             this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy(), key -> {
                 final String fishName = key.split("\\.")[0];

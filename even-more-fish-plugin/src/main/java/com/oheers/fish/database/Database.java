@@ -49,8 +49,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @NeedsTesting(
-        reason="Requires full testing, unit where possible, integration eventually.",
-        testType={TestType.MANUAL, TestType.UNIT, TestType.INTEGRATION}
+        reason = "Requires full testing, unit where possible, integration eventually.",
+        testType = {TestType.MANUAL, TestType.UNIT, TestType.INTEGRATION}
 )
 public class Database implements DatabaseAPI {
     private String version;
@@ -160,8 +160,9 @@ public class Database implements DatabaseAPI {
     }
 
     public boolean hasFishLog(UUID uuid) {
-        if (!hasUser(uuid))
+        if (!hasUser(uuid)) {
             return false;
+        }
 
         final int userId = getUserId(uuid);
         return hasFishLog(userId);
@@ -263,8 +264,9 @@ public class Database implements DatabaseAPI {
                         .from(Tables.USERS)
                         .where(Tables.USERS.UUID.eq(uuid.toString()))
                         .fetchOne();
-                if (tableRecord == null)
+                if (tableRecord == null) {
                     return empty();
+                }
 
                 DatabaseUtil.writeDbVerbose("Read user report for user (%s)".formatted(uuid.toString()));
                 final int id = tableRecord.getValue(Tables.USERS.ID);
@@ -451,8 +453,9 @@ public class Database implements DatabaseAPI {
                                 .and(Tables.FISH_LOG.CATCH_TIME.eq(time))
                         ).fetchOne();
 
-                if (result == null)
+                if (result == null) {
                     return empty();
+                }
 
 
                 final float length = result.getValue(Tables.FISH_LOG.FISH_LENGTH);
@@ -476,15 +479,17 @@ public class Database implements DatabaseAPI {
     }
 
     public String getDatabaseVersion() {
-        if (!MainConfig.getInstance().databaseEnabled())
+        if (!MainConfig.getInstance().databaseEnabled()) {
             return "Disabled";
+        }
 
         return "V" + this.version;
     }
 
     public String getType() {
-        if (!MainConfig.getInstance().databaseEnabled())
+        if (!MainConfig.getInstance().databaseEnabled()) {
             return "Disabled";
+        }
 
         return connectionFactory.getType();
     }
@@ -501,14 +506,15 @@ public class Database implements DatabaseAPI {
                         .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(fishRarity))
                         .fetchOptional();
 
-                if (optionalRecord.isEmpty())
+                if (optionalRecord.isEmpty()) {
                     return empty();
+                }
 
                 final LocalDateTime firstCatchTime = optionalRecord.get().getValue(Tables.USER_FISH_STATS.FIRST_CATCH_TIME);
                 final float shortestLength = optionalRecord.get().getValue(Tables.USER_FISH_STATS.SHORTEST_LENGTH);
                 final float longestLength = optionalRecord.get().getValue(Tables.USER_FISH_STATS.LONGEST_LENGTH);
                 final int quantity = optionalRecord.get().getValue(Tables.USER_FISH_STATS.QUANTITY);
-                return new UserFishStats(userId, fishName,fishRarity,firstCatchTime,shortestLength,longestLength,quantity);
+                return new UserFishStats(userId, fishName, fishRarity, firstCatchTime, shortestLength, longestLength, quantity);
             }
 
             @Override
@@ -520,9 +526,22 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void createUserFishStats(UserFishStats userFishStats) {
-        //This should have exactly one record//todo
-
+    public void createUserFishStats(UserFishStats userFishStats) { //todo maybe this should have on duplicate key and then this is createAndUpdate
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.USER_FISH_STATS)
+                        .set(Tables.USER_FISH_STATS.USER_ID, userFishStats.getUserId())
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
+                        .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
+                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
+                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
+                        .execute();
+            }
+        }.executeUpdate();
     }
 
     public void updateUserFishStats(UserFishStats userFishStats) {
@@ -555,11 +574,12 @@ public class Database implements DatabaseAPI {
                         .and(Tables.FISH_LOG.FISH_NAME.eq(fishName))
                         .and(Tables.FISH_LOG.FISH_RARITY.eq(fishName))
                         .fetch();
-                if (result.isEmpty())
+                if (result.isEmpty()) {
                     return empty();
+                }
 
                 final Set<FishLog> fishLogs = new HashSet<>();
-                for (Record record: result) {
+                for (Record record : result) {
                     final LocalDateTime catchTime = record.getValue(Tables.FISH_LOG.CATCH_TIME);
                     final float length = record.getValue(Tables.FISH_LOG.FISH_LENGTH);
                     final String competitionId = record.getValue(Tables.FISH_LOG.COMPETITION_ID);
@@ -606,8 +626,9 @@ public class Database implements DatabaseAPI {
                         .and(Tables.FISH.FISH_RARITY.eq(fishName))
                         .fetchOptional();
 
-                if (optionalRecord.isEmpty())
+                if (optionalRecord.isEmpty()) {
                     return empty();
+                }
 
                 final LocalDateTime firstCatchTime = optionalRecord.get().getValue(Tables.FISH.FIRST_CATCH_TIME);
                 final UUID discoverer = UUID.fromString(optionalRecord.get().get(Tables.FISH.DISCOVERER));
@@ -616,7 +637,7 @@ public class Database implements DatabaseAPI {
                 final float longestLength = optionalRecord.get().getValue(Tables.FISH.LARGEST_FISH);
                 final UUID longestFisher = UUID.fromString(optionalRecord.get().getValue(Tables.FISH.LARGEST_FISHER));
                 final int quantity = optionalRecord.get().getValue(Tables.FISH.TOTAL_CAUGHT);
-                return new FishStats(fishName, fishRarity, firstCatchTime, discoverer, shortestLength,shortestFisher,longestLength,longestFisher,quantity);
+                return new FishStats(fishName, fishRarity, firstCatchTime, discoverer, shortestLength, shortestFisher, longestLength, longestFisher, quantity);
             }
 
             @Override
@@ -659,10 +680,12 @@ public class Database implements DatabaseAPI {
         return new ExecuteQuery<Boolean>(connectionFactory, settings) {
             @Override
             protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
-                return dslContext.fetchExists(Tables.USER_FISH_STATS,
+                return dslContext.fetchExists(
+                        Tables.USER_FISH_STATS,
                         Tables.USER_FISH_STATS.USER_ID.eq(id)
                                 .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(rarity))
-                                .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fish)));
+                                .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fish))
+                );
             }
 
             @Override
@@ -763,7 +786,6 @@ public class Database implements DatabaseAPI {
     }
 
 
-
     public void updateCompetition(CompetitionReport competition) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
@@ -798,8 +820,9 @@ public class Database implements DatabaseAPI {
                         result.getValue(Tables.COMPETITIONS.WINNER_UUID),
                         result.getValue(Tables.COMPETITIONS.WINNER_SCORE),
                         result.getValue(Tables.COMPETITIONS.CONTESTANTS),
-                                result.getValue(Tables.COMPETITIONS.START_TIME),
-                        result.getValue(Tables.COMPETITIONS.END_TIME));
+                        result.getValue(Tables.COMPETITIONS.START_TIME),
+                        result.getValue(Tables.COMPETITIONS.END_TIME)
+                );
             }
 
             @Override
@@ -820,7 +843,10 @@ public class Database implements DatabaseAPI {
                             competitionsRecord.setWinnerFish(competition.getWinnerFish());
                             competitionsRecord.setWinnerUuid(competition.getWinnerUuid().toString());
                             competitionsRecord.setWinnerScore(competition.getWinnerScore());
-                            competitionsRecord.setContestants(competition.getContestants().stream().map(UUID::toString).collect(Collectors.joining(", "))); //todo, maybe this should be in it's own db? or too complex??
+                            competitionsRecord.setContestants(competition.getContestants()
+                                    .stream()
+                                    .map(UUID::toString)
+                                    .collect(Collectors.joining(", "))); //todo, maybe this should be in it's own db? or too complex??
                             competitionsRecord.setStartTime(competition.getStartTime());
                             competitionsRecord.setEndTime(competition.getEndTime());
 

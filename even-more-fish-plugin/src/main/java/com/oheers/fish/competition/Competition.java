@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -354,8 +353,7 @@ public class Competition {
             return;
         }
 
-        final int userId = EvenMoreFish.getInstance().getDatabase().getUserId(entry.getPlayer());
-        UserReport userReport = EvenMoreFish.getInstance().getUserReportDataManager().get(String.valueOf(userId));
+        UserReport userReport = EvenMoreFish.getInstance().getUserReportDataManager().get(String.valueOf(entry.getPlayer()));
         if (userReport == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not fetch User Report for " + entry.getPlayer() + ", their data has not been modified.");
             return;
