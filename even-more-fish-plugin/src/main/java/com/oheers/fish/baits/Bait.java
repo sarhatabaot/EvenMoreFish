@@ -153,6 +153,8 @@ public class Bait extends ConfigBase {
         Supplier<EMFListMessage> loreVariable = () -> EMFListMessage.fromStringList(getConfig().getStringList("lore"));
         lore.setVariable("{lore}", loreVariable.get());
 
+        lore.setVariable("{bait_theme}", "");
+
         return lore.getComponentListMessage();
     }
 
