@@ -117,21 +117,13 @@ public class MainCommand {
         );
         return new CommandAPICommand(name)
             .withPermission(UserPerms.TOP)
-            .executesPlayer(info -> {
-                Competition active = Competition.getCurrentlyActive();
-                if (active == null) {
-                    ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(info.sender());
-                    return;
-                }
-                active.sendPlayerLeaderboard(info.sender());
-            })
             .executes(info -> {
                 Competition active = Competition.getCurrentlyActive();
                 if (active == null) {
                     ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(info.sender());
                     return;
                 }
-                active.sendConsoleLeaderboard(info.sender());
+                active.sendLeaderboard(info.sender());
             });
     }
 
