@@ -42,9 +42,6 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(file);
         update();
-
-        getConfig().remove("config-version");
-        save();
     }
 
     public ConfigBase(@NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean configUpdater) {
@@ -55,9 +52,6 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
-
-        getConfig().remove("config-version");
-        save();
     }
 
     /**
@@ -78,7 +72,6 @@ public class ConfigBase {
     }
 
     public void reload(@NotNull File configFile) {
-
         if (preventIO) {
             return;
         }
@@ -96,8 +89,6 @@ public class ConfigBase {
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
         }
-        convertLegacy(getConfig());
-        save();
     }
 
     public void reload() {
