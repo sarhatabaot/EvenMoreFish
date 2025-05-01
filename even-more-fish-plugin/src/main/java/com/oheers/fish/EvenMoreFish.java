@@ -172,14 +172,14 @@ public class EvenMoreFish extends EMFPlugin {
 
         this.api = new EMFAPI();
 
-        decidedRarities = new HashMap<>();
+        this.decidedRarities = new HashMap<>();
 
-        logger = getLogger();
-        pluginManager = getServer().getPluginManager();
+        this.logger = getLogger();
+        this.pluginManager = getServer().getPluginManager();
 
-        usingVault = Bukkit.getPluginManager().isPluginEnabled("Vault");
-        usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
-        usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
+        this.usingVault = Bukkit.getPluginManager().isPluginEnabled("Vault");
+        this.usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
+        this.usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
 
         new MainConfig();
         new MessageConfig();
@@ -215,8 +215,6 @@ public class EvenMoreFish extends EMFPlugin {
         checkUpdate().thenAccept(available ->
             isUpdateAvailable = available
         );
-
-
 
         if (!MainConfig.getInstance().debugSession()) {
             metrics();

@@ -100,7 +100,7 @@ public class Database implements DatabaseAPI {
     private @NotNull ConnectionFactory getConnectionFactory(final @NotNull String type) {
         return switch (type) {
             case "mysql":
-                yield new MySqlConnectionFactory(); //todo check for credentials.
+                yield new MySqlConnectionFactory();
             case "sqlite":
                 yield new SqliteConnectionFactory();
             default:
@@ -178,35 +178,6 @@ public class Database implements DatabaseAPI {
                 return dslContext.fetchExists(Tables.FISH_LOG
                         .where(Tables.FISH_LOG.USER_ID.eq(userId))
                 );
-            }
-
-            @Override
-            protected Boolean empty() {
-                return false;
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Deprecated //use hasFishLog instead
-    @Override
-    public boolean hasUserLog(@NotNull UUID uuid) {
-        if (!hasUser(uuid)) {
-            return false;
-        }
-
-        final int userId = getUserId(uuid);
-        if (userId == 0) {
-            return false;
-        }
-
-        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
-            @Override
-            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
-                return dslContext.select()
-                        .from(Tables.FISH_LOG)
-                        .where(Tables.FISH_LOG.USER_ID.eq(userId))
-                        .fetch()
-                        .isNotEmpty();
             }
 
             @Override
@@ -550,7 +521,26 @@ public class Database implements DatabaseAPI {
 
     @Override
     public void createUserFishStats(UserFishStats userFishStats) {
-        //This should have exactly one record
+        //This should have exactly one record//todo
+
+    }
+
+    public void updateUserFishStats(UserFishStats userFishStats) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.update(Tables.USER_FISH_STATS)
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
+                        .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
+                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
+                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
+                        .where(Tables.USER_FISH_STATS.USER_ID.eq(userFishStats.getUserId()))
+                        .execute();
+            }
+        }.executeUpdate();
 
     }
 
@@ -772,24 +762,7 @@ public class Database implements DatabaseAPI {
 
     }
 
-    public void updateUserFishStats(UserFishStats userFishStats) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.update(Tables.USER_FISH_STATS)
-                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
-                        .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
-                        .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
-                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
-                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
-                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
-                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
-                        .where(Tables.USER_FISH_STATS.USER_ID.eq(userFishStats.getUserId()))
-                        .execute();
-            }
-        }.executeUpdate();
 
-    }
 
     public void updateCompetition(CompetitionReport competition) {
         new ExecuteUpdate(connectionFactory, settings) {
