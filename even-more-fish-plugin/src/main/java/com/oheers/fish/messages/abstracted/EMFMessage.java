@@ -301,16 +301,8 @@ public abstract class EMFMessage {
      * @param bait The name of the bait.
      */
     public void setBait(@NotNull final Object bait) {
+        setVariable("{bait_theme}", "");
         setVariable("{bait}", bait);
-    }
-
-    /**
-     * Defines the theme of the bait to be used throughout the message to replace the {bait_theme} variable.
-     *
-     * @param baitTheme The bait colour theme.
-     */
-    public void setBaitTheme(@NotNull final Object baitTheme) {
-        setVariable("{bait_theme}", baitTheme);
     }
 
     /**

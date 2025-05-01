@@ -95,8 +95,7 @@ public abstract class Processor<E extends Event> implements Listener {
             Bait caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
-                message.setBaitTheme(caughtBait.getTheme());
-                message.setBait(caughtBait.getId());
+                message.setBait(caughtBait.format(caughtBait.getId()));
                 message.setPlayer(player);
                 message.send(player);
 

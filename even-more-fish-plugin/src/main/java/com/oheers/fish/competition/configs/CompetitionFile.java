@@ -321,11 +321,4 @@ public class CompetitionFile extends ConfigBase {
         return getConfig().getBoolean("allow-fishing", true);
     }
 
-    @Override
-    public List<String> getMiniMessageExclusions() {
-        return List.of(
-            "start-commands"
-        );
-    }
-
 }
