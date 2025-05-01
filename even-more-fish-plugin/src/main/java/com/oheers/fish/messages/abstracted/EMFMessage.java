@@ -27,6 +27,11 @@ public abstract class EMFMessage {
         .postProcessor(component -> component)
         .build();
     public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
+    public static final LegacyComponentSerializer LEGACY_SERIALIZER_INPUT = LegacyComponentSerializer.builder()
+        .character('&')
+        .hexColors()
+        .useUnusualXRepeatedCharacterHexFormat()
+        .build();
     public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
     public static final Component EMPTY = Component.empty().colorIfAbsent(NamedTextColor.WHITE);
 
@@ -42,9 +47,13 @@ public abstract class EMFMessage {
      * Replaces all section symbols with ampersands so MiniMessage doesn't explode
      */
     public static Component formatString(@NotNull String message) {
-        return MINIMESSAGE.deserialize(
-            message.replace('§', '&')
-        );
+        if (FishUtils.isLegacyString(message)) {
+            return LEGACY_SERIALIZER_INPUT.deserialize(message);
+        } else {
+            return MINIMESSAGE.deserialize(
+                message.replace('§', '&')
+            );
+        }
     }
 
     public static @NotNull Component removeDefaultItalics(@NotNull Component component) {
