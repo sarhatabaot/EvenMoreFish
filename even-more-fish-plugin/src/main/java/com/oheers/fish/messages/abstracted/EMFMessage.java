@@ -43,9 +43,6 @@ public abstract class EMFMessage {
 
     public abstract EMFMessage createCopy();
 
-    /**
-     * Replaces all section symbols with ampersands so MiniMessage doesn't explode
-     */
     public static Component formatString(@NotNull String message) {
         if (FishUtils.isLegacyString(message)) {
             return LEGACY_SERIALIZER_INPUT.deserialize(message);
