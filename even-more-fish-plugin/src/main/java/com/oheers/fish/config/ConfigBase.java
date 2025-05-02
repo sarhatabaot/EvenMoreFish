@@ -42,9 +42,6 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(file);
         update();
-
-        getConfig().remove("config-version");
-        save();
     }
 
     public ConfigBase(@NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean configUpdater) {
@@ -55,9 +52,6 @@ public class ConfigBase {
         this.configUpdater = configUpdater;
         reload(new File(getPlugin().getDataFolder(), getFileName()));
         update();
-
-        getConfig().remove("config-version");
-        save();
     }
 
     /**
@@ -78,7 +72,6 @@ public class ConfigBase {
     }
 
     public void reload(@NotNull File configFile) {
-
         if (preventIO) {
             return;
         }
@@ -96,8 +89,6 @@ public class ConfigBase {
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
         }
-        convertLegacy(getConfig());
-        save();
     }
 
     public void reload() {
@@ -176,71 +167,6 @@ public class ConfigBase {
         } catch (IOException exception) {
             EvenMoreFish.getInstance().getLogger().warning("Failed to update " + getFileName());
         }
-    }
-
-    // MiniMessage conversion methods. DO NOT REMOVE
-
-    public List<String> getMiniMessageExclusions() {
-        return List.of();
-    }
-
-    /**
-     * Converts all Legacy colors to MiniMessage.
-     */
-    @SuppressWarnings("unchecked")
-    public void convertLegacy(@NotNull YamlDocument document) {
-        List<String> excludedKeys = getMiniMessageExclusions();
-        for (String key : document.getRoutesAsStrings(true)) {
-            if (excludedKeys.contains(key)) {
-                continue;
-            }
-            if (document.isString(key)) {
-                String updated = convertLegacyString(document.getString(key));
-                document.set(key, updated);
-            } else if (document.isList(key)) {
-                List<?> list = document.getList(key);
-                List<String> strings;
-                try {
-                    strings = (List<String>) list;
-                } catch (ClassCastException exception) {
-                    continue;
-                }
-                List<String> updated = strings.stream().map(this::convertLegacyString).toList();
-                document.set(key, updated);
-            }
-        }
-    }
-
-    /**
-     * Converts a Legacy String to MiniMessage.
-     * If the message already contains a MiniMessage tag, this does nothing.
-     */
-    private String convertLegacyString(@NotNull String message) {
-        // Exclude command reward types
-        if (message.toUpperCase().startsWith("COMMAND:")) {
-            return message;
-        }
-
-        // If the message isn't legacy, don't do anything
-        if (!FishUtils.isLegacyString(message)) {
-            return message;
-        }
-
-        // Get MiniMessage serializer
-        final MiniMessage miniMessageSerializer = MiniMessage.builder()
-            .strict(true)
-            .postProcessor(component -> component)
-            .build();
-
-        // Get LegacyComponentSerializer
-        final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.builder()
-            .character('&')
-            .hexColors()
-            .build();
-
-        // Legacy -> Component -> MiniMessage
-        Component legacy = legacySerializer.deserialize(message);
-        return miniMessageSerializer.serialize(legacy);
     }
 
 }

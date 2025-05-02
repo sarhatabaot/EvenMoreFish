@@ -636,9 +636,18 @@ public class FishUtils {
 
     /**
      * @param colour The original colour
-     * @return A MiniMessage string turned into a format key for use in configs.
+     * @return A string turned into a format key for use in configs.
      */
     public static @NotNull String getFormat(@NotNull String colour) {
+        if (isLegacyString(colour)) {
+            // Legacy's formatting makes this insanely simple
+            return colour + "{name}";
+        } else {
+            return getMiniMessageFormat(colour);
+        }
+    }
+
+    private static String getMiniMessageFormat(@NotNull String colour) {
         int openingTagEnd = colour.indexOf(">");
 
         if (openingTagEnd == -1) {
