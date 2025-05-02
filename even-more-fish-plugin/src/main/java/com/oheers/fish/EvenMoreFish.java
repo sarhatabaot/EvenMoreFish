@@ -43,6 +43,7 @@ import com.oheers.fish.events.AureliumSkillsFishingEvent;
 import com.oheers.fish.events.FishEatEvent;
 import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
+import com.oheers.fish.fishing.EMFFishListener;
 import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.fishing.items.FishManager;
@@ -316,19 +317,14 @@ public class EvenMoreFish extends EMFPlugin {
     public boolean isDebugSession() {
         return MainConfig.getInstance().debugSession();
     }
-
-    public static void dbVerbose(final String message) {
-        if (MainConfig.getInstance().doDBVerbose()) {
-            getInstance().getLogger().info("DB-VERBOSE %s".formatted(message));
-        }
-    }
-
+    
     private void listeners() {
         PluginManager pm = getServer().getPluginManager();
 
         if (MainConfig.getInstance().databaseEnabled()) {
             pm.registerEvents(new JoinChecker(database), this);
             pm.registerEvents(this.userManager, this);
+            pm.registerEvents(new EMFFishListener(),this);
         }
 
         pm.registerEvents(new FishingProcessor(), this);

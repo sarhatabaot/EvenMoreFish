@@ -5,7 +5,6 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.EMFFishEvent;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.FishRarityKey;
 import com.oheers.fish.database.data.UserFishRarityKey;
 import com.oheers.fish.database.data.manager.DataManager;
@@ -30,7 +29,7 @@ public class EMFFishListener implements Listener {
             return;
         }
 
-        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(event.getPlayer().getUniqueId()));
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(event.getPlayer().getUniqueId());
 
         final Fish fish = event.getFish();
 
