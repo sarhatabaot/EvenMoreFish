@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class UserFishStatsSavingStrategy extends HybridSavingStrategy<UserFishStats> {
     public UserFishStatsSavingStrategy(long interval) {
         super(
-                stats -> EvenMoreFish.getInstance().getDatabase().updateUserFishStats(stats),
+                stats -> EvenMoreFish.getInstance().getDatabase().upsertUserFishStats(stats),
                 stats ->  EvenMoreFish.getInstance().getDatabase().batchUpdateUserFishStats(stats),
                 interval,
                 TimeUnit.MINUTES

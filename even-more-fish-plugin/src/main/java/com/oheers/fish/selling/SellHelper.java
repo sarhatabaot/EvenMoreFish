@@ -164,7 +164,7 @@ public class SellHelper {
     }
 
     private void logSoldFish(final UUID uuid, @NotNull List<SoldFish> soldFish) {
-        int userId = EvenMoreFish.getInstance().getDatabase().getUserId(uuid);
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(uuid);
         final String transactionId = FriendlyId.createFriendlyId();
         final Timestamp timestamp = Timestamp.from(Instant.now());
 

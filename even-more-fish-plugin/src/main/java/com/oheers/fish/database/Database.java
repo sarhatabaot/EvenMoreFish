@@ -39,11 +39,9 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -127,16 +125,8 @@ public class Database implements DatabaseAPI {
         this.settings = DatabaseStrategyFactory.getStrategy(connectionFactory).applySettings(settings, tablePrefix, dbName);
     }
 
-    public void executeStatement(@NotNull Consumer<DSLContext> consumer) {
-        try (Connection connection = this.connectionFactory.getConnection()) {
-            consumer.accept(this.getContext(connection));
-        } catch (SQLException e) {
-            EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-        }
-
-    }
-
-    private @NotNull DSLContext getContext(Connection connection) {
+    @NotNull
+    public DSLContext getContext(Connection connection) {
         return DSL.using(connection, DatabaseUtil.getSQLDialect(this.connectionFactory.getType()), this.settings);
     }
 
@@ -157,15 +147,6 @@ public class Database implements DatabaseAPI {
                 return false;
             }
         }.prepareAndRunQuery();
-    }
-
-    public boolean hasFishLog(UUID uuid) {
-        if (!hasUser(uuid)) {
-            return false;
-        }
-
-        final int userId = getUserId(uuid);
-        return hasFishLog(userId);
     }
 
     public boolean hasFishLog(int userId) {
@@ -332,24 +313,6 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
-    @Override
-    public void createFishData(@NotNull Fish fish, @NotNull UUID uuid) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.insertInto(Tables.FISH)
-                        .set(Tables.FISH.FISH_NAME, fish.getName())
-                        .set(Tables.FISH.FISH_RARITY, fish.getRarity().getId())
-                        .set(Tables.FISH.FIRST_FISHER, uuid.toString())
-                        .set(Tables.FISH.TOTAL_CAUGHT, 1)
-                        .set(Tables.FISH.LARGEST_FISH, fish.getLength())
-                        .set(Tables.FISH.FIRST_FISHER, uuid.toString())
-                        .set(Tables.FISH.LARGEST_FISHER, uuid.toString())
-                        .set(Tables.FISH.FIRST_CATCH_TIME, LocalDateTime.now())
-                        .execute();
-            }
-        }.executeUpdate();
-    }
 
     @Override
     public void incrementFish(@NotNull Fish fish) {
@@ -525,17 +488,19 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
-    @Override
-    public void createUserFishStats(UserFishStats userFishStats) { //todo maybe this should have on duplicate key and then this is createAndUpdate
+    public void upsertUserFishStats(UserFishStats userFishStats) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.insertInto(Tables.USER_FISH_STATS)
                         .set(Tables.USER_FISH_STATS.USER_ID, userFishStats.getUserId())
-                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
                         .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
                         .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
                         .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
+                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
+                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
+                        .onDuplicateKeyUpdate()
                         .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
                         .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
                         .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
@@ -544,24 +509,6 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
-    public void updateUserFishStats(UserFishStats userFishStats) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.update(Tables.USER_FISH_STATS)
-                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
-                        .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
-                        .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
-                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
-                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
-                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
-                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
-                        .where(Tables.USER_FISH_STATS.USER_ID.eq(userFishStats.getUserId()))
-                        .execute();
-            }
-        }.executeUpdate();
-
-    }
 
     @Override
     public Set<FishLog> getFishLogEntries(int userId, String fishName, String fishRarity) {
@@ -579,10 +526,10 @@ public class Database implements DatabaseAPI {
                 }
 
                 final Set<FishLog> fishLogs = new HashSet<>();
-                for (Record record : result) {
-                    final LocalDateTime catchTime = record.getValue(Tables.FISH_LOG.CATCH_TIME);
-                    final float length = record.getValue(Tables.FISH_LOG.FISH_LENGTH);
-                    final String competitionId = record.getValue(Tables.FISH_LOG.COMPETITION_ID);
+                for (Record recordResult : result) {
+                    final LocalDateTime catchTime = recordResult.getValue(Tables.FISH_LOG.CATCH_TIME);
+                    final float length = recordResult.getValue(Tables.FISH_LOG.FISH_LENGTH);
+                    final String competitionId = recordResult.getValue(Tables.FISH_LOG.COMPETITION_ID);
 
                     fishLogs.add(new FishLog(userId, fishName, fishRarity, catchTime, length, competitionId));
                 }
@@ -591,7 +538,6 @@ public class Database implements DatabaseAPI {
 
             @Override
             protected Set<FishLog> empty() {
-                //todo
                 return Set.of();
             }
         }.prepareAndRunQuery();
@@ -642,29 +588,45 @@ public class Database implements DatabaseAPI {
 
             @Override
             protected FishStats empty() {
-                //todo
                 return null;
             }
         }.prepareAndRunQuery();
     }
 
-    @Override
-    public void updateFishStats(FishStats fishStats) {
+    public void upsertFishStats(@NotNull FishStats fishStats) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.update(Tables.FISH)
-                        .set(Tables.FISH.FIRST_CATCH_TIME, fishStats.getFirstCatchTime())
+                return dslContext.insertInto(Tables.FISH)
+                        .set(Tables.FISH.FISH_NAME, fishStats.getFishName())
+                        .set(Tables.FISH.FISH_RARITY, fishStats.getFishRarity())
+                        .set(Tables.FISH.FIRST_FISHER, fishStats.getDiscoverer().toString())
                         .set(Tables.FISH.DISCOVERER, fishStats.getDiscoverer().toString())
-                        .set(Tables.FISH.SHORTEST_LENGTH, fishStats.getShortestLength())
-                        .set(Tables.FISH.SHORTEST_FISHER, fishStats.getShortestFisher().toString())
+                        .set(Tables.FISH.TOTAL_CAUGHT, fishStats.getQuantity())
                         .set(Tables.FISH.LARGEST_FISH, fishStats.getLongestLength())
                         .set(Tables.FISH.LARGEST_FISHER, fishStats.getLongestFisher().toString())
-                        .where(Tables.FISH.FISH_NAME.eq(fishStats.getFishName()))
-                        .and(Tables.FISH.FISH_RARITY.eq(fishStats.getFishRarity()))
+                        .set(Tables.FISH.SHORTEST_LENGTH, fishStats.getShortestLength())
+                        .set(Tables.FISH.SHORTEST_FISHER, fishStats.getShortestFisher().toString())
+                        .set(Tables.FISH.FIRST_CATCH_TIME, fishStats.getFirstCatchTime())
+                        .onDuplicateKeyUpdate()
+                        .set(Tables.FISH.TOTAL_CAUGHT, fishStats.getQuantity())
+                        .set(Tables.FISH.LARGEST_FISH,
+                                DSL.when(Tables.FISH.LARGEST_FISH.lt(fishStats.getLongestLength()),
+                                        fishStats.getLongestLength()))
+                        .set(Tables.FISH.LARGEST_FISHER,
+                                DSL.when(Tables.FISH.LARGEST_FISH.lt(fishStats.getLongestLength()),
+                                        fishStats.getLongestFisher().toString()))
+                        .set(Tables.FISH.SHORTEST_LENGTH,
+                                DSL.when(Tables.FISH.SHORTEST_LENGTH.gt(fishStats.getShortestLength())
+                                                .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
+                                        fishStats.getShortestLength()))
+                        .set(Tables.FISH.SHORTEST_FISHER,
+                                DSL.when(Tables.FISH.SHORTEST_LENGTH.gt(fishStats.getShortestLength())
+                                                .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
+                                        fishStats.getShortestFisher().toString()))
                         .execute();
             }
-        }.executeUpdate();
+        }.executeInTransaction();
     }
 
     /**
@@ -721,7 +683,7 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
-    public void updateOrCreateUserReport(UserReport report) {
+    public void upsertUserReport(UserReport report) {
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
@@ -774,7 +736,7 @@ public class Database implements DatabaseAPI {
 
                             return userFishStatsRecord;
                         })
-                        .collect(Collectors.toList());
+                        .toList();
 
                 //upsert
                 dslContext.batchStore(records).execute();
@@ -852,7 +814,7 @@ public class Database implements DatabaseAPI {
 
                             return competitionsRecord;
                         })
-                        .collect(Collectors.toList());
+                        .toList();
 
                 //insert, comp are never updated, just inserted
                 dslContext.batchInsert(records).execute();

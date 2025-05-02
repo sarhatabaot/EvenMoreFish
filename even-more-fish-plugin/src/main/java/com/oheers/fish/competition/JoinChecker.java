@@ -22,7 +22,7 @@ public class JoinChecker implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (database.getUserId(event.getPlayer().getUniqueId()) == 0) {
-            database.updateOrCreateUserReport(new EmptyUserReport(event.getPlayer().getUniqueId()));
+            database.upsertUserReport(new EmptyUserReport(event.getPlayer().getUniqueId()));
         }
 
         Competition activeComp = Competition.getCurrentlyActive();

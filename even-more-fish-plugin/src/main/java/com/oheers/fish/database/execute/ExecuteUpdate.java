@@ -30,6 +30,15 @@ public abstract class ExecuteUpdate extends ExecuteBase {
         }
     }
 
+    public void executeSmartUpdate() {
+        if (supportsTransactions()) {
+            executeInTransaction();
+        } else {
+            executeUpdate();
+        }
+    }
+
+
     /**
      * Executes an update operation within a transaction.
      * Perhaps this should be a part of execute update, but we check if it's supported first, can have this saved somewhere too
@@ -43,6 +52,16 @@ public abstract class ExecuteUpdate extends ExecuteBase {
             });
         } catch (SQLException e) {
             EvenMoreFish.getInstance().getLogger().log(Level.SEVERE,"Transactional update execution failed", e);
+        }
+    }
+
+    public boolean supportsTransactions() {
+        try (Connection connection = getConnection()) {
+            return connection.getMetaData().supportsTransactions();
+        } catch (SQLException e) {
+            EvenMoreFish.getInstance().getLogger().log(Level.WARNING,
+                    "Failed to check transaction support, assuming false", e);
+            return false;
         }
     }
 

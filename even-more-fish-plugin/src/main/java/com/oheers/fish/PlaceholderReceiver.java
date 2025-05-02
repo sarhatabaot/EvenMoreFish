@@ -245,7 +245,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
         if (identifier.startsWith("total_money_earned_")) {
             try {
                 final UUID uuid = UUID.fromString(identifier.split("total_money_earned_")[1]);
-                final int userId = EvenMoreFish.getInstance().getDatabase().getUserId(uuid); //todo cache this somewhere
+                final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(uuid);
                 final UserReport userReport = EvenMoreFish.getInstance().getUserReportDataManager().get(String.valueOf(userId));
                 if (userReport == null) {
                     return null;
@@ -259,7 +259,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
         if (identifier.startsWith("total_fish_sold_")) {
             try {
                 final UUID uuid = UUID.fromString(identifier.split("total_fish_sold_")[1]);
-                final int userId = EvenMoreFish.getInstance().getDatabase().getUserId(uuid); //todo cache this somewhere
+                final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(uuid);
                 final UserReport userReport = EvenMoreFish.getInstance().getUserReportDataManager().get(String.valueOf(userId));
                 if (userReport == null) {
                     return null;

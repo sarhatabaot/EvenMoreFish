@@ -80,7 +80,6 @@ public class FishJournalGui extends ConfigGui {
         ItemFactory factory = new ItemFactory("fish-item", section);
         factory.enableAllChecks();
         ItemStack item = factory.createItem(null, -1);
-        //todo
         item.editMeta(meta -> {
             // Display Name
             String displayStr = section.getString("fish-item.item.displayname");
@@ -91,7 +90,7 @@ public class FishJournalGui extends ConfigGui {
             }
 
             //user id
-            int userId = database.getUserId(player.getUniqueId());
+            int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
             UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(userId + "." + fish.getName() + "." + fish.getRarity().getId());
             FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(fish.getName()+"."+fish.getRarity().getId());
             // Lore

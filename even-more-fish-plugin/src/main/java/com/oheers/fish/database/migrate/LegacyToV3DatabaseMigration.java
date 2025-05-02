@@ -5,11 +5,13 @@ import com.google.gson.Gson;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.connection.ConnectionFactory;
 import com.oheers.fish.database.connection.MigrationManager;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.io.File;
@@ -17,18 +19,23 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class LegacyToV3DatabaseMigration {
     private final Database database;
     private final MigrationManager migrationManager;
+    private final ConnectionFactory connectionFactory;
     
-    public LegacyToV3DatabaseMigration(final Database database, final MigrationManager migrationManager) {
+    public LegacyToV3DatabaseMigration(final Database database, final MigrationManager migrationManager, final ConnectionFactory connectionFactory) {
         this.database = database;
         this.migrationManager = migrationManager;
+        this.connectionFactory = connectionFactory;
     }
     
     /**
@@ -41,7 +48,7 @@ public class LegacyToV3DatabaseMigration {
         }
         
         if (migrationManager.queryTableExistence("Fish2")) {
-            database.executeStatement(c -> c.alterTable("Fish2")
+            executeStatement(c -> c.alterTable("Fish2")
                     .renameTo("${table.prefix}fish")
                     .execute());
             return;
@@ -87,7 +94,7 @@ public class LegacyToV3DatabaseMigration {
             var fishCatchTime = DSL.field("first_catch_time", Long.class);
             var largestLength = DSL.field("largest_length", Float.class);
 
-            database.executeStatement(c -> c.insertInto(fishLog)
+            executeStatement(c -> c.insertInto(fishLog)
                     .set(id, database.getUserId(uuid))
                     .set(rarity, report.getRarity())
                     .set(fish, report.getName())
@@ -111,7 +118,7 @@ public class LegacyToV3DatabaseMigration {
         var uuidField = DSL.field("uuid", String.class);
 
         // starts a field for the new fish that's been fished for the first time
-        database.executeStatement(c -> c.update(usersTable)
+        executeStatement(c -> c.update(usersTable)
                 .set(firstFishField,firstFishID)
                 .set(largestFishField, largestFishID)
                 .set(totalFishField, totalFish)
@@ -204,5 +211,14 @@ public class LegacyToV3DatabaseMigration {
 
         //Run the rest of the migrations, and ensure it's properly setup.
         migrationManager.migrateFromV5ToLatest();
+    }
+
+    public void executeStatement(@NotNull Consumer<DSLContext> consumer) {
+        try (Connection connection = this.connectionFactory.getConnection()) {
+            consumer.accept(database.getContext(connection));
+        } catch (SQLException e) {
+            EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+        }
+
     }
 }

@@ -28,6 +28,7 @@ import com.oheers.fish.config.MessageConfig;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.data.FishLogKey;
 import com.oheers.fish.database.data.manager.DataManager;
+import com.oheers.fish.database.data.manager.UserManager;
 import com.oheers.fish.database.data.strategy.impl.*;
 import com.oheers.fish.database.model.CompetitionReport;
 import com.oheers.fish.database.model.fish.FishLog;
@@ -122,6 +123,7 @@ public class EvenMoreFish extends EMFPlugin {
 
     private AddonManager addonManager;
 
+    private UserManager userManager;
     private DataManager<Collection<FishLog>> fishLogDataManager;
     private DataManager<FishStats> fishStatsDataManager;
     private DataManager<UserFishStats> userFishStatsDataManager;
@@ -225,6 +227,7 @@ public class EvenMoreFish extends EMFPlugin {
         if (MainConfig.getInstance().databaseEnabled()) {
             this.database = new Database();
 
+            this.userManager = new UserManager(database);
             this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy(), key -> {
                 FishLogKey logKey = FishLogKey.from(key);
                 return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime()));
@@ -323,13 +326,18 @@ public class EvenMoreFish extends EMFPlugin {
     private void listeners() {
         PluginManager pm = getServer().getPluginManager();
 
-        pm.registerEvents(new JoinChecker(database), this);
+        if (MainConfig.getInstance().databaseEnabled()) {
+            pm.registerEvents(new JoinChecker(database), this);
+            pm.registerEvents(this.userManager, this);
+        }
+
         pm.registerEvents(new FishingProcessor(), this);
         pm.registerEvents(new HuntingProcessor(), this);
         pm.registerEvents(new UpdateNotify(), this);
         pm.registerEvents(new SkullSaver(), this);
         pm.registerEvents(new BaitListener(), this);
         pm.registerEvents(new ItemProtectionListener(), this);
+
 
         optionalListeners();
     }
@@ -689,5 +697,9 @@ public class EvenMoreFish extends EMFPlugin {
 
     public DataManager<CompetitionReport> getCompetitionDataManager() {
         return competitionDataManager;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
     }
 }

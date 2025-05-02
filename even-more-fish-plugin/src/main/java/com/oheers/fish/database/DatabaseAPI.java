@@ -69,13 +69,6 @@ public interface DatabaseAPI {
      */
     boolean hasFishStats(@NotNull Fish fish);
 
-    /**
-     * Creates initial fish data in the database when a fish is first caught.
-     *
-     * @param fish The fish being recorded
-     * @param uuid The UUID of the player who caught the fish
-     */
-    void createFishData(@NotNull Fish fish, @NotNull UUID uuid);
 
     /**
      * Increments the catch count for a specific fish in the database.
@@ -152,12 +145,6 @@ public interface DatabaseAPI {
      */
     UserFishStats getUserFishStats(final int userId, final String fishName, final String fishRarity);
 
-    /**
-     * Creates new fish statistics for a player in the database.
-     *
-     * @param userFishStats The statistics to create
-     */
-    void createUserFishStats(final UserFishStats userFishStats);
 
     /**
      * Retrieves a specific fish log entry from the database.
@@ -201,7 +188,7 @@ public interface DatabaseAPI {
      *
      * @param fishStats The updated statistics
      */
-    void updateFishStats(final FishStats fishStats);
+    void upsertFishStats(final FishStats fishStats);
 
     /**
      * Batch inserts multiple fish log entries into the database.
@@ -216,7 +203,7 @@ public interface DatabaseAPI {
      *
      * @param report The UserReport containing all fishing statistics
      */
-    void updateOrCreateUserReport(UserReport report);
+    void upsertUserReport(UserReport report);
 
     /**
      * Batch updates multiple user fish statistics records in the database.
@@ -226,12 +213,6 @@ public interface DatabaseAPI {
      */
     void batchUpdateUserFishStats(Collection<UserFishStats> userFishStats);
 
-    /**
-     * Updates a single user's fish statistics in the database.
-     *
-     * @param userFishStats The updated statistics
-     */
-    void updateUserFishStats(UserFishStats userFishStats);
 
     /**
      * Updates or creates a competition report in the database.

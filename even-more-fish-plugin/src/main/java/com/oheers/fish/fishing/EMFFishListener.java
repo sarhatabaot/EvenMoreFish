@@ -30,11 +30,11 @@ public class EMFFishListener implements Listener {
             return;
         }
 
-        final Database database = EvenMoreFish.getInstance().getDatabase();
-        final int userId = database.getUserId(event.getPlayer().getUniqueId());
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(event.getPlayer().getUniqueId()));
 
         final Fish fish = event.getFish();
 
+        // could be in transaction todo
         handleFishLog(userId, fish, event.getCatchTime());
         handleUserFishStats(userId, fish);
         handleFishStats(fish);
