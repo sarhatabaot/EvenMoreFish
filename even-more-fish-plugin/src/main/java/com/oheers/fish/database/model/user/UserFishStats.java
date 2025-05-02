@@ -1,6 +1,8 @@
 package com.oheers.fish.database.model.user;
 
 
+import com.oheers.fish.fishing.items.Fish;
+
 import java.time.LocalDateTime;
 
 public class UserFishStats {
@@ -22,6 +24,16 @@ public class UserFishStats {
         this.shortestLength = shortestLength;
         this.longestLength = longestLength;
         this.quantity = quantity;
+    }
+
+    public UserFishStats(int userId, Fish fish, LocalDateTime firstCatchTime) {
+        this.userId = userId;
+        this.fishName = fish.getName();
+        this.fishRarity = fish.getRarity().getId();
+        this.firstCatchTime = firstCatchTime;
+        this.shortestLength = fish.getLength();
+        this.longestLength = fish.getLength();
+        this.quantity = 1;
     }
 
     public int getUserId() {

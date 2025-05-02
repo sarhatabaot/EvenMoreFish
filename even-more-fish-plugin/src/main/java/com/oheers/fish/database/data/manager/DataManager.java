@@ -27,6 +27,17 @@ public class DataManager<T> {
         });
     }
 
+    public T getOrCreate(String key, Function<String, T> loader, T fallbackValue) {
+        if (defaultLoader != null) {
+            return get(key, loader); // Use default loader which will create if not exists
+        }
+
+        return cache.computeIfAbsent(key, k -> {
+            savingStrategy.save(fallbackValue);
+            return fallbackValue;
+        });
+    }
+
     // Get data using default loader
     public T get(String key) {
         if (defaultLoader == null) {

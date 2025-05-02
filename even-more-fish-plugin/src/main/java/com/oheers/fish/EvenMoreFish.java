@@ -317,7 +317,7 @@ public class EvenMoreFish extends EMFPlugin {
     public boolean isDebugSession() {
         return MainConfig.getInstance().debugSession();
     }
-    
+
     private void listeners() {
         PluginManager pm = getServer().getPluginManager();
 
