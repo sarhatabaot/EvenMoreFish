@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 public class EMFFishListener implements Listener {
 
@@ -29,7 +30,7 @@ public class EMFFishListener implements Listener {
             return;
         }
 
-        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(event.getPlayer().getUniqueId());
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(event.getPlayer().getUniqueId()); //could be thrown in the event, with a null option
 
         final Fish fish = event.getFish();
 
@@ -42,9 +43,10 @@ public class EMFFishListener implements Listener {
     private void handleFishStats(final @NotNull Fish fish) {
         final DataManager<FishStats> fishStatsDataManager = EvenMoreFish.getInstance().getFishStatsDataManager();
         final FishRarityKey fishRarityKey = FishRarityKey.of(fish);
-        final FishStats stats = fishStatsDataManager.get(
+        final FishStats stats = fishStatsDataManager.getOrCreate(
                 fishRarityKey.toString(),
-                key -> EvenMoreFish.getInstance().getDatabase().getFishStats(fish.getName(),fish.getRarity().getId())
+                key -> EvenMoreFish.getInstance().getDatabase().getFishStats(fish.getName(),fish.getRarity().getId()),
+                new FishStats(fish.getName(),fish.getRarity().getId(),LocalDateTime.now(),fish.getFisherman(),fish.getLength(),fish.getFisherman(),fish.getLength(),fish.getFisherman(),1)
         );
 
         if (stats.getLongestLength() < fish.getLength()) {

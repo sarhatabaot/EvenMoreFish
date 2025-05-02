@@ -25,7 +25,7 @@ public class UserManager implements Listener {
     public void onJoin(final @NotNull PlayerJoinEvent event) {
         final UUID uuid = event.getPlayer().getUniqueId();
 
-        userCache.computeIfAbsent(uuid, database::getUserId);
+        userCache.putIfAbsent(uuid, database.getUserId(uuid));
     }
 
     @EventHandler

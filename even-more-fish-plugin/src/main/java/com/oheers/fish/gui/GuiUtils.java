@@ -5,6 +5,7 @@ import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.gui.guis.BaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
+import com.oheers.fish.gui.guis.journal.FishJournalGui;
 import com.oheers.fish.selling.SellHelper;
 import com.oheers.fish.utils.ItemFactory;
 import de.themoep.inventorygui.GuiElement;
@@ -151,6 +152,12 @@ public class GuiUtils {
                 gui.doRescue();
             }
             new BaitsGui(click.getWhoClicked()).open();
+        });
+        newActionMap.put("open-journal-menu", (gui, click) -> {
+            if (gui != null) {
+                gui.doRescue();
+            }
+            new FishJournalGui(click.getWhoClicked(), null);
         });
         // Add page actions so third party plugins cannot register their own.
         newActionMap.put("first-page", (gui, click) -> {});

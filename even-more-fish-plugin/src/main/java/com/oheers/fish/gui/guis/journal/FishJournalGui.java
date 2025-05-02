@@ -6,7 +6,6 @@ import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
-import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
@@ -92,7 +91,7 @@ public class FishJournalGui extends ConfigGui {
             //user id
             int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
             UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(userId + "." + fish.getName() + "." + fish.getRarity().getId());
-            FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(fish.getName()+"."+fish.getRarity().getId());
+            FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(fish.getName() + "." + fish.getRarity().getId());
             // Lore
             LocalDateTime discover = userFishStats.getFirstCatchTime();
             String discoverDate = discover == null ? "Unknown" : discover.format(DateTimeFormatter.ISO_DATE);
