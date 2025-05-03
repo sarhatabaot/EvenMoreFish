@@ -674,8 +674,7 @@ public class Database implements DatabaseAPI {
 
                             return logRecord;
                         })
-                        .collect(Collectors.toList());
-
+                        .toList();
                 dslContext.batchStore(records).execute();
 
                 return records.size();
