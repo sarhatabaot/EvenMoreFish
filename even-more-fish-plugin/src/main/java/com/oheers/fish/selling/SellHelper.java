@@ -100,12 +100,8 @@ public class SellHelper {
 
         this.player.playSound(this.player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.06f);
 
-        if (MainConfig.getInstance().isDatabaseOnline()) {
-            // TODO temporary fix until database PR is merged.
-            try {
-                logSoldFish(player.getUniqueId(), soldFish);
-            } catch (Exception exception) { /* Ignored */ }
-        }
+        logSoldFish(player.getUniqueId(), soldFish);
+        
         return totalWorth != 0.0;
 
     }
@@ -164,6 +160,10 @@ public class SellHelper {
     }
 
     private void logSoldFish(final UUID uuid, @NotNull List<SoldFish> soldFish) {
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            return;
+        }
+
         final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(uuid);
         final String transactionId = FriendlyId.createFriendlyId();
         final Timestamp timestamp = Timestamp.from(Instant.now());
