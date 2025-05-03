@@ -101,7 +101,7 @@ public class SellHelper {
         this.player.playSound(this.player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.06f);
 
         logSoldFish(player.getUniqueId(), soldFish);
-        
+
         return totalWorth != 0.0;
 
     }

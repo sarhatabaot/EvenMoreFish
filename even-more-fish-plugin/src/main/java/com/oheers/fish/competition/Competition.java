@@ -162,7 +162,7 @@ public class Competition {
 
                 if (MainConfig.getInstance().isDatabaseOnline()) {
                     Competition competitionRef = this;
-                    EvenMoreFish.getInstance().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(this, this.startTime, LocalDateTime.now()));
+                    EvenMoreFish.getInstance().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(competitionRef, competitionRef.startTime, LocalDateTime.now()));
                 }
 
                 leaderboard.clear();

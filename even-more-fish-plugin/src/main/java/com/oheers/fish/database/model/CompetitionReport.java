@@ -37,7 +37,7 @@ public class CompetitionReport {
 
     public CompetitionReport(Competition competition, LocalDateTime startTime, LocalDateTime endTime) {
         this.competitionConfigId = competition.getCompetitionName();
-        this.winnerFish = FishRarityKey.of(competition.getLeaderboard().getEntry(0).getFish()).toString(); //could just be the fish here todo
+        this.winnerFish = FishRarityKey.of(competition.getLeaderboard().getTopEntry().getFish()).toString(); //could just be the fish here todo
         this.winnerScore = competition.getLeaderboard().getTopEntry().getValue();
         this.winnerUuid = competition.getLeaderboard().getTopEntry().getPlayer();
         this.contestants = competition.getLeaderboard().getEntries().stream().map(CompetitionEntry::getPlayer).toList();
