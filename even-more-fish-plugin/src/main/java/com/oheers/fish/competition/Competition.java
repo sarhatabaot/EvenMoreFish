@@ -160,7 +160,7 @@ public class Competition {
                     competitionType = CompetitionType.RANDOM;
                 }
 
-                if (MainConfig.getInstance().databaseEnabled()) {
+                if (MainConfig.getInstance().isDatabaseOnline()) {
                     Competition competitionRef = this;
                     EvenMoreFish.getInstance().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(this, this.startTime, LocalDateTime.now()));
                 }
@@ -349,7 +349,7 @@ public class Competition {
     }
 
     private void handleDatabaseUpdates(CompetitionEntry entry, boolean isTopEntry) {
-        if (!MainConfig.getInstance().databaseEnabled()) {
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
             return;
         }
 
@@ -374,12 +374,11 @@ public class Competition {
             return;
         }
 
-        boolean databaseEnabled = MainConfig.getInstance().databaseEnabled();
         int rewardPlace = 1;
 
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        if (databaseEnabled && !entries.isEmpty()) {
+        if (MainConfig.getInstance().isDatabaseOnline() && !entries.isEmpty()) {
             handleDatabaseUpdates(entries.get(0), true); // Top entry
         }
 

@@ -100,7 +100,7 @@ public class SellHelper {
 
         this.player.playSound(this.player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.06f);
 
-        if (MainConfig.getInstance().databaseEnabled()) {
+        if (MainConfig.getInstance().isDatabaseOnline()) {
             // TODO temporary fix until database PR is merged.
             try {
                 logSoldFish(player.getUniqueId(), soldFish);

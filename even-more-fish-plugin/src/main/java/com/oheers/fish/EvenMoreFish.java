@@ -284,7 +284,7 @@ public class EvenMoreFish extends EMFPlugin {
         RewardType.unregisterAll();
         RequirementType.unregisterAll();
 
-        if (MainConfig.getInstance().databaseEnabled()) {
+        if (MainConfig.getInstance().isDatabaseOnline()) {
             database.shutdown();
         }
 
@@ -321,7 +321,7 @@ public class EvenMoreFish extends EMFPlugin {
     private void listeners() {
         PluginManager pm = getServer().getPluginManager();
 
-        if (MainConfig.getInstance().databaseEnabled()) {
+        if (MainConfig.getInstance().isDatabaseOnline()) {
             pm.registerEvents(new JoinChecker(database), this);
             pm.registerEvents(this.userManager, this);
             pm.registerEvents(new EMFFishListener(),this);

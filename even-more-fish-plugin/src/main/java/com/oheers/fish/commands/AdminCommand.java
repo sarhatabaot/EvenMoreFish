@@ -459,7 +459,7 @@ public class AdminCommand {
         );
         return new CommandAPICommand("migrate")
                 .executes(info -> {
-                    if (!MainConfig.getInstance().databaseEnabled()) {
+                    if (!MainConfig.getInstance().isDatabaseOnline()) {
                         EMFSingleMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
                                 .send(info.sender());
                         return;

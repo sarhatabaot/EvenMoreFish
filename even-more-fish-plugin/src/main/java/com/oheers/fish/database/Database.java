@@ -446,6 +446,10 @@ public class Database implements DatabaseAPI {
             return "Disabled";
         }
 
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            return "Offline";
+        }
+
         return "V" + this.version;
     }
 
@@ -454,6 +458,9 @@ public class Database implements DatabaseAPI {
             return "Disabled";
         }
 
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            return "Offline";
+        }
         return connectionFactory.getType();
     }
 
