@@ -700,7 +700,6 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
-    //todo error here, seems it's not being inserted...
     public Integer upsertUserReport(UserReport report) {
         return new ExecuteUpdate(connectionFactory, settings) {
             @Override
@@ -732,8 +731,7 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish())
                         .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
                         .returningResult(Tables.USERS.ID)
-                        .fetchOne()
-                        .getValue(Tables.USERS.ID);
+                        .execute();
             }
         }.executeUpdate();
     }

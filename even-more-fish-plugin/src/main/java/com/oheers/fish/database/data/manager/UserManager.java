@@ -28,7 +28,8 @@ public class UserManager implements Listener {
         final UUID uuid = event.getPlayer().getUniqueId();
         int id = database.getUserId(uuid);
         if (id == 0) {
-            id = EvenMoreFish.getInstance().getDatabase().upsertUserReport(new EmptyUserReport(event.getPlayer().getUniqueId()));
+            EvenMoreFish.getInstance().getDatabase().upsertUserReport(new EmptyUserReport(event.getPlayer().getUniqueId()));
+            id = database.getUserId(uuid);
         }
 
         userCache.putIfAbsent(uuid, id);
