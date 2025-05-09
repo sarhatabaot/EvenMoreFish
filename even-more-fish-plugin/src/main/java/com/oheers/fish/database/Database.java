@@ -620,18 +620,22 @@ public class Database implements DatabaseAPI {
                         .set(Tables.FISH.TOTAL_CAUGHT, fishStats.getQuantity())
                         .set(Tables.FISH.LARGEST_FISH,
                                 DSL.when(Tables.FISH.LARGEST_FISH.lt(fishStats.getLongestLength()),
-                                        fishStats.getLongestLength()))
+                                                fishStats.getLongestLength())
+                                        .otherwise(Tables.FISH.LARGEST_FISH))
                         .set(Tables.FISH.LARGEST_FISHER,
                                 DSL.when(Tables.FISH.LARGEST_FISH.lt(fishStats.getLongestLength()),
-                                        fishStats.getLongestFisher().toString()))
+                                                fishStats.getLongestFisher().toString())
+                                        .otherwise(Tables.FISH.LARGEST_FISHER))
                         .set(Tables.FISH.SHORTEST_LENGTH,
                                 DSL.when(Tables.FISH.SHORTEST_LENGTH.gt(fishStats.getShortestLength())
-                                                .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
-                                        fishStats.getShortestLength()))
+                                                        .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
+                                                fishStats.getShortestLength())
+                                        .otherwise(Tables.FISH.SHORTEST_LENGTH))
                         .set(Tables.FISH.SHORTEST_FISHER,
                                 DSL.when(Tables.FISH.SHORTEST_LENGTH.gt(fishStats.getShortestLength())
-                                                .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
-                                        fishStats.getShortestFisher().toString()))
+                                                        .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
+                                                fishStats.getShortestFisher().toString())
+                                        .otherwise(Tables.FISH.SHORTEST_FISHER))
                         .execute();
             }
         }.executeInTransaction();

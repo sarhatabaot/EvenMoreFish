@@ -59,6 +59,7 @@ public class EMFFishListener implements Listener {
         }
 
         stats.incrementQuantity();
+        EvenMoreFish.getInstance().debug("Fish Stats: %s".formatted( stats.toString()));
         fishStatsDataManager.update(fishRarityKey.toString(), stats);
     }
 

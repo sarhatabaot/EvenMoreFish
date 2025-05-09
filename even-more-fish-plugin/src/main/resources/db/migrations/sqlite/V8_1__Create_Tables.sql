@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    fish_rarity VARCHAR(256) NOT NULL,
    first_fisher VARCHAR(36) NOT NULL,
    total_caught INTEGER NOT NULL,
-   largest_fish REAL NOT NULL,
+   largest_fish REAL NOT NULL, --length
    largest_fisher VARCHAR(36) NOT NULL,
    shortest_length REAL NOT NULL,
    shortest_fisher VARCHAR(36) NOT NULL,
