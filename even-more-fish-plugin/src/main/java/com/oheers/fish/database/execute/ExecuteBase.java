@@ -33,5 +33,9 @@ public abstract class ExecuteBase {
     protected Connection getConnection() throws SQLException {
         return connectionFactory.getConnection();
     }
+
+    protected boolean supportsTransactions() {
+        return this.connectionFactory.supportsTransactions();
+    }
 }
 

@@ -31,7 +31,7 @@ public abstract class ExecuteUpdate extends ExecuteBase {
     }
 
     public void executeSmartUpdate() {
-        if (supportsTransactions()) {
+        if (this.supportsTransactions()) {
             executeInTransaction();
         } else {
             executeUpdate();
@@ -55,15 +55,6 @@ public abstract class ExecuteUpdate extends ExecuteBase {
         }
     }
 
-    public boolean supportsTransactions() {
-        try (Connection connection = getConnection()) {
-            return connection.getMetaData().supportsTransactions();
-        } catch (SQLException e) {
-            EvenMoreFish.getInstance().getLogger().log(Level.WARNING,
-                    "Failed to check transaction support, assuming false", e);
-            return false;
-        }
-    }
 
     /**
      * Abstract method for performing the update operation.
