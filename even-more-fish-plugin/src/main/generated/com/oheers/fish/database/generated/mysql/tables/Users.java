@@ -8,7 +8,9 @@ import com.oheers.fish.database.generated.mysql.DefaultSchema;
 import com.oheers.fish.database.generated.mysql.Keys;
 import com.oheers.fish.database.generated.mysql.tables.records.UsersRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -161,7 +163,12 @@ public class Users extends TableImpl<UsersRecord> {
 
     @Override
     public UniqueKey<UsersRecord> getPrimaryKey() {
-        return Keys.CONSTRAINT_A;
+        return Keys.CONSTRAINT_A3;
+    }
+
+    @Override
+    public List<UniqueKey<UsersRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.CONSTRAINT_A);
     }
 
     @Override
