@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
 -- user reports (stats)
 CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
    id INTEGER NOT NULL AUTO_INCREMENT, -- user_id
-   uuid VARCHAR(128) NOT NULL,
+   uuid VARCHAR(128) NOT NULL UNIQUE,
    first_fish VARCHAR(256) NOT NULL,
    last_fish VARCHAR(256) NOT NULL,
    largest_fish VARCHAR(256) NOT NULL,

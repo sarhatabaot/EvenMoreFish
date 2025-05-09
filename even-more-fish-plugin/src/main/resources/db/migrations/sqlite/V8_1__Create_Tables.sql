@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
 
 CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
    id INTEGER PRIMARY KEY AUTOINCREMENT,
-   uuid VARCHAR(128) NOT NULL,
+   uuid VARCHAR(128) NOT NULL UNIQUE,
    first_fish VARCHAR(256) NOT NULL,
    last_fish VARCHAR(256) NOT NULL,
    largest_fish VARCHAR(256) NOT NULL,

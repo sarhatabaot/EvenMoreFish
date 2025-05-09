@@ -59,7 +59,7 @@ public interface DatabaseAPI {
      * @param uuid The UUID of the player
      * @return The UserReport containing all fishing statistics, or null if not found
      */
-    UserReport readUserReport(@NotNull UUID uuid);
+    UserReport getUserReport(@NotNull UUID uuid);
 
     /**
      * Checks if fish statistics exist in the database for a specific fish.

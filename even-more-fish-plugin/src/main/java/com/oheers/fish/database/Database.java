@@ -169,6 +169,7 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
+    //used only in legacy migration, maybe move it there? todo
     @Override
     public void createEmptyUserReport(@NotNull UUID uuid) {
         new ExecuteUpdate(connectionFactory, settings) {
@@ -237,7 +238,7 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public UserReport readUserReport(@NotNull UUID uuid) {
+    public UserReport getUserReport(@NotNull UUID uuid) {
         return new ExecuteQuery<UserReport>(connectionFactory, settings) {
             @Override
             protected UserReport onRunQuery(DSLContext dslContext) throws Exception {

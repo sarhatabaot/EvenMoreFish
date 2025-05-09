@@ -14,9 +14,6 @@ import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
 import com.oheers.fish.commands.MainCommand;
-import com.oheers.fish.competition.*;
-import com.oheers.fish.competition.rewardtypes.*;
-import com.oheers.fish.competition.rewardtypes.external.*;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
@@ -246,7 +243,7 @@ public class EvenMoreFish extends EMFPlugin {
                 return EvenMoreFish.getInstance().getDatabase().getUserFishStats(userId, fishName, fishRarity);
             });
 
-            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), id -> EvenMoreFish.getInstance().getDatabase().readUserReport(UUID.fromString(id)));
+            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), id -> EvenMoreFish.getInstance().getDatabase().getUserReport(UUID.fromString(id)));
             this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L), key -> database.getCompetitionReport(Integer.parseInt(key)));
         }
 
