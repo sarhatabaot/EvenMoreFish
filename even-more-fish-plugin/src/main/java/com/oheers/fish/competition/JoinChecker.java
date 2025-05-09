@@ -12,28 +12,25 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class JoinChecker implements Listener {
-    private final Database database;
-
-    public JoinChecker(Database database) {
-        this.database = database;
-    }
 
     // Gives the player the active fishing bar if there's a fishing event cracking off
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        if (database.getUserId(event.getPlayer().getUniqueId()) == 0) {
-            database.upsertUserReport(new EmptyUserReport(event.getPlayer().getUniqueId()));
+        Competition activeComp = Competition.getCurrentlyActive();
+        if (activeComp == null) {
+            return;
         }
 
-        Competition activeComp = Competition.getCurrentlyActive();
-        if (activeComp != null) {
-            activeComp.getStatusBar().addPlayer(event.getPlayer());
-            if (activeComp.getStartMessage() != null) {
-                EMFMessage competitionJoin = ConfigMessage.COMPETITION_JOIN.getMessage();
-                competitionJoin.setCompetitionType(activeComp.getCompetitionType().getTypeVariable().getMessage());
-                EvenMoreFish.getScheduler().runTaskLater(() -> competitionJoin.send(event.getPlayer()), 20L * 3);
-            }
+
+        activeComp.getStatusBar().addPlayer(event.getPlayer());
+        if (activeComp.getStartMessage() == null) {
+            return;
         }
+
+
+        EMFMessage competitionJoin = ConfigMessage.COMPETITION_JOIN.getMessage();
+        competitionJoin.setCompetitionType(activeComp.getCompetitionType().getTypeVariable().getMessage());
+        EvenMoreFish.getScheduler().runTaskLater(() -> competitionJoin.send(event.getPlayer()), 20L * 3);
     }
 
     // Removes the player from the bar list if they leave the server

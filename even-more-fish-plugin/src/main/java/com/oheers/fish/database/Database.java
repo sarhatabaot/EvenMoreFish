@@ -671,18 +671,24 @@ public class Database implements DatabaseAPI {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 List<FishLogRecord> records = logs.stream()
+                        .filter(Objects::nonNull)
                         .map(log -> {
                             FishLogRecord logRecord = new FishLogRecord();
+                            EvenMoreFish.getInstance().debug(("USER ID " + log.getUserId()));
                             logRecord.setUserId(log.getUserId());
                             logRecord.setFishLength(log.getLength());
                             logRecord.setCompetitionId(log.getCompetitionId());
                             logRecord.setCatchTime(log.getCatchTime());
                             logRecord.setFishName(log.getFishName());
                             logRecord.setFishRarity(log.getFishRarity());
-
                             return logRecord;
                         })
                         .toList();
+
+                if (records.isEmpty()) {
+                    return 0;
+                }
+
                 dslContext.batchStore(records).execute();
 
                 return records.size();
@@ -690,12 +696,13 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
-    public void upsertUserReport(UserReport report) {
-        new ExecuteUpdate(connectionFactory, settings) {
+    //todo error here, seems it's not being inserted...
+    public Integer upsertUserReport(UserReport report) {
+        return new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.insertInto(Tables.USERS)
-                        .set(Tables.USERS.UUID, report.getUUID().toString())
+                        .set(Tables.USERS.UUID, report.getUuid().toString())
                         .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
                         .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
                         .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
@@ -720,7 +727,9 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.LAST_FISH, report.getLargestFish())
                         .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish())
                         .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
-                        .execute();
+                        .returningResult(Tables.USERS.ID)
+                        .fetchOne()
+                        .getValue(Tables.USERS.ID);
             }
         }.executeUpdate();
     }

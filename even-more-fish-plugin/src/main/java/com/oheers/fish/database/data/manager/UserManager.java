@@ -1,7 +1,9 @@
 package com.oheers.fish.database.data.manager;
 
 
+import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.model.user.EmptyUserReport;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -24,8 +26,13 @@ public class UserManager implements Listener {
     @EventHandler
     public void onJoin(final @NotNull PlayerJoinEvent event) {
         final UUID uuid = event.getPlayer().getUniqueId();
+        int id = database.getUserId(uuid);
+        if (id == 0) {
+            id = EvenMoreFish.getInstance().getDatabase().upsertUserReport(new EmptyUserReport(event.getPlayer().getUniqueId()));
+        }
 
-        userCache.putIfAbsent(uuid, database.getUserId(uuid));
+        userCache.putIfAbsent(uuid, id);
+        EvenMoreFish.getInstance().debug("User ID: %d UUID: %s".formatted(id, uuid));
     }
 
     @EventHandler

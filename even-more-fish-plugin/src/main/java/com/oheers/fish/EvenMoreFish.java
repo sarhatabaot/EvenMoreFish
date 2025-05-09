@@ -321,7 +321,7 @@ public class EvenMoreFish extends EMFPlugin {
         PluginManager pm = getServer().getPluginManager();
 
         if (MainConfig.getInstance().isDatabaseOnline()) {
-            pm.registerEvents(new JoinChecker(database), this);
+            pm.registerEvents(new JoinChecker(), this);
             pm.registerEvents(this.userManager, this);
             pm.registerEvents(new EMFFishListener(),this);
         }

@@ -203,7 +203,7 @@ public interface DatabaseAPI {
      *
      * @param report The UserReport containing all fishing statistics
      */
-    void upsertUserReport(UserReport report);
+    Integer upsertUserReport(UserReport report);
 
     /**
      * Batch updates multiple user fish statistics records in the database.

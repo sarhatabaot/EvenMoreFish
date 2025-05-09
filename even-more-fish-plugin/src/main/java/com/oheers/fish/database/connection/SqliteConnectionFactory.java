@@ -12,7 +12,6 @@ public class SqliteConnectionFactory extends ConnectionFactory {
     @Override
     protected void configureDatabase(@NotNull HikariConfig config, String address, int port, String databaseName, String username, String password) {
         config.setJdbcUrl("jdbc:sqlite:plugins/EvenMoreFish/" + databaseName + ".db?journal_mode=WAL");
-        config.setAutoCommit(false);
         config.setMaximumPoolSize(4);
         config.setMinimumIdle(1);
     }

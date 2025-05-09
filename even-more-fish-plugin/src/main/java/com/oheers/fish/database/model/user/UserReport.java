@@ -158,7 +158,7 @@ public class UserReport {
         return id;
     }
 
-    public UUID getUUID() {
+    public UUID getUuid() {
         return uuid;
     }
     

@@ -1,11 +1,13 @@
 package com.oheers.fish.database.data.manager;
 
 
+import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.database.data.strategy.DataSavingStrategy;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class DataManager<T> {
     private final Map<String, T> cache = new ConcurrentHashMap<>();
@@ -22,39 +24,38 @@ public class DataManager<T> {
     public T get(String key, Function<String, T> loader) {
         return cache.computeIfAbsent(key, k -> {
             T data = loader.apply(k);
-            savingStrategy.save(data);
+            if (data != null) {  // Only save if data is valid
+                savingStrategy.save(data);
+            }
             return data;
         });
     }
 
-    public T getOrCreate(String key, Function<String, T> loader, T fallbackValue) {
+    public T getOrCreate(String key, Function<String, T> loader, Supplier<T> fallbackValueSupplier) {
         // First try to get with the provided loader
         T loadedValue = get(key, loader);
 
         if (loadedValue != null) {
+            EvenMoreFish.getInstance().debug("Using loaded value.");
             return loadedValue;
         }
 
         // If we got null, check if we have a cached value
         T cachedValue = cache.get(key);
         if (cachedValue != null) {
+            EvenMoreFish.getInstance().debug("Using cached value.");
             return cachedValue;
         }
 
         // Otherwise, use the fallback value
-        cache.put(key, fallbackValue);
-        savingStrategy.save(fallbackValue);
+        T fallbackValue = fallbackValueSupplier.get();
+        if (fallbackValue != null) {
+            cache.put(key, fallbackValue);
+            savingStrategy.save(fallbackValue);
+            EvenMoreFish.getInstance().debug("Using fallback value.");
+        }
         return fallbackValue;
     }
-
-    // Get data using default loader, with a fallback value
-    public T getOrCreate(String key, T fallbackValue) {
-        if (defaultLoader == null) {
-            throw new IllegalStateException("No default loader configured");
-        }
-        return getOrCreate(key, defaultLoader, fallbackValue);
-    }
-
 
     // Get data using default loader
     public T get(String key) {
