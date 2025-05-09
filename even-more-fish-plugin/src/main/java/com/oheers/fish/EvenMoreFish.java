@@ -267,10 +267,12 @@ public class EvenMoreFish extends EMFPlugin {
 
         terminateGuis();
         // Don't use the scheduler here because it will throw errors on disable
-        EvenMoreFish.getInstance().getUserReportDataManager().flush();
-        EvenMoreFish.getInstance().getUserFishStatsDataManager().flush();
-        EvenMoreFish.getInstance().getFishStatsDataManager().flush();
-        EvenMoreFish.getInstance().getCompetitionDataManager().flush();
+        if (MainConfig.getInstance().databaseEnabled()) {
+            this.userReportDataManager.flush();
+            this.userFishStatsDataManager.flush();
+            this.fishStatsDataManager.flush();
+            this.competitionDataManager.flush();
+        }
 
         // Ends the current competition in case the plugin is being disabled when the server will continue running
         Competition active = Competition.getCurrentlyActive();
@@ -474,7 +476,6 @@ public class EvenMoreFish extends EMFPlugin {
         }
 
         firstLoad = false;
-
     }
 
     private void registerCommands() {

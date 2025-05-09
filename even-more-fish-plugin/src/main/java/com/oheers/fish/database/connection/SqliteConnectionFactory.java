@@ -3,13 +3,18 @@ package com.oheers.fish.database.connection;
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 
 public class SqliteConnectionFactory extends ConnectionFactory {
     @Override
     protected void configureDatabase(@NotNull HikariConfig config, String address, int port, String databaseName, String username, String password) {
-        config.setJdbcUrl("jdbc:sqlite:plugins/EvenMoreFish/" + databaseName + ".db");
-//        config.setMaximumPoolSize(1); // SQLite doesn't benefit from multiple connections
+        config.setJdbcUrl("jdbc:sqlite:plugins/EvenMoreFish/" + databaseName + ".db?journal_mode=WAL");
+        config.setAutoCommit(false);
+        config.setMaximumPoolSize(4);
+        config.setMinimumIdle(1);
     }
 
     @Override
@@ -27,4 +32,5 @@ public class SqliteConnectionFactory extends ConnectionFactory {
     public String getType() {
         return "SQLITE";
     }
+
 }

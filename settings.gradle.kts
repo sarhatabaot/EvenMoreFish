@@ -73,7 +73,7 @@ dependencyResolutionManagement {
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
-            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.0.0")
+            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.0.1")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
             plugin("shadow", "com.gradleup.shadow").version("9.0.0-beta12")

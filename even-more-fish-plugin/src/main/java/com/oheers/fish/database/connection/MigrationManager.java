@@ -94,8 +94,9 @@ public class MigrationManager {
 
                 )
         );
-        try {
-            DSLContext dsl = DSL.using(connectionFactory.getConnection(), settings);
+
+        try (Connection connection = connectionFactory.getConnection()) {
+             DSLContext dsl = DSL.using(connection, settings);
 
             return dsl.fetchExists(
                     DSL.select()
