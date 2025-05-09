@@ -28,15 +28,33 @@ public class DataManager<T> {
     }
 
     public T getOrCreate(String key, Function<String, T> loader, T fallbackValue) {
-        if (defaultLoader != null) {
-            return get(key, loader); // Use default loader which will create if not exists
+        // First try to get with the provided loader
+        T loadedValue = get(key, loader);
+
+        if (loadedValue != null) {
+            return loadedValue;
         }
 
-        return cache.computeIfAbsent(key, k -> {
-            savingStrategy.save(fallbackValue);
-            return fallbackValue;
-        });
+        // If we got null, check if we have a cached value
+        T cachedValue = cache.get(key);
+        if (cachedValue != null) {
+            return cachedValue;
+        }
+
+        // Otherwise, use the fallback value
+        cache.put(key, fallbackValue);
+        savingStrategy.save(fallbackValue);
+        return fallbackValue;
     }
+
+    // Get data using default loader, with a fallback value
+    public T getOrCreate(String key, T fallbackValue) {
+        if (defaultLoader == null) {
+            throw new IllegalStateException("No default loader configured");
+        }
+        return getOrCreate(key, defaultLoader, fallbackValue);
+    }
+    
 
     // Get data using default loader
     public T get(String key) {

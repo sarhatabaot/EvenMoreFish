@@ -34,7 +34,6 @@ public class EMFFishListener implements Listener {
 
         final Fish fish = event.getFish();
 
-        // could be in transaction todo
         handleFishLog(userId, fish, event.getCatchTime());
         handleUserFishStats(userId, fish);
         handleFishStats(fish);
