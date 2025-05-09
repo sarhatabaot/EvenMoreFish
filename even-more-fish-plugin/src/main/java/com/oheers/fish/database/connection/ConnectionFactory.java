@@ -56,6 +56,10 @@ public abstract class ConnectionFactory {
 
         configureDatabase(config, getDatabaseAddress(), getDatabasePort(), MainConfig.getInstance().getDatabase(), MainConfig.getInstance().getUsername(), MainConfig.getInstance().getPassword());
         config.setInitializationFailTimeout(-1);
+        config.setValidationTimeout(5000);
+        config.addDataSourceProperty("validateBorrowedConnections", true);
+        config.setLeakDetectionThreshold(30000);
+
 
         Map<String, String> properties = new HashMap<>();
 

@@ -17,7 +17,9 @@ public class SqliteConnectionFactory extends ConnectionFactory {
         properties.putIfAbsent("cachePrepStmts", "true");
         properties.putIfAbsent("prepStmtCacheSize", "250");
         properties.putIfAbsent("prepStmtCacheSqlLimit", "2048");
-
+        properties.putIfAbsent("foreign_keys", "true");
+        properties.putIfAbsent("journal_mode", "WAL");
+        properties.putIfAbsent("synchronous", "NORMAL");
         super.overrideProperties(properties);
     }
 

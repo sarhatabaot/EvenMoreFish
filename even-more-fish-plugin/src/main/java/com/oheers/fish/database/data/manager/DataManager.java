@@ -54,7 +54,7 @@ public class DataManager<T> {
         }
         return getOrCreate(key, defaultLoader, fallbackValue);
     }
-    
+
 
     // Get data using default loader
     public T get(String key) {
