@@ -128,7 +128,7 @@ public class EvenMoreFish extends EMFPlugin {
     private DataManager<UserReport> userReportDataManager;
     private DataManager<CompetitionReport> competitionDataManager;
 
-    public static EvenMoreFish getInstance() {
+    public static @NotNull EvenMoreFish getInstance() {
         return instance;
     }
 

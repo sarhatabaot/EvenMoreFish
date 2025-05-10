@@ -3,9 +3,6 @@ package com.oheers.fish.database.connection;
 import com.zaxxer.hikari.HikariConfig;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Map;
 
 public class SqliteConnectionFactory extends ConnectionFactory {
