@@ -45,13 +45,6 @@ public interface DatabaseAPI {
      */
     int getUserId(@NotNull UUID uuid);
 
-    /**
-     * Writes or updates a user's fishing report in the database.
-     *
-     * @param uuid The UUID of the player
-     * @param report The UserReport containing all fishing statistics
-     */
-    void writeUserReport(@NotNull UUID uuid, @NotNull UserReport report);
 
     /**
      * Retrieves a user's fishing report from the database.

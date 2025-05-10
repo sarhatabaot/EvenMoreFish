@@ -1,15 +1,19 @@
 package com.oheers.fish.database.model.user;
 
+import com.oheers.fish.database.data.FishRarityKey;
+import com.oheers.fish.fishing.items.Fish;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.UUID;
 
 public class UserReport {
 
     private int id;
     private final UUID uuid;
-    private String firstFish;
-    private String recentFish;
-    private String largestFish;
-    private String shortestFish;
+    private FishRarityKey firstFish;
+    private FishRarityKey recentFish;
+    private FishRarityKey largestFish;
+    private FishRarityKey shortestFish;
     private int numFishCaught;
     private int competitionsWon;
     private int competitionsJoined;
@@ -21,7 +25,7 @@ public class UserReport {
     private int fishSold;
     private double moneyEarned;
 
-    public UserReport(int id, UUID uuid, String firstFish, String recentFish, String largestFish, String shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
+    public UserReport(int id, UUID uuid, FishRarityKey firstFish, FishRarityKey recentFish, FishRarityKey largestFish, FishRarityKey shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
         this.id = id;
         this.uuid = uuid;
         this.firstFish = firstFish;
@@ -38,7 +42,7 @@ public class UserReport {
         this.moneyEarned = moneyEarned;
     }
 
-    public UserReport(UUID uuid, String firstFish, String recentFish, String largestFish, String shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
+    public UserReport(UUID uuid, FishRarityKey firstFish, FishRarityKey recentFish, FishRarityKey largestFish, FishRarityKey shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
         this.uuid = uuid;
         this.firstFish = firstFish;
         this.recentFish = recentFish;
@@ -54,27 +58,27 @@ public class UserReport {
         this.moneyEarned = moneyEarned;
     }
 
-    public String getFirstFish() {
+    public FishRarityKey getFirstFish() {
         return firstFish;
     }
 
-    public void setFirstFish(String firstFish) {
+    public void setFirstFish(FishRarityKey firstFish) {
         this.firstFish = firstFish;
     }
 
-    public String getRecentFish() {
+    public FishRarityKey getRecentFish() {
         return recentFish;
     }
 
-    public void setRecentFish(String recentFish) {
+    public void setRecentFish(FishRarityKey recentFish) {
         this.recentFish = recentFish;
     }
 
-    public String getLargestFish() {
+    public FishRarityKey getLargestFish() {
         return largestFish;
     }
 
-    public void setLargestFish(String largestFish) {
+    public void setLargestFish(FishRarityKey largestFish) {
         this.largestFish = largestFish;
     }
 
@@ -178,7 +182,7 @@ public class UserReport {
         return moneyEarned;
     }
 
-    public String getShortestFish() {
+    public FishRarityKey getShortestFish() {
         return shortestFish;
     }
 
@@ -186,11 +190,22 @@ public class UserReport {
         return shortestLength;
     }
 
-    public void setShortestFish(String shortestFish) {
+    public void setShortestFish(FishRarityKey shortestFish) {
         this.shortestFish = shortestFish;
     }
 
     public void setShortestLength(float shortestLength) {
         this.shortestLength = shortestLength;
     }
+
+    public void setShortestLengthAndFish(@NotNull Fish fish) {
+        this.shortestLength = fish.getLength();
+        this.shortestFish = FishRarityKey.of(fish);
+    }
+
+    public void setLongestLengthAndFish(@NotNull Fish fish) {
+        this.largestLength = fish.getLength();
+        this.largestFish = FishRarityKey.of(fish);
+    }
+
 }

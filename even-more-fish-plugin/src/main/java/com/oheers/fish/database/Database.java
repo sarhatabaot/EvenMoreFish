@@ -12,6 +12,7 @@ import com.oheers.fish.database.connection.H2ConnectionFactory;
 import com.oheers.fish.database.connection.MigrationManager;
 import com.oheers.fish.database.connection.MySqlConnectionFactory;
 import com.oheers.fish.database.connection.SqliteConnectionFactory;
+import com.oheers.fish.database.data.FishRarityKey;
 import com.oheers.fish.database.execute.ExecuteQuery;
 import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
@@ -215,29 +216,6 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void writeUserReport(@NotNull UUID uuid, @NotNull UserReport report) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                int rowsUpdated = dslContext.update(Tables.USERS)
-                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish())
-                        .set(Tables.USERS.LAST_FISH, report.getRecentFish())
-                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
-                        .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
-                        .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
-                        .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
-                        .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
-                        .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
-                        .where(Tables.USERS.UUID.eq(uuid.toString()))
-                        .execute();
-
-                DatabaseUtil.writeDbVerbose("Written user report for (%s) to the database.".formatted(uuid));
-                return rowsUpdated;
-            }
-        }.executeUpdate();
-    }
-
-    @Override
     public UserReport getUserReport(@NotNull UUID uuid) {
         return new ExecuteQuery<UserReport>(connectionFactory, settings) {
             @Override
@@ -255,16 +233,16 @@ public class Database implements DatabaseAPI {
                 final int numFishCaught = tableRecord.getValue(Tables.USERS.NUM_FISH_CAUGHT);
                 final int competitionsWon = tableRecord.getValue(Tables.USERS.COMPETITIONS_WON);
                 final int competitionsJoined = tableRecord.getValue(Tables.USERS.COMPETITIONS_JOINED);
-                final String firstFish = tableRecord.getValue(Tables.USERS.FIRST_FISH);
-                final String recentFish = tableRecord.getValue(Tables.USERS.LAST_FISH);
-                final String largestFish = tableRecord.getValue(Tables.USERS.LARGEST_FISH);
+                final FishRarityKey firstFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.FIRST_FISH));
+                final FishRarityKey recentFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.LAST_FISH));
+                final FishRarityKey largestFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.LARGEST_FISH));
                 final float totalFishLength = tableRecord.getValue(Tables.USERS.TOTAL_FISH_LENGTH);
                 final float largestLength = tableRecord.getValue(Tables.USERS.LARGEST_LENGTH);
                 final String uuid = tableRecord.getValue(Tables.USERS.UUID);
                 final int fishSold = tableRecord.getValue(Tables.USERS.FISH_SOLD);
                 final double moneyEarned = tableRecord.getValue(Tables.USERS.MONEY_EARNED);
 
-                final String shortestFish = tableRecord.getValue(Tables.USERS.SHORTEST_FISH);
+                final FishRarityKey shortestFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.SHORTEST_FISH));
                 final float shortestLength = tableRecord.getValue(Tables.USERS.SHORTEST_LENGTH);
 
                 return new UserReport(
@@ -700,6 +678,7 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
+    //todo, bug here, not updating properly....
     public Integer upsertUserReport(UserReport report) {
         return new ExecuteUpdate(connectionFactory, settings) {
             @Override
@@ -709,14 +688,14 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
                         .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
                         .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
-                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish())
+                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish().toString())
                         .set(Tables.USERS.MONEY_EARNED, report.getMoneyEarned())
                         .set(Tables.USERS.FISH_SOLD, report.getFishSold())
                         .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
-                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
+                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish().toString())
                         .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
-                        .set(Tables.USERS.LAST_FISH, report.getLargestFish())
-                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish())
+                        .set(Tables.USERS.LAST_FISH, report.getLargestFish().toString())
+                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish().toString())
                         .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
                         .onDuplicateKeyUpdate()
                         .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
@@ -725,12 +704,11 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.MONEY_EARNED, report.getMoneyEarned())
                         .set(Tables.USERS.FISH_SOLD, report.getFishSold())
                         .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
-                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
+                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish().toString())
                         .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
-                        .set(Tables.USERS.LAST_FISH, report.getLargestFish())
-                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish())
+                        .set(Tables.USERS.LAST_FISH, report.getLargestFish().toString())
+                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish().toString())
                         .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
-                        .returningResult(Tables.USERS.ID)
                         .execute();
             }
         }.executeUpdate();
@@ -826,7 +804,7 @@ public class Database implements DatabaseAPI {
                             competitionsRecord.setContestants(competition.getContestants()
                                     .stream()
                                     .map(UUID::toString)
-                                    .collect(Collectors.joining(", "))); //todo, maybe this should be in it's own db? or too complex??
+                                    .collect(Collectors.joining(", ")));
                             competitionsRecord.setStartTime(competition.getStartTime());
                             competitionsRecord.setEndTime(competition.getEndTime());
 

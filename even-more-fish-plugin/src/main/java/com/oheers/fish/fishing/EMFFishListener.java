@@ -11,12 +11,14 @@ import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +39,28 @@ public class EMFFishListener implements Listener {
         handleFishLog(userId, fish, event.getCatchTime());
         handleUserFishStats(userId, fish);
         handleFishStats(fish);
+        handleUserReport(userId, event.getPlayer().getUniqueId(), fish);
+    }
+
+    private void handleUserReport(final int userId, final UUID uuid, Fish fish) {
+        final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
+        final UserReport userReport = userReportDataManager.get(String.valueOf(userId), key -> EvenMoreFish.getInstance().getDatabase().getUserReport(uuid));
+
+        if (userReport.getShortestLength() > fish.getLength()) {
+            userReport.setShortestLengthAndFish(fish);
+        }
+
+        if (userReport.getLargestLength() < fish.getLength()) {
+            userReport.setLongestLengthAndFish(fish);
+        }
+
+        if (userReport.getFirstFish().toString().equals(".")) {
+            userReport.setFirstFish(FishRarityKey.of(fish));
+        }
+
+        userReport.setRecentFish(FishRarityKey.of(fish));
+        userReport.incrementFishCaught(1);
+        userReport.incrementTotalLength(fish.getLength());
     }
 
     private void handleFishStats(final @NotNull Fish fish) {

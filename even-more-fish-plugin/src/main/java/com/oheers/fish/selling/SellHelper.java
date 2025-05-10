@@ -42,10 +42,12 @@ public class SellHelper {
         if (!(humanEntity instanceof Player player)) {
             return;
         }
+
         if (!Economy.getInstance().isEnabled()) {
             ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
             return;
         }
+
         gui.getElements().forEach(element -> {
             if (!(element instanceof GuiStorageElement storageElement)) {
                 return;

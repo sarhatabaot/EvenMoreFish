@@ -28,6 +28,10 @@ public class FishRarityKey {
         return new FishRarityKey(fish.getName(), fish.getRarity().getId());
     }
 
+    public static @NotNull FishRarityKey empty() {
+        return new FishRarityKey("", "");
+    }
+
 
     @Override
     public String toString() {
@@ -40,4 +44,5 @@ public class FishRarityKey {
                 ", fishRarity='" + fishRarity + '\'' +
                 '}';
     }
+
 }

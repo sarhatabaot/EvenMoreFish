@@ -361,9 +361,9 @@ public class Competition {
 
         if (isTopEntry) {
             userReport.incrementCompetitionsWon(1);
-        } else {
-            userReport.incrementCompetitionsJoined(1);
         }
+
+        userReport.incrementCompetitionsJoined(1);
     }
 
     private void handleRewards() {
@@ -379,7 +379,7 @@ public class Competition {
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
         if (MainConfig.getInstance().isDatabaseOnline() && !entries.isEmpty()) {
-            handleDatabaseUpdates(entries.get(0), true); // Top entry
+            handleDatabaseUpdates(leaderboard.getTopEntry(), true); // Top entry
         }
 
         for (CompetitionEntry entry : entries) {
