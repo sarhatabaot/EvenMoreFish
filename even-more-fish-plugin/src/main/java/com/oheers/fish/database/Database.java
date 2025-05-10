@@ -169,27 +169,6 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
-    //used only in legacy migration, maybe move it there? todo
-    @Override
-    public void createEmptyUserReport(@NotNull UUID uuid) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.insertInto(Tables.USERS)
-                        .set(Tables.USERS.UUID, uuid.toString())
-                        .set(Tables.USERS.FIRST_FISH, "None")
-                        .set(Tables.USERS.LAST_FISH, "None")
-                        .set(Tables.USERS.LARGEST_FISH, "None")
-                        .set(Tables.USERS.LARGEST_LENGTH, 0F)
-                        .set(Tables.USERS.NUM_FISH_CAUGHT, 0)
-                        .set(Tables.USERS.COMPETITIONS_WON, 0)
-                        .set(Tables.USERS.COMPETITIONS_JOINED, 0)
-                        .set(Tables.USERS.TOTAL_FISH_LENGTH, 0F)
-                        .execute();
-            }
-        }.executeUpdate();
-    }
-
     @Override
     public int getUserId(@NotNull UUID uuid) {
         return new ExecuteQuery<Integer>(connectionFactory, settings) {
@@ -677,7 +656,6 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
-    //todo, bug here, not updating properly....
     public Integer upsertUserReport(UserReport report) {
         return new ExecuteUpdate(connectionFactory, settings) {
             @Override

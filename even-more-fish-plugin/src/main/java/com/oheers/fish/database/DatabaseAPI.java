@@ -30,12 +30,6 @@ public interface DatabaseAPI {
      */
     boolean hasUser(@NotNull UUID uuid);
 
-    /**
-     * Creates an empty user report with default values for a new player.
-     *
-     * @param uuid The UUID of the player to create the report for
-     */
-    void createEmptyUserReport(@NotNull UUID uuid);
 
     /**
      * Retrieves the internal database ID for a player.
