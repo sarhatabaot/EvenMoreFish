@@ -38,14 +38,14 @@ public class EMFFishListener implements Listener {
         handleFishLog(userId, fish, event.getCatchTime());
         handleUserFishStats(userId, fish);
         handleFishStats(fish);
-        handleUserReport(userId, event.getPlayer().getUniqueId(), fish);
+        handleUserReport(event.getPlayer().getUniqueId(), fish);
     }
 
-    private void handleUserReport(final int userId, final UUID uuid, Fish fish) {
+    private void handleUserReport(final UUID uuid, Fish fish) {
         final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
-        final UserReport userReport = userReportDataManager.get(String.valueOf(userId), key -> EvenMoreFish.getInstance().getDatabase().getUserReport(uuid));
+        final UserReport userReport = userReportDataManager.get(String.valueOf(uuid), key -> EvenMoreFish.getInstance().getDatabase().getUserReport(uuid));
 
-        if (userReport.getShortestLength() > fish.getLength()) {
+        if (userReport.getShortestLength() == -1 || userReport.getShortestLength() > fish.getLength()) {
             userReport.setShortestLengthAndFish(fish);
         }
 
@@ -60,6 +60,9 @@ public class EMFFishListener implements Listener {
         userReport.setRecentFish(FishRarityKey.of(fish));
         userReport.incrementFishCaught(1);
         userReport.incrementTotalLength(fish.getLength());
+
+        userReportDataManager.update(String.valueOf(uuid), userReport);
+        EvenMoreFish.getInstance().debug("Saving user report %s".formatted(userReport.toString()));
     }
 
     private void handleFishStats(final @NotNull Fish fish) {

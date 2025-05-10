@@ -208,4 +208,23 @@ public class UserReport {
         this.largestFish = FishRarityKey.of(fish);
     }
 
+    @Override
+    public String toString() {
+        return "UserReport{" +
+                "id=" + id +
+                ", uuid=" + uuid +
+                ", firstFish=" + firstFish +
+                ", recentFish=" + recentFish +
+                ", largestFish=" + largestFish +
+                ", shortestFish=" + shortestFish +
+                ", numFishCaught=" + numFishCaught +
+                ", competitionsWon=" + competitionsWon +
+                ", competitionsJoined=" + competitionsJoined +
+                ", largestLength=" + largestLength +
+                ", shortestLength=" + shortestLength +
+                ", totalFishLength=" + totalFishLength +
+                ", fishSold=" + fishSold +
+                ", moneyEarned=" + moneyEarned +
+                '}';
+    }
 }

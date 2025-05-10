@@ -678,6 +678,7 @@ public class Database implements DatabaseAPI {
                         .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
                         .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
                         .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
+                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish().toString())
                         .set(Tables.USERS.MONEY_EARNED, report.getMoneyEarned())
                         .set(Tables.USERS.FISH_SOLD, report.getFishSold())
                         .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
