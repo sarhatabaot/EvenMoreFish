@@ -7,6 +7,8 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.connection.ConnectionFactory;
 import com.oheers.fish.database.connection.MigrationManager;
+import com.oheers.fish.database.execute.ExecuteUpdate;
+import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import org.bukkit.command.CommandSender;
@@ -181,7 +183,7 @@ public class LegacyToV3DatabaseMigration {
                 }
 
                 UUID playerUUID = UUID.fromString(file.getName().substring(0, file.getName().lastIndexOf(".")));
-                database.createEmptyUserReport(playerUUID);
+                createEmptyUserReport(playerUUID);
                 translateFishReportsV2(playerUUID, reports);
                 
                 EMFSingleMessage migratedMSG = EMFSingleMessage.fromString("Migrated " + reports.size() + " fish for: " + playerUUID);
@@ -211,6 +213,25 @@ public class LegacyToV3DatabaseMigration {
 
         //Run the rest of the migrations, and ensure it's properly setup.
         migrationManager.migrateFromV5ToLatest();
+    }
+
+    public void createEmptyUserReport(@NotNull UUID uuid) {
+        new ExecuteUpdate(connectionFactory, migrationManager.getMigrationSettings()) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.USERS)
+                        .set(Tables.USERS.UUID, uuid.toString())
+                        .set(Tables.USERS.FIRST_FISH, "None")
+                        .set(Tables.USERS.LAST_FISH, "None")
+                        .set(Tables.USERS.LARGEST_FISH, "None")
+                        .set(Tables.USERS.LARGEST_LENGTH, 0F)
+                        .set(Tables.USERS.NUM_FISH_CAUGHT, 0)
+                        .set(Tables.USERS.COMPETITIONS_WON, 0)
+                        .set(Tables.USERS.COMPETITIONS_JOINED, 0)
+                        .set(Tables.USERS.TOTAL_FISH_LENGTH, 0F)
+                        .execute();
+            }
+        }.executeUpdate();
     }
 
     public void executeStatement(@NotNull Consumer<DSLContext> consumer) {

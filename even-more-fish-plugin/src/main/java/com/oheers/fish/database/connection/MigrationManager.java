@@ -38,12 +38,29 @@ public class MigrationManager {
     private final FluentConfiguration baseFlywayConfiguration;
     private final Flyway defaultFlyway;
     private final ConnectionFactory connectionFactory;
+    private final Settings migrationSettings;
 
     public MigrationManager(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
         this.baseFlywayConfiguration = getBaseFlywayConfiguration(connectionFactory);
         this.defaultFlyway = this.baseFlywayConfiguration.load();
         this.latestBaselineVersion = ManifestUtil.getAttributeFromManifest("Database-Baseline-Version", "8.1");
+
+        this.migrationSettings = new Settings();
+        this.migrationSettings.setExecuteLogging(true);
+        this.migrationSettings.withRenderMapping(
+                new RenderMapping().withSchemata(
+                        new MappedSchema().withInput("")
+                                .withOutput(MainConfig.getInstance().getDatabase())
+                                .withTables(
+                                        new MappedTable()
+                                                .withInputExpression(Pattern.compile("\\$\\{table.prefix}(.*)"))
+                                                .withOutput(MainConfig.getInstance().getPrefix() + "$1"
+                                                )
+                                )
+
+                )
+        );
     }
 
     public void migrateFromVersion(String currentDbVersion, boolean baseline) {
@@ -79,24 +96,8 @@ public class MigrationManager {
     }
 
     public boolean queryTableExistence(final String tableName) {
-        final Settings settings = new Settings();
-        settings.setExecuteLogging(true);
-        settings.withRenderMapping(
-                new RenderMapping().withSchemata(
-                        new MappedSchema().withInput("")
-                                .withOutput(MainConfig.getInstance().getDatabase())
-                                .withTables(
-                                        new MappedTable()
-                                                .withInputExpression(Pattern.compile("\\$\\{table.prefix}(.*)"))
-                                                .withOutput(MainConfig.getInstance().getPrefix() + "$1"
-                                                )
-                                )
-
-                )
-        );
-
         try (Connection connection = connectionFactory.getConnection()) {
-             DSLContext dsl = DSL.using(connection, settings);
+             DSLContext dsl = DSL.using(connection, migrationSettings);
 
             return dsl.fetchExists(
                     DSL.select()
@@ -222,5 +223,9 @@ public class MigrationManager {
                 .table(MainConfig.getInstance().getPrefix() + "flyway_schema_history");
 
         return DatabaseStrategyFactory.getStrategy(connectionFactory).configureFlyway(baseConfig);
+    }
+
+    public Settings getMigrationSettings() {
+        return migrationSettings;
     }
 }
