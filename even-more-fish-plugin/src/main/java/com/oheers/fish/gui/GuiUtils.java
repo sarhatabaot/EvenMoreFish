@@ -5,7 +5,7 @@ import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.gui.guis.BaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
-import com.oheers.fish.gui.guis.journal.FishJournalGui;
+import com.oheers.fish.gui.guis.FishJournalGui;
 import com.oheers.fish.selling.SellHelper;
 import com.oheers.fish.utils.ItemFactory;
 import de.themoep.inventorygui.GuiElement;

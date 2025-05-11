@@ -1,4 +1,4 @@
-package com.oheers.fish.gui.guis.journal;
+package com.oheers.fish.gui.guis;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
@@ -17,7 +17,6 @@ import com.oheers.fish.utils.ItemUtils;
 import de.themoep.inventorygui.*;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
