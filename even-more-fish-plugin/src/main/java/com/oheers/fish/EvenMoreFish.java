@@ -627,9 +627,11 @@ public class EvenMoreFish extends EMFPlugin {
         if (pm.isPluginEnabled("Vault")) {
             new VaultEconomyType().register();
         }
+
         if (pm.isPluginEnabled("PlayerPoints")) {
             new PlayerPointsEconomyType().register();
         }
+
         if (pm.isPluginEnabled("GriefPrevention")) {
             new GriefPreventionEconomyType().register();
         }

@@ -179,11 +179,11 @@ public class SellHelper {
         int fishSold = calcFishSold(soldFish);
 
         final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
-        final UserReport report = userReportDataManager.get(String.valueOf(userId));
+        final UserReport report = userReportDataManager.get(uuid.toString());
         report.incrementFishSold(fishSold);
         report.incrementMoneyEarned(moneyEarned);
 
-        userReportDataManager.update(String.valueOf(userId), report);
+        userReportDataManager.update(uuid.toString(), report);
     }
 
     private int calcFishSold(@NotNull List<SoldFish> soldFish) {
