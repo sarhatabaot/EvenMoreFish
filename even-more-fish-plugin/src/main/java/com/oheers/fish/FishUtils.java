@@ -675,13 +675,5 @@ public class FishUtils {
         return colour.substring(0, openingTagEnd + 1) + "{name}";
     }
 
-    public static String getPlayerName(@Nullable UUID uuid) {
-        if (uuid == null) {
-            return null;
-        }
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        return player.getName();
-    }
-
 
 }
