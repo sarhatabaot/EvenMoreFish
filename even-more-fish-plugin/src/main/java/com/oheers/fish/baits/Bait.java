@@ -1,6 +1,7 @@
 package com.oheers.fish.baits;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.baits.configs.BaitFileUpdates;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
@@ -52,6 +53,7 @@ public class Bait extends ConfigBase {
      */
     public Bait(@NotNull File file) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
+        BaitFileUpdates.update(this);
         performRequiredConfigChecks();
         this.id = Objects.requireNonNull(getConfig().getString("id"));
 
@@ -151,7 +153,7 @@ public class Bait extends ConfigBase {
         Supplier<EMFListMessage> loreVariable = () -> EMFListMessage.fromStringList(getConfig().getStringList("lore"));
         lore.setVariable("{lore}", loreVariable.get());
 
-        lore.setBaitTheme(getTheme());
+        lore.setVariable("{bait_theme}", "");
 
         return lore.getComponentListMessage();
     }
@@ -250,8 +252,7 @@ public class Bait extends ConfigBase {
         }
 
         EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
-        message.setBait(id);
-        message.setBaitTheme(getTheme());
+        message.setBait(format(id));
         message.send(player);
     }
 
@@ -283,11 +284,15 @@ public class Bait extends ConfigBase {
         return id;
     }
 
-    /**
-     * @return The colour theme defined for the bait.
-     */
-    public String getTheme() {
-        return getConfig().getString("bait-theme", "<yellow>");
+    public @NotNull EMFSingleMessage getFormat() {
+        String format = getConfig().getString("format", "<yellow>{name}");
+        return EMFSingleMessage.fromString(format);
+    }
+
+    public @NotNull EMFSingleMessage format(@NotNull String name) {
+        EMFSingleMessage message = getFormat();
+        message.setVariable("{name}", name);
+        return message;
     }
 
     /**
