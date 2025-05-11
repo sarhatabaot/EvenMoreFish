@@ -36,6 +36,7 @@ public class MainConfig extends ConfigBase {
     private final String shopSubCommandName;
     private final String sellAllSubCommandName;
     private final String applyBaitsSubCommandName;
+    private final String journalSubCommandName;
 
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
@@ -55,6 +56,7 @@ public class MainConfig extends ConfigBase {
         this.shopSubCommandName = getConfig().getString("command.subcommands.shop", "shop");
         this.sellAllSubCommandName = getConfig().getString("command.subcommands.sellall", "sellall");
         this.applyBaitsSubCommandName = getConfig().getString("command.subcommands.applybaits", "applybaits");
+        this.journalSubCommandName = getConfig().getString("command.subcommands.journal", "journal");
     }
 
     public static MainConfig getInstance() {
@@ -273,6 +275,10 @@ public class MainConfig extends ConfigBase {
 
     public String getApplyBaitsSubCommandName() {
         return applyBaitsSubCommandName;
+    }
+
+    public String getJournalSubCommandName() {
+        return journalSubCommandName;
     }
 
     public boolean giveStraightToInventory() {

@@ -244,6 +244,8 @@ command:
     sellall: "sellall"
     # The /emf applybaits command
     applybaits: "applybaits"
+    # The /emf journal command
+    journal: "journal"
 
 # Customizable sets of biomes for fish configuration
 biome-sets:

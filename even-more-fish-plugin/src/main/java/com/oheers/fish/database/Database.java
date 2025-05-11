@@ -26,6 +26,7 @@ import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.fishing.items.Fish;
+import com.oheers.fish.fishing.items.Rarity;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.HumanEntity;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
         testType = {TestType.MANUAL, TestType.UNIT, TestType.INTEGRATION}
 )
 public class Database implements DatabaseAPI {
+
     private String version;
     private final ConnectionFactory connectionFactory;
     private final MigrationManager migrationManager;
@@ -289,6 +291,18 @@ public class Database implements DatabaseAPI {
     @Override
     public boolean userHasFish(@NotNull Fish fish, @NotNull HumanEntity user) {
         return userHasFish(fish.getRarity().getId(), fish.getName(), getUserId(user.getUniqueId()));
+    }
+
+    /**
+     * Checks if a player has caught a specific rarity.
+     *
+     * @param rarity The rarity to check
+     * @param user   The player to check
+     * @return true if the player has caught the rarity, false otherwise
+     */
+    @Override
+    public boolean userHasRarity(@NotNull Rarity rarity, @NotNull HumanEntity user) {
+        return userHasRarity(rarity.getId(), getUserId(user.getUniqueId()));
     }
 
     @Override
@@ -624,6 +638,30 @@ public class Database implements DatabaseAPI {
             }
         }.prepareAndRunQuery();
 
+    }
+
+    /**
+     * Checks if a player has caught a specific rarity by its name.
+     *
+     * @param rarity The rarity's name
+     * @param id The database ID of the player
+     * @return true if the player has caught the rarity, false otherwise
+     */
+    @Override
+    public boolean userHasRarity(@NotNull String rarity, int id) {
+        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
+            @Override
+            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
+                return dslContext.fetchExists(Tables.USER_FISH_STATS,
+                    Tables.USER_FISH_STATS.FISH_RARITY.eq(rarity)
+                );
+            }
+
+            @Override
+            protected Boolean empty() {
+                return false;
+            }
+        }.prepareAndRunQuery();
     }
 
     public void batchInsertFishLogs(Collection<FishLog> logs) {

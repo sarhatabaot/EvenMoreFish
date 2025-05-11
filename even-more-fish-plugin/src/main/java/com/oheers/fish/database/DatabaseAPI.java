@@ -7,6 +7,7 @@ import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
+import com.oheers.fish.fishing.items.Rarity;
 import org.bukkit.entity.HumanEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -76,6 +77,15 @@ public interface DatabaseAPI {
     boolean userHasFish(@NotNull Fish fish, @NotNull HumanEntity user);
 
     /**
+     * Checks if a player has caught a specific rarity.
+     *
+     * @param rarity The rarity to check
+     * @param user The player to check
+     * @return true if the player has caught the rarity, false otherwise
+     */
+    boolean userHasRarity(@NotNull Rarity rarity, @NotNull HumanEntity user);
+
+    /**
      * Checks if a player has caught a specific fish by rarity and name.
      *
      * @param rarity The rarity of the fish
@@ -84,6 +94,15 @@ public interface DatabaseAPI {
      * @return true if the player has caught the fish, false otherwise
      */
     boolean userHasFish(@NotNull String rarity, @NotNull String fish, int id);
+
+    /**
+     * Checks if a player has caught a specific rarity by its name.
+     *
+     * @param rarity The rarity's name
+     * @param id The database ID of the player
+     * @return true if the player has caught the rarity, false otherwise
+     */
+    boolean userHasRarity(@NotNull String rarity, int id);
 
     /**
      * Creates a competition report in the database.

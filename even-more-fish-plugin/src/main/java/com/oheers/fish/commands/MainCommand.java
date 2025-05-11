@@ -47,14 +47,12 @@ public class MainCommand {
                         getShop(),
                         getSellAll(),
                         getApplyBaits(),
+                        getJournal(),
                         new AdminCommand(adminName).getCommand()
                 )
                 .executes(info -> {
                     sendHelpMessage(info.sender());
                 });
-        if (MainConfig.getInstance().isDatabaseOnline()) {
-            this.command.withSubcommand(getJournal());
-        }
     }
 
     public CommandAPICommand getCommand() {
@@ -209,16 +207,20 @@ public class MainCommand {
     }
 
     private CommandAPICommand getJournal() {
+        String name = MainConfig.getInstance().getJournalSubCommandName();
         helpMessageBuilder.addUsage(
-            "journal",
+            name,
             ConfigMessage.HELP_GENERAL_JOURNAL::getMessage
         );
-        return new CommandAPICommand("journal")
+        return new CommandAPICommand(name)
             .withPermission(UserPerms.JOURNAL)
             .withArguments(
                 RarityArgument.create().setOptional(true)
             )
             .executesPlayer(info -> {
+                if (!MainConfig.getInstance().isDatabaseOnline()) {
+                    return;
+                }
                 Rarity rarity = info.args().getUnchecked("rarity"); // This is allowed to be null.
                 new FishJournalGui(info.sender(), rarity).open();
             });

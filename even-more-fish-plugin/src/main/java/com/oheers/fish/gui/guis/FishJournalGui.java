@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class FishJournalGui extends ConfigGui {
 
@@ -104,9 +105,11 @@ public class FishJournalGui extends ConfigGui {
             );
             lore.setVariable("{times-caught}", Integer.toString(userFishStats.getQuantity()));
             lore.setVariable("{largest-size}", userFishStats.getLongestLength());
+            lore.setVariable("{shortest-size}", userFishStats.getShortestLength());
             lore.setVariable("{discover-date}", discoverDate);
             lore.setVariable("{discoverer}", discoverer);
             lore.setVariable("{server-largest}", fishStats.getLongestLength());
+            lore.setVariable("{server-shortest}", fishStats.getShortestLength());
             lore.setVariable("{server-caught}", fishStats.getQuantity());
             meta.lore(lore.getComponentListMessage());
         });
@@ -121,30 +124,43 @@ public class FishJournalGui extends ConfigGui {
 
         return new DynamicGuiElement(character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            FishManager.getInstance().getRarityMap().values().forEach(rarity -> {
-                ItemFactory factory = new ItemFactory("rarity-item", section);
-                factory.enableAllChecks();
-                ItemStack item = factory.createItem(null, -1);
-                item = ItemUtils.changeMaterial(item, rarity.getMaterial());
-
-                item.editMeta(meta -> {
-                    Component originalDisplay = meta.displayName();
-                    if (originalDisplay == null) {
-                        return;
-                    }
-                    EMFSingleMessage display = EMFSingleMessage.of(originalDisplay);
-                    display.setRarity(rarity.getDisplayName());
-                    meta.displayName(display.getComponentMessage());
-                });
-
-                group.addElement(new StaticGuiElement(character, item, click -> {
-                    click.getGui().close();
-                    new FishJournalGui(player, rarity).open();
-                    return true;
-                }));
-            });
+            FishManager.getInstance().getRarityMap().values().forEach(rarity ->
+                group.addElement(
+                    new StaticGuiElement(character, getRarityItem(rarity, section), click -> {
+                        click.getGui().close();
+                        new FishJournalGui(player, rarity).open();
+                        return true;
+                    }))
+            );
             return group;
         });
+    }
+
+    private ItemStack getRarityItem(Rarity rarity, Section section) {
+        Database database = EvenMoreFish.getInstance().getDatabase();
+        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
+
+        if (hideUndiscovered && !database.userHasRarity(rarity, player)) {
+            ItemFactory factory = new ItemFactory("undiscovered-rarity", section);
+            factory.enableAllChecks();
+            return factory.createItem(player, -1);
+        }
+
+        ItemFactory factory = new ItemFactory("rarity-item", section);
+        factory.enableAllChecks();
+        ItemStack item = factory.createItem(null, -1);
+        item = ItemUtils.changeMaterial(item, rarity.getMaterial());
+
+        item.editMeta(meta -> {
+            Component originalDisplay = meta.displayName();
+            if (originalDisplay != null) {
+                EMFSingleMessage display = EMFSingleMessage.of(originalDisplay);
+                display.setRarity(rarity.getDisplayName());
+                meta.displayName(display.getComponentMessage());
+            }
+        });
+
+        return item;
     }
 
     @Override

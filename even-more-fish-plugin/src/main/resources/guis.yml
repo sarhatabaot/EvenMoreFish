@@ -344,6 +344,19 @@ journal-rarity:
       - <white>Catch this fish
       - <white>to unlock it here.
 
+  # Whether to show the undiscovered-rarity config below when a rarity has not been discovered by the player.
+  hide-undiscovered-rarity: true
+
+  # How undiscovered rarities should look
+  undiscovered-rarity:
+    item:
+      material: iron_bars
+      displayname: <dark_gray>Undiscovered Rarity
+    lore:
+      - ''
+      - <white>Catch a fish from this
+      - <white>rarity to unlock it here.
+
   # How caught fish should look. Changing the material will not work, as it always uses the fish item as a base
   fish-item:
     item:
@@ -357,6 +370,10 @@ journal-rarity:
       - '<white>Discovered by: {discoverer}'
       - '<white>Server Largest: {server-largest}cm'
       - '<white>Server Caught: {server-caught}x'
+
+  rarity-item:
+    item:
+      displayname: <white>{rarityname}
 
   info:
     item:
