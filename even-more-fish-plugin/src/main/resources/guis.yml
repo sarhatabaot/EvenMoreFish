@@ -319,7 +319,7 @@ journal-menu:
 
 # The menu for the chosen rarity
 journal-rarity:
-  title: '<dark_blue>Fish Journal: {rarity_colour}{rarity}'
+  title: <dark_blue>Fish Journal
   layout:
     - '    a    '
     - ' fffffff '
