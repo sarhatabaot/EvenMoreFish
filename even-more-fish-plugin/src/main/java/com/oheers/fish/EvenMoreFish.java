@@ -248,7 +248,9 @@ public class EvenMoreFish extends EMFPlugin {
             this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L), key -> database.getCompetitionReport(Integer.parseInt(key)));
         }
 
+
         listeners();
+
         registerCommands();
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");

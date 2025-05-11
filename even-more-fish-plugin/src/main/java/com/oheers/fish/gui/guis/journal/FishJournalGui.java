@@ -17,6 +17,7 @@ import com.oheers.fish.utils.ItemUtils;
 import de.themoep.inventorygui.*;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -31,10 +32,10 @@ public class FishJournalGui extends ConfigGui {
 
     public FishJournalGui(@NotNull HumanEntity player, @Nullable Rarity rarity) {
         super(
-                GuiConfig.getInstance().getConfig().getSection(
-                        rarity == null ? "journal-menu" : "journal-rarity"
-                ),
-                player
+            GuiConfig.getInstance().getConfig().getSection(
+                rarity == null ? "journal-menu" : "journal-rarity"
+            ),
+            player
         );
 
         this.rarity = rarity;
@@ -54,15 +55,13 @@ public class FishJournalGui extends ConfigGui {
     private DynamicGuiElement getFishGroup(Section section) {
         char character = FishUtils.getCharFromString(section.getString("fish-character", "f"), 'f');
 
-        return new DynamicGuiElement(
-                character, who -> {
+        return new DynamicGuiElement(character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
             this.rarity.getFishList().forEach(fish ->
-                    group.addElement(new StaticGuiElement(character, getFishItem(fish, section)))
+                group.addElement(new StaticGuiElement(character, getFishItem(fish, section)))
             );
             return group;
-        }
-        );
+        });
     }
 
     private ItemStack getFishItem(Fish fish, Section section) {
@@ -121,8 +120,7 @@ public class FishJournalGui extends ConfigGui {
     private DynamicGuiElement getRarityGroup(Section section) {
         char character = FishUtils.getCharFromString(section.getString("rarity-character", "r"), 'r');
 
-        return new DynamicGuiElement(
-                character, who -> {
+        return new DynamicGuiElement(character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
             FishManager.getInstance().getRarityMap().values().forEach(rarity -> {
                 ItemFactory factory = new ItemFactory("rarity-item", section);
@@ -140,17 +138,14 @@ public class FishJournalGui extends ConfigGui {
                     meta.displayName(display.getComponentMessage());
                 });
 
-                group.addElement(new StaticGuiElement(
-                        character, item, click -> {
+                group.addElement(new StaticGuiElement(character, item, click -> {
                     click.getGui().close();
                     new FishJournalGui(player, rarity).open();
                     return true;
-                }
-                ));
+                }));
             });
             return group;
-        }
-        );
+        });
     }
 
     @Override

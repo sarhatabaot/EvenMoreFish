@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.exceptions.InvalidFishException;
+import com.oheers.fish.utils.ItemUtils;
 import com.oheers.fish.fishing.CatchType;
 import com.oheers.fish.fishing.items.config.RarityFileUpdates;
 import com.oheers.fish.messages.EMFSingleMessage;

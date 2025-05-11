@@ -111,8 +111,8 @@ main-menu:
 
   open-journal:
     item:
-      material: barrier
-      displayname: <red>Coming Soon!
+      material: writable_book
+      displayname: "<gold>»           Fish Journal"
     lore:
       - <gray>This menu is still being worked on!
     character: j

@@ -7,6 +7,7 @@ import com.oheers.fish.commands.arguments.RarityArgument;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.gui.guis.journal.FishJournalGui;
 import com.oheers.fish.gui.guis.ApplyBaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
@@ -218,9 +219,9 @@ public class MainCommand {
             .withArguments(
                 RarityArgument.create().setOptional(true)
             )
-            .executesPlayer((player, args) -> {
-                Rarity rarity = args.getUnchecked("rarity"); // This is allowed to be null.
-                new FishJournalGui(player, rarity).open();
+            .executesPlayer(info -> {
+                Rarity rarity = info.args().getUnchecked("rarity"); // This is allowed to be null.
+                new FishJournalGui(info.sender(), rarity).open();
             });
     }
 
