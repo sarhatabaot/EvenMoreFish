@@ -8,8 +8,8 @@ id: exampleBait
 # Should this bait be disabled?
 disabled: false
 
-# This can be used in the lore format to create a consistent colour theme. Defaults to &e (yellow)
-bait-theme: "<yellow>"
+# This can be used in the lore format to create a consistent colour theme. Defaults to yellow.
+format: <yellow>{name}</yellow>
 
 # When more than 1 types of baits are applied, how likely is it that this one should be used?
 application-weight: 150
