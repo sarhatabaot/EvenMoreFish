@@ -11,6 +11,7 @@ import com.oheers.fish.gui.guis.journal.FishJournalGui;
 import com.oheers.fish.gui.guis.ApplyBaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
+import com.oheers.fish.gui.guis.journal.FishJournalGui;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.PrefixType;
 import com.oheers.fish.messages.abstracted.EMFMessage;
@@ -47,7 +48,7 @@ public class MainCommand {
                         getShop(),
                         getSellAll(),
                         getApplyBaits(),
-                        new AdminCommand("admin").getCommand()
+                        new AdminCommand(adminName).getCommand()
                 )
                 .executes(info -> {
                     sendHelpMessage(info.sender());

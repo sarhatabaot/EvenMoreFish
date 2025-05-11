@@ -12,6 +12,7 @@ import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -86,6 +87,16 @@ public class RandomStrategy implements CompetitionStrategy {
 
         int type = EvenMoreFish.getInstance().getRandom().nextInt(types.size());
         return types.get(type);
+    }
+
+    @Override
+    public boolean shouldUseFishLength() {
+        return randomType.getStrategy().shouldUseFishLength();
+    }
+
+    @Override
+    public DecimalFormat getDecimalFormat() {
+        return randomType.getStrategy().getDecimalFormat();
     }
 
 }

@@ -49,73 +49,73 @@ public class FishLogRecord extends UpdatableRecordImpl<FishLogRecord> {
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.RARITY</code>.
+     * Setter for <code>${table.prefix}fish_log.FISH_RARITY</code>.
      */
-    public void setRarity(String value) {
+    public void setFishRarity(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.RARITY</code>.
+     * Getter for <code>${table.prefix}fish_log.FISH_RARITY</code>.
      */
-    public String getRarity() {
+    public String getFishRarity() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.FISH</code>.
+     * Setter for <code>${table.prefix}fish_log.FISH_NAME</code>.
      */
-    public void setFish(String value) {
+    public void setFishName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.FISH</code>.
+     * Getter for <code>${table.prefix}fish_log.FISH_NAME</code>.
      */
-    public String getFish() {
+    public String getFishName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.QUANTITY</code>.
+     * Setter for <code>${table.prefix}fish_log.FISH_LENGTH</code>.
      */
-    public void setQuantity(Integer value) {
+    public void setFishLength(Float value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.QUANTITY</code>.
+     * Getter for <code>${table.prefix}fish_log.FISH_LENGTH</code>.
      */
-    public Integer getQuantity() {
-        return (Integer) get(4);
+    public Float getFishLength() {
+        return (Float) get(4);
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.FIRST_CATCH_TIME</code>.
+     * Setter for <code>${table.prefix}fish_log.CATCH_TIME</code>.
      */
-    public void setFirstCatchTime(LocalDateTime value) {
+    public void setCatchTime(LocalDateTime value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.FIRST_CATCH_TIME</code>.
+     * Getter for <code>${table.prefix}fish_log.CATCH_TIME</code>.
      */
-    public LocalDateTime getFirstCatchTime() {
+    public LocalDateTime getCatchTime() {
         return (LocalDateTime) get(5);
     }
 
     /**
-     * Setter for <code>${table.prefix}fish_log.LARGEST_LENGTH</code>.
+     * Setter for <code>${table.prefix}fish_log.COMPETITION_ID</code>.
      */
-    public void setLargestLength(Float value) {
+    public void setCompetitionId(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>${table.prefix}fish_log.LARGEST_LENGTH</code>.
+     * Getter for <code>${table.prefix}fish_log.COMPETITION_ID</code>.
      */
-    public Float getLargestLength() {
-        return (Float) get(6);
+    public String getCompetitionId() {
+        return (String) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -141,16 +141,16 @@ public class FishLogRecord extends UpdatableRecordImpl<FishLogRecord> {
     /**
      * Create a detached, initialised FishLogRecord
      */
-    public FishLogRecord(Integer id, Integer userId, String rarity, String fish, Integer quantity, LocalDateTime firstCatchTime, Float largestLength) {
+    public FishLogRecord(Integer id, Integer userId, String fishRarity, String fishName, Float fishLength, LocalDateTime catchTime, String competitionId) {
         super(FishLog.FISH_LOG);
 
         setId(id);
         setUserId(userId);
-        setRarity(rarity);
-        setFish(fish);
-        setQuantity(quantity);
-        setFirstCatchTime(firstCatchTime);
-        setLargestLength(largestLength);
+        setFishRarity(fishRarity);
+        setFishName(fishName);
+        setFishLength(fishLength);
+        setCatchTime(catchTime);
+        setCompetitionId(competitionId);
         resetChangedOnNotNull();
     }
 }

@@ -12,7 +12,11 @@ import org.bukkit.boss.BarStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class MainConfig extends ConfigBase {
 
@@ -66,7 +70,10 @@ public class MainConfig extends ConfigBase {
     }
 
     public boolean isDatabaseOnline() {
-        return databaseEnabled() && !EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2();
+        if (!databaseEnabled() || EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2())
+            return false;
+
+        return EvenMoreFish.getInstance().getDatabase() != null;
     }
 
     public boolean isCatchEnabled() {

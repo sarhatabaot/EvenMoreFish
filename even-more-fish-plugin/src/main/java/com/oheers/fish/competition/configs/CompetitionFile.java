@@ -20,7 +20,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class CompetitionFile extends ConfigBase {
@@ -191,7 +195,7 @@ public class CompetitionFile extends ConfigBase {
                 seconds += (Long.parseLong(split[0]) * 60);
                 finalTimes.add(seconds);
             } catch (NumberFormatException exception) {
-                logger.severe("Could not turn " + time + " into an alert time. If you need support, feel free to join the discord server: https://discord.gg/Hb9cj3tNbb");
+                logger.severe("Could not turn " + time + " into an alert time. If you need support, feel free to join the discord server: https://discord.gg/9fRbqWTnHS");
             }
         }
         return finalTimes;
@@ -308,6 +312,13 @@ public class CompetitionFile extends ConfigBase {
      */
     public boolean isAllowHunting() {
         return getConfig().getBoolean("allow-hunting", false);
+    }
+
+    /**
+     * @return Whether fishing is allowed.
+     */
+    public boolean isAllowFishing() {
+        return getConfig().getBoolean("allow-fishing", true);
     }
 
 }

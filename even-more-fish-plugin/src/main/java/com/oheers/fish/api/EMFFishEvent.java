@@ -7,19 +7,20 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Called when an EMF Fish is caught with a fishing rod
- */
+import java.time.LocalDateTime;
+
 public class EMFFishEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final Fish fish;
     private final Player player;
+    private final LocalDateTime catchTime;
     private boolean cancel;
 
-    public EMFFishEvent(@NotNull Fish fish, @NotNull Player player) {
+    public EMFFishEvent(@NotNull Fish fish, @NotNull Player player, final LocalDateTime catchTime) {
         this.fish = fish;
         this.player = player;
+        this.catchTime = catchTime;
     }
 
     public static HandlerList getHandlerList() {
@@ -55,4 +56,9 @@ public class EMFFishEvent extends Event implements Cancellable {
         this.cancel = cancel;
     }
 
+
+    public LocalDateTime getCatchTime() {
+        return catchTime;
+    }
 }
+

@@ -19,10 +19,6 @@ public abstract class ExecuteBase {
         this.settings = settings;
     }
 
-    protected ExecuteBase(final ConnectionFactory connectionFactory) {
-        this(connectionFactory, null);
-    }
-
     protected @NotNull DSLContext getContext(Connection connection) {
         if (settings == null) {
             return DSL.using(connection, DatabaseUtil.getSQLDialect(connectionFactory.getType()));
@@ -32,6 +28,10 @@ public abstract class ExecuteBase {
 
     protected Connection getConnection() throws SQLException {
         return connectionFactory.getConnection();
+    }
+
+    protected boolean supportsTransactions() {
+        return this.connectionFactory.supportsTransactions();
     }
 }
 

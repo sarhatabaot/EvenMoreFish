@@ -2,8 +2,8 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.addons.AddonManager;
-import com.oheers.fish.api.addons.Addon;
+import com.oheers.fish.api.addons.ItemAddon;
+import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitManager;
@@ -20,7 +20,6 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
@@ -30,6 +29,7 @@ import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -64,7 +64,6 @@ public class AdminCommand {
                         getBait(),
                         getClearBaits(),
                         getReload(),
-                        getAddons(),
                         getVersion(),
                         getRewardTypes(),
                         getMigrate(),
@@ -136,7 +135,7 @@ public class AdminCommand {
                 .withArguments(
                         new MultiLiteralArgument(
                                 "listTarget",
-                                "fish", "rarities"
+                                "fish", "rarities", "requirementTypes", "rewardTypes", "itemAddons"
                         ),
                         RarityArgument.create().setOptional(true)
                 )
@@ -171,14 +170,17 @@ public class AdminCommand {
                                 message.setVariable("{rarity}", rarity.getDisplayName());
                                 rarityBuilder.append(message.getComponentMessage());
                                 rarityBuilder.hoverEvent(HoverEvent.hoverEvent(
-                                    HoverEvent.Action.SHOW_TEXT,
-                                    EMFSingleMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        EMFSingleMessage.fromString("Click to view " + rarity.getId() + " fish.").getComponentMessage()
                                 ));
                                 rarityBuilder.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/emf admin list fish " + rarity.getId()));
                                 builder.append(rarityBuilder);
                             }
                             sender.sendMessage(builder.build());
                         }
+                        case "requirementTypes" -> listRequirementTypes(sender);
+                        case "rewardTypes" -> listRewardTypes(sender);
+                        case "itemAddons" -> listItemAddons(sender);
                     }
                 });
     }
@@ -307,77 +309,116 @@ public class AdminCommand {
                 });
     }
 
-    private CommandAPICommand getAddons() {
-        helpMessageBuilder.addUsage(
-                "admin addons",
-                ConfigMessage.HELP_ADMIN_ADDONS::getMessage
-        );
-        return new CommandAPICommand("addons")
-                .withFullDescription(ConfigMessage.HELP_ADMIN_ADDONS.getMessage().getPlainTextMessage())
-                .executes(info -> {
-                    final AddonManager addonManager = EvenMoreFish.getInstance().getAddonManager();
-                    final String messageFormat = "Addon: %s, Loading: %b, Version: %s";
-                    final List<String> messageList = new ArrayList<>();
-                    for (final Map.Entry<String, Addon> entry : addonManager.getAddonMap().entrySet()) {
-                        final String prefix = entry.getKey();
-                        messageList.add(String.format(messageFormat, prefix, addonManager.isLoading(prefix), entry.getValue().getVersion()));
-                    }
+    private void listRewardTypes(@NotNull Audience audience) {
+        TextComponent.Builder builder = Component.text();
 
-                    EMFListMessage.fromStringList(messageList).send(info.sender());
-                });
+        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
+        listMessage.setVariable("{addon-type}", RewardType.class.getSimpleName());
+        builder.append(listMessage.getComponentMessage());
+
+        RewardType.getLoadedTypes().forEach((string, rewardType) -> {
+            Component show = EMFSingleMessage.fromString(
+                    "Author: " + rewardType.getAuthor() + "\n" +
+                            "Registered Plugin: " + rewardType.getPlugin().getName()
+            ).getComponentMessage();
+
+            TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
+            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
+            builder.append(typeBuilder).append(Component.text(", "));
+        });
+        audience.sendMessage(builder.build());
+    }
+
+    private void listRequirementTypes(@NotNull Audience audience) {
+        TextComponent.Builder builder = Component.text();
+
+        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
+        listMessage.setVariable("{addon-type}", RequirementType.class.getSimpleName());
+        builder.append(listMessage.getComponentMessage());
+
+        RequirementType.getLoadedTypes().forEach((string, requirementType) -> {
+            Component show = EMFSingleMessage.fromString(
+                    "Author: " + requirementType.getAuthor() + "\n" +
+                            "Registered Plugin: " + requirementType.getPlugin().getName()
+            ).getComponentMessage();
+
+            TextComponent.Builder typeBuilder = Component.text().content(requirementType.getIdentifier());
+            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
+            builder.append(typeBuilder).append(Component.text(", "));
+        });
+        audience.sendMessage(builder.build());
+    }
+
+    private void listItemAddons(@NotNull Audience audience) {
+        TextComponent.Builder builder = Component.text();
+
+        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
+        listMessage.setVariable("{addon-type}", ItemAddon.class.getSimpleName());
+        builder.append(listMessage.getComponentMessage());
+
+        ItemAddon.getLoadedAddons().forEach((string, itemAddon) -> {
+            Component show = EMFSingleMessage.fromString(
+                    "Author: " + itemAddon.getAuthor()
+            ).getComponentMessage();
+
+            TextComponent.Builder typeBuilder = Component.text().content(itemAddon.getIdentifier());
+            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
+            builder.append(typeBuilder).append(Component.text(", "));
+        });
+        audience.sendMessage(builder.build());
     }
 
     @SuppressWarnings("UnstableApiUsage")
     private CommandAPICommand getVersion() {
         helpMessageBuilder.addUsage(
-            "admin version",
-            ConfigMessage.HELP_ADMIN_VERSION::getMessage
+                "admin version",
+                ConfigMessage.HELP_ADMIN_VERSION::getMessage
         );
         return new CommandAPICommand("version")
-            .executes(info -> {
-                int fishCount = FishManager.getInstance().getRarityMap().values().stream()
-                    .mapToInt(rarity -> rarity.getFishList().size())
-                    .sum();
+                .executes(info -> {
+                    int fishCount = FishManager.getInstance().getRarityMap().values().stream()
+                            .mapToInt(rarity -> rarity.getFishList().size())
+                            .sum();
 
-                String databaseEngine = "N/A";
-                String databaseType = "N/A";
-                final Database database = EvenMoreFish.getInstance().getDatabase();
-                if (database != null) {
-                    databaseEngine = database.getDatabaseVersion();
-                    databaseType = database.getType();
-                }
+                    String databaseEngine = "N/A";
+                    String databaseType = "N/A";
+                    final Database database = EvenMoreFish.getInstance().getDatabase();
+                    if (database != null) {
+                        databaseEngine = database.getDatabaseVersion();
+                        databaseType = database.getType();
+                    }
 
-                final String msgString =
-                    """
-                        {prefix} EvenMoreFish by Oheers {version}\s
-                        {prefix} Feature Branch: {branch}\s
-                        {prefix} Feature Build/Date: {build-date}\s
-                        {prefix} MCV: {mcv}\s
-                        {prefix} SSV: {ssv}\s
-                        {prefix} Online: {online}\s
-                        {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
-                        {prefix} Database Engine: {engine}\s
-                        {prefix} Database Type: {type}\s
-                        """;
+                    final String msgString =
+                            """
+                                {prefix} EvenMoreFish by Oheers {version}\s
+                                {prefix} Feature Branch: {branch}\s
+                                {prefix} Feature Build/Date: {build-date}\s
+                                {prefix} MCV: {mcv}\s
+                                {prefix} SSV: {ssv}\s
+                                {prefix} Online: {online}\s
+                                {prefix} Loaded Rarities({rarities}) Fish({fish}) Baits({baits}) Competitions({competitions})\s
+                                {prefix} Database Engine: {engine}\s
+                                {prefix} Database Type: {type}\s
+                                """;
 
-                EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
+                    EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
 
-                message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
-                message.setVariable("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion());
-                message.setVariable("{branch}", getFeatureBranchName());
-                message.setVariable("{build-date}", getFeatureBranchBuildOrDate());
-                message.setVariable("{mcv}", Bukkit.getServer().getVersion());
-                message.setVariable("{ssv}", Bukkit.getServer().getBukkitVersion());
-                message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
-                message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
-                message.setVariable("{fish}", String.valueOf(fishCount));
-                message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
-                message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
-                message.setVariable("{engine}", databaseEngine);
-                message.setVariable("{type}", databaseType);
+                    message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
+                    message.setVariable("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion());
+                    message.setVariable("{branch}", getFeatureBranchName());
+                    message.setVariable("{build-date}", getFeatureBranchBuildOrDate());
+                    message.setVariable("{mcv}", Bukkit.getServer().getVersion());
+                    message.setVariable("{ssv}", Bukkit.getServer().getBukkitVersion());
+                    message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
+                    message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
+                    message.setVariable("{fish}", String.valueOf(fishCount));
+                    message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
+                    message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
+                    message.setVariable("{engine}", databaseEngine);
+                    message.setVariable("{type}", databaseType);
 
-                message.send(info.sender());
-            });
+                    message.send(info.sender());
+                });
     }
 
     private String getFeatureBranchName() {
@@ -399,8 +440,8 @@ public class AdminCommand {
                     builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
                     RewardType.getLoadedTypes().forEach((string, rewardType) -> {
                         Component show = EMFSingleMessage.fromString(
-                            "Author: " + rewardType.getAuthor() + "\n" +
-                            "Registered Plugin: " + rewardType.getPlugin().getName()
+                                "Author: " + rewardType.getAuthor() + "\n" +
+                                        "Registered Plugin: " + rewardType.getPlugin().getName()
                         ).getComponentMessage();
 
                         TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
@@ -418,9 +459,9 @@ public class AdminCommand {
         );
         return new CommandAPICommand("migrate")
                 .executes(info -> {
-                    if (!MainConfig.getInstance().databaseEnabled()) {
+                    if (!MainConfig.getInstance().isDatabaseOnline()) {
                         EMFSingleMessage.fromString("You cannot run migrations when the database is disabled. Please set database.enabled: true. And restart the server.")
-                            .send(info.sender());
+                                .send(info.sender());
                         return;
                     }
                     EvenMoreFish.getScheduler().runTaskAsynchronously(() -> EvenMoreFish.getInstance().getDatabase().getMigrationManager().migrateLegacy(info.sender()));

@@ -1,41 +1,60 @@
 package com.oheers.fish.database.model;
 
-import org.jetbrains.annotations.NotNull;
+import com.oheers.fish.competition.Competition;
+import com.oheers.fish.competition.CompetitionEntry;
+import com.oheers.fish.database.data.FishRarityKey;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CompetitionReport {
 
-    private final String competitionConfigID;
+    private final String competitionConfigId;
     private final String winnerFish;
-    private final UUID winnerUUID;
-    private final List<UUID> contestants = new ArrayList<>();
+    private final UUID winnerUuid;
+    private final List<UUID> contestants;
 
     private final float winnerScore;
 
-    public CompetitionReport(@NotNull final String competitionConfigID, @NotNull final String winnerUUIDString,
-                             @NotNull final String winnerFish, final float winnerScore, @NotNull final String contestants) {
-        this.competitionConfigID = competitionConfigID;
-        this.winnerUUID = UUID.fromString(winnerUUIDString);
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
+
+
+    public CompetitionReport(String competitionConfigID, String winnerFish, String winnerUUIDString, float winnerScore, String contestants, LocalDateTime startTime, LocalDateTime endTime) {
+        this.competitionConfigId = competitionConfigID;
         this.winnerFish = winnerFish;
+        this.winnerUuid = UUID.fromString(winnerUUIDString);
         this.winnerScore = winnerScore;
+        this.contestants = new ArrayList<>();
         for (String contestant : contestants.split(",")) {
             this.contestants.add(UUID.fromString(contestant));
         }
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
-    public String getCompetitionConfigID() {
-        return competitionConfigID;
+    public CompetitionReport(Competition competition, LocalDateTime startTime, LocalDateTime endTime) {
+        this.competitionConfigId = competition.getCompetitionName();
+        this.winnerFish = FishRarityKey.of(competition.getLeaderboard().getTopEntry().getFish()).toString(); //could just be the fish here todo
+        this.winnerScore = competition.getLeaderboard().getTopEntry().getValue();
+        this.winnerUuid = competition.getLeaderboard().getTopEntry().getPlayer();
+        this.contestants = competition.getLeaderboard().getEntries().stream().map(CompetitionEntry::getPlayer).toList();
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public String getCompetitionConfigId() {
+        return competitionConfigId;
     }
 
     public String getWinnerFish() {
         return winnerFish;
     }
 
-    public UUID getWinnerUUID() {
-        return winnerUUID;
+    public UUID getWinnerUuid() {
+        return winnerUuid;
     }
 
     public List<UUID> getContestants() {
@@ -44,5 +63,13 @@ public class CompetitionReport {
 
     public float getWinnerScore() {
         return winnerScore;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 }

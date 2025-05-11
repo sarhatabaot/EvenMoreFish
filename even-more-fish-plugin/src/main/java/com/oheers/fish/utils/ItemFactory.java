@@ -26,8 +26,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
 
 public class ItemFactory {
 
@@ -192,7 +195,8 @@ public class ItemFactory {
         }
 
         // The fish has no item type specified
-        EvenMoreFish.debug("GET TYPE: No item type specified, config location (%s)".formatted(configLocation + configurationFile.getNameAsString()));
+        this.rawMaterial = false;
+        EvenMoreFish.getInstance().debug("GET TYPE: No item type specified, config location (%s)".formatted(configLocation + configurationFile.getNameAsString()));
         return new ItemStack(Material.COD);
 
     }
@@ -338,7 +342,7 @@ public class ItemFactory {
      */
     private ItemStack checkMaterial(String mValue) {
         if (mValue == null || mValue.isBlank()) {
-            EvenMoreFish.debug("MATERIAL CHECK: Config Location (%s, %s), empty string".formatted(configLocation + "item.material", configurationFile.getNameAsString()));
+            EvenMoreFish.getInstance().debug("MATERIAL CHECK: Config Location (%s, %s), empty string".formatted(configLocation + "item.material", configurationFile.getNameAsString()));
             return null;
         }
 
@@ -363,10 +367,11 @@ public class ItemFactory {
 
         try {
             ItemStack item = getItem(materialId);
-            this.rawMaterial = rawMaterial;
+            if (item != null) {
+                this.rawMaterial = rawMaterial;
+            }
             return item;
         } catch (IncorrectAssignedMaterialException e) {
-            this.rawMaterial = true;
             EvenMoreFish.getInstance().getLogger().warning(e::getMessage);
             return new ItemStack(Material.COD);
         }
@@ -520,8 +525,8 @@ public class ItemFactory {
      */
     private ItemStack checkRawMaterial() {
         String materialID = this.configurationFile.getString(configLocation + "item.raw-material");
-        if (materialID != null) {
-            rawMaterial = true;
+        if (materialID == null) {
+            return null;
         }
 
         return checkItem(materialID, true);

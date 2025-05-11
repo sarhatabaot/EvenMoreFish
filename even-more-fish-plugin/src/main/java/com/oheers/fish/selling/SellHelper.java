@@ -5,7 +5,8 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.database.DataManager;
+import com.oheers.fish.database.data.manager.DataManager;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
@@ -24,7 +25,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class SellHelper {
 
@@ -37,10 +42,12 @@ public class SellHelper {
         if (!(humanEntity instanceof Player player)) {
             return;
         }
+
         if (!Economy.getInstance().isEnabled()) {
             ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
             return;
         }
+
         gui.getElements().forEach(element -> {
             if (!(element instanceof GuiStorageElement storageElement)) {
                 return;
@@ -81,7 +88,8 @@ public class SellHelper {
         economy.deposit(this.player, totalWorth, true);
 
         if (!(inventory instanceof PlayerInventory)) {
-            FishUtils.giveItems(Arrays.stream(inventory.getStorageContents()).filter(Objects::nonNull).toArray(ItemStack[]::new), this.player);
+            FishUtils.giveItems(inventory.getStorageContents(), this.player);
+            inventory.clear();
         }
 
         // sending the sell message to the player
@@ -94,12 +102,8 @@ public class SellHelper {
 
         this.player.playSound(this.player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.06f);
 
-        if (MainConfig.getInstance().databaseEnabled()) {
-            // TODO temporary fix until database PR is merged.
-            try {
-                logSoldFish(player.getUniqueId(), soldFish);
-            } catch (Exception exception) { /* Ignored */ }
-        }
+        logSoldFish(player.getUniqueId(), soldFish);
+
         return totalWorth != 0.0;
 
     }
@@ -158,7 +162,11 @@ public class SellHelper {
     }
 
     private void logSoldFish(final UUID uuid, @NotNull List<SoldFish> soldFish) {
-        int userId = EvenMoreFish.getInstance().getDatabase().getUserId(uuid);
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            return;
+        }
+
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(uuid);
         final String transactionId = FriendlyId.createFriendlyId();
         final Timestamp timestamp = Timestamp.from(Instant.now());
 
@@ -169,8 +177,13 @@ public class SellHelper {
 
         double moneyEarned = getTotalWorth(soldFish);
         int fishSold = calcFishSold(soldFish);
-        DataManager.getInstance().getUserReportIfExists(uuid).incrementFishSold(fishSold);
-        DataManager.getInstance().getUserReportIfExists(uuid).incrementMoneyEarned(moneyEarned);
+
+        final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
+        final UserReport report = userReportDataManager.get(uuid.toString());
+        report.incrementFishSold(fishSold);
+        report.incrementMoneyEarned(moneyEarned);
+
+        userReportDataManager.update(uuid.toString(), report);
     }
 
     private int calcFishSold(@NotNull List<SoldFish> soldFish) {

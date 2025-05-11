@@ -1,27 +1,37 @@
 package com.oheers.fish.database;
 
-
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.annotations.NeedsTesting;
+import com.oheers.fish.api.annotations.TestType;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.database.connection.*;
+import com.oheers.fish.database.connection.ConnectionFactory;
+import com.oheers.fish.database.connection.H2ConnectionFactory;
+import com.oheers.fish.database.connection.MigrationManager;
+import com.oheers.fish.database.connection.MySqlConnectionFactory;
+import com.oheers.fish.database.connection.SqliteConnectionFactory;
+import com.oheers.fish.database.data.FishRarityKey;
 import com.oheers.fish.database.execute.ExecuteQuery;
 import com.oheers.fish.database.execute.ExecuteUpdate;
 import com.oheers.fish.database.generated.mysql.Tables;
 import com.oheers.fish.database.generated.mysql.tables.records.CompetitionsRecord;
-import com.oheers.fish.database.model.FishReport;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.generated.mysql.tables.records.FishLogRecord;
+import com.oheers.fish.database.generated.mysql.tables.records.UserFishStatsRecord;
+import com.oheers.fish.database.model.CompetitionReport;
+import com.oheers.fish.database.model.fish.FishLog;
+import com.oheers.fish.database.model.fish.FishStats;
+import com.oheers.fish.database.model.user.UserFishStats;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.fishing.items.Fish;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.HumanEntity;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.DSLContext;
-import org.jooq.InsertSetMoreStep;
+import org.jetbrains.annotations.Nullable;
+import org.jooq.*;
 import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.conf.MappedSchema;
 import org.jooq.conf.MappedTable;
 import org.jooq.conf.RenderMapping;
@@ -29,16 +39,17 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+@NeedsTesting(
+        reason = "Requires full testing, unit where possible, integration eventually.",
+        testType = {TestType.MANUAL, TestType.UNIT, TestType.INTEGRATION}
+)
 public class Database implements DatabaseAPI {
     private String version;
     private final ConnectionFactory connectionFactory;
@@ -85,10 +96,13 @@ public class Database implements DatabaseAPI {
     }
 
     private @NotNull ConnectionFactory getConnectionFactory(final @NotNull String type) {
-        return switch(type) {
-            case "mysql": yield new MySqlConnectionFactory(); //todo check for credentials.
-            case "sqlite": yield new SqliteConnectionFactory();
-            default: yield new H2ConnectionFactory();
+        return switch (type) {
+            case "mysql":
+                yield new MySqlConnectionFactory();
+            case "sqlite":
+                yield new SqliteConnectionFactory();
+            default:
+                yield new H2ConnectionFactory();
         };
     }
 
@@ -108,19 +122,11 @@ public class Database implements DatabaseAPI {
                 )
         );
 
-        this.settings = DatabaseStrategyFactory.getStrategy(connectionFactory).applySettings(settings, tablePrefix,dbName);
+        this.settings = DatabaseStrategyFactory.getStrategy(connectionFactory).applySettings(settings, tablePrefix, dbName);
     }
 
-    public void executeStatement(@NotNull Consumer<DSLContext> consumer) {
-        try (Connection connection = this.connectionFactory.getConnection()) {
-            consumer.accept(this.getContext(connection));
-        } catch (SQLException e) {
-            EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-        }
-
-    }
-
-    private @NotNull DSLContext getContext(Connection connection) {
+    @NotNull
+    public DSLContext getContext(Connection connection) {
         return DSL.using(connection, DatabaseUtil.getSQLDialect(this.connectionFactory.getType()), this.settings);
     }
 
@@ -143,13 +149,7 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
-    @Override
-    public boolean hasUserLog(@NotNull UUID uuid) {
-        if (!hasUser(uuid)) {
-            return false;
-        }
-
-        final int userId = getUserId(uuid);
+    public boolean hasFishLog(int userId) {
         if (userId == 0) {
             return false;
         }
@@ -157,11 +157,9 @@ public class Database implements DatabaseAPI {
         return new ExecuteQuery<Boolean>(connectionFactory, settings) {
             @Override
             protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
-                return dslContext.select()
-                        .from(Tables.FISH_LOG)
+                return dslContext.fetchExists(Tables.FISH_LOG
                         .where(Tables.FISH_LOG.USER_ID.eq(userId))
-                        .fetch()
-                        .isNotEmpty();
+                );
             }
 
             @Override
@@ -172,34 +170,20 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void createUser(@NotNull UUID uuid) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.insertInto(Tables.USERS)
-                        .set(Tables.USERS.UUID, uuid.toString())
-                        .set(Tables.USERS.FIRST_FISH, "None")
-                        .set(Tables.USERS.LAST_FISH, "None")
-                        .set(Tables.USERS.LARGEST_FISH, "None")
-                        .set(Tables.USERS.LARGEST_LENGTH, 0F)
-                        .set(Tables.USERS.NUM_FISH_CAUGHT, 0)
-                        .set(Tables.USERS.COMPETITIONS_WON, 0)
-                        .set(Tables.USERS.COMPETITIONS_JOINED, 0)
-                        .set(Tables.USERS.TOTAL_FISH_LENGTH, 0F)
-                        .execute();
-            }
-        }.executeUpdate();
-    }
-
-    @Override
     public int getUserId(@NotNull UUID uuid) {
         return new ExecuteQuery<Integer>(connectionFactory, settings) {
             @Override
             protected Integer onRunQuery(DSLContext dslContext) {
-                return dslContext.select()
+                Integer id = dslContext.select()
                         .from(Tables.USERS)
                         .where(Tables.USERS.UUID.eq(uuid.toString()))
                         .fetchOne(Tables.USERS.ID);
+
+                if (id == null) {
+                    return empty();
+                }
+
+                return id;
             }
 
             @Override
@@ -210,30 +194,7 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public void writeUserReport(@NotNull UUID uuid, @NotNull UserReport report) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                int rowsUpdated = dslContext.update(Tables.USERS)
-                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish())
-                        .set(Tables.USERS.LAST_FISH, report.getRecentFish())
-                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish())
-                        .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
-                        .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
-                        .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
-                        .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
-                        .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
-                        .where(Tables.USERS.UUID.eq(uuid.toString()))
-                        .execute();
-
-                DatabaseUtil.writeDbVerbose("Written user report for (%s) to the database.".formatted(uuid));
-                return rowsUpdated;
-            }
-        }.executeUpdate();
-    }
-
-    @Override
-    public UserReport readUserReport(@NotNull UUID uuid) {
+    public UserReport getUserReport(@NotNull UUID uuid) {
         return new ExecuteQuery<UserReport>(connectionFactory, settings) {
             @Override
             protected UserReport onRunQuery(DSLContext dslContext) throws Exception {
@@ -241,41 +202,47 @@ public class Database implements DatabaseAPI {
                         .from(Tables.USERS)
                         .where(Tables.USERS.UUID.eq(uuid.toString()))
                         .fetchOne();
-                if (tableRecord == null)
+                if (tableRecord == null) {
                     return empty();
+                }
 
                 DatabaseUtil.writeDbVerbose("Read user report for user (%s)".formatted(uuid.toString()));
                 final int id = tableRecord.getValue(Tables.USERS.ID);
                 final int numFishCaught = tableRecord.getValue(Tables.USERS.NUM_FISH_CAUGHT);
                 final int competitionsWon = tableRecord.getValue(Tables.USERS.COMPETITIONS_WON);
                 final int competitionsJoined = tableRecord.getValue(Tables.USERS.COMPETITIONS_JOINED);
-                final String firstFish = tableRecord.getValue(Tables.USERS.FIRST_FISH);
-                final String lastFish = tableRecord.getValue(Tables.USERS.LAST_FISH);
-                final String largestFish = tableRecord.getValue(Tables.USERS.LARGEST_FISH);
+                final FishRarityKey firstFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.FIRST_FISH));
+                final FishRarityKey recentFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.LAST_FISH));
+                final FishRarityKey largestFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.LARGEST_FISH));
                 final float totalFishLength = tableRecord.getValue(Tables.USERS.TOTAL_FISH_LENGTH);
                 final float largestLength = tableRecord.getValue(Tables.USERS.LARGEST_LENGTH);
                 final String uuid = tableRecord.getValue(Tables.USERS.UUID);
                 final int fishSold = tableRecord.getValue(Tables.USERS.FISH_SOLD);
                 final double moneyEarned = tableRecord.getValue(Tables.USERS.MONEY_EARNED);
 
+                final FishRarityKey shortestFish = FishRarityKey.from(tableRecord.getValue(Tables.USERS.SHORTEST_FISH));
+                final float shortestLength = tableRecord.getValue(Tables.USERS.SHORTEST_LENGTH);
+
                 return new UserReport(
                         id,
+                        UUID.fromString(uuid),
+                        firstFish,
+                        recentFish,
+                        largestFish,
+                        shortestFish,
                         numFishCaught,
                         competitionsWon,
                         competitionsJoined,
-                        firstFish,
-                        lastFish,
-                        largestFish,
-                        totalFishLength,
                         largestLength,
-                        uuid,
+                        shortestLength,
+                        totalFishLength,
                         fishSold,
                         moneyEarned
                 );
             }
 
             @Override
-            protected UserReport empty() {
+            protected @Nullable UserReport empty() {
                 DatabaseUtil.writeDbVerbose("User report for (%s) does not exist in the database.".formatted(uuid));
                 return null;
             }
@@ -283,7 +250,7 @@ public class Database implements DatabaseAPI {
     }
 
     @Override
-    public boolean hasFishData(@NotNull Fish fish) {
+    public boolean hasFishStats(@NotNull Fish fish) {
         return new ExecuteQuery<Boolean>(connectionFactory, settings) {
             @Override
             protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
@@ -303,24 +270,6 @@ public class Database implements DatabaseAPI {
         }.prepareAndRunQuery();
     }
 
-    @Override
-    public void createFishData(@NotNull Fish fish, @NotNull UUID uuid) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.insertInto(Tables.FISH)
-                        .set(Tables.FISH.FISH_NAME, fish.getName())
-                        .set(Tables.FISH.FISH_RARITY, fish.getRarity().getId())
-                        .set(Tables.FISH.FIRST_FISHER, uuid.toString())
-                        .set(Tables.FISH.TOTAL_CAUGHT, 1)
-                        .set(Tables.FISH.LARGEST_FISH, fish.getLength())
-                        .set(Tables.FISH.FIRST_FISHER, uuid.toString())
-                        .set(Tables.FISH.LARGEST_FISHER, uuid.toString())
-                        .set(Tables.FISH.FIRST_CATCH_TIME, LocalDateTime.now())
-                        .execute();
-            }
-        }.executeUpdate();
-    }
 
     @Override
     public void incrementFish(@NotNull Fish fish) {
@@ -336,278 +285,10 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
-    @Override
-    public String getDiscoverer(@NotNull Fish fish) {
-        return new ExecuteQuery<String>(connectionFactory, settings) {
-            @Override
-            protected String onRunQuery(DSLContext dslContext) {
-                return dslContext.select()
-                    .from(Tables.FISH)
-                    .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                        .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                    .fetchOne(Tables.FISH.FIRST_FISHER);
-            }
-
-            @Override
-            protected String empty() {
-                return "Unknown";
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
-    public LocalDateTime getFirstCatchDateForPlayer(@NotNull Fish fish, @NotNull HumanEntity player) {
-        List<FishReport> reports = getReportsForFish(player.getUniqueId(), fish); // Need to use this here, as no method exists in UserReport
-        LocalDateTime earliest = null;
-        for (FishReport report : reports) {
-            LocalDateTime catchTime = report.getLocalDateTime();
-            if (earliest == null || catchTime.isBefore(earliest)) {
-                earliest = catchTime;
-            }
-        }
-        return earliest;
-    }
-
-    @Override
-    public LocalDateTime getFirstCatchDate(@NotNull Fish fish) {
-        return new ExecuteQuery<LocalDateTime>(connectionFactory, settings) {
-            @Override
-            protected LocalDateTime onRunQuery(DSLContext dslContext) {
-                return dslContext.select()
-                    .from(Tables.FISH)
-                    .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                        .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                    .fetchOne(Tables.FISH.FIRST_CATCH_TIME);
-            }
-
-            @Override
-            protected LocalDateTime empty() {
-                return null;
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
-    public float getLargestFishSizeForPlayer(@NotNull Fish fish, @NotNull HumanEntity player) {
-        UUID uuid = player.getUniqueId();
-        if (!hasUser(uuid)) {
-            createUser(uuid);
-        }
-        UserReport report = readUserReport(player.getUniqueId());
-        return report.getLargestLength();
-    }
-
-    @Override
-    public float getLargestFishSize(@NotNull Fish fish) {
-        return new ExecuteQuery<Float>(connectionFactory, settings) {
-            @Override
-            protected Float onRunQuery(DSLContext dslContext) {
-                Float value = dslContext.select()
-                        .from(Tables.FISH)
-                        .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                                .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                        .fetchOne(Tables.FISH.LARGEST_FISH);
-                if (value == null) {
-                    value = 0F;
-                }
-                return value;
-            }
-
-            @Override
-            protected Float empty() {
-                return null;
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
-    public int getAmountFishCaughtForPlayer(@NotNull Fish fish, @NotNull HumanEntity player) {
-        List<FishReport> reports = getReportsForFish(player.getUniqueId(), fish);
-        return reports.stream().mapToInt(FishReport::getNumCaught).sum();
-    }
-
-    @Override
-    public int getAmountFishCaught(@NotNull Fish fish) {
-        return new ExecuteQuery<Integer>(connectionFactory, settings) {
-            @Override
-            protected Integer onRunQuery(DSLContext dslContext) {
-                Integer integer = dslContext.select()
-                    .from(Tables.FISH)
-                    .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId())
-                        .and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                    .fetchOne(Tables.FISH.TOTAL_CAUGHT);
-                if (integer == null) {
-                    integer = 0;
-                }
-                return integer;
-            }
-
-            @Override
-            protected Integer empty() {
-                return 0;
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
-    public void updateLargestFish(@NotNull Fish fish, @NotNull UUID uuid) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.update(Tables.FISH)
-                        .set(Tables.FISH.LARGEST_FISH, fish.getLength()) // TODO use decimal format
-                        .set(Tables.FISH.LARGEST_FISHER, uuid.toString())
-                        .where(Tables.FISH.FISH_RARITY.eq(fish.getRarity().getId()).and(Tables.FISH.FISH_NAME.eq(fish.getName())))
-                        .execute();
-
-            }
-        }.executeUpdate();
-    }
-
-    @Override
-    public List<FishReport> getFishReportsForPlayer(@NotNull UUID uuid) {
-        final int userId = getUserId(uuid);
-
-        return new ExecuteQuery<List<FishReport>>(connectionFactory, settings) {
-            @Override
-            protected List<FishReport> onRunQuery(DSLContext dslContext) throws Exception {
-                Result<Record> result = dslContext.select()
-                        .from(Tables.FISH_LOG)
-                        .where(Tables.FISH_LOG.USER_ID.eq(userId))
-                        .fetch();
-
-                if (result.isEmpty()) {
-                    return empty();
-                }
-
-                DatabaseUtil.writeDbVerbose("Read fish reports for (%s) from the database.".formatted(uuid));
-                List<FishReport> reports = new ArrayList<>();
-                for (Record recordResult : result) {
-                    final String rarity = recordResult.getValue(Tables.FISH_LOG.RARITY);
-                    final String fish = recordResult.getValue(Tables.FISH_LOG.FISH);
-                    final float largestLength = recordResult.getValue(Tables.FISH_LOG.LARGEST_LENGTH);
-                    final int quantity = recordResult.getValue(Tables.FISH_LOG.QUANTITY);
-                    final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME); // convert to long, or maybe store as long?
-                    reports.add(new FishReport(rarity, fish, largestLength, quantity, firstCatchTime));
-                }
-                return reports;
-            }
-
-            @Override
-            protected List<FishReport> empty() {
-                return List.of();
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
-    public List<FishReport> getReportsForFish(@NotNull UUID uuid, @NotNull Fish fish) {
-        final int userId = getUserId(uuid);
-
-        return new ExecuteQuery<List<FishReport>>(connectionFactory, settings) {
-            @Override
-            protected List<FishReport> onRunQuery(DSLContext dslContext) throws Exception {
-                Result<Record> result = dslContext.select()
-                        .from(Tables.FISH_LOG)
-                        .where(Tables.FISH_LOG.USER_ID.eq(userId)
-                                .and(Tables.FISH_LOG.FISH.eq(fish.getName()))
-                                .and(Tables.FISH_LOG.RARITY.eq(fish.getRarity().getId())))
-                        .fetch();
-
-                if (result.isEmpty()) {
-                    return empty();
-                }
-
-                DatabaseUtil.writeDbVerbose("Read fish reports for (%s) from the database.".formatted(uuid));
-                List<FishReport> reports = new ArrayList<>();
-                for (Record recordResult : result) {
-                    final String rarity = recordResult.getValue(Tables.FISH_LOG.RARITY);
-                    final String fish = recordResult.getValue(Tables.FISH_LOG.FISH);
-                    final float largestLength = recordResult.getValue(Tables.FISH_LOG.LARGEST_LENGTH);
-                    final int quantity = recordResult.getValue(Tables.FISH_LOG.QUANTITY);
-                    final LocalDateTime firstCatchTime = recordResult.getValue(Tables.FISH_LOG.FIRST_CATCH_TIME); // convert to long, or maybe store as long?
-                    reports.add(new FishReport(rarity, fish, largestLength, quantity, firstCatchTime));
-                }
-                return reports;
-            }
-
-            @Override
-            protected List<FishReport> empty() {
-                return List.of();
-            }
-        }.prepareAndRunQuery();
-    }
-
-    @Override
-    public void addUserFish(@NotNull FishReport report, int userId) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.insertInto(Tables.FISH_LOG)
-                        .set(Tables.FISH_LOG.USER_ID, userId)
-                        .set(Tables.FISH_LOG.RARITY, report.getRarity())
-                        .set(Tables.FISH_LOG.FISH, report.getName())
-                        .set(Tables.FISH_LOG.QUANTITY, report.getNumCaught())
-                        .set(Tables.FISH_LOG.FIRST_CATCH_TIME, report.getLocalDateTime()) //convert to bytes
-                        .set(Tables.FISH_LOG.LARGEST_LENGTH, report.getLargestLength())
-                        .execute();
-            }
-        }.executeUpdate();
-    }
-
-    @Override
-    public void updateUserFish(@NotNull FishReport report, int userId) {
-        new ExecuteUpdate(connectionFactory, settings) {
-            @Override
-            protected int onRunUpdate(DSLContext dslContext) {
-                return dslContext.update(Tables.FISH_LOG)
-                        .set(Tables.FISH_LOG.QUANTITY, report.getNumCaught())
-                        .set(Tables.FISH_LOG.LARGEST_LENGTH, report.getLargestLength())
-                        .where(Tables.FISH_LOG.USER_ID.eq(userId)
-                                .and(Tables.FISH_LOG.RARITY.eq(report.getRarity()))
-                                .and(Tables.FISH_LOG.FISH.eq(report.getName())))
-                        .execute();
-            }
-        }.executeUpdate();
-
-    }
-
-    @Override
-    public void writeFishReports(@NotNull UUID uuid, @NotNull List<FishReport> reports) {
-        int userID = getUserId(uuid);
-        for (FishReport report : reports) {
-            if (userHasFish(report.getRarity(), report.getName(), userID)) {
-                updateUserFish(report, userID);
-            } else {
-                addUserFish(report, userID);
-            }
-        }
-    }
 
     @Override
     public boolean userHasFish(@NotNull Fish fish, @NotNull HumanEntity user) {
         return userHasFish(fish.getRarity().getId(), fish.getName(), getUserId(user.getUniqueId()));
-    }
-
-    @Override
-    public boolean userHasFish(@NotNull String rarity, @NotNull String fish, int userId) {
-        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
-            @Override
-            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
-                return dslContext.select()
-                        .from(Tables.FISH_LOG)
-                        .where(Tables.FISH_LOG.USER_ID.eq(userId)
-                                .and(Tables.FISH_LOG.RARITY.eq(rarity)
-                                        .and(Tables.FISH_LOG.FISH.eq(fish))))
-                        .fetch()
-                        .isNotEmpty();
-            }
-
-            @Override
-            protected Boolean empty() {
-                return false;
-            }
-        }.prepareAndRunQuery();
     }
 
     @Override
@@ -626,6 +307,7 @@ public class Database implements DatabaseAPI {
                             .set(Tables.COMPETITIONS.CONTESTANTS, prepareContestantsString(leaderboard.getEntries()))
                             .execute();
                 }
+                //add start and end times
 
                 return common.set(Tables.COMPETITIONS.WINNER_UUID, "None")
                         .set(Tables.COMPETITIONS.WINNER_FISH, "None")
@@ -676,6 +358,38 @@ public class Database implements DatabaseAPI {
         }.executeUpdate();
     }
 
+    //todo should be cached and fetched only when a player asks for it?
+    @Override
+    public FishLog getFishLog(int userId, String fishName, String fishRarity, LocalDateTime time) {
+        return new ExecuteQuery<FishLog>(connectionFactory, settings) {
+
+            @Override
+            protected FishLog onRunQuery(DSLContext dslContext) throws Exception {
+                Record result = dslContext.select()
+                        .from(Tables.FISH_LOG)
+                        .where(Tables.FISH_LOG.USER_ID.eq(userId)
+                                .and(Tables.FISH_LOG.FISH_NAME.eq(fishName))
+                                .and(Tables.FISH_LOG.FISH_RARITY.eq(fishName))
+                                .and(Tables.FISH_LOG.CATCH_TIME.eq(time))
+                        ).fetchOne();
+
+                if (result == null) {
+                    return empty();
+                }
+
+
+                final float length = result.getValue(Tables.FISH_LOG.FISH_LENGTH);
+                final String competitionId = result.getValue(Tables.FISH_LOG.COMPETITION_ID);
+                return new FishLog(userId, fishName, fishRarity, time, length, competitionId);
+            }
+
+            @Override
+            protected FishLog empty() {
+                return null;
+            }
+        }.prepareAndRunQuery();
+    }
+
     public void shutdown() {
         try {
             this.connectionFactory.shutdown();
@@ -685,16 +399,402 @@ public class Database implements DatabaseAPI {
     }
 
     public String getDatabaseVersion() {
-        if (!MainConfig.getInstance().databaseEnabled())
+        if (!MainConfig.getInstance().databaseEnabled()) {
             return "Disabled";
+        }
 
-        return "V"+this.version;
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            return "Offline";
+        }
+
+        return "V" + this.version;
     }
 
     public String getType() {
-        if (!MainConfig.getInstance().databaseEnabled())
+        if (!MainConfig.getInstance().databaseEnabled()) {
             return "Disabled";
+        }
 
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            return "Offline";
+        }
         return connectionFactory.getType();
+    }
+
+    @Override
+    public UserFishStats getUserFishStats(int userId, String fishName, String fishRarity) {
+        return new ExecuteQuery<UserFishStats>(connectionFactory, settings) {
+            @Override
+            protected UserFishStats onRunQuery(DSLContext dslContext) throws Exception {
+                Optional<Record> optionalRecord = dslContext.select()
+                        .from(Tables.USER_FISH_STATS)
+                        .where(Tables.USER_FISH_STATS.USER_ID.eq(userId)
+                                .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fishName)))
+                        .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(fishRarity))
+                        .fetchOptional();
+
+                if (optionalRecord.isEmpty()) {
+                    return empty();
+                }
+
+                final LocalDateTime firstCatchTime = optionalRecord.get().getValue(Tables.USER_FISH_STATS.FIRST_CATCH_TIME);
+                final float shortestLength = optionalRecord.get().getValue(Tables.USER_FISH_STATS.SHORTEST_LENGTH);
+                final float longestLength = optionalRecord.get().getValue(Tables.USER_FISH_STATS.LONGEST_LENGTH);
+                final int quantity = optionalRecord.get().getValue(Tables.USER_FISH_STATS.QUANTITY);
+                return new UserFishStats(userId, fishName, fishRarity, firstCatchTime, shortestLength, longestLength, quantity);
+            }
+
+            @Override
+            protected UserFishStats empty() {
+                //todo
+                return null;
+            }
+        }.prepareAndRunQuery();
+    }
+
+    public void upsertUserFishStats(UserFishStats userFishStats) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.USER_FISH_STATS)
+                        .set(Tables.USER_FISH_STATS.USER_ID, userFishStats.getUserId())
+                        .set(Tables.USER_FISH_STATS.FISH_NAME, userFishStats.getFishName())
+                        .set(Tables.USER_FISH_STATS.FISH_RARITY, userFishStats.getFishRarity())
+                        .set(Tables.USER_FISH_STATS.FIRST_CATCH_TIME, userFishStats.getFirstCatchTime())
+                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
+                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
+                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
+                        .onDuplicateKeyUpdate()
+                        .set(Tables.USER_FISH_STATS.SHORTEST_LENGTH, userFishStats.getShortestLength())
+                        .set(Tables.USER_FISH_STATS.LONGEST_LENGTH, userFishStats.getLongestLength())
+                        .set(Tables.USER_FISH_STATS.QUANTITY, userFishStats.getQuantity())
+                        .execute();
+            }
+        }.executeUpdate();
+    }
+
+
+    @Override
+    public Set<FishLog> getFishLogEntries(int userId, String fishName, String fishRarity) {
+        return new ExecuteQuery<Set<FishLog>>(connectionFactory, settings) {
+            @Override
+            protected Set<FishLog> onRunQuery(DSLContext dslContext) throws Exception {
+                Result<Record> result = dslContext.select()
+                        .from(Tables.FISH_LOG)
+                        .where(Tables.FISH_LOG.USER_ID.eq(userId))
+                        .and(Tables.FISH_LOG.FISH_NAME.eq(fishName))
+                        .and(Tables.FISH_LOG.FISH_RARITY.eq(fishName))
+                        .fetch();
+                if (result.isEmpty()) {
+                    return empty();
+                }
+
+                final Set<FishLog> fishLogs = new HashSet<>();
+                for (Record recordResult : result) {
+                    final LocalDateTime catchTime = recordResult.getValue(Tables.FISH_LOG.CATCH_TIME);
+                    final float length = recordResult.getValue(Tables.FISH_LOG.FISH_LENGTH);
+                    final String competitionId = recordResult.getValue(Tables.FISH_LOG.COMPETITION_ID);
+
+                    fishLogs.add(new FishLog(userId, fishName, fishRarity, catchTime, length, competitionId));
+                }
+                return fishLogs;
+            }
+
+            @Override
+            protected Set<FishLog> empty() {
+                return Set.of();
+            }
+        }.prepareAndRunQuery();
+    }
+
+    @Override
+    public void setFishLogEntry(FishLog fishLogEntry) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.FISH_LOG)
+                        .set(Tables.FISH_LOG.USER_ID, fishLogEntry.getUserId())
+                        .set(Tables.FISH_LOG.FISH_NAME, fishLogEntry.getFishName())
+                        .set(Tables.FISH_LOG.FISH_RARITY, fishLogEntry.getFishRarity())
+                        .set(Tables.FISH_LOG.FISH_LENGTH, fishLogEntry.getLength())
+                        .set(Tables.FISH_LOG.CATCH_TIME, fishLogEntry.getCatchTime())
+                        .set(Tables.FISH_LOG.COMPETITION_ID, fishLogEntry.getCompetitionId())
+                        .execute();
+            }
+        }.executeUpdate();
+    }
+
+
+    @Override
+    public FishStats getFishStats(String fishName, String fishRarity) {
+        return new ExecuteQuery<FishStats>(connectionFactory, settings) {
+            @Override
+            protected FishStats onRunQuery(DSLContext dslContext) throws Exception {
+                Optional<Record> optionalRecord = dslContext.select()
+                        .from(Tables.FISH)
+                        .where(Tables.FISH.FISH_NAME.eq(fishName))
+                        .and(Tables.FISH.FISH_RARITY.eq(fishName))
+                        .fetchOptional();
+
+                if (optionalRecord.isEmpty()) {
+                    return empty();
+                }
+
+                final LocalDateTime firstCatchTime = optionalRecord.get().getValue(Tables.FISH.FIRST_CATCH_TIME);
+                final UUID discoverer = UUID.fromString(optionalRecord.get().get(Tables.FISH.DISCOVERER));
+                final float shortestLength = optionalRecord.get().getValue(Tables.FISH.SHORTEST_LENGTH);
+                final UUID shortestFisher = UUID.fromString(optionalRecord.get().getValue(Tables.FISH.SHORTEST_FISHER));
+                final float longestLength = optionalRecord.get().getValue(Tables.FISH.LARGEST_FISH);
+                final UUID longestFisher = UUID.fromString(optionalRecord.get().getValue(Tables.FISH.LARGEST_FISHER));
+                final int quantity = optionalRecord.get().getValue(Tables.FISH.TOTAL_CAUGHT);
+                return new FishStats(fishName, fishRarity, firstCatchTime, discoverer, shortestLength, shortestFisher, longestLength, longestFisher, quantity);
+            }
+
+            @Override
+            protected FishStats empty() {
+                return null;
+            }
+        }.prepareAndRunQuery();
+    }
+
+    public void upsertFishStats(@NotNull FishStats fishStats) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.FISH)
+                        .set(Tables.FISH.FISH_NAME, fishStats.getFishName())
+                        .set(Tables.FISH.FISH_RARITY, fishStats.getFishRarity())
+                        .set(Tables.FISH.FIRST_FISHER, fishStats.getDiscoverer().toString())
+                        .set(Tables.FISH.DISCOVERER, fishStats.getDiscoverer().toString())
+                        .set(Tables.FISH.TOTAL_CAUGHT, fishStats.getQuantity())
+                        .set(Tables.FISH.LARGEST_FISH, fishStats.getLongestLength())
+                        .set(Tables.FISH.LARGEST_FISHER, fishStats.getLongestFisher().toString())
+                        .set(Tables.FISH.SHORTEST_LENGTH, fishStats.getShortestLength())
+                        .set(Tables.FISH.SHORTEST_FISHER, fishStats.getShortestFisher().toString())
+                        .set(Tables.FISH.FIRST_CATCH_TIME, fishStats.getFirstCatchTime())
+                        .onDuplicateKeyUpdate()
+                        .set(Tables.FISH.TOTAL_CAUGHT, fishStats.getQuantity())
+                        .set(Tables.FISH.LARGEST_FISH,
+                                DSL.when(Tables.FISH.LARGEST_FISH.lt(fishStats.getLongestLength()),
+                                                fishStats.getLongestLength())
+                                        .otherwise(Tables.FISH.LARGEST_FISH))
+                        .set(Tables.FISH.LARGEST_FISHER,
+                                DSL.when(Tables.FISH.LARGEST_FISH.lt(fishStats.getLongestLength()),
+                                                fishStats.getLongestFisher().toString())
+                                        .otherwise(Tables.FISH.LARGEST_FISHER))
+                        .set(Tables.FISH.SHORTEST_LENGTH,
+                                DSL.when(Tables.FISH.SHORTEST_LENGTH.gt(fishStats.getShortestLength())
+                                                        .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
+                                                fishStats.getShortestLength())
+                                        .otherwise(Tables.FISH.SHORTEST_LENGTH))
+                        .set(Tables.FISH.SHORTEST_FISHER,
+                                DSL.when(Tables.FISH.SHORTEST_LENGTH.gt(fishStats.getShortestLength())
+                                                        .or(Tables.FISH.SHORTEST_LENGTH.isNull()),
+                                                fishStats.getShortestFisher().toString())
+                                        .otherwise(Tables.FISH.SHORTEST_FISHER))
+                        .execute();
+            }
+        }.executeInTransaction();
+    }
+
+    /**
+     * Checks if a user has caught a specific fish with a given rarity.
+     *
+     * @param rarity The rarity of the fish.
+     * @param fish   The name of the fish.
+     * @param id     The unique identifier of the user.
+     * @return {@code true} if the user has caught the fish, {@code false} otherwise.
+     */
+    @Override
+    public boolean userHasFish(@NotNull String rarity, @NotNull String fish, int id) {
+        return new ExecuteQuery<Boolean>(connectionFactory, settings) {
+            @Override
+            protected Boolean onRunQuery(DSLContext dslContext) throws Exception {
+                return dslContext.fetchExists(
+                        Tables.USER_FISH_STATS,
+                        Tables.USER_FISH_STATS.USER_ID.eq(id)
+                                .and(Tables.USER_FISH_STATS.FISH_RARITY.eq(rarity))
+                                .and(Tables.USER_FISH_STATS.FISH_NAME.eq(fish))
+                );
+            }
+
+            @Override
+            protected Boolean empty() {
+                return false;
+            }
+        }.prepareAndRunQuery();
+
+    }
+
+    public void batchInsertFishLogs(Collection<FishLog> logs) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                List<FishLogRecord> records = logs.stream()
+                        .filter(Objects::nonNull)
+                        .map(log -> {
+                            FishLogRecord logRecord = new FishLogRecord();
+                            EvenMoreFish.getInstance().debug(("USER ID " + log.getUserId()));
+                            logRecord.setUserId(log.getUserId());
+                            logRecord.setFishLength(log.getLength());
+                            logRecord.setCompetitionId(log.getCompetitionId());
+                            logRecord.setCatchTime(log.getCatchTime());
+                            logRecord.setFishName(log.getFishName());
+                            logRecord.setFishRarity(log.getFishRarity());
+                            return logRecord;
+                        })
+                        .toList();
+
+                if (records.isEmpty()) {
+                    return 0;
+                }
+
+                dslContext.batchStore(records).execute();
+
+                return records.size();
+            }
+        }.executeUpdate();
+    }
+
+    public Integer upsertUserReport(UserReport report) {
+        return new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.USERS)
+                        .set(Tables.USERS.UUID, report.getUuid().toString())
+                        .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
+                        .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
+                        .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
+                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish().toString())
+                        .set(Tables.USERS.MONEY_EARNED, report.getMoneyEarned())
+                        .set(Tables.USERS.FISH_SOLD, report.getFishSold())
+                        .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
+                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish().toString())
+                        .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
+                        .set(Tables.USERS.LAST_FISH, report.getLargestFish().toString())
+                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish().toString())
+                        .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
+                        .onDuplicateKeyUpdate()
+                        .set(Tables.USERS.COMPETITIONS_JOINED, report.getCompetitionsJoined())
+                        .set(Tables.USERS.COMPETITIONS_WON, report.getCompetitionsWon())
+                        .set(Tables.USERS.TOTAL_FISH_LENGTH, report.getTotalFishLength())
+                        .set(Tables.USERS.FIRST_FISH, report.getFirstFish().toString())
+                        .set(Tables.USERS.MONEY_EARNED, report.getMoneyEarned())
+                        .set(Tables.USERS.FISH_SOLD, report.getFishSold())
+                        .set(Tables.USERS.NUM_FISH_CAUGHT, report.getNumFishCaught())
+                        .set(Tables.USERS.LARGEST_FISH, report.getLargestFish().toString())
+                        .set(Tables.USERS.LARGEST_LENGTH, report.getLargestLength())
+                        .set(Tables.USERS.LAST_FISH, report.getLargestFish().toString())
+                        .set(Tables.USERS.SHORTEST_FISH, report.getShortestFish().toString())
+                        .set(Tables.USERS.SHORTEST_LENGTH, report.getShortestLength())
+                        .execute();
+            }
+        }.executeUpdate();
+    }
+
+
+    public void batchUpdateUserFishStats(Collection<UserFishStats> userFishStats) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                List<UserFishStatsRecord> records = userFishStats.stream()
+                        .map(stats -> {
+                            UserFishStatsRecord userFishStatsRecord = new UserFishStatsRecord();
+                            userFishStatsRecord.setUserId(stats.getUserId());
+                            userFishStatsRecord.setFishName(stats.getFishName());
+                            userFishStatsRecord.setFishRarity(stats.getFishRarity());
+                            userFishStatsRecord.setFirstCatchTime(stats.getFirstCatchTime());
+                            userFishStatsRecord.setLongestLength(stats.getLongestLength());
+                            userFishStatsRecord.setShortestLength(stats.getShortestLength());
+                            userFishStatsRecord.setQuantity(stats.getQuantity());
+
+                            return userFishStatsRecord;
+                        })
+                        .toList();
+
+                //upsert
+                dslContext.batchStore(records).execute();
+
+                return records.size();
+            }
+        }.executeUpdate();
+
+    }
+
+
+    public void updateCompetition(CompetitionReport competition) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                return dslContext.insertInto(Tables.COMPETITIONS)
+                        .set(Tables.COMPETITIONS.COMPETITION_NAME, competition.getCompetitionConfigId())
+                        .set(Tables.COMPETITIONS.WINNER_FISH, competition.getWinnerFish())
+                        .set(Tables.COMPETITIONS.WINNER_UUID, competition.getWinnerUuid().toString())
+                        .set(Tables.COMPETITIONS.WINNER_SCORE, competition.getWinnerScore())
+                        .set(Tables.COMPETITIONS.CONTESTANTS, competition.getContestants().stream().map(UUID::toString).collect(Collectors.joining(", ")))
+                        .set(Tables.COMPETITIONS.START_TIME, competition.getStartTime())
+                        .set(Tables.COMPETITIONS.END_TIME, competition.getEndTime())
+                        .execute();
+            }
+        }.executeUpdate();
+    }
+
+    public CompetitionReport getCompetitionReport(int id) {
+        return new ExecuteQuery<CompetitionReport>(connectionFactory, settings) {
+            @Override
+            protected CompetitionReport onRunQuery(DSLContext dslContext) throws Exception {
+                Record result = dslContext.select(Tables.COMPETITIONS)
+                        .where(Tables.COMPETITIONS.ID.eq(id))
+                        .fetchOne();
+                if (result == null) {
+                    return empty();
+                }
+
+                return new CompetitionReport(
+                        result.getValue(Tables.COMPETITIONS.COMPETITION_NAME),
+                        result.getValue(Tables.COMPETITIONS.WINNER_FISH),
+                        result.getValue(Tables.COMPETITIONS.WINNER_UUID),
+                        result.getValue(Tables.COMPETITIONS.WINNER_SCORE),
+                        result.getValue(Tables.COMPETITIONS.CONTESTANTS),
+                        result.getValue(Tables.COMPETITIONS.START_TIME),
+                        result.getValue(Tables.COMPETITIONS.END_TIME)
+                );
+            }
+
+            @Override
+            protected CompetitionReport empty() {
+                return null;
+            }
+        }.prepareAndRunQuery();
+    }
+
+    public void batchUpdateCompetitions(Collection<CompetitionReport> competitions) {
+        new ExecuteUpdate(connectionFactory, settings) {
+            @Override
+            protected int onRunUpdate(DSLContext dslContext) {
+                List<CompetitionsRecord> records = competitions.stream()
+                        .map(competition -> {
+                            CompetitionsRecord competitionsRecord = new CompetitionsRecord();
+                            competitionsRecord.setCompetitionName(competition.getCompetitionConfigId());
+                            competitionsRecord.setWinnerFish(competition.getWinnerFish());
+                            competitionsRecord.setWinnerUuid(competition.getWinnerUuid().toString());
+                            competitionsRecord.setWinnerScore(competition.getWinnerScore());
+                            competitionsRecord.setContestants(competition.getContestants()
+                                    .stream()
+                                    .map(UUID::toString)
+                                    .collect(Collectors.joining(", ")));
+                            competitionsRecord.setStartTime(competition.getStartTime());
+                            competitionsRecord.setEndTime(competition.getEndTime());
+
+                            return competitionsRecord;
+                        })
+                        .toList();
+
+                //insert, comp are never updated, just inserted
+                dslContext.batchInsert(records).execute();
+
+                return records.size();
+            }
+        }.executeUpdate();
     }
 }

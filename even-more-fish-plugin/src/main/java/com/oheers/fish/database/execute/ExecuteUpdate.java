@@ -30,8 +30,18 @@ public abstract class ExecuteUpdate extends ExecuteBase {
         }
     }
 
+    public void executeSmartUpdate() {
+        if (this.supportsTransactions()) {
+            executeInTransaction();
+        } else {
+            executeUpdate();
+        }
+    }
+
+
     /**
      * Executes an update operation within a transaction.
+     * Perhaps this should be a part of execute update, but we check if it's supported first, can have this saved somewhere too
      */
     public void executeInTransaction() {
         try (Connection connection = getConnection()) {
@@ -44,6 +54,7 @@ public abstract class ExecuteUpdate extends ExecuteBase {
             EvenMoreFish.getInstance().getLogger().log(Level.SEVERE,"Transactional update execution failed", e);
         }
     }
+
 
     /**
      * Abstract method for performing the update operation.

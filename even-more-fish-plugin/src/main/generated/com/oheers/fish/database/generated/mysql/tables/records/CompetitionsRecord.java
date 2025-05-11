@@ -6,6 +6,8 @@ package com.oheers.fish.database.generated.mysql.tables.records;
 
 import com.oheers.fish.database.generated.mysql.tables.Competitions;
 
+import java.time.LocalDateTime;
+
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
 
@@ -102,6 +104,34 @@ public class CompetitionsRecord extends UpdatableRecordImpl<CompetitionsRecord> 
         return (String) get(5);
     }
 
+    /**
+     * Setter for <code>${table.prefix}competitions.START_TIME</code>.
+     */
+    public void setStartTime(LocalDateTime value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}competitions.START_TIME</code>.
+     */
+    public LocalDateTime getStartTime() {
+        return (LocalDateTime) get(6);
+    }
+
+    /**
+     * Setter for <code>${table.prefix}competitions.END_TIME</code>.
+     */
+    public void setEndTime(LocalDateTime value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}competitions.END_TIME</code>.
+     */
+    public LocalDateTime getEndTime() {
+        return (LocalDateTime) get(7);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -125,7 +155,7 @@ public class CompetitionsRecord extends UpdatableRecordImpl<CompetitionsRecord> 
     /**
      * Create a detached, initialised CompetitionsRecord
      */
-    public CompetitionsRecord(Integer id, String competitionName, String winnerUuid, String winnerFish, Float winnerScore, String contestants) {
+    public CompetitionsRecord(Integer id, String competitionName, String winnerUuid, String winnerFish, Float winnerScore, String contestants, LocalDateTime startTime, LocalDateTime endTime) {
         super(Competitions.COMPETITIONS);
 
         setId(id);
@@ -134,6 +164,8 @@ public class CompetitionsRecord extends UpdatableRecordImpl<CompetitionsRecord> 
         setWinnerFish(winnerFish);
         setWinnerScore(winnerScore);
         setContestants(contestants);
+        setStartTime(startTime);
+        setEndTime(endTime);
         resetChangedOnNotNull();
     }
 }

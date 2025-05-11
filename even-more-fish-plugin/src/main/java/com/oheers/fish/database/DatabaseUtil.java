@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DatabaseUtil {
+
     private DatabaseUtil() {
         throw new UnsupportedOperationException();
     }
@@ -21,6 +22,7 @@ public class DatabaseUtil {
         //assume it's sqlite otherwise
         return "sqlite";
     }
+
 
     public static @NotNull String parseSqlString(final String sql, final Connection connection) throws SQLException {
         final String dbVendor = determineDbVendor(connection);

@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
+    id("org.sonarqube") version "6.0.1.5171"
 }
 
 group = "com.oheers.evenmorefish"
@@ -211,6 +212,15 @@ bukkit {
 
     }
 }
+
+sonar {
+  properties {
+    property("sonar.projectKey", "EvenMoreFish_EvenMoreFish")
+    property("sonar.organization", "evenmorefish")
+    property("sonar.host.url", "https://sonarcloud.io")
+  }
+}
+
 sourceSets {
     main {
         java.srcDirs.add(File("src/main/generated"))
@@ -218,6 +228,20 @@ sourceSets {
 }
 tasks.named("compileJava") {
     dependsOn(":even-more-fish-plugin:generateMysqlJooq")
+}
+
+val copyAddons by tasks.registering(Copy::class) {
+    // Make sure the plugin waits for the addons to be built first
+    dependsOn(":addons:even-more-fish-addons-j17:build", ":addons:even-more-fish-addons-j21:build")
+
+    from(project(":addons:even-more-fish-addons-j17").layout.buildDirectory.dir("libs"))
+    from(project(":addons:even-more-fish-addons-j21").layout.buildDirectory.dir("libs"))
+
+    into(file("src/main/resources/addons"))
+}
+
+tasks.named("processResources") {
+    dependsOn(copyAddons)
 }
 
 tasks {
@@ -238,7 +262,7 @@ tasks {
         version.set(libs.versions.jooq)
 
         val dialects = listOf("mysql")
-        val latestSchema = "V7_1__Create_Tables.sql"
+        val latestSchema = "V8_1__Create_Tables.sql"
         dialects.forEach { dialect ->
             val schemaPath = "src/main/resources/db/migrations/${dialect}/${latestSchema}"
             configureDialect(dialect, schemaPath)
@@ -268,13 +292,12 @@ tasks {
             attributes["Specification-Version"] = project.version
             attributes["Implementation-Title"] = grgit.branch.current().name
             attributes["Implementation-Version"] = buildNumberOrDate
-            attributes["Database-Baseline-Version"] = "7.0"
+            attributes["Database-Baseline-Version"] = "8.0"
         }
 
-        minimize {
-            exclude(dependency("net.kyori:.*"))
-        }
+        minimize()
 
+        exclude("LICENSE")
         exclude("META-INF/**")
 
         archiveFileName.set("even-more-fish-${project.version}-${buildNumberOrDate}.jar")
