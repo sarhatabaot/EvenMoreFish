@@ -170,7 +170,7 @@ public class Rarity extends ConfigBase {
     public Material getMaterial() {
         return ItemUtils.getMaterial(
             getConfig().getString("material"),
-            Material.IRON_BARS
+            Material.COD
         );
     }
 
