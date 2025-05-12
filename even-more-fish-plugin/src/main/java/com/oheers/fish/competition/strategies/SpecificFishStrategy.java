@@ -58,11 +58,12 @@ public class SpecificFishStrategy implements CompetitionStrategy {
             entry.incrementValue(increaseAmount);
             leaderboard.updateEntry(entry);
         } else {
-            leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
+            entry = new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType());
+            leaderboard.addEntry(entry);
         }
 
-        if (entry != null && entry.getValue() >= competition.getNumberNeeded()) {
-            competition.singleReward(fisher);
+        if (entry.getValue() >= competition.getNumberNeeded()) {
+            competition.setSingleWinner(fisher);
             competition.end(false);
         }
     }
@@ -116,6 +117,11 @@ public class SpecificFishStrategy implements CompetitionStrategy {
 
     @Override
     public boolean shouldUseFishLength() {
+        return true;
+    }
+
+    @Override
+    public boolean isSingleReward() {
         return true;
     }
 
