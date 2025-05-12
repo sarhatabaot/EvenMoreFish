@@ -19,16 +19,16 @@ public class JoinChecker implements Listener {
             return;
         }
 
-
         activeComp.getStatusBar().addPlayer(event.getPlayer());
         if (activeComp.getStartMessage() == null) {
             return;
         }
 
+        EMFMessage message = activeComp.getCompetitionType().getStrategy().getTypeFormat(
+            activeComp, ConfigMessage.COMPETITION_JOIN
+        );
 
-        EMFMessage competitionJoin = ConfigMessage.COMPETITION_JOIN.getMessage();
-        competitionJoin.setCompetitionType(activeComp.getCompetitionType().getTypeVariable().getMessage());
-        EvenMoreFish.getScheduler().runTaskLater(() -> competitionJoin.send(event.getPlayer()), 20L * 3);
+        EvenMoreFish.getScheduler().runTaskLater(() -> message.send(event.getPlayer()), 20L * 3);
     }
 
     // Removes the player from the bar list if they leave the server
