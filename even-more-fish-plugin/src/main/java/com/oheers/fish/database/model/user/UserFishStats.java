@@ -33,7 +33,7 @@ public class UserFishStats {
         this.firstCatchTime = firstCatchTime;
         this.shortestLength = fish.getLength();
         this.longestLength = fish.getLength();
-        this.quantity = 1;
+        this.quantity = 0;
     }
 
     public int getUserId() {
