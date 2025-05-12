@@ -27,19 +27,27 @@ public class EMFFishListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEMFFishCatch(EMFFishEvent event) {
+        handleFishEvent(event.getPlayer(), event.getFish(), event.getCatchTime());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEMFFishHunt(EMFFishHuntEvent event) {
+        handleFishEvent(event.getPlayer(), event.getFish(), LocalDateTime.now());
+    }
+
+    private void handleFishEvent(Player player, Fish fish, LocalDateTime catchTime) {
         if (!MainConfig.getInstance().isDatabaseOnline()) {
             return;
         }
 
-        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(event.getPlayer().getUniqueId()); //could be thrown in the event, with a null option
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
 
-        final Fish fish = event.getFish();
-
-        handleFishLog(userId, fish, event.getCatchTime());
+        handleFishLog(userId, fish, catchTime);
         handleUserFishStats(userId, fish);
         handleFishStats(fish);
-        handleUserReport(event.getPlayer().getUniqueId(), fish);
+        handleUserReport(player.getUniqueId(), fish);
     }
+
 
     private void handleUserReport(final UUID uuid, Fish fish) {
         final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
