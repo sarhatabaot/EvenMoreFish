@@ -157,7 +157,7 @@ public class GuiUtils {
             if (gui != null) {
                 gui.doRescue();
             }
-            new FishJournalGui(click.getWhoClicked(), null);
+            new FishJournalGui(click.getWhoClicked(), null).open();
         });
         // Add page actions so third party plugins cannot register their own.
         newActionMap.put("first-page", (gui, click) -> {});
