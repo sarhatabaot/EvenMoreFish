@@ -96,8 +96,7 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
     @Override
     protected boolean fireEvent(@NotNull Fish fish, @NotNull Player player) {
         EMFFishEvent fishEvent = new EMFFishEvent(fish, player, LocalDateTime.now());
-        Bukkit.getPluginManager().callEvent(fishEvent);
-        return !fishEvent.isCancelled();
+        return fishEvent.callEvent();
     }
 
     @Override

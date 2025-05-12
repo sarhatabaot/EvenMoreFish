@@ -153,7 +153,7 @@ public class Competition {
         try {
             if (!startFail) {
                 EMFCompetitionEndEvent endEvent = new EMFCompetitionEndEvent(this);
-                Bukkit.getServer().getPluginManager().callEvent(endEvent);
+                endEvent.callEvent();
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     ConfigMessage.COMPETITION_END.getMessage().send(player);
                     sendLeaderboard(player);

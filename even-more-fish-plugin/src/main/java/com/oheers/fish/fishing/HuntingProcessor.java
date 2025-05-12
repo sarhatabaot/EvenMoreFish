@@ -78,8 +78,7 @@ public class HuntingProcessor extends Processor<EntityDeathEvent> {
     @Override
     protected boolean fireEvent(@NotNull Fish fish, @NotNull Player player) {
         EMFFishHuntEvent fishHuntEvent = new EMFFishHuntEvent(fish, player);
-        Bukkit.getPluginManager().callEvent(fishHuntEvent);
-        return !fishHuntEvent.isCancelled();
+        return fishHuntEvent.callEvent();
     }
 
     @Override
