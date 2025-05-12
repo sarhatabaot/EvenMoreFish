@@ -369,10 +369,12 @@ journal-rarity:
       - ''
       - '<white>Caught: {times-caught}x'
       - '<white>Largest Size: {largest-size}cm'
+      - '<white>Smallest Size: {smallest-size}cm'
       - '<white>Found: {discover-date}'
       - ''
       - '<white>Discovered by: {discoverer}'
       - '<white>Server Largest: {server-largest}cm'
+      - '<white>Server Smallest: {server-smallest}cm'
       - '<white>Server Caught: {server-caught}x'
 
   rarity-item:
