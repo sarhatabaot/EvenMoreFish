@@ -49,7 +49,11 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private DynamicGuiElement getGroup(Section section) {
-        return (this.rarity == null ? getRarityGroup(section) : getFishGroup(section));
+        if (this.rarity == null) {
+            return getRarityGroup(section);
+        } else {
+            return getFishGroup(section);
+        }
     }
 
     private DynamicGuiElement getFishGroup(Section section) {
@@ -105,11 +109,11 @@ public class FishJournalGui extends ConfigGui {
             );
             lore.setVariable("{times-caught}", Integer.toString(userFishStats.getQuantity()));
             lore.setVariable("{largest-size}", userFishStats.getLongestLength());
-            lore.setVariable("{shortest-size}", userFishStats.getShortestLength());
+            lore.setVariable("{smallest-size}", userFishStats.getShortestLength());
             lore.setVariable("{discover-date}", discoverDate);
             lore.setVariable("{discoverer}", discoverer);
             lore.setVariable("{server-largest}", fishStats.getLongestLength());
-            lore.setVariable("{server-shortest}", fishStats.getShortestLength());
+            lore.setVariable("{server-smallest}", fishStats.getShortestLength());
             lore.setVariable("{server-caught}", fishStats.getQuantity());
             meta.lore(lore.getComponentListMessage());
         });

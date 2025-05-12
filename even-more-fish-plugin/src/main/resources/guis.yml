@@ -64,7 +64,7 @@ main-menu:
   fish-toggle:
     item:
       material: tropical_fish
-      displayname: <gold>»     Toggle Custom Fish
+      displayname: <gold>»    Toggle Custom Fish
     lore:
       - '<strikethrough><white>                                 '
       - <gray>Click this button to
@@ -76,7 +76,7 @@ main-menu:
   open-shop:
     item:
       material: gold_ingot
-      displayname: <gold>»     Open Fish Shop
+      displayname: <gold>»    Open Fish Shop
     lore:
       - '<strikethrough><white>                                 '
       - <gray>Sell the fish you catch to
@@ -88,7 +88,7 @@ main-menu:
   help-button:
     item:
       material: COMPASS
-      displayname: <gold>»           Command Help
+      displayname: <gold>»    Command Help
     lore:
       - '<strikethrough><white>                                 '
       - <gray>Shows a list of commands
@@ -101,7 +101,7 @@ main-menu:
   open-baits:
     item:
       material: nautilus_shell
-      displayname: <gold>»           View Baits
+      displayname: <gold>»    View Baits
     lore:
       - '<strikethrough><white>                                 '
       - <gray>Shows all loaded baits
@@ -112,9 +112,12 @@ main-menu:
   open-journal:
     item:
       material: writable_book
-      displayname: "<gold>»           Fish Journal"
+      displayname: "<gold>»    Fish Journal"
     lore:
-      - <gray>This menu is still being worked on!
+      - '<strikethrough><white>                                 '
+      - <gray>Keep track of all the
+      - <gray>fish you have caught.
+      - '<strikethrough><white>                                 '
     character: j
     click-action: open-journal-menu
 
@@ -299,10 +302,24 @@ journal-menu:
   # The character to use for rarity items
   rarity-character: r
 
-  rarity-item:
+  # Whether to show the undiscovered-rarity config below when a rarity has not been discovered by the player.
+  hide-undiscovered-rarity: true
+
+  # How undiscovered rarities should look
+  undiscovered-rarity:
     item:
       material: iron_bars
-      displayname: '{rarity_colour}{rarity}'
+      displayname: <dark_gray>Undiscovered Rarity
+    lore:
+      - ''
+      - <white>Catch a fish from this
+      - <white>rarity to unlock it here.
+
+  rarity-item:
+    item:
+      # This will be overwritten by the rarity's material.
+      material: cod
+      displayname: '{rarity}'
     lore:
       - ''
       - '<aqua>→ Click to view caught fish'
@@ -344,19 +361,6 @@ journal-rarity:
       - <white>Catch this fish
       - <white>to unlock it here.
 
-  # Whether to show the undiscovered-rarity config below when a rarity has not been discovered by the player.
-  hide-undiscovered-rarity: true
-
-  # How undiscovered rarities should look
-  undiscovered-rarity:
-    item:
-      material: iron_bars
-      displayname: <dark_gray>Undiscovered Rarity
-    lore:
-      - ''
-      - <white>Catch a fish from this
-      - <white>rarity to unlock it here.
-
   # How caught fish should look. Changing the material will not work, as it always uses the fish item as a base
   fish-item:
     item:
@@ -396,4 +400,4 @@ journal-rarity:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 1
+version: 2
