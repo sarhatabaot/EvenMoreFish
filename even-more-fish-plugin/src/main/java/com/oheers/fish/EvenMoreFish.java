@@ -14,16 +14,24 @@ import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.baits.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
 import com.oheers.fish.commands.MainCommand;
+import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.GuiFillerConfig;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
-import com.oheers.fish.database.DataManager;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.data.FishLogKey;
+import com.oheers.fish.database.data.manager.DataManager;
+import com.oheers.fish.database.data.manager.UserManager;
+import com.oheers.fish.database.data.strategy.impl.*;
+import com.oheers.fish.database.model.CompetitionReport;
+import com.oheers.fish.database.model.fish.FishLog;
+import com.oheers.fish.database.model.fish.FishStats;
+import com.oheers.fish.database.model.user.UserFishStats;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.economy.GriefPreventionEconomyType;
 import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
@@ -32,11 +40,13 @@ import com.oheers.fish.events.AureliumSkillsFishingEvent;
 import com.oheers.fish.events.FishEatEvent;
 import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
+import com.oheers.fish.fishing.EMFFishListener;
 import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.placeholders.PlaceholderReceiver;
 import com.oheers.fish.utils.HeadDBIntegration;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemProtectionListener;
@@ -63,16 +73,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import uk.firedev.vanishchecker.VanishChecker;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -119,11 +122,12 @@ public class EvenMoreFish extends EMFPlugin {
 
     private AddonManager addonManager;
 
-    public EvenMoreFish() {
-        // Assigns the EMFPlugin instance for API usage.
-        super();
-        instance = this;
-    }
+    private UserManager userManager;
+    private DataManager<Collection<FishLog>> fishLogDataManager;
+    private DataManager<FishStats> fishStatsDataManager;
+    private DataManager<UserFishStats> userFishStatsDataManager;
+    private DataManager<UserReport> userReportDataManager;
+    private DataManager<CompetitionReport> competitionDataManager;
 
     public static @NotNull EvenMoreFish getInstance() {
         return instance;
@@ -158,6 +162,8 @@ public class EvenMoreFish extends EMFPlugin {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
 
+        instance = this;
+
         CommandAPI.onEnable();
 
         // If EMF folder does not exist, this is the first load.
@@ -167,14 +173,14 @@ public class EvenMoreFish extends EMFPlugin {
 
         this.api = new EMFAPI();
 
-        decidedRarities = new HashMap<>();
+        this.decidedRarities = new HashMap<>();
 
-        logger = getLogger();
-        pluginManager = getServer().getPluginManager();
+        this.logger = getLogger();
+        this.pluginManager = getServer().getPluginManager();
 
-        usingVault = Bukkit.getPluginManager().isPluginEnabled("Vault");
-        usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
-        usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
+        this.usingVault = Bukkit.getPluginManager().isPluginEnabled("Vault");
+        this.usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
+        this.usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
 
         new MainConfig();
         new MessageConfig();
@@ -211,9 +217,6 @@ public class EvenMoreFish extends EMFPlugin {
             isUpdateAvailable = available
         );
 
-        listeners();
-        registerCommands();
-
         if (!MainConfig.getInstance().debugSession()) {
             metrics();
         }
@@ -221,11 +224,34 @@ public class EvenMoreFish extends EMFPlugin {
         AutoRunner.init();
 
         if (MainConfig.getInstance().databaseEnabled()) {
-            DataManager.init();
+            this.database = new Database();
 
-            database = new Database();
-            DataManager.getInstance().loadUserReportsIntoCache();
+            this.userManager = new UserManager(database);
+            this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy(), key -> {
+                FishLogKey logKey = FishLogKey.from(key);
+                return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime()));
+            });
+            this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy(), key -> {
+                final String fishName = key.split("\\.")[0];
+                final String fishRarity = key.split("\\.")[1];
+                return EvenMoreFish.getInstance().getDatabase().getFishStats(fishName,fishRarity);
+            });
+
+            this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(5L), key -> {
+                final int userId = Integer.parseInt(key.split("\\.")[0]);
+                final String fishName = key.split("\\.")[1];
+                final String fishRarity = key.split("\\.")[2];
+                return EvenMoreFish.getInstance().getDatabase().getUserFishStats(userId, fishName, fishRarity);
+            });
+
+            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), uuid -> EvenMoreFish.getInstance().getDatabase().getUserReport(UUID.fromString(uuid)));
+            this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(5L), key -> database.getCompetitionReport(Integer.parseInt(key)));
         }
+
+
+        listeners();
+
+        registerCommands();
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");
 
@@ -244,7 +270,12 @@ public class EvenMoreFish extends EMFPlugin {
 
         terminateGuis();
         // Don't use the scheduler here because it will throw errors on disable
-        saveUserData(false);
+        if (MainConfig.getInstance().databaseEnabled()) {
+            this.userReportDataManager.flush();
+            this.userFishStatsDataManager.flush();
+            this.fishStatsDataManager.flush();
+            this.competitionDataManager.flush();
+        }
 
         // Ends the current competition in case the plugin is being disabled when the server will continue running
         Competition active = Competition.getCurrentlyActive();
@@ -255,7 +286,7 @@ public class EvenMoreFish extends EMFPlugin {
         RewardType.unregisterAll();
         RequirementType.unregisterAll();
 
-        if (MainConfig.getInstance().databaseEnabled()) {
+        if (MainConfig.getInstance().isDatabaseOnline()) {
             database.shutdown();
         }
 
@@ -289,22 +320,22 @@ public class EvenMoreFish extends EMFPlugin {
         return MainConfig.getInstance().debugSession();
     }
 
-    public static void dbVerbose(final String message) {
-        if (MainConfig.getInstance().doDBVerbose()) {
-            getInstance().getLogger().info("DB-VERBOSE %s".formatted(message));
-        }
-    }
-
     private void listeners() {
         PluginManager pm = getServer().getPluginManager();
 
-        pm.registerEvents(new JoinChecker(), this);
+        if (MainConfig.getInstance().isDatabaseOnline()) {
+            pm.registerEvents(new JoinChecker(), this);
+            pm.registerEvents(this.userManager, this);
+            pm.registerEvents(new EMFFishListener(),this);
+        }
+
         pm.registerEvents(new FishingProcessor(), this);
         pm.registerEvents(new HuntingProcessor(), this);
         pm.registerEvents(new UpdateNotify(), this);
         pm.registerEvents(new SkullSaver(), this);
         pm.registerEvents(new BaitListener(), this);
         pm.registerEvents(new ItemProtectionListener(), this);
+
 
         optionalListeners();
     }
@@ -389,24 +420,6 @@ public class EvenMoreFish extends EMFPlugin {
         });
     }
 
-    private void saveUserData(boolean scheduler) {
-        Runnable save = () -> {
-            if (!(MainConfig.getInstance().isDatabaseOnline())) {
-                return;
-            }
-
-            DataManager.getInstance().saveFishReports();
-            DataManager.getInstance().saveUserReports();
-
-            DataManager.getInstance().uncacheAll();
-        };
-        if (scheduler) {
-            getScheduler().runTask(save);
-        } else {
-            save.run();
-        }
-    }
-
 
     public ItemStack createCustomNBTRod() {
         ItemFactory itemFactory = new ItemFactory("nbt-rod-item", MainConfig.getInstance().getConfig());
@@ -466,7 +479,6 @@ public class EvenMoreFish extends EMFPlugin {
         }
 
         firstLoad = false;
-
     }
 
     private void registerCommands() {
@@ -615,9 +627,11 @@ public class EvenMoreFish extends EMFPlugin {
         if (pm.isPluginEnabled("Vault")) {
             new VaultEconomyType().register();
         }
+
         if (pm.isPluginEnabled("PlayerPoints")) {
             new PlayerPointsEconomyType().register();
         }
+
         if (pm.isPluginEnabled("GriefPrevention")) {
             new GriefPreventionEconomyType().register();
         }
@@ -633,7 +647,8 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     public List<Player> getVisibleOnlinePlayers() {
-        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
+        return new ArrayList<>(Bukkit.getOnlinePlayers());
+//        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
     }
 
     // FISH TOGGLE METHODS
@@ -663,4 +678,27 @@ public class EvenMoreFish extends EMFPlugin {
         return firstLoad;
     }
 
+    public DataManager<Collection<FishLog>> getFishLogDataManager() {
+        return fishLogDataManager;
+    }
+
+    public DataManager<FishStats> getFishStatsDataManager() {
+        return fishStatsDataManager;
+    }
+
+    public DataManager<UserFishStats> getUserFishStatsDataManager() {
+        return userFishStatsDataManager;
+    }
+
+    public DataManager<UserReport> getUserReportDataManager() {
+        return userReportDataManager;
+    }
+
+    public DataManager<CompetitionReport> getCompetitionDataManager() {
+        return competitionDataManager;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
+    }
 }

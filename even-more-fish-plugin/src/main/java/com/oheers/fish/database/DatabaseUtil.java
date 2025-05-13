@@ -23,6 +23,7 @@ public class DatabaseUtil {
         return "sqlite";
     }
 
+
     public static @NotNull String parseSqlString(final String sql, final Connection connection) throws SQLException {
         final String dbVendor = determineDbVendor(connection);
         if ("mysql".equalsIgnoreCase(dbVendor)) {

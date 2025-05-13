@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}competitions` (
    PRIMARY KEY (id)
 );
 
-
+-- global stats for fish
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish` (
    fish_name VARCHAR(100) NOT NULL,
    fish_rarity VARCHAR(100) NOT NULL,
@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `${table.prefix}users` (
    PRIMARY KEY (id)
 );
 
+-- per player stats for fish
 CREATE TABLE IF NOT EXISTS `${table.prefix}fish_log` (
    id INTEGER NOT NULL AUTO_INCREMENT,
    user_id INTEGER NOT NULL, -- user id

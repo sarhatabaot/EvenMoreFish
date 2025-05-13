@@ -177,7 +177,8 @@ bukkit {
                 "emf.sellall",
                 "emf.help",
                 "emf.next",
-                "emf.applybaits"
+                "emf.applybaits",
+                "emf.journal"
             )
         }
 
@@ -261,7 +262,7 @@ tasks {
         version.set(libs.versions.jooq)
 
         val dialects = listOf("mysql")
-        val latestSchema = "V7_1__Create_Tables.sql"
+        val latestSchema = "V8_1__Create_Tables.sql"
         dialects.forEach { dialect ->
             val schemaPath = "src/main/resources/db/migrations/${dialect}/${latestSchema}"
             configureDialect(dialect, schemaPath)
@@ -291,7 +292,7 @@ tasks {
             attributes["Specification-Version"] = project.version
             attributes["Implementation-Title"] = grgit.branch.current().name
             attributes["Implementation-Version"] = buildNumberOrDate
-            attributes["Database-Baseline-Version"] = "7.0"
+            attributes["Database-Baseline-Version"] = "8.0"
         }
 
         minimize()

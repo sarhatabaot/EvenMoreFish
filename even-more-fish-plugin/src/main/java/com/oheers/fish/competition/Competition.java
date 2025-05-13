@@ -11,8 +11,8 @@ import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
-import com.oheers.fish.database.DataManager;
-import com.oheers.fish.database.model.UserReport;
+import com.oheers.fish.database.model.CompetitionReport;
+import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +54,7 @@ public class Competition {
     private long timeLeft;
     private Bar statusBar;
     private long epochStartTime;
+    private LocalDateTime startTime;
     private final List<Long> alertTimes;
     private final Map<Integer, List<Reward>> rewards;
     private int playersNeeded;
@@ -118,7 +121,7 @@ public class Competition {
 
             this.timeLeft = this.maxDuration;
 
-            leaderboard = new Leaderboard(competitionType);
+            this.leaderboard = new Leaderboard(competitionType);
 
             statusBar.show();
 
@@ -126,7 +129,10 @@ public class Competition {
             announceBegin();
             EMFCompetitionStartEvent startEvent = new EMFCompetitionStartEvent(this);
             Bukkit.getServer().getPluginManager().callEvent(startEvent);
-            epochStartTime = Instant.now().getEpochSecond();
+
+            final Instant now = Instant.now();
+            this.epochStartTime = now.getEpochSecond();
+            this.startTime = LocalDateTime.ofInstant(now, ZoneId.systemDefault());
 
             // Execute start commands
             getCompetitionFile().getStartCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
@@ -148,7 +154,7 @@ public class Competition {
         try {
             if (!startFail) {
                 EMFCompetitionEndEvent endEvent = new EMFCompetitionEndEvent(this);
-                Bukkit.getServer().getPluginManager().callEvent(endEvent);
+                endEvent.callEvent();
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     ConfigMessage.COMPETITION_END.getMessage().send(player);
                     sendLeaderboard(player);
@@ -161,15 +167,13 @@ public class Competition {
                 if (originallyRandom) {
                     competitionType = CompetitionType.RANDOM;
                 }
-                if (MainConfig.getInstance().databaseEnabled()) {
+
+                if (MainConfig.getInstance().isDatabaseOnline()) {
                     Competition competitionRef = this;
-                    EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
-                        EvenMoreFish.getInstance().getDatabase().createCompetitionReport(competitionRef);
-                        leaderboard.clear();
-                    });
-                } else {
-                    leaderboard.clear();
+                    EvenMoreFish.getInstance().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(competitionRef, competitionRef.startTime, LocalDateTime.now()));
                 }
+
+                leaderboard.clear();
             }
         } catch (Exception exception) {
             EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, "An exception was thrown while the competition was being ended!", exception);
@@ -340,11 +344,11 @@ public class Competition {
     }
 
     private void handleDatabaseUpdates(CompetitionEntry entry, boolean isTopEntry) {
-        if (!MainConfig.getInstance().databaseEnabled()) {
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
             return;
         }
 
-        UserReport userReport = DataManager.getInstance().getUserReportIfExists(entry.getPlayer());
+        UserReport userReport = EvenMoreFish.getInstance().getUserReportDataManager().get(String.valueOf(entry.getPlayer()));
         if (userReport == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not fetch User Report for " + entry.getPlayer() + ", their data has not been modified.");
             return;
@@ -352,9 +356,9 @@ public class Competition {
 
         if (isTopEntry) {
             userReport.incrementCompetitionsWon(1);
-        } else {
-            userReport.incrementCompetitionsJoined(1);
         }
+
+        userReport.incrementCompetitionsJoined(1);
     }
 
     private void handleRewards() {
@@ -366,13 +370,12 @@ public class Competition {
             return;
         }
 
-        boolean databaseEnabled = MainConfig.getInstance().databaseEnabled();
         int rewardPlace = 1;
 
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        if (databaseEnabled && !entries.isEmpty()) {
-            handleDatabaseUpdates(entries.get(0), true); // Top entry
+        if (MainConfig.getInstance().isDatabaseOnline() && !entries.isEmpty()) {
+            handleDatabaseUpdates(leaderboard.getTopEntry(), true); // Top entry
         }
 
         for (CompetitionEntry entry : entries) {

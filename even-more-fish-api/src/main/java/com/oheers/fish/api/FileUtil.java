@@ -78,7 +78,6 @@ public class FileUtil {
                 //todo, this can't be here it's blocking
                 logger.severe(() -> String.format("Failed to load addon class %s", file.getName()));
                 logger.severe(() -> String.format("Cause: %s %s", ex.getClass().getSimpleName(), ex.getMessage()));
-                continue;
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

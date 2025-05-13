@@ -8,7 +8,7 @@ import com.oheers.fish.database.generated.mysql.tables.Fish;
 
 import java.time.LocalDateTime;
 
-import org.jooq.Record1;
+import org.jooq.Record2;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -105,17 +105,59 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
     }
 
     /**
+     * Setter for <code>${table.prefix}fish.SHORTEST_LENGTH</code>.
+     */
+    public void setShortestLength(Float value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}fish.SHORTEST_LENGTH</code>.
+     */
+    public Float getShortestLength() {
+        return (Float) get(6);
+    }
+
+    /**
+     * Setter for <code>${table.prefix}fish.SHORTEST_FISHER</code>.
+     */
+    public void setShortestFisher(String value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}fish.SHORTEST_FISHER</code>.
+     */
+    public String getShortestFisher() {
+        return (String) get(7);
+    }
+
+    /**
      * Setter for <code>${table.prefix}fish.FIRST_CATCH_TIME</code>.
      */
     public void setFirstCatchTime(LocalDateTime value) {
-        set(6, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>${table.prefix}fish.FIRST_CATCH_TIME</code>.
      */
     public LocalDateTime getFirstCatchTime() {
-        return (LocalDateTime) get(6);
+        return (LocalDateTime) get(8);
+    }
+
+    /**
+     * Setter for <code>${table.prefix}fish.DISCOVERER</code>.
+     */
+    public void setDiscoverer(String value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}fish.DISCOVERER</code>.
+     */
+    public String getDiscoverer() {
+        return (String) get(9);
     }
 
     // -------------------------------------------------------------------------
@@ -123,8 +165,8 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<String> key() {
-        return (Record1) super.key();
+    public Record2<String, String> key() {
+        return (Record2) super.key();
     }
 
     // -------------------------------------------------------------------------
@@ -141,7 +183,7 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
     /**
      * Create a detached, initialised FishRecord
      */
-    public FishRecord(String fishName, String fishRarity, String firstFisher, Integer totalCaught, Float largestFish, String largestFisher, LocalDateTime firstCatchTime) {
+    public FishRecord(String fishName, String fishRarity, String firstFisher, Integer totalCaught, Float largestFish, String largestFisher, Float shortestLength, String shortestFisher, LocalDateTime firstCatchTime, String discoverer) {
         super(Fish.FISH);
 
         setFishName(fishName);
@@ -150,7 +192,10 @@ public class FishRecord extends UpdatableRecordImpl<FishRecord> {
         setTotalCaught(totalCaught);
         setLargestFish(largestFish);
         setLargestFisher(largestFisher);
+        setShortestLength(shortestLength);
+        setShortestFisher(shortestFisher);
         setFirstCatchTime(firstCatchTime);
+        setDiscoverer(discoverer);
         resetChangedOnNotNull();
     }
 }

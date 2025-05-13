@@ -8,7 +8,6 @@ import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.database.DataManager;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
@@ -156,22 +155,6 @@ public abstract class Processor<E extends Event> implements Listener {
         }
 
         competitionCheck(fish, player, location);
-
-        if (MainConfig.getInstance().isDatabaseOnline()) {
-            EvenMoreFish.getScheduler().runTaskAsynchronously(() -> {
-                if (EvenMoreFish.getInstance().getDatabase().hasFishData(fish)) {
-                    EvenMoreFish.getInstance().getDatabase().incrementFish(fish);
-
-                    if (EvenMoreFish.getInstance().getDatabase().getLargestFishSize(fish) < fish.getLength()) {
-                        EvenMoreFish.getInstance().getDatabase().updateLargestFish(fish, player.getUniqueId());
-                    }
-                } else {
-                    EvenMoreFish.getInstance().getDatabase().createFishData(fish, player.getUniqueId());
-                }
-
-                DataManager.getInstance().handleFishCatch(player.getUniqueId(), fish);
-            });
-        }
 
         return fish.give(-1);
     }
