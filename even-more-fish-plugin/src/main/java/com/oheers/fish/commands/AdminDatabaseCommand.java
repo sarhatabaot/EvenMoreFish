@@ -1,7 +1,9 @@
 package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.config.MainConfig;
 import dev.jorel.commandapi.CommandAPICommand;
+import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
@@ -23,6 +25,9 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                 .withPermission("emf.admin.debug.database.flyway")
                 .withShortDescription("Drops the flyway schema history, useful for when the database breaks")
                 .executes((commandSender, commandArguments) -> {
+                            if (isLogDbError(commandSender)) {
+                                return;
+                            }
                             EvenMoreFish.getInstance().getDatabase().getMigrationManager().dropFlywaySchemaHistory();
                             commandSender.sendMessage("Dropped flyway schema history.");
                         }
@@ -34,6 +39,9 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                 .withPermission("emf.admin.debug.database.flyway")
                 .withShortDescription("Attempt to repair the database")
                 .executes((commandSender, commandArguments) -> {
+                    if (isLogDbError(commandSender)) {
+                        return;
+                    }
                     commandSender.sendMessage("Attempting to repair the migrations, check the logs.");
                     EvenMoreFish.getInstance().getDatabase().getMigrationManager().repairFlyway();
                 });
@@ -44,6 +52,9 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                 .withShortDescription("Attempt to clean the database")
                 .withPermission("emf.admin.debug.database.clean")
                 .executes((commandSender, commandArguments) -> {
+                    if (isLogDbError(commandSender)) {
+                        return;
+                    }
                     commandSender.sendMessage("Attempting to clean flyway, check the logs.");
                     EvenMoreFish.getInstance().getDatabase().getMigrationManager().cleanFlyway();
                 });
@@ -54,8 +65,19 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                 .withShortDescription("Migrate to the latest DB version.")
                 .withPermission("emf.admin.debug.database.migrate")
                 .executes((commandSender, commandArguments) -> {
+                    if (isLogDbError(commandSender)) {
+                        return;
+                    }
                     EvenMoreFish.getInstance().getDatabase().migrateFromDatabaseVersionToLatest();
                 });
+    }
+
+    private boolean isLogDbError(final CommandSender sender) {
+        if (!MainConfig.getInstance().isDatabaseOnline()) {
+            sender.sendMessage("Database is offline.");
+            return true;
+        }
+        return false;
     }
 
 }

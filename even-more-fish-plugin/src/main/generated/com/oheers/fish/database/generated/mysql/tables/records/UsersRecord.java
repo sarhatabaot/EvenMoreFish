@@ -89,101 +89,129 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
     }
 
     /**
+     * Setter for <code>${table.prefix}users.SHORTEST_FISH</code>.
+     */
+    public void setShortestFish(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}users.SHORTEST_FISH</code>.
+     */
+    public String getShortestFish() {
+        return (String) get(5);
+    }
+
+    /**
      * Setter for <code>${table.prefix}users.LARGEST_LENGTH</code>.
      */
     public void setLargestLength(Float value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.LARGEST_LENGTH</code>.
      */
     public Float getLargestLength() {
-        return (Float) get(5);
+        return (Float) get(6);
+    }
+
+    /**
+     * Setter for <code>${table.prefix}users.SHORTEST_LENGTH</code>.
+     */
+    public void setShortestLength(Float value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>${table.prefix}users.SHORTEST_LENGTH</code>.
+     */
+    public Float getShortestLength() {
+        return (Float) get(7);
     }
 
     /**
      * Setter for <code>${table.prefix}users.NUM_FISH_CAUGHT</code>.
      */
     public void setNumFishCaught(Integer value) {
-        set(6, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.NUM_FISH_CAUGHT</code>.
      */
     public Integer getNumFishCaught() {
-        return (Integer) get(6);
+        return (Integer) get(8);
     }
 
     /**
      * Setter for <code>${table.prefix}users.TOTAL_FISH_LENGTH</code>.
      */
     public void setTotalFishLength(Float value) {
-        set(7, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.TOTAL_FISH_LENGTH</code>.
      */
     public Float getTotalFishLength() {
-        return (Float) get(7);
+        return (Float) get(9);
     }
 
     /**
      * Setter for <code>${table.prefix}users.COMPETITIONS_WON</code>.
      */
     public void setCompetitionsWon(Integer value) {
-        set(8, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.COMPETITIONS_WON</code>.
      */
     public Integer getCompetitionsWon() {
-        return (Integer) get(8);
+        return (Integer) get(10);
     }
 
     /**
      * Setter for <code>${table.prefix}users.COMPETITIONS_JOINED</code>.
      */
     public void setCompetitionsJoined(Integer value) {
-        set(9, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.COMPETITIONS_JOINED</code>.
      */
     public Integer getCompetitionsJoined() {
-        return (Integer) get(9);
+        return (Integer) get(11);
     }
 
     /**
      * Setter for <code>${table.prefix}users.FISH_SOLD</code>.
      */
     public void setFishSold(Integer value) {
-        set(10, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.FISH_SOLD</code>.
      */
     public Integer getFishSold() {
-        return (Integer) get(10);
+        return (Integer) get(12);
     }
 
     /**
      * Setter for <code>${table.prefix}users.MONEY_EARNED</code>.
      */
     public void setMoneyEarned(Double value) {
-        set(11, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>${table.prefix}users.MONEY_EARNED</code>.
      */
     public Double getMoneyEarned() {
-        return (Double) get(11);
+        return (Double) get(13);
     }
 
     // -------------------------------------------------------------------------
@@ -209,7 +237,7 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
     /**
      * Create a detached, initialised UsersRecord
      */
-    public UsersRecord(Integer id, String uuid, String firstFish, String lastFish, String largestFish, Float largestLength, Integer numFishCaught, Float totalFishLength, Integer competitionsWon, Integer competitionsJoined, Integer fishSold, Double moneyEarned) {
+    public UsersRecord(Integer id, String uuid, String firstFish, String lastFish, String largestFish, String shortestFish, Float largestLength, Float shortestLength, Integer numFishCaught, Float totalFishLength, Integer competitionsWon, Integer competitionsJoined, Integer fishSold, Double moneyEarned) {
         super(Users.USERS);
 
         setId(id);
@@ -217,7 +245,9 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
         setFirstFish(firstFish);
         setLastFish(lastFish);
         setLargestFish(largestFish);
+        setShortestFish(shortestFish);
         setLargestLength(largestLength);
+        setShortestLength(shortestLength);
         setNumFishCaught(numFishCaught);
         setTotalFishLength(totalFishLength);
         setCompetitionsWon(competitionsWon);

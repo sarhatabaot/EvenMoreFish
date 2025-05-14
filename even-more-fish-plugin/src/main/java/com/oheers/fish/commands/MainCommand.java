@@ -3,8 +3,11 @@ package com.oheers.fish.commands;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.commands.arguments.ArgumentHelper;
+import com.oheers.fish.commands.arguments.RarityArgument;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.gui.guis.FishJournalGui;
 import com.oheers.fish.gui.guis.ApplyBaitsGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
@@ -34,21 +37,22 @@ public class MainCommand {
         );
 
         this.command = new CommandAPICommand(MainConfig.getInstance().getMainCommandName())
-            .withAliases(MainConfig.getInstance().getMainCommandAliases().toArray(String[]::new))
-            .withSubcommands(
-                getNext(),
-                getToggle(),
-                getGui(),
-                getHelp(),
-                getTop(),
-                getShop(),
-                getSellAll(),
-                getApplyBaits(),
-                new AdminCommand(adminName).getCommand()
-            )
-            .executes(info -> {
-                sendHelpMessage(info.sender());
-            });
+                .withAliases(MainConfig.getInstance().getMainCommandAliases().toArray(String[]::new))
+                .withSubcommands(
+                        getNext(),
+                        getToggle(),
+                        getGui(),
+                        getHelp(),
+                        getTop(),
+                        getShop(),
+                        getSellAll(),
+                        getApplyBaits(),
+                        getJournal(),
+                        new AdminCommand(adminName).getCommand()
+                )
+                .executes(info -> {
+                    sendHelpMessage(info.sender());
+                });
     }
 
     public CommandAPICommand getCommand() {
@@ -117,21 +121,13 @@ public class MainCommand {
         );
         return new CommandAPICommand(name)
             .withPermission(UserPerms.TOP)
-            .executesPlayer(info -> {
-                Competition active = Competition.getCurrentlyActive();
-                if (active == null) {
-                    ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(info.sender());
-                    return;
-                }
-                active.sendPlayerLeaderboard(info.sender());
-            })
             .executes(info -> {
                 Competition active = Competition.getCurrentlyActive();
                 if (active == null) {
                     ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(info.sender());
                     return;
                 }
-                active.sendConsoleLeaderboard(info.sender());
+                active.sendLeaderboard(info.sender());
             });
     }
 
@@ -199,6 +195,26 @@ public class MainCommand {
             .withPermission(UserPerms.APPLYBAITS)
             .executesPlayer(info -> {
                 new ApplyBaitsGui(info.sender(), null).open();
+            });
+    }
+
+    private CommandAPICommand getJournal() {
+        String name = MainConfig.getInstance().getJournalSubCommandName();
+        helpMessageBuilder.addUsage(
+            name,
+            ConfigMessage.HELP_GENERAL_JOURNAL::getMessage
+        );
+        return new CommandAPICommand(name)
+            .withPermission(UserPerms.JOURNAL)
+            .withArguments(
+                RarityArgument.create().setOptional(true)
+            )
+            .executesPlayer(info -> {
+                if (!MainConfig.getInstance().isDatabaseOnline()) {
+                    return;
+                }
+                Rarity rarity = info.args().getUnchecked("rarity"); // This is allowed to be null.
+                new FishJournalGui(info.sender(), rarity).open();
             });
     }
 

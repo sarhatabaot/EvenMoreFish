@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /*
  * We can add additional factories to allow for multiple database support in the future.
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ConnectionFactory {
     protected HikariDataSource dataSource;
     private final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
+    private Boolean supportsTransaction;
 
 
     /**
@@ -56,6 +58,10 @@ public abstract class ConnectionFactory {
 
         configureDatabase(config, getDatabaseAddress(), getDatabasePort(), MainConfig.getInstance().getDatabase(), MainConfig.getInstance().getUsername(), MainConfig.getInstance().getPassword());
         config.setInitializationFailTimeout(-1);
+        config.setValidationTimeout(5000);
+        config.addDataSourceProperty("validateBorrowedConnections", true);
+        config.setLeakDetectionThreshold(30000);
+
 
         Map<String, String> properties = new HashMap<>();
 
@@ -116,6 +122,22 @@ public abstract class ConnectionFactory {
         } catch (ClassNotFoundException e) {
             EvenMoreFish.getInstance().getLogger().severe("Tried to init driver: %s, but could not find it.".formatted(getDriverClass()));
         }
+    }
+
+    public boolean supportsTransactions() {
+        if (supportsTransaction != null) {
+            return supportsTransaction;
+        }
+
+        try (Connection connection = getConnection()) {
+            this.supportsTransaction = connection.getMetaData().supportsTransactions();
+        } catch (SQLException e) {
+            EvenMoreFish.getInstance().getLogger().log(Level.WARNING,
+                    "Failed to check transaction support, assuming false", e);
+            this.supportsTransaction = false;
+        }
+
+        return this.supportsTransaction;
     }
 
 

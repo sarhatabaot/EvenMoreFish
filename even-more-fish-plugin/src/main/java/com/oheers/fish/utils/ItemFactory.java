@@ -98,7 +98,7 @@ public class ItemFactory {
      */
     public ItemStack createItem(OfflinePlayer player, int randomIndex, @Nullable Map<String, EMFMessage> replacements) {
         if (rawMaterial) {
-            return this.product;
+            return this.product.clone();
         }
         if (itemRandom && player != null) {
             applyItemRandomType(player, randomIndex);
@@ -128,7 +128,7 @@ public class ItemFactory {
 
         applyFlags();
 
-        return product;
+        return product.clone();
     }
 
     /**
@@ -195,6 +195,7 @@ public class ItemFactory {
         }
 
         // The fish has no item type specified
+        this.rawMaterial = false;
         EvenMoreFish.getInstance().debug("GET TYPE: No item type specified, config location (%s)".formatted(configLocation + configurationFile.getNameAsString()));
         return new ItemStack(Material.COD);
 
@@ -366,10 +367,11 @@ public class ItemFactory {
 
         try {
             ItemStack item = getItem(materialId);
-            this.rawMaterial = rawMaterial;
+            if (item != null) {
+                this.rawMaterial = rawMaterial;
+            }
             return item;
         } catch (IncorrectAssignedMaterialException e) {
-            this.rawMaterial = true;
             EvenMoreFish.getInstance().getLogger().warning(e::getMessage);
             return new ItemStack(Material.COD);
         }
@@ -523,8 +525,8 @@ public class ItemFactory {
      */
     private ItemStack checkRawMaterial() {
         String materialID = this.configurationFile.getString(configLocation + "item.raw-material");
-        if (materialID != null) {
-            rawMaterial = true;
+        if (materialID == null) {
+            return null;
         }
 
         return checkItem(materialID, true);
@@ -650,7 +652,7 @@ public class ItemFactory {
 
         String[] split = potionSettings.split(":");
         if (split.length != 3) {
-            EvenMoreFish.getInstance().getLogger().severe(configLocation + "item.potion: is formatted incorrectly in the fish.yml file. Use \"potion:duration:amplifier\".");
+            EvenMoreFish.getInstance().getLogger().severe(configLocation + "item.potion: is formatted incorrectly in the fish config. Use \"potion:duration:amplifier\".");
         }
 
         try {
@@ -664,7 +666,7 @@ public class ItemFactory {
         } catch (NumberFormatException exception) {
             EvenMoreFish.getInstance()
                     .getLogger()
-                    .severe(configLocation + "item.potion: is formatted incorrectly in the fish.yml file. Use \"potion:duration:amplifier\", where duration & amplifier are integer values.");
+                    .severe(configLocation + "item.potion: is formatted incorrectly in the fish config. Use \"potion:duration:amplifier\", where duration & amplifier are integer values.");
         } catch (NullPointerException exception) {
             EvenMoreFish.getInstance()
                     .getLogger()

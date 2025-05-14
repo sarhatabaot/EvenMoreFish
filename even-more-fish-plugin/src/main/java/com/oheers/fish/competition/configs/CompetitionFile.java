@@ -34,6 +34,7 @@ public class CompetitionFile extends ConfigBase {
     // We should never use the configUpdater for this.
     public CompetitionFile(@NotNull File file) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
+        CompetitionFileUpdates.update(this);
         performRequiredConfigChecks();
     }
 
@@ -174,11 +175,8 @@ public class CompetitionFile extends ConfigBase {
         return getConfig().getInt("broadcast-range", -1);
     }
 
-    /**
-     * @return The colours to show for each winning position, if the {pos_colour} variable is used.
-     */
-    public @NotNull List<String> getPositionColours() {
-        return getConfig().getStringList("leaderboard.position-colours", List.of("<gold>", "<yellow>", "<gray>", "<gray>", "<#888888>"));
+    public @NotNull List<String> getLeaderboardColours() {
+        return getConfig().getStringList("leaderboard", List.of("<gold>{name}</gold>", "<yellow>{name}</yellow>", "<gray>{name}</gray>", "<gray>{name}</gray>", "<#888888>{name}</#888888>"));
     }
 
     public @NotNull List<Long> getAlertTimes() {
@@ -195,7 +193,7 @@ public class CompetitionFile extends ConfigBase {
                 seconds += (Long.parseLong(split[0]) * 60);
                 finalTimes.add(seconds);
             } catch (NumberFormatException exception) {
-                logger.severe("Could not turn " + time + " into an alert time. If you need support, feel free to join the discord server: https://discord.gg/Hb9cj3tNbb");
+                logger.severe("Could not turn " + time + " into an alert time. If you need support, feel free to join the discord server: https://discord.gg/9fRbqWTnHS");
             }
         }
         return finalTimes;

@@ -6,7 +6,7 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.codemc.org/repository/maven-public/")
+    maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://jitpack.io")
 }
 
@@ -15,18 +15,6 @@ tasks {
         val addonName = defaultAddonName(project.name)
         jar {
             archiveFileName.set(addonName)
-        }
-        build {
-            doLast {
-                copy {
-
-                    val sourceFolder = project.layout.buildDirectory.dir("libs/${addonName}").get()
-                    val targetFolder = File(rootProject.project(":even-more-fish-plugin").projectDir, "src/main/resources/addons")
-                    from(sourceFolder)
-                    into(targetFolder)
-                    logger.lifecycle("Copying $addonName from $sourceFolder to $targetFolder")
-                }
-            }
         }
     }
 }

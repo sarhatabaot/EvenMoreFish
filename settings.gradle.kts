@@ -1,9 +1,12 @@
 rootProject.name = "even-more-fish"
 
+// Addons
+include(":addons:even-more-fish-addons-j17")
+include(":addons:even-more-fish-addons-j21")
+
+// Plugin Stuff
 include(":even-more-fish-api")
-include(":even-more-fish-addons-j17")
 include(":even-more-fish-database-extras")
-include(":even-more-fish-addons-j21")
 include(":even-more-fish-plugin")
 
 dependencyResolutionManagement {
@@ -70,7 +73,7 @@ dependencyResolutionManagement {
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
-            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.0.0")
+            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.0.1")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
             plugin("shadow", "com.gradleup.shadow").version("9.0.0-beta12")

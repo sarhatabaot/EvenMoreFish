@@ -47,4 +47,15 @@ public class ShortestFishStrategy implements CompetitionStrategy {
         message.setLength("%.1f".formatted(entry.getValue()));
         return message;
     }
+
+    @Override
+    public boolean shouldUseFishLength() {
+        return true;
+    }
+
+    @Override
+    public boolean isSingleReward() {
+        return false;
+    }
+
 }

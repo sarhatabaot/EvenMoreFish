@@ -78,8 +78,7 @@ public class BaitListener implements Listener {
         } catch (MaxBaitReachedException exception) {
             result = exception.getRecoveryResult();
             EMFMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
-            message.setBaitTheme(bait.getTheme());
-            message.setBait(bait.getId());
+            message.setBait(bait.format(bait.getId()));
             message.send(event.getWhoClicked());
         }
 

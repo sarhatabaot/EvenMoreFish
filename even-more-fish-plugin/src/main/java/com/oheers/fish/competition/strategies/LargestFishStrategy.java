@@ -47,4 +47,14 @@ public class LargestFishStrategy implements CompetitionStrategy {
         message.setLength(getDecimalFormat().format(entry.getValue()));
         return message;
     }
+
+    @Override
+    public boolean shouldUseFishLength() {
+        return true;
+    }
+
+    @Override
+    public boolean isSingleReward() {
+        return false;
+    }
 }

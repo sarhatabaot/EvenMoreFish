@@ -89,4 +89,8 @@ public interface CompetitionStrategy {
         return new DecimalFormat("#.0"); // For 1 decimal place
     }
 
+    boolean shouldUseFishLength();
+
+    boolean isSingleReward();
+
 }

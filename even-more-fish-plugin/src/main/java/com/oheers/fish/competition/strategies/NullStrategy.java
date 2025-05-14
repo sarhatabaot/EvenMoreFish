@@ -45,4 +45,14 @@ public class NullStrategy implements CompetitionStrategy {
         return EMFSingleMessage.empty();
     }
 
+    @Override
+    public boolean shouldUseFishLength() {
+        return true;
+    }
+
+    @Override
+    public boolean isSingleReward() {
+        return false;
+    }
+
 }

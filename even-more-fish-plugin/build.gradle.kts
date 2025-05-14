@@ -18,7 +18,7 @@ plugins {
 }
 
 group = "com.oheers.evenmorefish"
-version = "2.0.0-SNAPSHOT"
+version = properties["project-version"] as String
 
 description = "A fishing extension bringing an exciting new experience to fishing."
 
@@ -177,7 +177,8 @@ bukkit {
                 "emf.sellall",
                 "emf.help",
                 "emf.next",
-                "emf.applybaits"
+                "emf.applybaits",
+                "emf.journal"
             )
         }
 
@@ -229,6 +230,20 @@ tasks.named("compileJava") {
     dependsOn(":even-more-fish-plugin:generateMysqlJooq")
 }
 
+val copyAddons by tasks.registering(Copy::class) {
+    // Make sure the plugin waits for the addons to be built first
+    dependsOn(":addons:even-more-fish-addons-j17:build", ":addons:even-more-fish-addons-j21:build")
+
+    from(project(":addons:even-more-fish-addons-j17").layout.buildDirectory.dir("libs"))
+    from(project(":addons:even-more-fish-addons-j21").layout.buildDirectory.dir("libs"))
+
+    into(file("src/main/resources/addons"))
+}
+
+tasks.named("processResources") {
+    dependsOn(copyAddons)
+}
+
 tasks {
     build {
         dependsOn(
@@ -247,7 +262,7 @@ tasks {
         version.set(libs.versions.jooq)
 
         val dialects = listOf("mysql")
-        val latestSchema = "V7_1__Create_Tables.sql"
+        val latestSchema = "V8_1__Create_Tables.sql"
         dialects.forEach { dialect ->
             val schemaPath = "src/main/resources/db/migrations/${dialect}/${latestSchema}"
             configureDialect(dialect, schemaPath)
@@ -277,7 +292,7 @@ tasks {
             attributes["Specification-Version"] = project.version
             attributes["Implementation-Title"] = grgit.branch.current().name
             attributes["Implementation-Version"] = buildNumberOrDate
-            attributes["Database-Baseline-Version"] = "7.0"
+            attributes["Database-Baseline-Version"] = "8.0"
         }
 
         minimize()

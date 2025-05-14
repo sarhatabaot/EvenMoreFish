@@ -21,13 +21,27 @@ public class SpecificFishStrategy implements CompetitionStrategy {
 
     @Override
     public boolean begin(Competition competition) {
+        // Check if the competition fish is valid
+        if (!competition.chooseFish()) {
+            EvenMoreFish.getInstance().getLogger().warning(
+                "Failed to select a fish for " + competition.getCompetitionFile().getId() + " competition."
+            );
+            return false;
+        }
+        // Set number-needed to 1 if it's not configured
         if (competition.getNumberNeeded() == 0) {
             EvenMoreFish.getInstance().getLogger().warning(
                 competition.getCompetitionFile().getId() + " competition does not have number-needed set. Defaulting to 1."
             );
             competition.setNumberNeeded(1);
         }
-        return competition.getSelectedFish() != null;
+        if (competition.getSelectedFish() == null) {
+            EvenMoreFish.getInstance().getLogger().warning(
+                "Failed to select a fish for " + competition.getCompetitionFile().getId() + " competition."
+            );
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -44,11 +58,12 @@ public class SpecificFishStrategy implements CompetitionStrategy {
             entry.incrementValue(increaseAmount);
             leaderboard.updateEntry(entry);
         } else {
-            leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
+            entry = new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType());
+            leaderboard.addEntry(entry);
         }
 
-        if (entry != null && entry.getValue() >= competition.getNumberNeeded()) {
-            competition.singleReward(fisher);
+        if (entry.getValue() >= competition.getNumberNeeded()) {
+            competition.setSingleWinner(fisher);
             competition.end(false);
         }
     }
@@ -98,6 +113,16 @@ public class SpecificFishStrategy implements CompetitionStrategy {
         message.setRarity(fish.getRarity().getDisplayName());
         message.setFishCaught(fish.getDisplayName());
         return message;
+    }
+
+    @Override
+    public boolean shouldUseFishLength() {
+        return true;
+    }
+
+    @Override
+    public boolean isSingleReward() {
+        return true;
     }
 
 }

@@ -50,6 +50,9 @@ database:
   # Login information
   username: root
   password: ''
+  advanced:
+    save-interval:
+      user-fish-stats: 5
 
 # Prevents verbose output when the plugin interacts with the database.
 disable-db-verbose: true
@@ -80,12 +83,11 @@ economy:
 # you can use like: SEGMENTED_6 SEGMENTED_10 SEGMENTED_12 SEGMENTED_20 SOLID
 barstyle: SEGMENTED_10
 
-# Requires that the fishing rod to have the "emf-rod-nbt" value in order to catch custom fish defined in fish.yml.
+# Requires that the fishing rod to have the "emf-rod-nbt" value in order to catch custom fish.
 # This allows you to sell rods that will be the only ones able to catch EvenMoreFish fish.
 require-nbt-rod: false
 
-# This defines the item given with the "/emf admin rod-nbt -p:Playername" command. It uses the same formatting as the fish
-# and baits in fish & baits .yml files.
+# This defines the item given with the "/emf admin rod-nbt -p:Playername" command. It uses the same formatting as fish.
 nbt-rod-item:
   item:
     # This needs to be FISHING_ROD, can be an addon string, but the base material has to be FISHING_ROD
@@ -97,7 +99,7 @@ nbt-rod-item:
     - <gray>Catch </gray><yellow>custom </yellow><gray>fish using this
     - <gray>fishing rod.
 
-# Should the user need emf.use_rod permission in order to catch default custom fish defined in fish.yml. This requires
+# Should the user need emf.use_rod permission in order to catch default custom fish. This requires
 # Vault and a permission manager such as LuckPerms.
 requires-fishing-permission: false
 
@@ -242,8 +244,10 @@ command:
     sellall: "sellall"
     # The /emf applybaits command
     applybaits: "applybaits"
+    # The /emf journal command
+    journal: "journal"
 
-# Customizable sets of biomes for fish.yml configuration
+# Customizable sets of biomes for fish configuration
 biome-sets:
   # oceans biome set. you can add more sets as you please.
   oceans:

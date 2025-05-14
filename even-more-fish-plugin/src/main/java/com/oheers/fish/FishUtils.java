@@ -335,12 +335,9 @@ public class FishUtils {
     }
 
     public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
-        String plain = message.getPlainTextMessage();
         Competition activeComp = Competition.getCurrentlyActive();
 
-        if (plain.isEmpty() || activeComp == null) {
-            EvenMoreFish.getInstance().debug("Formatted (Empty Message) " + plain.isEmpty());
-            EvenMoreFish.getInstance().debug("Active Comp is null? " + (activeComp == null));
+        if (message.isEmpty()) {
             return;
         }
 
@@ -355,7 +352,11 @@ public class FishUtils {
         }
     }
 
-    private static @NotNull List<? extends Player> getValidPlayers(@NotNull Player referencePlayer, @NotNull Competition activeComp) {
+    private static @NotNull List<? extends Player> getValidPlayers(@NotNull Player referencePlayer, @Nullable Competition activeComp) {
+        if (activeComp == null) {
+            return Bukkit.getOnlinePlayers().stream().toList();
+        }
+
         CompetitionFile activeCompetitionFile = activeComp.getCompetitionFile();
 
         // Get the list of online players once and store in a variable.
@@ -490,6 +491,26 @@ public class FishUtils {
             return true;
         } catch (ClassNotFoundException exception) {
             return false;
+        }
+    }
+
+    public static String getPlayerName(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return null;
+        }
+        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+        return player.getName();
+    }
+
+    public static String getPlayerName(@Nullable String uuidString) {
+        if (uuidString == null) {
+            return null;
+        }
+        try {
+            UUID uuid = UUID.fromString(uuidString);
+            return getPlayerName(uuid);
+        } catch (IllegalArgumentException exception) {
+            return null;
         }
     }
 
@@ -636,9 +657,18 @@ public class FishUtils {
 
     /**
      * @param colour The original colour
-     * @return A MiniMessage string turned into a format key for use in configs.
+     * @return A string turned into a format key for use in configs.
      */
     public static @NotNull String getFormat(@NotNull String colour) {
+        if (isLegacyString(colour)) {
+            // Legacy's formatting makes this insanely simple
+            return colour + "{name}";
+        } else {
+            return getMiniMessageFormat(colour);
+        }
+    }
+
+    private static String getMiniMessageFormat(@NotNull String colour) {
         int openingTagEnd = colour.indexOf(">");
 
         if (openingTagEnd == -1) {
@@ -654,5 +684,6 @@ public class FishUtils {
         // Case: <tag> → <tag>{name}
         return colour.substring(0, openingTagEnd + 1) + "{name}";
     }
+
 
 }

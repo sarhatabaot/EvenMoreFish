@@ -8,7 +8,7 @@ plugin for your server.
 
 ---
 
-Supported Versions: 1.20.6, 1.21.1, 1.21.4 (Experimental, Dev Builds)
+Supported Versions: 1.20.6, 1.21.1, 1.21.5 (Experimental, Dev Builds)
 
 If you encounter any issues with the plugin, please do the following before reporting the problem:
 - Create a Paper test server using one of the supported versions.
@@ -35,7 +35,7 @@ this plugin highly customizable for use in your own server.
 
 * ### Rarities
 
-There's 4 rarities in the default config, but it's possible to add your own in the `rarities.yml` file, with its own
+There's 4 rarities in the default config, but it's possible to add your own in the `rarities` folder, with its own
 colour, drop frequency, standard fish length. It's also possible to set per-fish lengths.
 
 * ### Baits

@@ -11,6 +11,8 @@ import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
+
 public class MostFishStrategy implements CompetitionStrategy {
 
     @Override
@@ -55,6 +57,21 @@ public class MostFishStrategy implements CompetitionStrategy {
         EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
         message.setAmount(getDecimalFormat().format(entry.getValue()));
         return message;
+    }
+
+    @Override
+    public boolean shouldUseFishLength() {
+        return false;
+    }
+
+    @Override
+    public DecimalFormat getDecimalFormat() {
+        return new DecimalFormat();
+    }
+
+    @Override
+    public boolean isSingleReward() {
+        return false;
     }
 
 }

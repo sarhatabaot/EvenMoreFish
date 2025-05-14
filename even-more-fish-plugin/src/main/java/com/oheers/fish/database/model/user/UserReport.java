@@ -1,77 +1,84 @@
-package com.oheers.fish.database.model;
+package com.oheers.fish.database.model.user;
+
+import com.oheers.fish.database.data.FishRarityKey;
+import com.oheers.fish.fishing.items.Fish;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
 public class UserReport {
 
-    private final int id;
-    private String firstFish;
-    private String recentFish;
-    private String largestFish;
+    private int id;
     private final UUID uuid;
+    private FishRarityKey firstFish;
+    private FishRarityKey recentFish;
+    private FishRarityKey largestFish;
+    private FishRarityKey shortestFish;
     private int numFishCaught;
     private int competitionsWon;
     private int competitionsJoined;
 
     private float largestLength;
+    private float shortestLength;
     private float totalFishLength;
     
     private int fishSold;
     private double moneyEarned;
 
-    public UserReport(final int id, final int numFishCaught, final int competitionsWon, final int competitionsJoined,
-                      final String firstFish, final String recentFish, final String largestFish, final float totalFishLength,
-                      final float largestLength, final String uuid) {
+    public UserReport(int id, UUID uuid, FishRarityKey firstFish, FishRarityKey recentFish, FishRarityKey largestFish, FishRarityKey shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
         this.id = id;
-        this.numFishCaught = numFishCaught;
-        this.competitionsWon = competitionsWon;
-        this.competitionsJoined = competitionsJoined;
+        this.uuid = uuid;
         this.firstFish = firstFish;
         this.recentFish = recentFish;
         this.largestFish = largestFish;
-        this.totalFishLength = totalFishLength;
-        this.largestLength = largestLength;
-        this.uuid = UUID.fromString(uuid);
-    }
-    
-    public UserReport(final int id, final int numFishCaught, final int competitionsWon, final int competitionsJoined,
-                      final String firstFish, final String recentFish, final String largestFish, final float totalFishLength,
-                      final float largestLength, final String uuid, final int fishSold, final double moneyEarned) {
-        this.id = id;
+        this.shortestFish = shortestFish;
         this.numFishCaught = numFishCaught;
         this.competitionsWon = competitionsWon;
         this.competitionsJoined = competitionsJoined;
-        this.firstFish = firstFish;
-        this.recentFish = recentFish;
-        this.largestFish = largestFish;
-        this.totalFishLength = totalFishLength;
         this.largestLength = largestLength;
-        this.uuid = UUID.fromString(uuid);
+        this.shortestLength = shortestLength;
+        this.totalFishLength = totalFishLength;
         this.fishSold = fishSold;
         this.moneyEarned = moneyEarned;
     }
 
-    public String getFirstFish() {
+    public UserReport(UUID uuid, FishRarityKey firstFish, FishRarityKey recentFish, FishRarityKey largestFish, FishRarityKey shortestFish, int numFishCaught, int competitionsWon, int competitionsJoined, float largestLength, float shortestLength, float totalFishLength, int fishSold, double moneyEarned) {
+        this.uuid = uuid;
+        this.firstFish = firstFish;
+        this.recentFish = recentFish;
+        this.largestFish = largestFish;
+        this.shortestFish = shortestFish;
+        this.numFishCaught = numFishCaught;
+        this.competitionsWon = competitionsWon;
+        this.competitionsJoined = competitionsJoined;
+        this.largestLength = largestLength;
+        this.shortestLength = shortestLength;
+        this.totalFishLength = totalFishLength;
+        this.fishSold = fishSold;
+        this.moneyEarned = moneyEarned;
+    }
+
+    public FishRarityKey getFirstFish() {
         return firstFish;
     }
 
-    public void setFirstFish(String firstFish) {
+    public void setFirstFish(FishRarityKey firstFish) {
         this.firstFish = firstFish;
     }
 
-    public String getRecentFish() {
+    public FishRarityKey getRecentFish() {
         return recentFish;
     }
 
-    public void setRecentFish(String recentFish) {
+    public void setRecentFish(FishRarityKey recentFish) {
         this.recentFish = recentFish;
     }
 
-    public String getLargestFish() {
+    public FishRarityKey getLargestFish() {
         return largestFish;
     }
 
-    public void setLargestFish(String largestFish) {
+    public void setLargestFish(FishRarityKey largestFish) {
         this.largestFish = largestFish;
     }
 
@@ -155,7 +162,7 @@ public class UserReport {
         return id;
     }
 
-    public UUID getUUID() {
+    public UUID getUuid() {
         return uuid;
     }
     
@@ -173,5 +180,51 @@ public class UserReport {
     
     public double getMoneyEarned() {
         return moneyEarned;
+    }
+
+    public FishRarityKey getShortestFish() {
+        return shortestFish;
+    }
+
+    public float getShortestLength() {
+        return shortestLength;
+    }
+
+    public void setShortestFish(FishRarityKey shortestFish) {
+        this.shortestFish = shortestFish;
+    }
+
+    public void setShortestLength(float shortestLength) {
+        this.shortestLength = shortestLength;
+    }
+
+    public void setShortestLengthAndFish(@NotNull Fish fish) {
+        this.shortestLength = fish.getLength();
+        this.shortestFish = FishRarityKey.of(fish);
+    }
+
+    public void setLongestLengthAndFish(@NotNull Fish fish) {
+        this.largestLength = fish.getLength();
+        this.largestFish = FishRarityKey.of(fish);
+    }
+
+    @Override
+    public String toString() {
+        return "UserReport{" +
+                "id=" + id +
+                ", uuid=" + uuid +
+                ", firstFish=" + firstFish +
+                ", recentFish=" + recentFish +
+                ", largestFish=" + largestFish +
+                ", shortestFish=" + shortestFish +
+                ", numFishCaught=" + numFishCaught +
+                ", competitionsWon=" + competitionsWon +
+                ", competitionsJoined=" + competitionsJoined +
+                ", largestLength=" + largestLength +
+                ", shortestLength=" + shortestLength +
+                ", totalFishLength=" + totalFishLength +
+                ", fishSold=" + fishSold +
+                ", moneyEarned=" + moneyEarned +
+                '}';
     }
 }

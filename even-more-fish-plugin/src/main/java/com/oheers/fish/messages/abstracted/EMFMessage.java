@@ -27,6 +27,11 @@ public abstract class EMFMessage {
         .postProcessor(component -> component)
         .build();
     public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
+    public static final LegacyComponentSerializer LEGACY_SERIALIZER_INPUT = LegacyComponentSerializer.builder()
+        .character('&')
+        .hexColors()
+        .useUnusualXRepeatedCharacterHexFormat()
+        .build();
     public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
     public static final Component EMPTY = Component.empty().colorIfAbsent(NamedTextColor.WHITE);
 
@@ -38,13 +43,14 @@ public abstract class EMFMessage {
 
     public abstract EMFMessage createCopy();
 
-    /**
-     * Replaces all section symbols with ampersands so MiniMessage doesn't explode
-     */
     public static Component formatString(@NotNull String message) {
-        return MINIMESSAGE.deserialize(
-            message.replace('§', '&')
-        );
+        if (FishUtils.isLegacyString(message)) {
+            return LEGACY_SERIALIZER_INPUT.deserialize(message);
+        } else {
+            return MINIMESSAGE.deserialize(
+                message.replace('§', '&')
+            );
+        }
     }
 
     public static @NotNull Component removeDefaultItalics(@NotNull Component component) {
@@ -295,16 +301,8 @@ public abstract class EMFMessage {
      * @param bait The name of the bait.
      */
     public void setBait(@NotNull final Object bait) {
+        setVariable("{bait_theme}", "");
         setVariable("{bait}", bait);
-    }
-
-    /**
-     * Defines the theme of the bait to be used throughout the message to replace the {bait_theme} variable.
-     *
-     * @param baitTheme The bait colour theme.
-     */
-    public void setBaitTheme(@NotNull final Object baitTheme) {
-        setVariable("{bait_theme}", baitTheme);
     }
 
     /**
