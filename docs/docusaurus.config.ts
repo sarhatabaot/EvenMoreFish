@@ -51,7 +51,7 @@ const config: Config = {
       title: 'EvenMoreFish',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/favicon.ico',
+        src: 'img/brand/favicon.ico',
       },
       items: [
         {
@@ -126,6 +126,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+      additionalLanguages: ['java'],
     },
   } satisfies Preset.ThemeConfig,
 };
