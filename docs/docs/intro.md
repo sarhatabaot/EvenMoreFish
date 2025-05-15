@@ -1,6 +1,7 @@
 ---
 title: Welcome to the wiki
 description: Create a doc page with rich content.
+sidebar_position: 1
 ---
 
 # Welcome to the wiki

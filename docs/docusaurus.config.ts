@@ -3,10 +3,11 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+let discord = "https://discord.gg/9fRbqWTnHS";
 
 const config: Config = {
   title: 'EvenMoreFish',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'Fish & Hunt Fish',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -30,32 +31,12 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-
   presets: [
     [
       'classic',
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -65,24 +46,37 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
     image: 'img/evenmorefish-social-card.jpg',
     navbar: {
       title: 'EvenMoreFish',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'img/favicon.ico',
       },
       items: [
         {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Documentation',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://modrinth.com/plugin/evenmorefish',
+          label: 'Download (Modrinth)',
+          position: 'right',
+        },
+        {
+          href: 'https://ci.codemc.io/job/EvenMoreFish/job/EvenMoreFish/',
+          label: 'Experimental Download (Jenkins)',
+          position: 'right',
+        },
+        {
+          href: discord,
+          label: 'Discord',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/EvenMoreFish/EvenMoreFish',
           label: 'GitHub',
           position: 'right',
         },
@@ -98,6 +92,10 @@ const config: Config = {
               label: 'Documentation',
               to: '/docs/intro',
             },
+            {
+              label: 'FAQs',
+              to: '/docs/support/faq',
+            }
           ],
         },
         {
@@ -105,11 +103,7 @@ const config: Config = {
           items: [
             {
               label: 'Discord',
-              href: 'https://discord.gg/9fRbqWTnHS',
-            },
-            {
-              label: 'Documentation',
-              to: '/docs/intro',
+              href: discord,
             },
           ],
         },
