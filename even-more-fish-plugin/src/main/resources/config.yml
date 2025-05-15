@@ -29,7 +29,6 @@ fishing:
 # Supports EssentialsX and CMI.
 respect-vanished: true
 
-# WARNING EXPERIMENTAL: This feature is experimental and may not work properly.
 # The plugin stores stats about fish caught by players, used in the fish log. Disabling this will disable functionality
 # of this feature.
 # ATTENTION: Toggling this requires a full server restart.
@@ -52,7 +51,9 @@ database:
   password: ''
   advanced:
     save-interval:
+      unit: SECONDS
       user-fish-stats: 5
+      competition: 5
 
 # Prevents verbose output when the plugin interacts with the database.
 disable-db-verbose: true
@@ -66,7 +67,7 @@ random-durability: true
 economy:
   # Allows fish to pay out with your Vault economy plugin
   vault:
-    enabled: false
+    enabled: true
     multiplier: 1.0
   # Allows fish to pay out with PlayerPoints
   playerpoints:
