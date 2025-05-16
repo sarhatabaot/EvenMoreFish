@@ -8,7 +8,7 @@ let discord = "https://discord.gg/9fRbqWTnHS";
 const config: Config = {
   title: 'EvenMoreFish',
   tagline: 'Fish & Hunt Fish',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/brand/favicon.ico',
 
   // Set the production url of your site here
   url: 'https://evenmorefish.github.io',
@@ -46,7 +46,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/evenmorefish-social-card.jpg',
+    image: 'img/brand/evenmorefish-social-card.jpg',
     navbar: {
       title: 'EvenMoreFish',
       logo: {

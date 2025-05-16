@@ -1,5 +1,5 @@
 ---
-title: Messages.yml
+title: Messages
 ---
 
 ## The file
@@ -14,7 +14,7 @@ basic text editor.
 
 This file has every value explained already so unlike
 the [Competition Wiki](/docs/features/competitions)
-and [Rarity Wiki](/docs/configuration/), not every value will be explained but a copy of
+and [Rarity Wiki](/docs/configuration/rarities), not every value will be explained but a copy of
 messages_en.yml can be found on the Spigot page in the "Technical Stuff" section.
 
 ***

@@ -1,3 +1,6 @@
+---
+title: Reward Types
+---
 To use, change the identifier to the one you want using the table below:
 ```yaml title="Example"
 rewards:
