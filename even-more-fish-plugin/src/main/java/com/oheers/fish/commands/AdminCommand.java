@@ -27,6 +27,7 @@ import com.oheers.fish.utils.ManifestUtil;
 import de.tr7zw.changeme.nbtapi.NBT;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import net.kyori.adventure.audience.Audience;
@@ -44,6 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.jar.Attributes;
 
+@SuppressWarnings("unchecked")
 public class AdminCommand {
 
     private final HelpMessageBuilder helpMessageBuilder = HelpMessageBuilder.create();
@@ -227,28 +229,35 @@ public class AdminCommand {
                 .withArguments(
                         BaitArgument.create(),
                         new IntegerArgument("quantity", 1).setOptional(true),
-                        ArgumentHelper.getPlayerArgument("target").setOptional(true)
+                        new EntitySelectorArgument.ManyPlayers("targets").setOptional(true)
                 )
                 .executes((sender, args) -> {
                     final Bait bait = Objects.requireNonNull(args.getUnchecked("bait"));
                     final int quantity = (int) args.getOptional("quantity").orElse(1);
-                    final Player target = (Player) args.getOptional("target").orElseGet(() -> {
+                    final List<Player> targets = (List<Player>) args.getOptional("targets").orElseGet(() -> {
                         if (sender instanceof Player p) {
-                            return p;
+                            return List.of(p);
                         }
                         return null;
                     });
 
-                    if (target == null) {
+                    if (targets == null) {
                         ConfigMessage.ADMIN_CANT_BE_CONSOLE.getMessage().send(sender);
                         return;
                     }
 
-                    ItemStack baitItem = bait.create(target);
-                    baitItem.setAmount(quantity);
-                    FishUtils.giveItems(List.of(baitItem), target);
+                    for (Player target : targets) {
+                        ItemStack baitItem = bait.create(target);
+                        baitItem.setAmount(quantity);
+                        FishUtils.giveItems(List.of(baitItem), target);
+                    }
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
-                    message.setPlayer(target);
+
+                    if ("@a".equals(args.getRaw("targets"))) {
+                        message.setVariable("{player}", "All Players");
+                    } else {
+                        message.setVariable("{player}", String.join(", ", targets.stream().map(Player::getName).toList()));
+                    }
                     message.setBait(bait.getId());
                     message.send(sender);
                 });
