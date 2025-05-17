@@ -205,28 +205,39 @@ public class AdminCommand {
         );
         return new CommandAPICommand("nbt-rod")
                 .withArguments(
-                        ArgumentHelper.getPlayerArgument("target").setOptional(true)
+                    new EntitySelectorArgument.ManyPlayers("targets").setOptional(true)
                 )
                 .executes(((sender, args) -> {
                     if (!MainConfig.getInstance().requireNBTRod()) {
                         ConfigMessage.ADMIN_NBT_NOT_REQUIRED.getMessage().send(sender);
                         return;
                     }
-                    final Player player = (Player) args.getOptional("target").orElseGet(() -> {
+                    final List<Player> players = (List<Player>) args.getOptional("targets").orElseGet(() -> {
                         if (sender instanceof Player p) {
-                            return p;
+                            return List.of(p);
                         }
                         return null;
                     });
 
-                    if (player == null) {
+                    if (players == null) {
                         ConfigMessage.ADMIN_CANT_BE_CONSOLE.getMessage().send(sender);
                         return;
                     }
 
-                    FishUtils.giveItems(Collections.singletonList(EvenMoreFish.getInstance().getCustomNBTRod()), player);
+                    ItemStack rod = EvenMoreFish.getInstance().getCustomNBTRod();
+
+                    for (Player player : players) {
+                        FishUtils.giveItems(List.of(rod), player);
+                    }
+
                     EMFMessage giveMessage = ConfigMessage.ADMIN_NBT_ROD_GIVEN.getMessage();
-                    giveMessage.setPlayer(player);
+
+                    if ("@a".equals(args.getRaw("targets"))) {
+                        giveMessage.setVariable("{player}", "All Players");
+                    } else {
+                        giveMessage.setVariable("{player}", String.join(", ", players.stream().map(Player::getName).toList()));
+                    }
+
                     giveMessage.send(sender);
                 }));
     }
