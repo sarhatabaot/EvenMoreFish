@@ -10,7 +10,7 @@ To create a new competition, you need to create a new yml file in the competitio
 
 The following configs are required in each competition config file:
 - `id` - Allows the plugin to identify this competition internally, mainly used in the Database
-- `type` - Controls the type of competition this is. You can see a list of valid types [here](/docs/features/competitions/Competition-Types)
+- `type` - Controls the type of competition this is. You can see a list of valid types [here](/docs/features/competitions/types)
 - `duration` - Controls how long this competition should last for. This is measured in minutes.
 
 All other configs are optional, however you will most likely want to schedule your competition for specific times in the day.
