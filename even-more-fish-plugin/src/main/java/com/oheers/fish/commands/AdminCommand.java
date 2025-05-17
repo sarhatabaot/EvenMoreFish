@@ -93,41 +93,52 @@ public class AdminCommand {
                         RarityArgument.create(),
                         FishArgument.create(),
                         new IntegerArgument("amount", 1).setOptional(true),
-                        ArgumentHelper.getPlayerArgument("target").setOptional(true)
+                        new EntitySelectorArgument.ManyPlayers("targets").setOptional(true)
                 )
                 .executes((sender, arguments) -> {
-                    final Fish fish = arguments.getUnchecked("fish");
-                    if (fish == null) {
+                    final Fish initialFish = arguments.getUnchecked("fish");
+                    if (initialFish == null) {
                         return;
                     }
                     final int amount = (Integer) arguments.getOptional("amount").orElse(1);
-                    final Player target = (Player) arguments.getOptional("target").orElseGet(() -> {
-                        if (!(sender instanceof Player player)) {
-                            return null;
+                    final List<Player> targets = (List<Player>) arguments.getOptional("targets").orElseGet(() -> {
+                        if (sender instanceof Player player) {
+                            return List.of(player);
                         }
-                        return player;
+                        return null;
                     });
 
-                    if (target == null) {
+                    if (targets == null) {
                         ConfigMessage.ADMIN_CANT_BE_CONSOLE.getMessage().send(sender);
                         return;
                     }
 
-                    fish.init();
-                    fish.checkFishEvent();
-                    if (fish.hasFishRewards()) {
-                        fish.getFishRewards().forEach(reward -> reward.rewardPlayer(target, target.getLocation()));
+                    for (Player target : targets) {
+                        Fish fish = initialFish.createCopy();
+                        fish.init();
+                        fish.checkFishEvent();
+
+                        if (fish.hasFishRewards()) {
+                            fish.getFishRewards().forEach(reward -> reward.rewardPlayer(target, target.getLocation()));
+                        }
+
+                        fish.setFisherman(target.getUniqueId());
+
+                        final ItemStack fishItem = fish.give(-1);
+                        fishItem.setAmount(amount);
+
+                        FishUtils.giveItem(fishItem, target);
                     }
-                    fish.setFisherman(target.getUniqueId());
-
-                    final ItemStack fishItem = fish.give(-1);
-                    fishItem.setAmount(amount);
-
-                    FishUtils.giveItem(fishItem, target);
 
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
-                    message.setPlayer(target);
-                    message.setFishCaught(fish.getName());
+
+                    if ("@a".equals(arguments.getRaw("targets"))) {
+                        message.setVariable("{player}", "All Players");
+                    } else {
+                        message.setVariable("{player}", String.join(", ", targets.stream().map(Player::getName).toList()));
+                    }
+
+                    message.setFishCaught(initialFish.getName());
                     message.send(sender);
                 });
     }
