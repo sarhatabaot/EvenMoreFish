@@ -10,33 +10,60 @@ type FeatureItem = {
 };
 
 const FeatureList: FeatureItem[] = [
-  {
-    title: 'Custom Item Support',
-    Svg: require('@site/static/img/home/settings.svg').default,
-    description: (
-      <>
-        EvenMoreFish supports the use of custom item plugins like: ItemsAdder, Nexo and more.
-      </>
-    ),
-  },
-  {
-    title: 'Economies',
-    Svg: require('@site/static/img/home/coins-swap.svg').default,
-    description: (
-      <>
-        EvenMoreFish allows the use of multiple economies through a config switch.
-      </>
-    ),
-  },
-  {
-    title: 'Competitions',
-    Svg: require('@site/static/img/home/leaderboard-star.svg').default,
-    description: (
-      <>
-        Special events that allow your players to compete against one another!
-      </>
-    ),
-  },
+    {
+        title: 'Custom Fish & Items',
+        Svg: require('@site/static/img/home/fish.svg').default, // You'll need to add this SVG
+        description: (
+            <>
+                Create unique fish with custom items, lore, lengths, and effects. Supports custom heads and model data.
+            </>
+        ),
+    },
+    {
+        title: 'Dynamic Competitions',
+        Svg: require('@site/static/img/home/leaderboard-star.svg').default,
+        description: (
+            <>
+                6 competition types with configurable rewards, bossbars, and leaderboards.
+            </>
+        ),
+    },
+    {
+        title: 'Advanced Customization',
+        Svg: require('@site/static/img/home/settings.svg').default,
+        description: (
+            <>
+                Biome-specific fish, region restrictions, commands on catch, and more.
+            </>
+        ),
+    },
+    {
+        title: 'Fish Shop & Economy',
+        Svg: require('@site/static/img/home/coins-swap.svg').default,
+        description: (
+            <>
+                Players can sell their catches with secure transactions and configurable prices.
+            </>
+        ),
+    },
+    {
+        title: 'Bait System',
+        Svg: require('@site/static/img/home/bait.svg').default,
+        description: (
+            <>
+                Special baits that affect catch rates for specific fish or rarities.
+            </>
+        ),
+    },
+    {
+        title: 'PlaceholderAPI Integration',
+        Svg: require('@site/static/img/home/placeholder.svg').default,
+        description: (
+            <>
+                Display competition standings and timers anywhere with comprehensive placeholders.
+            </>
+        ),
+    },
 ];
 
 function Feature({title, Svg, description}: FeatureItem) {

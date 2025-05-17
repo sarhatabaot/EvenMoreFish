@@ -50,7 +50,7 @@ const config: Config = {
     navbar: {
       title: 'EvenMoreFish',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'EvenMoreFish Logo',
         src: 'img/brand/favicon.ico',
       },
       items: [
