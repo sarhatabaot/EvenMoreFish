@@ -1,8 +1,9 @@
 ---
 title: Getting Started
 sidebar_position: 1
+description: Maven, Gradle
 ---
-## Using:
+## Artifacts:
 Currently, EMF has 2 main artifacts for use.
 even-more-fish-api & even-more-fish-plugin
 

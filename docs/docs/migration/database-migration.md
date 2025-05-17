@@ -1,24 +1,30 @@
 ---
 title: Database Migration
 ---
-> 📖 Permission: `emf.admin.debug.database`
+
+:::info[Permission: `emf.admin.debug.database`]
+:::
+
 # Database Migration
 EMF uses flyway to automatically migrate the database. Normally you shouldn't need to manually migrate the database.
 In case things breaks you can use some commands to try and fix the issues.
 
-> 📖 Permission: `emf.admin.debug.database.flyway`
-## /emf admin database drop-flyway
+:::info[Permission `emf.admin.debug.database.flyway`] 
+:::
 
-Drops the flyway schema history table.
-## /emf admin database repair-flyway
-Runs the flyway repair command.
-## /emf admin database clean-flyway
-Runs the flyway clean command.
-## /emf admin database migrate-to-latest
-> 📖 Permission: `emf.admin.debug.database.migrate`
->
-Attempts to migrate the database to the latest version.
+| Command                                 | Description                                            | Permission                         |
+|-----------------------------------------|--------------------------------------------------------|------------------------------------|
+| `/emf admin database drop-flyway`       | Drops the Flyway schema history table                  | `emf.admin.debug.database.flyway`  |
+| `/emf admin database repair-flyway`     | Runs the Flyway repair command                         | `emf.admin.debug.database.flyway`  |
+| `/emf admin database clean-flyway`      | Runs the Flyway clean command                          | `emf.admin.debug.database.flyway`  |
+| `/emf admin database migrate-to-latest` | Attempts to migrate the database to the latest version | `emf.admin.debug.database.migrate` |
 
+## Migrating from Database V2
 
-## Migrating from V2
+:::tip[Not sure what database version you have?]
+
+Try running `/emf admin version`
+
+:::
+
 Running the `/emf admin migrate` will attempt to migrate from database version 2 to the latest version.

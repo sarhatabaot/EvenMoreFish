@@ -5,6 +5,8 @@ title: Baits
 ## The files
 As of EvenMoreFish 2.0, all bait configs are located in `plugins/EvenMoreFish/baits`.
 
+![Epic Elixir](./assets/bait-epic-elixir-example.webp)
+
 ## Creating Baits
 To create a new bait, you need to create a new yml file in the baits folder.
 
@@ -12,6 +14,7 @@ The following configs are required in each bait config file:
 - `id` - Allows the plugin to identify this bait.
 
 All other configs are optional, however you will most likely want to add fish and rarities to your bait. You can see how to do this in the example file.
+
 
 ## Disabling Baits
 To disable a bait, you have two choices:

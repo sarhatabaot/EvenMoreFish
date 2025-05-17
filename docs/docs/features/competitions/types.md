@@ -1,5 +1,6 @@
 ---
 title: Competition Types
+sidebar_position: 1
 ---
 ## What are they?
 There are 7 different competition types in EvenMoreFish for your players to experience, and include: MOST_FISH, LARGEST_FISH and SPECIFIC_FISH. Each competition you choose must define a competition type for it to work, however if you want to start a competition via commands, `/emf admin competition start <duration>` it will default to the LARGEST_FISH competition type. An argument after duration can be used to start a chosen competition type, as is seen in the screenshot below.

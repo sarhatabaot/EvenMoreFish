@@ -1,5 +1,6 @@
 ---
 title: Competition Configs
+sidebar_position: 2
 ---
 ## The files
 As of EvenMoreFish 2.0, all competition config files are located in `plugins/EvenMoreFish/competitions`.

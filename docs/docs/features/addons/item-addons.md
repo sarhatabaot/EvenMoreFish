@@ -1,5 +1,6 @@
 ---
 title: Item Addons
+description: Third Party Plugins & Internal addons
 ---
 
 | Required Plugin | Prefix      | Format                     | Min Java |
