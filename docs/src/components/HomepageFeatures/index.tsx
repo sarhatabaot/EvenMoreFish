@@ -12,7 +12,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
     {
         title: 'Custom Fish & Items',
-        Svg: require('@site/static/img/home/fish.svg').default, // You'll need to add this SVG
+        Svg: require('@site/static/img/home/fish.svg').default, 
         description: (
             <>
                 Create unique fish with custom items, lore, lengths, and effects. Supports custom heads and model data.
