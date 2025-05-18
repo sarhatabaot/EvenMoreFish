@@ -18,6 +18,7 @@ Welcome to the EvenMoreFish Wiki.
 ### Additional Features
 * [Reward Types](https://github.com/EvenMoreFish/EvenMoreFish/wiki/Reward-Types)
 * [Item Addons](https://github.com/EvenMoreFish/EvenMoreFish/wiki/Item-Addons)
+* [Placeholders](https://github.com/EvenMoreFish/EvenMoreFish/wiki/Placeholders)
 ### Support
 * [FAQs](https://github.com/EvenMoreFish/EvenMoreFish/wiki/FAQs)
 * [Discord](https://discord.gg/9fRbqWTnHS)
