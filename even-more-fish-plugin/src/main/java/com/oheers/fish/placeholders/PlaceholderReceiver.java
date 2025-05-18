@@ -4,6 +4,8 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionType;
+import com.oheers.fish.database.model.fish.FishStats;
+import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
