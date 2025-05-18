@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Handles all PlaceholderAPI expansions for EvenMoreFish.
@@ -71,7 +72,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
     }
 
     private List<HandlerDefinition> createHandlers() {
-        return Arrays.asList(
+        return Stream.of(
                         // Competition placeholders
                         new HandlerDefinition(
                                 id -> id.startsWith("competition_place_size_"),
@@ -132,9 +133,9 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                                 Priority.EXACT_MATCH,
                                 this::handleCompetitionTypeFormat
                         )
-                ).stream()
+                )
                 .sorted(Comparator.comparingInt(def -> def.priority().ordinal()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private String handleCompetitionPlacePlayer(Player player, String identifier) {
