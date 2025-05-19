@@ -46,7 +46,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/brand/evenmorefish-social-card.jpg',
+    image: 'img/brand/evenmorefish-social-card.png',
     navbar: {
       title: 'EvenMoreFish',
       logo: {

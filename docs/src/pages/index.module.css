@@ -8,6 +8,17 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+
+  background: #838ba0;
+  background: linear-gradient(180deg, #838ba0 0%, #6d758b 100%);
+
+  display: flex;
+  justify-content: center;  /* horizontal */
+  align-items: center;
+}
+
+.heroBanner img {
+  border-radius: 10px;
 }
 
 @media screen and (max-width: 996px) {
