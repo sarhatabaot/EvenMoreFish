@@ -1,5 +1,5 @@
 ---
-title: Welcome to the wiki
+title: Overview & Installation
 description: Create a doc page with rich content.
 sidebar_position: 1
 ---
@@ -10,7 +10,7 @@ This is a feature-rich plugin providing a new experience to fishing on Minecraft
 
 ## Where/how to download/compile the plugin
 
-### Downloading
+### Downloading & Installation
 
 The latest version of the plugin will always be available at the official [Modrinth page](https://modrinth.com/plugin/evenmorefish). To run it on your server, insert the .jar file into your server's `plugin` folder and **restart** the server completely.
 
