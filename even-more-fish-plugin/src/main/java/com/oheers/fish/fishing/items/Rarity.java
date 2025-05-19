@@ -76,7 +76,7 @@ public class Rarity extends ConfigBase {
     }
 
     public boolean getAnnounce() {
-        return getConfig().getBoolean("broadcast");
+        return getConfig().getBoolean("broadcast", true);
     }
 
     public boolean getUseConfigCasing() {
