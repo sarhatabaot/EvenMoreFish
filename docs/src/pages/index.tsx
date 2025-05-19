@@ -10,7 +10,7 @@ function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
-        <div className={styles.cardBg}>      {/* NEW */}
+        <div className={styles.cardBg}>
             <img
                 src={siteConfig.themeConfig.image}
                 alt={siteConfig.title}
@@ -28,7 +28,7 @@ export default function Home(): ReactNode {
       title={`${siteConfig.title}`}
       description="Description will go into a meta tag in <head />">
       <HomepageHeader />
-      <main>
+      <main className={styles.emfHome}>
         <HomepageFeatures />
       </main>
     </Layout>
