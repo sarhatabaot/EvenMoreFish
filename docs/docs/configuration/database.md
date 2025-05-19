@@ -1,6 +1,7 @@
 ---
 title: Database
 description: Configuring your database
+version: "2.0.0"
 ---
 :::info[Supported Types]
 

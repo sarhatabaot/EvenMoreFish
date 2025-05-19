@@ -16,9 +16,13 @@
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 
-  --emf-background-color: #a4adbd;
+  --emf-background-color: #ffffff;
+  /*--emf-background-color: #a4adbd;*/
   --emf-background-color-alt: #6d758b;
   --emf-background-color-gradient: linear-gradient(180deg, var(--emf-background-color) 0%, var(--emf-background-color-alt) 100%);
+
+  --badge-background-color: #fef0d7;
+  --badge-color: #131313;
 }
 
 [data-theme='dark'] {
@@ -33,6 +37,10 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 
   --emf-background-color: #2e384d;
+  /*--emf-background-color: #2e384d;*/
   --emf-background-color-alt: #151923;
   --emf-background-color-gradient: linear-gradient(180deg,var(--emf-background-color) 0%, var(--emf-background-color-alt) 100%);
+
+  --badge-background-color: #131313;
+  --badge-color: #fef0d7;
 }
