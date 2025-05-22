@@ -90,44 +90,52 @@ public class FishJournalGui extends ConfigGui {
             return factory.createItem(null, -1);
         }
 
-        ItemFactory factory = new ItemFactory("fish-item", section);
-        factory.enableAllChecks();
-        ItemStack item = factory.createItem(null, -1);
+        ItemStack item = fish.give(-1);
+
         item.editMeta(meta -> {
-            // Display Name
-            final String displayStr = section.getString("fish-item.item.displayname");
-            if (displayStr != null) {
-                EMFSingleMessage display = EMFSingleMessage.fromString(displayStr);
-                display.setVariable("{fishname}", fish.getDisplayName());
+            EMFSingleMessage display = prepareDisplay(section, fish);
+            if (display != null) {
                 meta.displayName(display.getComponentMessage());
             }
-
-            final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
-
-            final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId, fish).toString());
-            final FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(FishRarityKey.of(fish).toString());
-
-            final String discoverDate = getValueOrUnknown(() -> userFishStats.getFirstCatchTime().format(DateTimeFormatter.ISO_DATE));
-            final String discoverer = getValueOrUnknown(() -> FishUtils.getPlayerName(fishStats.getDiscoverer()));
-
-            EMFListMessage lore = EMFListMessage.fromStringList(
-                    section.getStringList("fish-item.lore")
-            );
-
-            lore.setVariable("{times-caught}", getValueOrUnknown(() -> Integer.toString(userFishStats.getQuantity())));
-            lore.setVariable("{largest-size}", getValueOrUnknown(() -> String.valueOf(userFishStats.getLongestLength())));
-            lore.setVariable("{smallest-size}", getValueOrUnknown(() -> String.valueOf(userFishStats.getShortestLength())));
-            lore.setVariable("{discover-date}", discoverDate);
-            lore.setVariable("{discoverer}", discoverer);
-            lore.setVariable("{server-largest}", getValueOrUnknown(() -> String.valueOf(fishStats.getLongestLength())));
-            lore.setVariable("{server-smallest}", getValueOrUnknown(() -> String.valueOf(fishStats.getShortestLength())));
-            lore.setVariable("{server-caught}", getValueOrUnknown(() -> String.valueOf(fishStats.getQuantity())));
-            meta.lore(lore.getComponentListMessage());
+            meta.lore(prepareLore(section, fish).getComponentListMessage());
         });
 
-        ItemUtils.changeMaterial(item, fish.getFactory().getMaterial());
-
         return item;
+    }
+
+    private @Nullable EMFSingleMessage prepareDisplay(@NotNull Section section, @NotNull Fish fish) {
+        final String displayStr = section.getString("fish-item.item.displayname");
+        if (displayStr == null) {
+            return null;
+        }
+        EMFSingleMessage display = EMFSingleMessage.fromString(displayStr);
+        display.setVariable("{fishname}", fish.getDisplayName());
+        return display;
+    }
+
+    private @NotNull EMFListMessage prepareLore(@NotNull Section section, @NotNull Fish fish) {
+        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
+
+        final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId, fish).toString());
+        final FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(FishRarityKey.of(fish).toString());
+
+        final String discoverDate = getValueOrUnknown(() -> userFishStats.getFirstCatchTime().format(DateTimeFormatter.ISO_DATE));
+        final String discoverer = getValueOrUnknown(() -> FishUtils.getPlayerName(fishStats.getDiscoverer()));
+
+        EMFListMessage lore = EMFListMessage.fromStringList(
+            section.getStringList("fish-item.lore")
+        );
+
+        lore.setVariable("{times-caught}", getValueOrUnknown(() -> Integer.toString(userFishStats.getQuantity())));
+        lore.setVariable("{largest-size}", getValueOrUnknown(() -> String.valueOf(userFishStats.getLongestLength())));
+        lore.setVariable("{smallest-size}", getValueOrUnknown(() -> String.valueOf(userFishStats.getShortestLength())));
+        lore.setVariable("{discover-date}", discoverDate);
+        lore.setVariable("{discoverer}", discoverer);
+        lore.setVariable("{server-largest}", getValueOrUnknown(() -> String.valueOf(fishStats.getLongestLength())));
+        lore.setVariable("{server-smallest}", getValueOrUnknown(() -> String.valueOf(fishStats.getShortestLength())));
+        lore.setVariable("{server-caught}", getValueOrUnknown(() -> String.valueOf(fishStats.getQuantity())));
+
+        return lore;
     }
 
     @NotNull

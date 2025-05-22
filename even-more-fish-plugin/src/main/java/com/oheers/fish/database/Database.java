@@ -786,13 +786,15 @@ public class Database implements DatabaseAPI {
 
 
     public void updateCompetition(CompetitionReport competition) {
+        String winnerUuid = competition.getWinnerUuid() == null ? "None" : competition.getWinnerUuid().toString();
+
         new ExecuteUpdate(connectionFactory, settings) {
             @Override
             protected int onRunUpdate(DSLContext dslContext) {
                 return dslContext.insertInto(Tables.COMPETITIONS)
                         .set(Tables.COMPETITIONS.COMPETITION_NAME, competition.getCompetitionConfigId())
                         .set(Tables.COMPETITIONS.WINNER_FISH, competition.getWinnerFish())
-                        .set(Tables.COMPETITIONS.WINNER_UUID, competition.getWinnerUuid().toString())
+                        .set(Tables.COMPETITIONS.WINNER_UUID, winnerUuid)
                         .set(Tables.COMPETITIONS.WINNER_SCORE, competition.getWinnerScore())
                         .set(Tables.COMPETITIONS.CONTESTANTS, competition.getContestants().stream().map(UUID::toString).collect(Collectors.joining(", ")))
                         .set(Tables.COMPETITIONS.START_TIME, competition.getStartTime())
