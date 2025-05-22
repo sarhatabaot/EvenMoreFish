@@ -36,7 +36,14 @@ const config: Config = {
       'classic',
       {
         docs: {
-          sidebarPath: './sidebars.ts',
+        sidebarPath: './sidebars.ts',
+        lastVersion: 'current',
+        versions: {
+          current: {
+            label: '2.0.0',
+            path: '2.0.0',
+            },
+          },
         },
         theme: {
           customCss: './src/css/custom.css',

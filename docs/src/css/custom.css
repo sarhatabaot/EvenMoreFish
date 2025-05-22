@@ -19,7 +19,16 @@
   --emf-background-color: #ffffff;
   /*--emf-background-color: #a4adbd;*/
   --emf-background-color-alt: #6d758b;
-  --emf-background-color-gradient: linear-gradient(180deg, var(--emf-background-color) 0%, var(--emf-background-color-alt) 100%);
+  --emf-background-color-gradient: linear-gradient(
+          180deg,
+          var(--emf-background-color) 0%,
+          color-mix(in srgb, var(--emf-background-color) 75%, var(--emf-background-color-alt) 25%) 25%,
+          color-mix(in srgb, var(--emf-background-color) 50%, var(--emf-background-color-alt) 50%) 50%,
+          color-mix(in srgb, var(--emf-background-color) 25%, var(--emf-background-color-alt) 75%) 75%,
+          color-mix(in srgb, var(--emf-background-color) 15%, var(--emf-background-color-alt) 90%) 90%,
+          color-mix(in srgb, var(--emf-background-color) 0%, var(--emf-background-color-alt) 100%) 100%,
+          var(--emf-background-color-alt) 100%
+  );
 
   --badge-background-color: #fef0d7;
   --badge-color: #131313;
@@ -39,7 +48,16 @@
   --emf-background-color: #2e384d;
   /*--emf-background-color: #2e384d;*/
   --emf-background-color-alt: #151923;
-  --emf-background-color-gradient: linear-gradient(180deg,var(--emf-background-color) 0%, var(--emf-background-color-alt) 100%);
+  --emf-background-color-gradient: linear-gradient(
+          180deg,
+          var(--emf-background-color) 0%,
+          color-mix(in srgb, var(--emf-background-color) 75%, var(--emf-background-color-alt) 25%) 25%,
+          color-mix(in srgb, var(--emf-background-color) 50%, var(--emf-background-color-alt) 50%) 50%,
+          color-mix(in srgb, var(--emf-background-color) 25%, var(--emf-background-color-alt) 75%) 75%,
+          color-mix(in srgb, var(--emf-background-color) 15%, var(--emf-background-color-alt) 90%) 90%,
+          color-mix(in srgb, var(--emf-background-color) 0%, var(--emf-background-color-alt) 100%) 100%,
+          var(--emf-background-color-alt) 100%
+  );
 
   --badge-background-color: #131313;
   --badge-color: #fef0d7;
