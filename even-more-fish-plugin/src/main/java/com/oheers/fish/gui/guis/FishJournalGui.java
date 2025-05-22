@@ -16,6 +16,7 @@ import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.utils.ItemFactory;
 import com.oheers.fish.utils.ItemUtils;
+import com.oheers.fish.utils.Logging;
 import de.themoep.inventorygui.*;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
@@ -73,6 +74,13 @@ public class FishJournalGui extends ConfigGui {
 
     private ItemStack getFishItem(Fish fish, Section section) {
         Database database = EvenMoreFish.getInstance().getDatabase();
+
+        if (database == null) {
+            Logging.warn("Can not show fish in the Journal Menu, please enable the database!");
+            ItemFactory factory = new ItemFactory("undiscovered-fish", section);
+            factory.enableAllChecks();
+            return factory.createItem(null, -1);
+        }
 
         boolean hideUndiscovered = section.getBoolean("hide-undiscovered-fish", true);
         // If undiscovered fish should be hidden
@@ -143,7 +151,6 @@ public class FishJournalGui extends ConfigGui {
                     group.addElement(
                             new StaticGuiElement(
                                     character, getRarityItem(rarity, section), click -> {
-                                click.getGui().close();
                                 new FishJournalGui(player, rarity).open();
                                 return true;
                             }
@@ -157,6 +164,13 @@ public class FishJournalGui extends ConfigGui {
     private ItemStack getRarityItem(Rarity rarity, Section section) {
         Database database = EvenMoreFish.getInstance().getDatabase();
         boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
+
+        if (database == null) {
+            Logging.warn("Can not show rarities in the Journal Menu, please enable the database!");
+            ItemFactory factory = new ItemFactory("undiscovered-rarity", section);
+            factory.enableAllChecks();
+            return factory.createItem(player, -1);
+        }
 
         if (hideUndiscovered && !database.userHasRarity(rarity, player)) {
             ItemFactory factory = new ItemFactory("undiscovered-rarity", section);
