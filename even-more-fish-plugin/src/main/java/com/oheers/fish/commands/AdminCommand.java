@@ -603,7 +603,7 @@ public class AdminCommand {
                         ConfigMessage.COMPETITION_ALREADY_RUNNING.getMessage().send(sender);
                         return;
                     }
-                    final int duration = (int) args.getOptional("duration").orElse(1);
+                    final int duration = (int) args.getOptional("duration").orElse(60);
                     final CompetitionType type = (CompetitionType) args.getOptional("competitionType").orElse(CompetitionType.LARGEST_FISH);
                     CompetitionFile file = new CompetitionFile("adminTest", type, duration);
                     Competition competition = new Competition(file);
