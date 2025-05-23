@@ -18,8 +18,8 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'evenmorefish', // Usually your GitHub org/user name.
-  projectName: 'evenmorefish', // Usually your repo name.
+  organizationName: 'evenmorefish',
+  projectName: 'evenmorefish',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

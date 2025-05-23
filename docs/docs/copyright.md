@@ -19,6 +19,6 @@ EvenMoreFish uses libraries and icons from various locations.
 
 :::info[This page is a WIP]
 
-It does not include all libraries and attributions just yet, if we are using a library and it's not here, you can send us a message on discord.
+It does not include all libraries and attributions just yet, if we are using a library, and it's not here, you can send us a message on discord.
 
 :::

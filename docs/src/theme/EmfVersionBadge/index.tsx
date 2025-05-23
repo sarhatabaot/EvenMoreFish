@@ -1,20 +1,32 @@
 import React from 'react';
 import clsx from 'clsx';
-import type {Props} from "@theme/DocItem";
 
-export default function EmfVersionBadge(props: Props) {
-    const frontMatter = props.content.metadata;
+interface EmfVersionBadgeProps {
+    frontMatter: {
+        version?: string;
+        [key: string]: unknown;
+    };
+}
 
+export default function EmfVersionBadge({frontMatter}: EmfVersionBadgeProps) {
     // Return null if no version specified in front matter
-    if (!frontMatter.version) return null;
-    const variant = frontMatter.version.split('-').pop(); //test this, 2.0.0 (-RC, -BETA, -ALPHA etc) just RC atm, RC = orange
+    if (!frontMatter?.version) return null;
+    const variant = getVariantFromVersion(frontMatter.version);
     return (
         <span className={clsx(
             'emf-version-badge', // Reserved class for future customization
             'badge', // Infima base class
-            `badge--${frontMatter.versionVariant || 'primary'}` // Infima variant
+            `badge--${variant|| 'primary'}` // Infima variant
         )}>
-      {frontMatter.versionPrefix || 'v'}{frontMatter.version}
+      Version: {frontMatter.version}
     </span>
     );
+}
+
+function getVariantFromVersion(version: string): string {
+    const channel = version.split('-')[1]; //test this, 2.0.0 (-RC, -BETA, -ALPHA etc) just RC atm, RC = orange
+    switch (channel) {
+        case 'RC': return 'warning';
+        default: return 'secondary';
+    }
 }
