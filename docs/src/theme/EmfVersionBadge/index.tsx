@@ -4,29 +4,44 @@ import clsx from 'clsx';
 interface EmfVersionBadgeProps {
     frontMatter: {
         version?: string;
+        experimental?: string;
         [key: string]: unknown;
     };
 }
 
-export default function EmfVersionBadge({frontMatter}: EmfVersionBadgeProps) {
-    // Return null if no version specified in front matter
-    if (!frontMatter?.version) return null;
-    const variant = getVariantFromVersion(frontMatter.version);
+export default function EmfVersionBadge({ frontMatter }: EmfVersionBadgeProps) {
+    const hasVersion = Boolean(frontMatter?.version);
+    const isExperimental = Boolean(frontMatter?.experimental);
+
+    // Return null if neither badge should be shown
+    if (!hasVersion && !isExperimental) return null;
+
+    const versionBadge = hasVersion ? (
+        <span className={clsx('emf-version-badge', 'badge', `badge--${getVariantFromVersion(frontMatter.version!)}`)}>
+            Version: {frontMatter.version}
+        </span>
+    ) : null;
+
+    const experimentalBadge = isExperimental ? (
+        <span className={clsx('emf-experimental-badge', 'badge', 'badge--warning')}>
+            Warning: EXPERIMENTAL
+        </span>
+    ) : null;
+
     return (
-        <span className={clsx(
-            'emf-version-badge', // Reserved class for future customization
-            'badge', // Infima base class
-            `badge--${variant|| 'primary'}` // Infima variant
-        )}>
-      Version: {frontMatter.version}
-    </span>
+        <div className="emf-badge-container" style={{ display: 'flex', gap: '0.5rem' }}>
+            {versionBadge}
+            {experimentalBadge}
+        </div>
     );
 }
 
 function getVariantFromVersion(version: string): string {
     const channel = version.split('-')[1]; //test this, 2.0.0 (-RC, -BETA, -ALPHA etc) just RC atm, RC = orange
     switch (channel) {
-        case 'RC': return 'warning';
-        default: return 'secondary';
+        case 'RC':
+            return 'warning';
+        default:
+            return 'secondary';
     }
 }
