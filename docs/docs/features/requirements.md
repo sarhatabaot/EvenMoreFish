@@ -11,25 +11,24 @@ As of 1.6.10 it's possible to add in requirements to rarities. These are applied
 
 An example of using requirements for a rarity:
 ```yaml
-rarities:
-  # ▼ All rarity names should start on the same column as this down arrow.
-  Common:
-    # How likely is the rarity to be chosen? Having a greater weight means the rarity is more likely to be chosen (the total weights don't have to add to 100)
-    weight: 100
-    # What colour should the fish's name be?
-    format: '<gray>{name}</gray>'
-    # Prices in /emf shop are calculated by using the calculation "length * worth-multiplier". You can change the worth-multiplier here.
-    worth-multiplier: 0.1
-    # Should a catch of this fish be broadcasted to everyone (true) or just the fisher (false)?
-    broadcast: false
-    # Change the sizing ranges of the fish.
-    size:
-      # Absolute minimum size the fish can be, this must be an integer
-      minSize: 1
-      # Absolute maximum size the fish can be, this must be an integer
-      maxSize: 30
-    requirements:
-      permission: "emf.rarity.common"
+# The id for this rarity.
+id: Common
+# How likely is the rarity to be chosen? Having a greater weight means the rarity is more likely to be chosen (the total weights don't have to add to 100)
+weight: 100
+# What colour should the fish's name be?
+format: '<gray>{name}</gray>'
+# Prices in /emf shop are calculated by using the calculation "length * worth-multiplier". You can change the worth-multiplier here.
+worth-multiplier: 0.1
+# Should a catch of this fish be broadcasted to everyone (true) or just the fisher (false)?
+broadcast: false
+# Change the sizing ranges of the fish.
+size:
+  # Absolute minimum size the fish can be, this must be an integer
+  minSize: 1
+  # Absolute maximum size the fish can be, this must be an integer
+  maxSize: 30
+requirements:
+  permission: "emf.rarity.common"
 ```
 
 ***
