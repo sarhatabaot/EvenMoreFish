@@ -1,3 +1,7 @@
+---
+title: Placeholders
+---
+
 ## Placeholders
 
 Below is a list of the plugin's placeholders and what they do:

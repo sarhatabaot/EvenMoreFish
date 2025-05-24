@@ -1,3 +1,7 @@
+---
+title: Catch Types
+---
+
 ## What are they?
 As of EvenMoreFish 2.0, there are three different catch types:
 - `CATCH` - These fish are obtained by fishing with a rod.
