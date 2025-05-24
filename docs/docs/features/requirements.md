@@ -17,7 +17,7 @@ rarities:
     # How likely is the rarity to be chosen? Having a greater weight means the rarity is more likely to be chosen (the total weights don't have to add to 100)
     weight: 100
     # What colour should the fish's name be?
-    colour: '<gray>'
+    format: '<gray>{name}</gray>'
     # Prices in /emf shop are calculated by using the calculation "length * worth-multiplier". You can change the worth-multiplier here.
     worth-multiplier: 0.1
     # Should a catch of this fish be broadcasted to everyone (true) or just the fisher (false)?
