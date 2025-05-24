@@ -38,6 +38,7 @@ public class MainConfig extends ConfigBase {
     private final String applyBaitsSubCommandName;
     private final String journalSubCommandName;
 
+
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
@@ -212,6 +213,26 @@ public class MainConfig extends ConfigBase {
         return getConfig().getString("database.type", "sqlite");
     }
 
+    public String getSaveIntervalUnit() {
+        return getConfig().getString(Route.from("database", "advanced", "save-interval", "units"), "SECONDS");
+    }
+
+    public int getCompetitionSaveInterval() {
+        return getSaveInterval("competition");
+    }
+
+    public int getUserFishStatsSaveInterval() {
+        return getSaveInterval("user-fish-stats");
+    }
+
+    private int getSaveInterval(final String path) {
+        return getConfig().getInt(Route.from("database", "advanced", "save-interval", path), 5);
+    }
+
+    public boolean isDisableJooqStartupCommments() {
+        return getConfig().getBoolean("database.advanced.disable-jooq-startup-comments", true);
+    }
+
 
     public boolean useAdditionalAddons() {
         return getConfig().getBoolean("addons.additional-addons", true);
@@ -306,6 +327,7 @@ public class MainConfig extends ConfigBase {
     }
 
     public double getRegionBoost(String region, String rarity) {
+        double defaultBoostRate = 1.0;
         if (region == null || rarity == null) {
             return 1.0; // Default boost rate is 1.0 if region or rarity is null
         }
@@ -400,5 +422,6 @@ public class MainConfig extends ConfigBase {
     public boolean getBaitShowUnusedSlots() {
         return getConfig().getBoolean("bait.show-unused-slots", true);
     }
+
 
 }
