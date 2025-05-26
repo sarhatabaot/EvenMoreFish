@@ -89,7 +89,7 @@ Atlantic Cod:
 ```
 
 ### IRL Time
-This restricts your users to only catching fish during certain times of the real-world day, this is inputted similar to times for [Competition Configs](https://github.com/Oheers/EvenMoreFish/wiki/Competition-Configs#option-1-times) where they are formatted by 00:00 in 24-hour format. Like ingame-time, you need to specify the minimum and maximum time.
+This restricts your users to only catching fish during certain times of the real-world day, this is inputted similar to times for [Competition Configs](https://evenmorefish.github.io/EvenMoreFish/docs/features/competitions/configs#option-1-times) where they are formatted by 00:00 in 24-hour format. Like ingame-time, you need to specify the minimum and maximum time.
 
 A config example of using the irl-time requirement:
 ```yaml title="Irl Time Example"

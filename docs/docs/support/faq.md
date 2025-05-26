@@ -54,7 +54,7 @@ See [Weights](/docs/features/weights)
 
 ## How do I use items from other plugins?
 
-See https://github.com/EvenMoreFish/EvenMoreFish/wiki/Addons
+See https://evenmorefish.github.io/EvenMoreFish/docs/category/addons
 
 ## There is something missing in the documentation! Or there is a mistake!
 
