@@ -2,7 +2,6 @@ package com.oheers.fish.fishing.rods;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.FileUtil;
-import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -16,7 +15,7 @@ import java.util.TreeMap;
 
 public class RodManager {
 
-    private static RodManager instance = new RodManager();
+    private static final RodManager instance = new RodManager();
 
     private final TreeMap<String, CustomRod> rodMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private boolean loaded = false;
@@ -119,11 +118,7 @@ public class RodManager {
 
     private void loadDefaultFiles(@NotNull File targetDirectory) {
         EvenMoreFish.getInstance().getLogger().info("Loading default rod configs.");
-        FileUtil.loadFileOrResource(targetDirectory, "common.yml", "rarities/common.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "junk.yml", "rarities/junk.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "rare.yml", "rarities/rare.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "epic.yml", "rarities/epic.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "legendary.yml", "rarities/legendary.yml", EvenMoreFish.getInstance());
+        FileUtil.loadFileOrResource(targetDirectory, "default.yml", "rods/default.yml", EvenMoreFish.getInstance());
     }
 
 }

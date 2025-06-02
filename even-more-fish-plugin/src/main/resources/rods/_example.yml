@@ -19,6 +19,7 @@ allowed-fish:
     - Nemo
 
 # What should the rod look like?
+# This does not support anything specific to players.
 item:
   # You can set this to other materials, but it won't work as a fishing rod.
   material: FISHING_ROD
