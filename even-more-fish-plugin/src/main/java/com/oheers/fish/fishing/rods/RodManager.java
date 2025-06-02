@@ -1,0 +1,129 @@
+package com.oheers.fish.fishing.rods;
+
+import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.FileUtil;
+import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.utils.nbt.NbtKeys;
+import com.oheers.fish.utils.nbt.NbtUtils;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.List;
+import java.util.TreeMap;
+
+public class RodManager {
+
+    private static RodManager instance = new RodManager();
+
+    private final TreeMap<String, CustomRod> rodMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private boolean loaded = false;
+
+    private RodManager() {}
+
+    public static RodManager getInstance() {
+        return instance;
+    }
+
+    public void load() {
+        if (isLoaded()) {
+            return;
+        }
+        loadRods();
+        logLoadedItems();
+        loaded = true;
+    }
+
+    public void reload() {
+        if (!isLoaded()) {
+            return;
+        }
+        rodMap.clear();
+        loadRods();
+        logLoadedItems();
+    }
+
+    public void unload() {
+        if (!isLoaded()) {
+            return;
+        }
+        rodMap.clear();
+        loaded = false;
+    }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    // Getters for Rods
+
+    public @Nullable CustomRod getRod(@Nullable String id) {
+        if (id == null || id.isEmpty()) {
+            return null;
+        }
+        return rodMap.get(id);
+    }
+
+    public @Nullable CustomRod getRod(@NotNull ItemStack item) {
+        String rodId = NbtUtils.getString(item, NbtKeys.EMF_ROD_ID);
+        return getRod(rodId);
+    }
+
+    // Loading Things
+
+    private void logLoadedItems() {
+        EvenMoreFish.getInstance().getLogger().info("Loaded RodManager with " + rodMap.size() + " Custom Rods.");
+    }
+
+    private void loadRods() {
+        rodMap.clear();
+        File rodsFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "rods");
+        if (EvenMoreFish.getInstance().isFirstLoad()) {
+            loadDefaultFiles(rodsFolder);
+        }
+        regenExampleFile(rodsFolder);
+        List<File> rodFiles = FileUtil.getFilesInDirectory(rodsFolder, true, true);
+
+        if (rodFiles.isEmpty()) {
+            return;
+        }
+
+        rodFiles.forEach(file -> {
+            EvenMoreFish.getInstance().debug("Loading " + file.getName() + " custom rod");
+            CustomRod rod;
+            try {
+                rod = new CustomRod(file);
+            } catch (InvalidConfigurationException exception) { // Skip invalid configs
+                return;
+            }
+            // Skip disabled files.
+            if (rod.isDisabled()) {
+                return;
+            }
+            // Skip duplicate IDs
+            String id = rod.getId();
+            if (rodMap.containsKey(id)) {
+                EvenMoreFish.getInstance().getLogger().warning("A custom rod with the id: " + id + " already exists! Skipping.");
+                return;
+            }
+            rodMap.put(id, rod);
+        });
+    }
+
+    private void regenExampleFile(@NotNull File targetDirectory) {
+        new File(targetDirectory, "_example.yml").delete();
+        FileUtil.loadFileOrResource(targetDirectory, "_example.yml", "rods/_example.yml", EvenMoreFish.getInstance());
+    }
+
+    private void loadDefaultFiles(@NotNull File targetDirectory) {
+        EvenMoreFish.getInstance().getLogger().info("Loading default rod configs.");
+        FileUtil.loadFileOrResource(targetDirectory, "common.yml", "rarities/common.yml", EvenMoreFish.getInstance());
+        FileUtil.loadFileOrResource(targetDirectory, "junk.yml", "rarities/junk.yml", EvenMoreFish.getInstance());
+        FileUtil.loadFileOrResource(targetDirectory, "rare.yml", "rarities/rare.yml", EvenMoreFish.getInstance());
+        FileUtil.loadFileOrResource(targetDirectory, "epic.yml", "rarities/epic.yml", EvenMoreFish.getInstance());
+        FileUtil.loadFileOrResource(targetDirectory, "legendary.yml", "rarities/legendary.yml", EvenMoreFish.getInstance());
+    }
+
+}

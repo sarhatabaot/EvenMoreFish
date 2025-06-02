@@ -45,6 +45,7 @@ import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.fishing.rods.RodManager;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.placeholders.PlaceholderReceiver;
 import com.oheers.fish.utils.HeadDBIntegration;
@@ -201,13 +202,16 @@ public class EvenMoreFish extends EMFPlugin {
 
         // could not set up economy.
         if (!Economy.getInstance().isEnabled()) {
-            EvenMoreFish.getInstance().getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
+            getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
         }
 
         setupPermissions();
 
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
+
+        // Always load this after FishManager and BaitManager
+        RodManager.getInstance().load();
 
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
@@ -290,8 +294,10 @@ public class EvenMoreFish extends EMFPlugin {
             database.shutdown();
         }
 
-        FishManager.getInstance().unload();
+        // Make sure this is in the reverse order of loading.
+        RodManager.getInstance().unload();
         BaitManager.getInstance().unload();
+        FishManager.getInstance().unload();
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Disabled");
     }
@@ -459,6 +465,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         FishManager.getInstance().reload();
         BaitManager.getInstance().reload();
+        RodManager.getInstance().reload();
 
         HandlerList.unregisterAll(FishEatEvent.getInstance());
         HandlerList.unregisterAll(FishInteractEvent.getInstance());
