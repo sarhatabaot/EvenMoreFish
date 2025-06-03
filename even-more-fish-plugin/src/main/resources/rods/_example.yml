@@ -11,12 +11,14 @@ disabled: false
 # Which rarities can this rod catch?
 allowed-rarities:
   - Common
+  - Junk
 
-# Which fish can this rod catch?
-# This ignores the allowed-rarities setting
+# Which specific fish can this rod catch from the configured rarities?
 allowed-fish:
-  Uncommon:
-    - Nemo
+  Common:
+    - Eel
+  Junk:
+    - Explorers_Boat
 
 # What should the rod look like?
 # This does not support anything specific to players.
@@ -27,6 +29,5 @@ item:
   glowing: true
   lore:
     - ''
-    - '<gray>You can catch the following fish with this rod:'
-    - '<gray>- All Common fish'
-    - '<gray>- Uncommon fish: </gray><yellow>Nemo</yellow>'
+    - '<gray>Allows you to catch'
+    - '<gray><yellow>Common Eel</yellow> and <yellow>Junk Explorer''s Boat</yellow>.'
