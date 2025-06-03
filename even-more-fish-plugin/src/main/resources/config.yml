@@ -90,18 +90,6 @@ barstyle: SEGMENTED_10
 # This allows you to sell rods that will be the only ones able to catch EvenMoreFish fish.
 require-nbt-rod: false
 
-# This defines the item given with the "/emf admin rod-nbt -p:Playername" command. It uses the same formatting as fish.
-nbt-rod-item:
-  item:
-    # This needs to be FISHING_ROD, can be an addon string, but the base material has to be FISHING_ROD
-    material: FISHING_ROD
-    displayname: <yellow>EvenMoreFish Fishing Rod
-    glowing: true
-    lore:
-      - ''
-      - <gray>Catch </gray><yellow>custom </yellow><gray>fish using this
-      - <gray>fishing rod.
-
 # Should the user need emf.use_rod permission in order to catch default custom fish. This requires
 # Vault and a permission manager such as LuckPerms.
 requires-fishing-permission: false

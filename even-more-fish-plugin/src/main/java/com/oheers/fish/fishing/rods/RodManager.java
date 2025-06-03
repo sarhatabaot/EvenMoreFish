@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class RodManager {
@@ -57,6 +58,10 @@ public class RodManager {
     }
 
     // Getters for Rods
+
+    public @NotNull TreeMap<String, CustomRod> getRodMap() {
+        return rodMap;
+    }
 
     public @Nullable CustomRod getRod(@Nullable String id) {
         if (id == null || id.isEmpty()) {
