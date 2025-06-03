@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class RodManager {
@@ -73,7 +72,14 @@ public class RodManager {
 
     public @Nullable CustomRod getRod(@NotNull ItemStack item) {
         String rodId = NbtUtils.getString(item, NbtKeys.EMF_ROD_ID);
-        return getRod(rodId);
+        if (rodId != null) {
+            return getRod(rodId);
+        }
+        // For the old nbt-rod tags
+        if (NbtUtils.hasKey(item, NbtKeys.EMF_ROD_NBT)) {
+            return getRod("default");
+        }
+        return null;
     }
 
     // Loading Things

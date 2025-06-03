@@ -7,6 +7,10 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.items.ItemFactory;
 import com.oheers.fish.utils.Logging;
+import com.oheers.fish.utils.nbt.NbtKeys;
+import com.oheers.fish.utils.nbt.NbtUtils;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +33,12 @@ public class CustomRod extends ConfigBase {
         this.allowedRarities = loadAllowedRarities();
         this.allowedFish = loadAllowedFish();
         this.factory = ItemFactory.itemFactory(getConfig());
+        this.factory.setFinalChanges(item -> {
+            NBT.modify(item, nbt -> {
+                ReadWriteNBT emfCompound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+                emfCompound.setString(NbtKeys.EMF_ROD_ID, getId());
+            });
+        });
     }
 
     // Current required config: id
@@ -67,22 +77,16 @@ public class CustomRod extends ConfigBase {
                     Logging.warn("Rarity '" + rarityId + "' not found for custom rod '" + getId() + "'.");
                     return Stream.empty();
                 }
+                if (!allowedRarities.contains(rarity)) {
+                    Logging.warn("Rarity '" + rarityId + "' is not allowed for custom rod '" + getId() + "'.");
+                    return Stream.empty();
+                }
                 return section.getStringList(rarityId)
                     .stream()
                     .map(rarity::getFish)
                     .filter(Objects::nonNull);
             })
             .toList();
-    }
-
-    /**
-     * @return a list of all allowed fish for this rod, including those from allowed rarities.
-     */
-    public List<Fish> getAllAllowedFish() {
-        return Stream.concat(
-            getAllowedFish().stream(),
-            getAllowedRarities().stream().flatMap(rarity -> rarity.getFishList().stream())
-        ).toList();
     }
 
     // Config getters
