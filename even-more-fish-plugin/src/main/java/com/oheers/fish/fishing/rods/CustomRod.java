@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 public class CustomRod extends ConfigBase {
@@ -42,6 +41,9 @@ public class CustomRod extends ConfigBase {
 
     // Loading things
 
+    /**
+     * @return the contents of the "allowed-rarities" section, or an empty list if the section does not exist.
+     */
     public List<Rarity> loadAllowedRarities() {
         return getConfig().getStringList("allowed-rarities").stream()
             .map(id -> FishManager.getInstance().getRarity(id))
@@ -49,6 +51,9 @@ public class CustomRod extends ConfigBase {
             .toList();
     }
 
+    /**
+     * @return the contents of the "allowed-fish" section, or an empty list if the section does not exist.
+     */
     public List<Fish> loadAllowedFish() {
         Section section = getConfig().getSection("allowed-fish");
         if (section == null) {
@@ -68,6 +73,16 @@ public class CustomRod extends ConfigBase {
                     .filter(Objects::nonNull);
             })
             .toList();
+    }
+
+    /**
+     * @return a list of all allowed fish for this rod, including those from allowed rarities.
+     */
+    public List<Fish> getAllAllowedFish() {
+        return Stream.concat(
+            getAllowedFish().stream(),
+            getAllowedRarities().stream().flatMap(rarity -> rarity.getFishList().stream())
+        ).toList();
     }
 
     // Config getters
