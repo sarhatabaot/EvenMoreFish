@@ -31,6 +31,7 @@ public class RodManager {
         if (isLoaded()) {
             return;
         }
+        new RodConversion().performCheck();
         loadRods();
         logLoadedItems();
         loaded = true;
