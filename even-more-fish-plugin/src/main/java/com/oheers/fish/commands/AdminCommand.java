@@ -42,6 +42,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.jar.Attributes;
@@ -132,12 +133,7 @@ public class AdminCommand {
                     }
 
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
-
-                    if ("@a".equals(arguments.getRaw("targets"))) {
-                        message.setVariable("{player}", "All Players");
-                    } else {
-                        message.setVariable("{player}", String.join(", ", targets.stream().map(Player::getName).toList()));
-                    }
+                    message.setVariable("{player}", getPlayersVariable(arguments.getRaw("targets"), targets));
 
                     message.setFishCaught(initialFish.getName());
                     message.send(sender);
@@ -230,12 +226,7 @@ public class AdminCommand {
                 }
 
                 EMFMessage giveMessage = ConfigMessage.ADMIN_CUSTOM_ROD_GIVEN.getMessage();
-
-                if ("@a".equals(args.getRaw("targets"))) {
-                    giveMessage.setVariable("{player}", "All Players");
-                } else {
-                    giveMessage.setVariable("{player}", String.join(", ", players.stream().map(Player::getName).toList()));
-                }
+                giveMessage.setVariable("{player}", getPlayersVariable(args.getRaw("targets"), players));
 
                 giveMessage.send(sender);
             }));
@@ -273,12 +264,7 @@ public class AdminCommand {
                         FishUtils.giveItems(List.of(baitItem), target);
                     }
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
-
-                    if ("@a".equals(args.getRaw("targets"))) {
-                        message.setVariable("{player}", "All Players");
-                    } else {
-                        message.setVariable("{player}", String.join(", ", targets.stream().map(Player::getName).toList()));
-                    }
+                    message.setVariable("{player}", getPlayersVariable(args.getRaw("targets"), targets));
                     message.setBait(bait.getId());
                     message.send(sender);
                 });
@@ -609,6 +595,14 @@ public class AdminCommand {
                     competition.setAdminStarted(true);
                     competition.begin();
                 });
+    }
+
+    private @NotNull String getPlayersVariable(@Nullable String raw, @NotNull List<Player> players) {
+        if ("@a".equals(raw)) {
+            return "All Players";
+        } else {
+            return String.join(", ", players.stream().map(Player::getName).toList());
+        }
     }
 
 }
