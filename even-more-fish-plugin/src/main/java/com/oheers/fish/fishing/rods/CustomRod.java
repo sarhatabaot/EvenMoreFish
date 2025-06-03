@@ -6,15 +6,19 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.items.ItemFactory;
+import com.oheers.fish.recipe.EMFRecipe;
+import com.oheers.fish.recipe.RecipeUtil;
 import com.oheers.fish.utils.Logging;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
@@ -25,6 +29,7 @@ public class CustomRod extends ConfigBase {
 
     private final List<Rarity> allowedRarities;
     private final List<Fish> allowedFish;
+    private final EMFRecipe<?> recipe;
     private final ItemFactory factory;
 
     public CustomRod(@NotNull File file) throws InvalidConfigurationException {
@@ -39,6 +44,7 @@ public class CustomRod extends ConfigBase {
                 emfCompound.setString(NbtKeys.EMF_ROD_ID, getId());
             });
         });
+        this.recipe = loadRecipe();
     }
 
     // Current required config: id
@@ -89,10 +95,26 @@ public class CustomRod extends ConfigBase {
             .toList();
     }
 
+    private EMFRecipe<?> loadRecipe() {
+        Section section = getConfig().getSection("recipe");
+        if (section == null) {
+            return null;
+        }
+        return RecipeUtil.getRecipe(
+            section,
+            getRecipeKey(),
+            create()
+        );
+    }
+
     // Config getters
 
     public @NotNull String getId() {
         return Objects.requireNonNull(getConfig().getString("id"));
+    }
+
+    private @NotNull NamespacedKey getRecipeKey() {
+        return new NamespacedKey(EvenMoreFish.getInstance(), "customrod-" + getId());
     }
 
     public boolean isDisabled() {
@@ -113,6 +135,10 @@ public class CustomRod extends ConfigBase {
 
     public List<Fish> getAllowedFish() {
         return this.allowedFish;
+    }
+
+    public @Nullable EMFRecipe<?> getRecipe() {
+        return this.recipe;
     }
 
 }

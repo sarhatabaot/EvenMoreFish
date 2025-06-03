@@ -40,7 +40,7 @@ public class RodManager {
         if (!isLoaded()) {
             return;
         }
-        rodMap.clear();
+        clearMap(true);
         loadRods();
         logLoadedItems();
     }
@@ -49,7 +49,7 @@ public class RodManager {
         if (!isLoaded()) {
             return;
         }
-        rodMap.clear();
+        clearMap(false);
         loaded = false;
     }
 
@@ -89,7 +89,6 @@ public class RodManager {
     }
 
     private void loadRods() {
-        rodMap.clear();
         File rodsFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "rods");
         if (EvenMoreFish.getInstance().isFirstLoad()) {
             loadDefaultFiles(rodsFolder);
@@ -119,6 +118,9 @@ public class RodManager {
                 EvenMoreFish.getInstance().getLogger().warning("A custom rod with the id: " + id + " already exists! Skipping.");
                 return;
             }
+            if (rod.getRecipe() != null) {
+                rod.getRecipe().register();
+            }
             rodMap.put(id, rod);
         });
     }
@@ -131,6 +133,17 @@ public class RodManager {
     private void loadDefaultFiles(@NotNull File targetDirectory) {
         EvenMoreFish.getInstance().getLogger().info("Loading default rod configs.");
         FileUtil.loadFileOrResource(targetDirectory, "default.yml", "rods/default.yml", EvenMoreFish.getInstance());
+    }
+
+    private void clearMap(boolean reload) {
+        if (reload) {
+            rodMap.forEach((id, rod) -> {
+                if (rod.getRecipe() != null) {
+                    rod.getRecipe().unregister();
+                }
+            });
+        }
+        rodMap.clear();
     }
 
 }
