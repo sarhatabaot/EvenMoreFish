@@ -9,9 +9,7 @@ public abstract class EMFRecipe<R extends CraftingRecipe> {
     protected boolean registered = false;
     protected R recipe;
 
-    protected EMFRecipe() {
-        this.recipe = prepareRecipe();
-    }
+    protected EMFRecipe() {}
 
     public boolean isRegistered() {
         return this.registered;
