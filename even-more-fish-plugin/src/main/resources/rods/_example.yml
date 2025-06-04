@@ -31,3 +31,10 @@ item:
     - ''
     - '<gray>Allows you to catch'
     - '<gray><yellow>Common Eel</yellow> and <yellow>Junk Explorer''s Boat</yellow>.'
+
+# Should this rod have a recipe? See the wiki for recipe examples.
+# This is optional. If you do not want a recipe, don't add this section.
+recipe:
+  type: shapeless
+  ingredients:
+    - cobblestone
