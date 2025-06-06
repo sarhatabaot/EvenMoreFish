@@ -194,10 +194,6 @@ public class EvenMoreFish extends EMFPlugin {
 
         checkPapi();
 
-        if (MainConfig.getInstance().requireNBTRod()) {
-            customNBTRod = createCustomNBTRod();
-        }
-
         loadEconomy();
 
         // could not set up economy.
@@ -426,27 +422,6 @@ public class EvenMoreFish extends EMFPlugin {
         });
     }
 
-
-    public ItemStack createCustomNBTRod() {
-        ItemFactory itemFactory = ItemFactory.itemFactory(MainConfig.getInstance().getConfig(), "nbt-rod-item");
-
-        ItemStack customRod = itemFactory.createItem();
-
-        setCustomNBTRod(customRod);
-
-        return customRod;
-    }
-
-    /**
-     * Allows external plugins to set their own items as an EMF NBT-rod.
-     * @param item The item to set as an EMF NBT-rod.
-     */
-    public void setCustomNBTRod(@NotNull ItemStack item) {
-        NBT.modify(item, nbt -> {
-            nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND).setBoolean(NbtKeys.EMF_ROD_NBT, true);
-        });
-    }
-
     @Override
     public void reload(@Nullable CommandSender sender) {
 
@@ -471,10 +446,6 @@ public class EvenMoreFish extends EMFPlugin {
         HandlerList.unregisterAll(FishInteractEvent.getInstance());
         HandlerList.unregisterAll(McMMOTreasureEvent.getInstance());
         optionalListeners();
-
-        if (MainConfig.getInstance().requireNBTRod()) {
-            customNBTRod = createCustomNBTRod();
-        }
 
         competitionQueue.load();
 
