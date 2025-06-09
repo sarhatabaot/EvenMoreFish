@@ -74,9 +74,9 @@ length-lore:
   - <white>Mede {length}cm.
 
 # O formato do placar após uma competição terminar (essa mensagem não suporta placeholders do papi)
-leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-largest-total: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>peixes)
+leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-largest-total: <reset>#{position} | {player} <reset>({amount}cm<reset>)
+leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>peixes)
 # Se você estiver executando uma competição em que não há placar, essa mensagem é enviada quando há um vencedor
 single-winner: <reset>{player} venceu a competição de {type}. Parabéns!
 # Mostra o número de jogadores atualmente na competição, defina como "" para desativar.
@@ -173,11 +173,11 @@ emf-time-remaining-during-comp: Há uma competição em andamento no momento.
 # Enviado quando um jogador tenta aplicar muitos tipos de isca em uma vara de pescar, definido na seção geral de baits.yml
 max-baits-reached: <reset>Você atingiu o número máximo de tipos de iscas para esta vara de pescar.
 # Não confunda com o acima, isso é enviado quando o máximo de uma isca específica é atingido. Defina isso em baits.yml usando "max-baits".
-max-bait-reached: <reset>Você atingiu o número máximo de {bait_theme}{bait} <reset>isca que pode ser aplicada a uma vara.
+max-bait-reached: <reset>Você atingiu o número máximo de {bait} <reset>isca que pode ser aplicada a uma vara.
 # Enviado quando um jogador pesca uma isca (isso pode ser desativado definindo a porcentagem de captura para 0 em baits.yml)
-bait-catch: <reset><bold>{player} <reset>pescou uma {bait_theme}<bold>{bait} <reset>isca!
+bait-catch: <reset><bold>{player} <reset>pescou uma <bold>{bait} <reset>isca!
 # Enviado quando uma isca é aplicada e um peixe é capturado.
-bait-use: <reset>Você usou uma das iscas {bait_theme}<bold>{bait} <reset>da sua vara.
+bait-use: <reset>Você usou uma das iscas <bold>{bait} <reset>da sua vara.
 # Enviado quando alguém tenta usar uma isca no modo criativo
 bait-survival-limited: <reset>Você deve estar no <underlined>modo sobrevivência ou aventura<reset> para aplicar iscas às varas de pescar.
 # Enviado quando alguém tenta combinar uma vara com isca em outra sem isca

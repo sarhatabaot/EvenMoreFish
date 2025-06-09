@@ -63,8 +63,8 @@ fish-lore:
 help: /{command} - {description}
 
 # The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
-leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
+leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>fish)
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} {type}대회에서 우승했습니다!
 # This shows the number of players currently in the competition, set to "" to disable.
@@ -127,9 +127,9 @@ emf-competition-fish-format: '{length}cm <bold>{rarity}</bold> {fish}'
 # Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: 이 낚싯대의 최대 미끼 유형 수에 도달했습니다.
 # Sent when a player catches a bait from fishing (this can be disabled by setting catch-percentage to 0 in baits.yml
-bait-catch: <bold>{player} <reset>가 {bait_theme}<bold>{bait} <reset>미끼를 잡았습니다!
+bait-catch: <bold>{player} <reset>가 <bold>{bait} <reset>미끼를 잡았습니다!
 # Sent when a bait is applied and a fish is caught.
-bait-use: '{bait_theme}<bold>{bait} <reset>미끼 중 하나를 사용했습니다.'
+bait-use: '<bold>{bait} <reset>미끼 중 하나를 사용했습니다.'
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!

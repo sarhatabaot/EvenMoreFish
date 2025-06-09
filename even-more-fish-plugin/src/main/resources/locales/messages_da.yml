@@ -71,9 +71,9 @@ length-lore:
 help: /{command} - {description}
 
 # The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
-leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-largest-total: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
+leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-largest-total: <reset>#{position} | {player} <reset>({amount}cm<reset>)
+leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>fish)
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} har vundet konkurrencen om {type}. Tillykke!
 # This shows the number of players currently in the competition, set to "" to disable.
@@ -143,11 +143,11 @@ emf-time-remaining-during-comp: Der er ikke en konkurrence i gang lige nu.
 # Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: <reset>Du har opnået det maksimale antal maddings typer denne fiskestang kan bruge.
 # Not to be confused with the above, this is sent when the maximum of a specific bait is reached. Define this in baits.yml using "max-baits".
-max-bait-reached: <reset>Du har opnået det maksimale antal af {bait_theme}{bait} <reset>madding der kan bruges på en enkelt fiskestang.
+max-bait-reached: <reset>Du har opnået det maksimale antal af {bait} <reset>madding der kan bruges på en enkelt fiskestang.
 # Sent when a player catches a bait from fishing (this can be disabled by setting catch-percentage to 0 in baits.yml
-bait-catch: <reset><bold>{player} <reset>har fanget en {bait_theme}<bold>{bait} <reset>madding!
+bait-catch: <reset><bold>{player} <reset>har fanget en <bold>{bait} <reset>madding!
 # Sent when a bait is applied and a fish is caught.
-bait-use: <reset>Du har brugt en af de {bait_theme}<bold>{bait} <reset>maddinger din fiskestang havde.
+bait-use: <reset>Du har brugt en af de <bold>{bait} <reset>maddinger din fiskestang havde.
 # Sent when someone tries to use a bait in creative
 bait-survival-limited: <reset>Du er nød til at være i <underlined>overlevelses tilstand<reset> for at benytte maddinger på fiskestænger.
 

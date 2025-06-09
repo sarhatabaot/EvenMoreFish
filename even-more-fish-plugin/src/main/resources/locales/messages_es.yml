@@ -71,9 +71,9 @@ length-lore:
 help: /{command} - {description}
 
 # The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
-leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-largest-total: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
+leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-largest-total: <reset>#{position} | {player} <reset>({amount}cm<reset>)
+leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>fish)
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} ha ganado la competencia de {type}. Felicidades!
 # This shows the number of players currently in the competition, set to "" to disable.
@@ -168,11 +168,11 @@ emf-time-remaining-during-comp: En estos momentos se está celebrando una compet
 # Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: <reset>Ha alcanzado el número máximo de tipos de cebos para esta caña de pescar.
 # Not to be confused with the above, this is sent when the maximum of a specific bait is reached. Define this in baits.yml using "max-baits".
-max-bait-reached: <reset>Ha alcanzado el número máximo de {bait_theme}{bait} <reset>cebos que se puede aplicar a una caña.
+max-bait-reached: <reset>Ha alcanzado el número máximo de {bait} <reset>cebos que se puede aplicar a una caña.
 # Sent when a player catches a bait from fishing (this can be disabled by setting catch-percentage to 0 in baits.yml
-bait-catch: <reset><bold>{player} <reset>¡ha atrapado un {bait_theme}<bold>{bait} <reset>cebos!
+bait-catch: <reset><bold>{player} <reset>¡ha atrapado un <bold>{bait} <reset>cebos!
 # Sent when a bait is applied and a fish is caught.
-bait-use: <reset>Has utilizado uno de los {bait_theme}<bold>{bait} <reset>cebos de tu caña.
+bait-use: <reset>Has utilizado uno de los <bold>{bait} <reset>cebos de tu caña.
 # Sent when someone tries to use a bait in creative
 bait-survival-limited: <reset>Debes estar en <underlined>survival<reset> para aplicar cebos a las cañas de pescar.
 # Sent when someone tries to merge a baited rod into an unbaited rod

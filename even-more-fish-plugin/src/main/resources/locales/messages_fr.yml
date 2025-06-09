@@ -66,9 +66,9 @@ fish-lore:
 help: /{command} - {description}
 
 # Le format du classement après la fin d'une compétition (ce message ne prend pas en charge les placeholders papi)
-leaderboard-largest-fish: <reset>#{position} | {pos_colour}{player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-largest-total: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {pos_colour}{player} <reset>({pos_colour}{amount} <reset>fish)
+leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
+leaderboard-largest-total: <reset>#{position} | {player} <reset>({amount}cm<reset>)
+leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>fish)
 # Si vous organisez un concours où il n'y a pas de classement, ce message est envoyé lorsqu'il y a un gagnant
 single-winner: <reset>{player} a remporté une compétition {type}. Félicitations!
 # Cela montre le nombre de joueurs actuellement dans la compétition, mettez "" pour désactiver.
@@ -138,11 +138,11 @@ emf-time-remaining-during-comp: Il y a un concours en cours en ce moment.
 # Envoyé lorsqu'un joueur essaie d'appliquer trop de types d'appâts à une canne à pêche, défini dans la section générale de baits.yml
 max-baits-reached: <reset>Vous avez atteint le nombre maximum de types d'appâts pour cette canne à pêche.
 # À ne pas confondre avec ce qui précède, ceci est envoyé lorsque le maximum d'un appât spécifique est atteint. Définissez ceci dans baits.yml en utilisant "max-baits".
-max-bait-reached: <reset>Vous avez atteint le nombre maximum d'appâts {bait_theme}{bait} <reset>pouvant être appliqués sur une canne.
+max-bait-reached: <reset>Vous avez atteint le nombre maximum d'appâts {bait} <reset>pouvant être appliqués sur une canne.
 # Envoyé lorsqu'un joueur attrape un appât en pêchant (cela peut être désactivé en définissant catch-percentage sur 0 dans baits.yml
-bait-catch: <reset><bold>{player} <reset>a attrapé un appât{bait_theme}<bold>{bait} <reset>!
+bait-catch: <reset><bold>{player} <reset>a attrapé un appât<bold>{bait} <reset>!
 # Envoyé lorsqu'un appât est appliqué et qu'un poisson est attrapé.
-bait-use: <reset>Vous avez utilisé l'un des appâts {bait_theme}<bold>{bait} <reset>de votre canne.
+bait-use: <reset>Vous avez utilisé l'un des appâts <bold>{bait} <reset>de votre canne.
 # Envoyé lorsque quelqu'un essaie d'utiliser un appât en créatif
 bait-survival-limited: <reset>Vous devez être en <underlined>survie<reset> pour appliquer des appâts aux cannes à pêche.
 
