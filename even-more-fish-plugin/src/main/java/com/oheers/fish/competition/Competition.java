@@ -539,7 +539,7 @@ public class Competition {
         }
 
         try {
-            Fish selectedFish = FishManager.getInstance().getFish(allowedRarities.get(idx), null, null, 1.0d, null, false, null);
+            Fish selectedFish = FishManager.getInstance().getFish(allowedRarities.get(idx), null, null, 1.0d, null, false, null, null);
             if (selectedFish == null) {
                 // For the catch block to catch.
                 throw new IllegalArgumentException();
@@ -570,7 +570,7 @@ public class Competition {
                 this.selectedRarity = rarity;
                 return true;
             }
-            this.selectedRarity = FishManager.getInstance().getRandomWeightedRarity(null, 0, null, Set.copyOf(FishManager.getInstance().getRarityMap().values()));
+            this.selectedRarity = FishManager.getInstance().getRandomWeightedRarity(null, 0, null, Set.copyOf(FishManager.getInstance().getRarityMap().values()), null);
             return true;
         } catch (IllegalArgumentException exception) {
             EvenMoreFish.getInstance()
