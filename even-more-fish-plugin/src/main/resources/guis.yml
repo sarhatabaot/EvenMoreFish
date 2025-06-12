@@ -149,7 +149,8 @@ sell-menu-normal:
       lore:
         - <dark_gray>Fish Shop
         - ''
-        - <gray>Total Value » </gray><yellow>{sell-price}
+        # If you are using Vault, you need to set the color of {sell-price} in config.yml's sell-price-format
+        - <gray>Total Value » </gray>{sell-price}
         - ''
         - <gray>Sell your fish here to make
         - <gray>some extra money.
@@ -168,6 +169,7 @@ sell-menu-normal:
       lore:
         - <dark_gray>Inventory
         - ''
+        # If you are using Vault, you need to set the color of {sell-all-price} in config.yml's sell-price-format
         - <gray>Total Value » </gray><yellow>{sell-all-price}
         - ''
         - <gray>Click this button to sell
