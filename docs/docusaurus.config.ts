@@ -45,7 +45,6 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
-
   themeConfig: {
     image: 'img/brand/evenmorefish-social-card.png',
     navbar: {
@@ -63,22 +62,30 @@ const config: Config = {
         },
         {
           href: 'https://modrinth.com/plugin/evenmorefish',
-          label: 'Download (Modrinth)',
+          className: 'header-modrinth-link',
+          'aria-label': 'Download (Modrinth)',
+          // label: 'Download (Modrinth)',
           position: 'right',
         },
         {
           href: 'https://ci.codemc.io/job/EvenMoreFish/job/EvenMoreFish/',
-          label: 'Experimental Download (Jenkins)',
+          // label: 'Experimental Download (Jenkins)',
+          className: 'header-jenkins-link',
+          'aria-label': 'Experimental Download (Jenkins)',
           position: 'right',
         },
         {
           href: discord,
-          label: 'Discord',
+          // label: 'Discord',
+          className: 'header-discord-link',
+          'aria-label': 'Discord',
           position: 'right',
         },
         {
           href: 'https://github.com/EvenMoreFish/EvenMoreFish',
-          label: 'GitHub',
+          // label: 'GitHub',
+          className: 'header-github-link',
+          'aria-label': 'Github',
           position: 'right',
         },
       ],
@@ -123,6 +130,24 @@ const config: Config = {
         },
       ],
       copyright: `Copyright © 2021 - ${new Date().getFullYear()} EvenMoreFish`,
+    },
+    algolia: {
+      appId: 'OYCYW3JATA',
+      apiKey: '078a0c0e8ee1517d753bdccc6f56716a', //safe to commit
+
+      indexName: 'evenmorefishio',
+
+      // Optional: see doc section below
+      contextualSearch: true,
+
+      // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+      replaceSearchResultPathname: {
+        from: '/docs/', // or as RegExp: /\/docs\//
+        to: '/',
+      },
+
+      searchParameters: {},
+      searchPagePath: 'search',
     },
     prism: {
       theme: prismThemes.github,
