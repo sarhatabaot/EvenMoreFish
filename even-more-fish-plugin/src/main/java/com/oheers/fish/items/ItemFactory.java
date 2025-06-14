@@ -229,7 +229,6 @@ public class ItemFactory {
         if (item == null) {
             return null;
         }
-        rawItem = true;
         return item;
     }
 
