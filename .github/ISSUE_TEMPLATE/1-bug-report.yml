@@ -22,16 +22,12 @@ body:
       description: Also tell us, what did you expect to happen?
     validations:
       required: true
-  - type: dropdown
+  - type: input
     id: version
     attributes:
       label: Version
       description: What version of our software are you running?
-      options:
-        - "1.7.3"
-        - "1.7.2"
-        - "1.7"
-        - "Development"
+      placeholder: ex. 2.0.2
     validations:
       required: true
   - type: input
