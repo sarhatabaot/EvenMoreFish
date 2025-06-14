@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLOutput;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
@@ -73,6 +74,8 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private ItemStack getFishItem(Fish fish, Section section) {
+        System.out.println(section.getRouteAsString());
+
         Database database = EvenMoreFish.getInstance().getDatabase();
 
         if (database == null) {
@@ -91,18 +94,19 @@ public class FishJournalGui extends ConfigGui {
         ItemStack item = fish.give();
 
         item.editMeta(meta -> {
-            EMFSingleMessage display = prepareDisplay(section, fish);
+            ItemFactory factory = ItemFactory.itemFactory(section, "fish-item");
+            EMFSingleMessage display = prepareDisplay(factory, fish);
             if (display != null) {
                 meta.displayName(display.getComponentMessage());
             }
-            meta.lore(prepareLore(section, fish).getComponentListMessage());
+            meta.lore(prepareLore(factory, fish).getComponentListMessage());
         });
 
         return item;
     }
 
-    private @Nullable EMFSingleMessage prepareDisplay(@NotNull Section section, @NotNull Fish fish) {
-        final String displayStr = section.getString("fish-item.item.displayname");
+    private @Nullable EMFSingleMessage prepareDisplay(@NotNull ItemFactory factory, @NotNull Fish fish) {
+        final String displayStr = factory.getDisplayName().getConfiguredValue();
         if (displayStr == null) {
             return null;
         }
@@ -111,7 +115,7 @@ public class FishJournalGui extends ConfigGui {
         return display;
     }
 
-    private @NotNull EMFListMessage prepareLore(@NotNull Section section, @NotNull Fish fish) {
+    private @NotNull EMFListMessage prepareLore(@NotNull ItemFactory factory, @NotNull Fish fish) {
         final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
 
         final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId, fish).toString());
@@ -121,7 +125,7 @@ public class FishJournalGui extends ConfigGui {
         final String discoverer = getValueOrUnknown(() -> FishUtils.getPlayerName(fishStats.getDiscoverer()));
 
         EMFListMessage lore = EMFListMessage.fromStringList(
-            section.getStringList("fish-item.lore")
+            factory.getLore().getConfiguredValue()
         );
 
         lore.setVariable("{times-caught}", getValueOrUnknown(() -> Integer.toString(userFishStats.getQuantity())));
