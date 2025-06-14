@@ -22,6 +22,7 @@ import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,8 +75,6 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private ItemStack getFishItem(Fish fish, Section section) {
-        System.out.println(section.getRouteAsString());
-
         Database database = EvenMoreFish.getInstance().getDatabase();
 
         if (database == null) {
@@ -155,16 +154,16 @@ public class FishJournalGui extends ConfigGui {
         char character = FishUtils.getCharFromString(section.getString("rarity-character", "r"), 'r');
 
         return new DynamicGuiElement(
-                character, who -> {
+            character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
             FishManager.getInstance().getRarityMap().values().forEach(rarity ->
-                    group.addElement(
-                            new StaticGuiElement(
-                                    character, getRarityItem(rarity, section), click -> {
-                                new FishJournalGui(player, rarity).open();
-                                return true;
-                            }
-                            ))
+                group.addElement(
+                    new StaticGuiElement(
+                        character, getRarityItem(rarity, section), click -> {
+                        new FishJournalGui(player, rarity).open();
+                        return true;
+                    })
+                )
             );
             return group;
         }
@@ -186,20 +185,26 @@ public class FishJournalGui extends ConfigGui {
             return factory.createItem(player.getUniqueId());
         }
 
+        ItemStack rarityItem = rarity.getMaterial();
+
         final ItemFactory factory = ItemFactory.itemFactory(section, "rarity-item");
-        ItemStack item = factory.createItem(player.getUniqueId());
-        item = ItemUtils.changeMaterial(item, rarity.getMaterial());
+        ItemStack configuredItem = factory.createItem(player.getUniqueId());
 
-        item.editMeta(meta -> {
-            Component originalDisplay = meta.displayName();
-            if (originalDisplay != null) {
-                EMFSingleMessage display = EMFSingleMessage.of(originalDisplay);
-                display.setRarity(rarity.getDisplayName());
-                meta.displayName(display.getComponentMessage());
-            }
-        });
+        // Carry the configured item's lore and display name to the rarity item
+        ItemMeta configuredMeta = configuredItem.getItemMeta();
+        if (configuredMeta != null) {
+            rarityItem.editMeta(meta -> {
+                Component configuredDisplay = configuredMeta.displayName();
+                if (configuredDisplay != null) {
+                    EMFSingleMessage display = EMFSingleMessage.of(configuredDisplay);
+                    display.setRarity(rarity.getDisplayName());
+                    meta.displayName(display.getComponentMessage());
+                }
+                meta.lore(configuredMeta.lore());
+            });
+        }
 
-        return item;
+        return rarityItem;
     }
 
     @Override
