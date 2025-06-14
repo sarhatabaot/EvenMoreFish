@@ -4,6 +4,10 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 let discord = "https://discord.gg/9fRbqWTnHS";
+let modrinth = "https://modrinth.com/plugin/evenmorefish";
+let spigot = "https://www.spigotmc.org/resources/evenmorefish-%E2%96%AA-extensive-fishing-plugin-%E2%96%AA.91310/";
+let jenkins = "https://ci.codemc.io/job/EvenMoreFish/job/EvenMoreFish/";
+let github = "https://github.com/EvenMoreFish/EvenMoreFish";
 
 const config: Config = {
   title: 'EvenMoreFish',
@@ -61,14 +65,14 @@ const config: Config = {
           label: 'Documentation',
         },
         {
-          href: 'https://modrinth.com/plugin/evenmorefish',
+          href: modrinth,
           className: 'header-modrinth-link',
           'aria-label': 'Download (Modrinth)',
           // label: 'Download (Modrinth)',
           position: 'right',
         },
         {
-          href: 'https://ci.codemc.io/job/EvenMoreFish/job/EvenMoreFish/',
+          href: jenkins,
           // label: 'Experimental Download (Jenkins)',
           className: 'header-jenkins-link',
           'aria-label': 'Experimental Download (Jenkins)',
@@ -82,7 +86,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/EvenMoreFish/EvenMoreFish',
+          href: github,
           // label: 'GitHub',
           className: 'header-github-link',
           'aria-label': 'Github',
@@ -120,11 +124,11 @@ const config: Config = {
           items: [
             {
               label: 'Modrinth',
-              href: 'https://modrinth.com/plugin/evenmorefish',
+              href: modrinth,
             },
             {
               label: 'Spigot',
-              href: 'https://www.spigotmc.org/resources/evenmorefish-%E2%96%AA-extensive-fishing-plugin-%E2%96%AA.91310/',
+              href: spigot,
             }
           ]
         },

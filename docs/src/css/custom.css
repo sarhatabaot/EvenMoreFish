@@ -83,7 +83,7 @@
 }
 
 .header-github-link:hover:before {
-    --brand-color: #b7b7b7;
+    --brand-color: var(--ifm-color-primary);
 }
 
 .header-discord-link:before {
