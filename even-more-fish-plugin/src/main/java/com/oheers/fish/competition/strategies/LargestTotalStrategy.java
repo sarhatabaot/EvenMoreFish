@@ -26,9 +26,7 @@ public class LargestTotalStrategy implements CompetitionStrategy {
             entry.incrementValue(increaseAmount);
             leaderboard.updateEntry(entry);
         } else {
-            CompetitionEntry newEntry = new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType());
-            newEntry.incrementValue(increaseAmount - 1); // Adjust for new entry
-            leaderboard.addEntry(newEntry);
+            leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
         }
     }
 
