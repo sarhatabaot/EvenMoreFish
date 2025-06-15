@@ -22,9 +22,11 @@ import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLOutput;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
@@ -91,18 +93,19 @@ public class FishJournalGui extends ConfigGui {
         ItemStack item = fish.give();
 
         item.editMeta(meta -> {
-            EMFSingleMessage display = prepareDisplay(section, fish);
+            ItemFactory factory = ItemFactory.itemFactory(section, "fish-item");
+            EMFSingleMessage display = prepareDisplay(factory, fish);
             if (display != null) {
                 meta.displayName(display.getComponentMessage());
             }
-            meta.lore(prepareLore(section, fish).getComponentListMessage());
+            meta.lore(prepareLore(factory, fish).getComponentListMessage());
         });
 
         return item;
     }
 
-    private @Nullable EMFSingleMessage prepareDisplay(@NotNull Section section, @NotNull Fish fish) {
-        final String displayStr = section.getString("fish-item.item.displayname");
+    private @Nullable EMFSingleMessage prepareDisplay(@NotNull ItemFactory factory, @NotNull Fish fish) {
+        final String displayStr = factory.getDisplayName().getConfiguredValue();
         if (displayStr == null) {
             return null;
         }
@@ -111,7 +114,7 @@ public class FishJournalGui extends ConfigGui {
         return display;
     }
 
-    private @NotNull EMFListMessage prepareLore(@NotNull Section section, @NotNull Fish fish) {
+    private @NotNull EMFListMessage prepareLore(@NotNull ItemFactory factory, @NotNull Fish fish) {
         final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
 
         final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId, fish).toString());
@@ -121,7 +124,7 @@ public class FishJournalGui extends ConfigGui {
         final String discoverer = getValueOrUnknown(() -> FishUtils.getPlayerName(fishStats.getDiscoverer()));
 
         EMFListMessage lore = EMFListMessage.fromStringList(
-            section.getStringList("fish-item.lore")
+            factory.getLore().getConfiguredValue()
         );
 
         lore.setVariable("{times-caught}", getValueOrUnknown(() -> Integer.toString(userFishStats.getQuantity())));
@@ -151,16 +154,16 @@ public class FishJournalGui extends ConfigGui {
         char character = FishUtils.getCharFromString(section.getString("rarity-character", "r"), 'r');
 
         return new DynamicGuiElement(
-                character, who -> {
+            character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
             FishManager.getInstance().getRarityMap().values().forEach(rarity ->
-                    group.addElement(
-                            new StaticGuiElement(
-                                    character, getRarityItem(rarity, section), click -> {
-                                new FishJournalGui(player, rarity).open();
-                                return true;
-                            }
-                            ))
+                group.addElement(
+                    new StaticGuiElement(
+                        character, getRarityItem(rarity, section), click -> {
+                        new FishJournalGui(player, rarity).open();
+                        return true;
+                    })
+                )
             );
             return group;
         }
@@ -182,20 +185,26 @@ public class FishJournalGui extends ConfigGui {
             return factory.createItem(player.getUniqueId());
         }
 
+        ItemStack rarityItem = rarity.getMaterial();
+
         final ItemFactory factory = ItemFactory.itemFactory(section, "rarity-item");
-        ItemStack item = factory.createItem(player.getUniqueId());
-        item = ItemUtils.changeMaterial(item, rarity.getMaterial());
+        ItemStack configuredItem = factory.createItem(player.getUniqueId());
 
-        item.editMeta(meta -> {
-            Component originalDisplay = meta.displayName();
-            if (originalDisplay != null) {
-                EMFSingleMessage display = EMFSingleMessage.of(originalDisplay);
-                display.setRarity(rarity.getDisplayName());
-                meta.displayName(display.getComponentMessage());
-            }
-        });
+        // Carry the configured item's lore and display name to the rarity item
+        ItemMeta configuredMeta = configuredItem.getItemMeta();
+        if (configuredMeta != null) {
+            rarityItem.editMeta(meta -> {
+                Component configuredDisplay = configuredMeta.displayName();
+                if (configuredDisplay != null) {
+                    EMFSingleMessage display = EMFSingleMessage.of(configuredDisplay);
+                    display.setRarity(rarity.getDisplayName());
+                    meta.displayName(display.getComponentMessage());
+                }
+                meta.lore(configuredMeta.lore());
+            });
+        }
 
-        return item;
+        return rarityItem;
     }
 
     @Override

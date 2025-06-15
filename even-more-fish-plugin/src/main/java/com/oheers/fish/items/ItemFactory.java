@@ -34,8 +34,8 @@ public class ItemFactory {
     private UUID relevantPlayer = null;
     private int randomIndex = -1;
     private Consumer<ItemStack> finalChanges = null;
+    private @NotNull ItemStack baseItem;
 
-    private final @NotNull ItemStack baseItem;
     private final CustomModelDataItemConfig customModelData;
     private final ItemDamageItemConfig itemDamage;
     private final DisplayNameItemConfig displayName;
@@ -229,7 +229,6 @@ public class ItemFactory {
         if (item == null) {
             return null;
         }
-        rawItem = true;
         return item;
     }
 
@@ -411,6 +410,7 @@ public class ItemFactory {
 
     public void setRandomIndex(int randomIndex) {
         this.randomIndex = randomIndex;
+        this.baseItem = getBaseItem();
     }
 
     public int getRandomIndex() {
