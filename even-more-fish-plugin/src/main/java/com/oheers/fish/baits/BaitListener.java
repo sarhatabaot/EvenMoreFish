@@ -21,6 +21,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Handles inventory interactions between fishing rods and bait items in the EvenMoreFish plugin.
+ * Manages bait application to rods, including NBT data conversion, game mode checks, and protection
+ * against unauthorized modifications (e.g., via anvils). Also handles bait limits and player feedback.
+ */
 public class BaitListener implements Listener {
 
     @EventHandler

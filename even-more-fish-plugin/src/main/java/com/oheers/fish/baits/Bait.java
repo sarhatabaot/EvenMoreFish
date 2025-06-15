@@ -223,10 +223,12 @@ public class Bait extends ConfigBase {
         return fish;
     }
 
+    //bug here todo
     public void handleFish(@NotNull Player player, @NotNull Fish fish, @NotNull ItemStack fishingRod) {
         if (!fish.isWasBaited()) {
             return;
         }
+
         fish.setFisherman(player.getUniqueId());
         try {
             ApplicationResult result = BaitNBTManager.applyBaitedRodNBT(fishingRod, this, -1);
