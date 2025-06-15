@@ -10,7 +10,6 @@ import com.oheers.fish.recipe.EMFRecipe;
 import com.oheers.fish.recipe.RecipeUtil;
 import com.oheers.fish.utils.Logging;
 import com.oheers.fish.utils.nbt.NbtKeys;
-import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
