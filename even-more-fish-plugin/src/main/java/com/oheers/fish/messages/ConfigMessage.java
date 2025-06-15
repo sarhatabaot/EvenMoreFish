@@ -38,6 +38,7 @@ public enum ConfigMessage {
     BAITS_MAXED("<reset>You have reached the maximum number of types of baits for this fishing rod.", PrefixType.DEFAULT, false, true, "max-baits-reached"),
     BAITS_MAXED_ON_ROD("<reset>You have reached the maximum number of {bait} <reset>bait that can be applied to one rod.", PrefixType.ERROR, false, true, "max-baits-reached"),
     BAIT_ROD_PROTECTION("<reset>Protected your baited fishing rod. If you are trying to repair it, please put it in the first slot instead.", PrefixType.ERROR, false, true, "bait-rod-protection"),
+    BAIT_INVALID_ROD("<white>You cannot apply bait to this fishing rod!", PrefixType.ERROR, true, false, "bait-invalid-rod"),
 
     BAR_LAYOUT("{prefix}<reset>{time-formatted}<reset> {remaining}", PrefixType.NONE, true, false, "bossbar.layout"),
     BAR_SECOND("<reset>{second}s", PrefixType.NONE, true, false, "bossbar.second"),

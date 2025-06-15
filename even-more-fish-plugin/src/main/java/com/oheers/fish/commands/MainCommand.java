@@ -1,5 +1,6 @@
 package com.oheers.fish.commands;
 
+import com.oheers.fish.Checks;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.commands.arguments.ArgumentHelper;
@@ -194,7 +195,12 @@ public class MainCommand {
         return new CommandAPICommand(name)
             .withPermission(UserPerms.APPLYBAITS)
             .executesPlayer(info -> {
-                new ApplyBaitsGui(info.sender(), null).open();
+                Player player = info.sender();
+                if (!Checks.canUseRod(player.getInventory().getItemInMainHand())) {
+                    ConfigMessage.BAIT_INVALID_ROD.getMessage().send(player);
+                    return;
+                }
+                new ApplyBaitsGui(player, null).open();
             });
     }
 
