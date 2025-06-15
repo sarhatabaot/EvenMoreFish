@@ -61,6 +61,9 @@ public class CustomRod extends ConfigBase {
      * @return the contents of the "allowed-rarities" section, or an empty list if the section does not exist.
      */
     public List<Rarity> loadAllowedRarities() {
+        if ("ALL".equalsIgnoreCase(getConfig().getString("allowed-rarities"))) {
+            return FishManager.getInstance().getRarityMap().values().stream().toList();
+        }
         return getConfig().getStringList("allowed-rarities").stream()
             .map(id -> FishManager.getInstance().getRarity(id))
             .filter(Objects::nonNull)
