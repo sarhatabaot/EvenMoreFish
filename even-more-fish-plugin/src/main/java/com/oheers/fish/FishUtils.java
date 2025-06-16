@@ -419,12 +419,7 @@ public class FishUtils {
     }
 
     public static @Nullable Biome getBiome(@NotNull String keyString) {
-        // Force lowercase
         keyString = keyString.toLowerCase();
-        // If no namespace, assume minecraft
-        if (!keyString.contains(":")) {
-            keyString = "minecraft:" + keyString;
-        }
         // Get the key and check if null
         NamespacedKey key = NamespacedKey.fromString(keyString);
         if (key == null) {
@@ -727,14 +722,12 @@ public class FishUtils {
     }
 
     public static Enchantment getEnchantment(@NotNull String namespace) {
-        Registry<Enchantment> registry = Registry.ENCHANTMENT;
+        namespace = namespace.toLowerCase();
         NamespacedKey key = NamespacedKey.fromString(namespace);
         if (key == null) {
-            System.out.println("Key invalid");
             return null;
         }
-        System.out.println(key);
-        return registry.get(key);
+        return Registry.ENCHANTMENT.get(key);
     }
 
 }
