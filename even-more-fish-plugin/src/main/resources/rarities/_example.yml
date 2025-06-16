@@ -96,6 +96,14 @@ fish:
       lore:
         - <gray>Hola!
 
+      # Customize this item's enchantments.
+      # This supports custom enchantments if you use their namespace.
+      enchantments:
+        # Add lure 3
+        - lure,3
+        # Add veinminer
+        - veinminer-enchantment:veinminer,1
+
     # The catch type for this fish. This overrides the rarity's value.
     catch-type: BOTH
 
