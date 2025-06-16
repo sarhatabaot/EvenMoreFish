@@ -410,23 +410,22 @@ public class BaitNBTManager {
                 return message;
             }
 
-            int baitCount = 0;
-
-            for (String bait : rodNBT.split(",")) {
-                baitCount++;
+            final String[] baitRodNbt = rodNBT.split(",");
+            for (String bait : baitRodNbt) {
                 EMFMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
-                // TODO this is to prevent an ArrayIndexOutOfBoundsException, but it should be handled in a better way.
-                try {
-                    baitFormat.setAmount(bait.split(":")[1]);
-                } catch (ArrayIndexOutOfBoundsException exception) {
+                final String[] parts = bait.split(":");
+                if (parts.length == 2) {
+                    baitFormat.setAmount(parts[1]);
+                } else {
                     baitFormat.setAmount("N/A");
                 }
-                baitFormat.setBait(getBaitFormatted(bait.split(":")[0]));
+
+                baitFormat.setBait(getBaitFormatted(parts[0]));
                 message.appendMessage(baitFormat);
             }
 
             if (MainConfig.getInstance().getBaitShowUnusedSlots()) {
-                for (int i = baitCount; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
+                for (int i = baitRodNbt.length; i < MainConfig.getInstance().getBaitsPerRod(); i++) {
                     message.appendMessage(ConfigMessage.BAIT_UNUSED_SLOT.getMessage());
                 }
             }
