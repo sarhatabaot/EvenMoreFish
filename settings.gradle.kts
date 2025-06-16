@@ -57,7 +57,7 @@ dependencyResolutionManagement {
             library("commons-lang3", "org.apache.commons:commons-lang3:3.14.0")
             library("commons-codec", "commons-codec:commons-codec:1.17.0")
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.1.8")
-            library("annotations", "org.jetbrains:annotations:24.1.0")
+            library("annotations", "org.jetbrains:annotations:26.0.2")
 
             version("flyway", "11.2.0")
             library("flyway-core", "org.flywaydb","flyway-core").versionRef("flyway")
@@ -95,6 +95,10 @@ dependencyResolutionManagement {
             library("connectors-h2", "com.h2database:h2:2.3.232")
 
             library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-3")
+
+            version("junit", "5.11.0")
+            library("junit-jupiter-api", "org.junit.jupiter","junit-jupiter-api").versionRef("junit")
+            library("junit-jupiter-engine","org.junit.jupiter","junit-jupiter-engine").versionRef("junit")
         }
     }
 }
