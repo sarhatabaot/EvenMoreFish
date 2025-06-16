@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 public class BaitNBTManager {
-
+    public static final int UNLIMITED_BAIT = -1;
     // Our line identifier. This is U+200C ZERO WIDTH NON-JOINER and is invisible
     public static final String LINE_IDENTIFIER = "\u200C";
 
@@ -138,18 +138,22 @@ public class BaitNBTManager {
             boolean foundBait = false;
 
             for (String baitName : baitList) {
-                if (baitName.split(":")[0].equals(bait.getId())) {
-                    if (bait.isInfinite()) {
-                        combined.append(baitName.split(":")[0]).append(":∞,");
-                    } else {
-                        int newQuantity = Integer.parseInt(baitName.split(":")[1]) + quantity;
+                String[] split = baitName.split(":");
+                final String baitId = split[0];
+                final int baitQuantity = Integer.parseInt(split[1]);
 
-                        if (newQuantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
-                            combined.append(baitName.split(":")[0]).append(":").append(bait.getMaxApplications()).append(",");
+                if (baitId.equals(bait.getId())) {
+                    if (bait.isInfinite()) {
+                        combined.append(baitId).append(":∞,");
+                    } else {
+                        int newQuantity = baitQuantity + quantity;
+
+                        if (newQuantity > bait.getMaxApplications() && bait.getMaxApplications() != UNLIMITED_BAIT) {
+                            combined.append(baitId).append(":").append(bait.getMaxApplications()).append(",");
                             cursorModifier.set(-bait.getMaxApplications() + (newQuantity - quantity));
                             maxBait.set(true);
                         } else if (newQuantity != 0) {
-                            combined.append(baitName.split(":")[0]).append(":").append(newQuantity).append(",");
+                            combined.append(baitId).append(":").append(newQuantity).append(",");
                             cursorModifier.set(-quantity);
                         }
                     }
@@ -170,7 +174,7 @@ public class BaitNBTManager {
                     throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
                 }
 
-                if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
+                if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != UNLIMITED_BAIT) {
                     cursorModifier.set(-bait.getMaxApplications());
                     combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
                     maxBait.set(true);
@@ -194,7 +198,7 @@ public class BaitNBTManager {
         } else {
             NBT.modify(item, nbt -> {
                 ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
-                if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != -1) {
+                if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != UNLIMITED_BAIT) {
                     combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
                     compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
                     cursorModifier.set(-bait.getMaxApplications());
