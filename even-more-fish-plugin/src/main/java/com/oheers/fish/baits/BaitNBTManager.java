@@ -8,6 +8,7 @@ import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
+import com.oheers.fish.utils.WeightedRandom;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -52,9 +53,9 @@ public class BaitNBTManager {
 
         if (itemStack.hasItemMeta()) {
             return NbtUtils.hasKey(itemStack, NbtKeys.EMF_BAIT);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -283,16 +284,11 @@ public class BaitNBTManager {
             return null;
         }
 
-        double totalWeight = baitList.stream().mapToDouble(Bait::getApplicationWeight).sum();
-
-        int idx = 0;
-        for (double r = EvenMoreFish.getInstance().getRandom().nextDouble() * totalWeight; idx < baitList.size() - 1; ++idx) {
-            r -= baitList.get(idx).getApplicationWeight();
-            if (r <= 0.0) {
-                break;
-            }
-        }
-        return baitList.get(idx);
+        return WeightedRandom.pick(
+                baitList,
+                Bait::getApplicationWeight,
+                EvenMoreFish.getInstance().getRandom()
+        );
     }
 
     /**
@@ -313,17 +309,7 @@ public class BaitNBTManager {
             return null;
         }
 
-        double totalWeight = baitList.stream().mapToDouble(Bait::getCatchWeight).sum();
-
-        int idx = 0;
-        for (double r = Math.random() * totalWeight; idx < baitList.size() - 1; ++idx) {
-            r -= baitList.get(idx).getCatchWeight();
-            if (r <= 0.0) {
-                break;
-            }
-        }
-
-        return baitList.get(idx);
+        return WeightedRandom.pick(baitList, Bait::getCatchWeight, EvenMoreFish.getInstance().getRandom());
     }
 
     /**
@@ -413,7 +399,7 @@ public class BaitNBTManager {
                 return message;
             }
 
-            final String[] baitRodNbt = rodNBT.split(",");
+            final String[] baitRodNbt = rodNBT.split(BAIT_ENTRY_DELIMITER);
             for (String bait : baitRodNbt) {
                 EMFMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
                 final String[] parts = bait.split(BAIT_SEPARATOR);

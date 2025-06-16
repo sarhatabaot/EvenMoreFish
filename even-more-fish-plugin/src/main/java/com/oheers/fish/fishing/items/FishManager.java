@@ -11,6 +11,7 @@ import com.oheers.fish.fishing.Processor;
 import com.oheers.fish.fishing.items.config.FishConversions;
 import com.oheers.fish.fishing.items.config.RarityConversions;
 import com.oheers.fish.fishing.rods.CustomRod;
+import com.oheers.fish.utils.WeightedRandom;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -19,12 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.ToDoubleFunction;
 
 public class FishManager {
 
@@ -91,15 +88,71 @@ public class FishManager {
         return rarity.getFish(fishName);
     }
 
-    // TODO cleanup
     public Rarity getRandomWeightedRarity(Player fisher, double boostRate, Set<Rarity> boostedRarities, Set<Rarity> totalRarities, @Nullable CustomRod customRod) {
-        Map<UUID, Rarity> decidedRarities = EvenMoreFish.getInstance().getDecidedRarities();
-        if (fisher != null && decidedRarities.containsKey(fisher.getUniqueId())) {
-            Rarity chosenRarity = decidedRarities.get(fisher.getUniqueId());
-            decidedRarities.remove(fisher.getUniqueId());
-            return chosenRarity;
+        if (fisher != null) {
+            Map<UUID, Rarity> decidedRarities = EvenMoreFish.getInstance().getDecidedRarities();
+            if (decidedRarities.containsKey(fisher.getUniqueId())) {
+                return decidedRarities.remove(fisher.getUniqueId());
+            }
         }
 
+        List<Rarity> allowedRarities = getAllowedRarities(fisher, boostRate, boostedRarities, totalRarities);
+
+        // Remove all rarities that are not allowed by the custom rod.
+        if (customRod != null) {
+            allowedRarities.retainAll(customRod.getAllowedRarities());
+        }
+
+        if (allowedRarities.isEmpty()) {
+            String fisherName = fisher == null ? "N/A" : fisher.getName();
+            EvenMoreFish.getInstance().getLogger().severe("There are no rarities for the user " + fisherName + " to fish. They have received no fish.");
+            return null;
+        }
+
+        double totalWeight = calculateTotalWeight(allowedRarities, boostRate, boostedRarities);
+        Rarity selected = WeightedRandom.pick(
+                allowedRarities,
+                Rarity::getWeight,
+                boostRate,
+                boostedRarities,
+                EvenMoreFish.getInstance().getRandom()
+        );
+
+        if (selected == null) {
+            return null;
+        }
+
+        if (!Competition.isActive() && EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) {
+            if (selected.hasCompExemptFish()) {
+                return selected;
+            }
+        }
+
+        if (Competition.isActive() || !MainConfig.getInstance().isFishCatchOnlyInCompetition()) {
+            return selected;
+        }
+        return null;
+
+    }
+
+    private double calculateTotalWeight(@NotNull List<Rarity> rarities, double boostRate, Set<Rarity> boostedRarities) {
+        double totalWeight = 0.0;
+        for (Rarity rarity : rarities) {
+            if (boostRate != -1.0 && boostedRarities != null && boostedRarities.contains(rarity)) {
+                totalWeight += rarity.getWeight() * boostRate;
+            } else {
+                totalWeight += rarity.getWeight();
+            }
+        }
+        return totalWeight;
+    }
+
+    private @NotNull List<Rarity> getAllowedRarities(
+            Player fisher,
+            double boostRate,
+            Set<Rarity> boostedRarities,
+            Set<Rarity> totalRarities
+    ) {
         List<Rarity> allowedRarities = new ArrayList<>();
 
         if (fisher != null) {
@@ -108,11 +161,9 @@ public class FishManager {
                 if (boostedRarities != null && boostRate == -1 && !boostedRarities.contains(rarity)) {
                     continue;
                 }
-
                 if (!(rarity.getPermission() == null || fisher.hasPermission(rarity.getPermission()))) {
                     continue;
                 }
-
                 Requirement requirement = rarity.getRequirement();
                 RequirementContext context = new RequirementContext(fisher.getWorld(), fisher.getLocation(), fisher, null, null);
                 if (requirement.meetsRequirements(context)) {
@@ -126,66 +177,24 @@ public class FishManager {
             allowedRarities.addAll(totalRarities);
         }
 
-        // Remove all rarities that are not allowed by the custom rod.
-        if (customRod != null) {
-            allowedRarities.retainAll(customRod.getAllowedRarities());
-        }
-
-        if (allowedRarities.isEmpty()) {
-            String fisherName = fisher == null ? "N/A" : fisher.getName();
-            EvenMoreFish.getInstance().getLogger().severe("There are no rarities for the user " + fisherName + " to fish. They have received no fish.");
-            return null;
-        }
-
-        double totalWeight = 0;
-
-        for (Rarity r : allowedRarities) {
-            if (boostRate != -1.0 && boostedRarities != null && boostedRarities.contains(r)) {
-                totalWeight += (r.getWeight() * boostRate);
-            } else {
-                totalWeight += r.getWeight();
-            }
-        }
-
-        int idx = 0;
-        for (double r = Math.random() * totalWeight; idx < allowedRarities.size() - 1; ++idx) {
-            if (boostRate != -1.0 && boostedRarities != null && boostedRarities.contains(allowedRarities.get(idx))) {
-                r -= allowedRarities.get(idx).getWeight() * boostRate;
-            } else {
-                r -= allowedRarities.get(idx).getWeight();
-            }
-            if (r <= 0.0) break;
-        }
-
-        if (!Competition.isActive() && EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) {
-            if (allowedRarities.get(idx).hasCompExemptFish()) return allowedRarities.get(idx);
-        } else if (Competition.isActive() || !MainConfig.getInstance().isFishCatchOnlyInCompetition()) {
-            return allowedRarities.get(idx);
-        }
-
-        return null;
+        return allowedRarities;
     }
 
-    public Fish getRandomWeightedFish(List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
-        final double totalWeight = FishUtils.getTotalWeight(fishList, boostRate, boostedFish);
 
-        int idx = 0;
-        for (double r = Math.random() * totalWeight; idx < fishList.size() - 1; ++idx) {
-            double weight = fishList.get(idx).getWeight();
-            if (weight == 0.0d) {
-                weight = 1;
-            }
-            if (boostRate != -1 && boostedFish != null && boostedFish.contains(fishList.get(idx))) {
-                r -= weight * boostRate;
-            } else {
-                r -= weight;
-            }
+    public Fish getRandomWeightedFish(@NotNull List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
+        if (fishList.isEmpty()) return null;
 
-            if (r <= 0.0) break;
-        }
+        // Define a weight function that handles zero weights as 1
+        ToDoubleFunction<Fish> weightFunction = fish -> {
+            double weight = fish.getWeight();
+            return weight == 0.0d ? 1.0 : weight;
+        };
 
-        return fishList.get(idx);
+        Set<Fish> boostedSet = boostedFish == null ? Collections.emptySet() : new HashSet<>(boostedFish);
+
+        return WeightedRandom.pick(fishList, weightFunction, boostRate, boostedSet, EvenMoreFish.getInstance().getRandom());
     }
+
 
     public Fish getFish(Rarity r, Location l, Player p, double boostRate, List<Fish> boostedFish, boolean doRequirementChecks, @Nullable Processor<?> processor, @Nullable CustomRod customRod) {
         if (r == null) return null;
