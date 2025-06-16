@@ -104,6 +104,12 @@ fish:
         # Add veinminer
         - veinminer-enchantment:veinminer,1
 
+      # Should the item be unbreakable?
+      unbreakable: false
+
+      # How many of this item should be given?
+      quantity: 1
+
     # The catch type for this fish. This overrides the rarity's value.
     catch-type: BOTH
 
