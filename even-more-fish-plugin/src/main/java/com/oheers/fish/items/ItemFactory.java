@@ -6,6 +6,7 @@ import com.oheers.fish.config.ConfigUtils;
 import com.oheers.fish.items.configs.CustomModelDataItemConfig;
 import com.oheers.fish.items.configs.DisplayNameItemConfig;
 import com.oheers.fish.items.configs.DyeColourItemConfig;
+import com.oheers.fish.items.configs.EnchantmentsItemConfig;
 import com.oheers.fish.items.configs.GlowingItemConfig;
 import com.oheers.fish.items.configs.ItemDamageItemConfig;
 import com.oheers.fish.items.configs.LoreItemConfig;
@@ -43,6 +44,7 @@ public class ItemFactory {
     private final GlowingItemConfig glowing;
     private final LoreItemConfig lore;
     private final PotionMetaItemConfig potionMeta;
+    private final EnchantmentsItemConfig enchantments;
 
     private ItemFactory(@NotNull Section initialSection, @Nullable String configLocation) {
         if (configLocation == null) {
@@ -61,6 +63,7 @@ public class ItemFactory {
         this.glowing = new GlowingItemConfig(this.configuration);
         this.lore = new LoreItemConfig(this.configuration);
         this.potionMeta = new PotionMetaItemConfig(this.configuration);
+        this.enchantments = new EnchantmentsItemConfig(this.configuration);
 
         this.baseItem = getBaseItem();
     }
@@ -99,6 +102,7 @@ public class ItemFactory {
             glowing.apply(item, replacements);
             lore.apply(item, replacements);
             potionMeta.apply(item, replacements);
+            enchantments.apply(item, replacements);
 
             if (finalChanges != null) {
                 finalChanges.accept(item);
@@ -210,6 +214,10 @@ public class ItemFactory {
 
     public PotionMetaItemConfig getPotionMeta() {
         return potionMeta;
+    }
+
+    public EnchantmentsItemConfig getEnchantments() {
+        return enchantments;
     }
 
     // Base Item Methods //

@@ -40,6 +40,7 @@ import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Skull;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -723,6 +724,17 @@ public class FishUtils {
             amplifier - 1,
             false
         );
+    }
+
+    public static Enchantment getEnchantment(@NotNull String namespace) {
+        Registry<Enchantment> registry = Registry.ENCHANTMENT;
+        NamespacedKey key = NamespacedKey.fromString(namespace);
+        if (key == null) {
+            System.out.println("Key invalid");
+            return null;
+        }
+        System.out.println(key);
+        return registry.get(key);
     }
 
 }
