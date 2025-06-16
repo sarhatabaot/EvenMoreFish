@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class BaitListener implements Listener {
 
@@ -29,11 +30,13 @@ public class BaitListener implements Listener {
         ItemStack potentialFishingRod = event.getCurrentItem();
         ItemStack cursor = event.getCursor();
 
-        if (potentialFishingRod == null) {
+        // Check anvil protection first
+        if (MainConfig.getInstance().shouldProtectBaitedRods() && anvilCheck(event)) {
             return;
         }
 
-        if (MainConfig.getInstance().shouldProtectBaitedRods() && anvilCheck(event)) {
+        // Check if we need to continue applying a bait
+        if (!BaitNBTManager.isBaitObject(cursor) || potentialFishingRod == null || !(event.getClickedInventory() instanceof PlayerInventory)) {
             return;
         }
 
@@ -45,10 +48,6 @@ public class BaitListener implements Listener {
         // Tell the player if the rod is invalid
         if (!Checks.canUseRod(potentialFishingRod)) {
             ConfigMessage.BAIT_INVALID_ROD.getMessage().send(event.getWhoClicked());
-            return;
-        }
-
-        if (!BaitNBTManager.isBaitObject(cursor)) {
             return;
         }
 
