@@ -109,7 +109,6 @@ public class FishManager {
             return null;
         }
 
-        double totalWeight = calculateTotalWeight(allowedRarities, boostRate, boostedRarities);
         Rarity selected = WeightedRandom.pick(
                 allowedRarities,
                 Rarity::getWeight,
@@ -133,18 +132,6 @@ public class FishManager {
         }
         return null;
 
-    }
-
-    private double calculateTotalWeight(@NotNull List<Rarity> rarities, double boostRate, Set<Rarity> boostedRarities) {
-        double totalWeight = 0.0;
-        for (Rarity rarity : rarities) {
-            if (boostRate != -1.0 && boostedRarities != null && boostedRarities.contains(rarity)) {
-                totalWeight += rarity.getWeight() * boostRate;
-            } else {
-                totalWeight += rarity.getWeight();
-            }
-        }
-        return totalWeight;
     }
 
     private @NotNull List<Rarity> getAllowedRarities(
