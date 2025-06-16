@@ -122,93 +122,21 @@ public class BaitNBTManager {
 
         StringBuilder combined = new StringBuilder();
         if (isBaitedRod(item)) {
-            try {
-                if (doingLoreStuff) {
-                    item.editMeta(meta -> meta.lore(deleteOldLore(item)));
-                }
-            } catch (IndexOutOfBoundsException exception) {
-                EvenMoreFish.getInstance()
-                        .getLogger()
-                        .severe("Failed to apply bait: " + bait.getId() + " to a user's fishing rod. This is likely caused by a change in format in the baits.yml config.");
-                return null;
-            }
+            removeOldLoreIfNecessary(item, bait);
 
-            String[] baitList = NbtUtils.getBaitArray(item);
-
-            boolean foundBait = false;
-
-            for (String baitName : baitList) {
-                String[] split = baitName.split(":");
-                final String baitId = split[0];
-                final int baitQuantity = Integer.parseInt(split[1]);
-
-                if (baitId.equals(bait.getId())) {
-                    if (bait.isInfinite()) {
-                        combined.append(baitId).append(":∞,");
-                    } else {
-                        int newQuantity = baitQuantity + quantity;
-
-                        if (newQuantity > bait.getMaxApplications() && bait.getMaxApplications() != UNLIMITED_BAIT) {
-                            combined.append(baitId).append(":").append(bait.getMaxApplications()).append(",");
-                            cursorModifier.set(-bait.getMaxApplications() + (newQuantity - quantity));
-                            maxBait.set(true);
-                        } else if (newQuantity != 0) {
-                            combined.append(baitId).append(":").append(newQuantity).append(",");
-                            cursorModifier.set(-quantity);
-                        }
-                    }
-                    foundBait = true;
-                } else {
-                    combined.append(baitName).append(",");
-                }
-            }
+            boolean foundBait = applyToExistingBaits(item, bait, quantity, combined,cursorModifier,maxBait);
 
             // We can manage the last character not being a colon if we have to add it in ourselves.
             if (!foundBait) {
-
-                if (getNumBaitsApplied(item) >= MainConfig.getInstance().getBaitsPerRod()) {
-                    // the lore's been taken out, we're not going to be doing anymore here, so we're just re-adding it now.
-                    if (doingLoreStuff) {
-                        item.editMeta(meta -> meta.lore(newApplyLore(item)));
-                    }
-                    throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
-                }
-
-                if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != UNLIMITED_BAIT) {
-                    cursorModifier.set(-bait.getMaxApplications());
-                    combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
-                    maxBait.set(true);
-                } else {
-                    combined.append(bait.getId()).append(":").append(quantity);
-                    cursorModifier.set(-quantity);
-                }
+                addNewBait(item, bait, quantity, combined, cursorModifier, maxBait, doingLoreStuff);
             } else {
                 if (!combined.isEmpty()) {
                     combined.deleteCharAt(combined.length() - 1);
                 }
             }
-            NBT.modify(item, nbt -> {
-                ReadWriteNBT emfCompound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
-                if (!combined.isEmpty()) {
-                    emfCompound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
-                } else {
-                    emfCompound.removeKey(NbtKeys.EMF_APPLIED_BAIT);
-                }
-            });
+            updateNBT(item, combined);
         } else {
-            NBT.modify(item, nbt -> {
-                ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
-                if (quantity > bait.getMaxApplications() && bait.getMaxApplications() != UNLIMITED_BAIT) {
-                    combined.append(bait.getId()).append(":").append(bait.getMaxApplications());
-                    compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
-                    cursorModifier.set(-bait.getMaxApplications());
-                    maxBait.set(true);
-                } else {
-                    combined.append(bait.getId()).append(":").append(quantity);
-                    compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
-                    cursorModifier.set(-quantity);
-                }
-            });
+            applyInitialBait(item, bait, quantity, combined, cursorModifier, maxBait);
         }
 
         if (doingLoreStuff && !combined.isEmpty()) {
@@ -221,6 +149,107 @@ public class BaitNBTManager {
 
         return new ApplicationResult(item, cursorModifier.get());
     }
+
+    private static void addNewBait(
+            ItemStack item, Bait bait, int quantity,
+            StringBuilder combined, AtomicInteger cursorModifier, AtomicBoolean maxBait,
+            boolean doingLoreStuff) throws MaxBaitsReachedException {
+
+        if (getNumBaitsApplied(item) >= MainConfig.getInstance().getBaitsPerRod()) {
+            if (doingLoreStuff) {
+                item.editMeta(meta -> meta.lore(newApplyLore(item)));
+            }
+            throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
+        }
+
+        int maxApplications = bait.getMaxApplications();
+        if (quantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
+            cursorModifier.set(-maxApplications);
+            combined.append(bait.getId()).append(":").append(maxApplications);
+            maxBait.set(true);
+        } else {
+            combined.append(bait.getId()).append(":").append(quantity);
+            cursorModifier.set(-quantity);
+        }
+    }
+
+
+    private static void removeOldLoreIfNecessary(@NotNull ItemStack item, Bait bait) {
+        try {
+            item.editMeta(meta -> meta.lore(deleteOldLore(item)));
+        } catch (IndexOutOfBoundsException ex) {
+            EvenMoreFish.getInstance().getLogger().severe(
+                    "Failed to apply bait: " + bait.getId() + " to a user's fishing rod. Check baits.yml format.");
+            throw new RuntimeException("Lore removal failed.", ex); // Optionally make this a custom exception
+        }
+    }
+
+    private static boolean applyToExistingBaits(
+            ItemStack item, Bait bait, int quantity,
+            StringBuilder combined, AtomicInteger cursorModifier, AtomicBoolean maxBait) {
+
+        boolean foundBait = false;
+        for (String baitName : NbtUtils.getBaitArray(item)) {
+            String[] split = baitName.split(":");
+            String baitId = split[0];
+            int baitQuantity = Integer.parseInt(split[1]);
+
+            if (baitId.equals(bait.getId())) {
+                if (bait.isInfinite()) {
+                    combined.append(baitId).append(":∞,");
+                } else {
+                    int newQuantity = baitQuantity + quantity;
+                    int maxApplications = bait.getMaxApplications();
+
+                    if (newQuantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
+                        combined.append(baitId).append(":").append(maxApplications).append(",");
+                        cursorModifier.set(-maxApplications + (newQuantity - quantity));
+                        maxBait.set(true);
+                    } else if (newQuantity != 0) {
+                        combined.append(baitId).append(":").append(newQuantity).append(",");
+                        cursorModifier.set(-quantity);
+                    }
+                }
+                foundBait = true;
+            } else {
+                combined.append(baitName).append(",");
+            }
+        }
+        return foundBait;
+    }
+
+    private static void updateNBT(ItemStack item, StringBuilder combined) {
+        NBT.modify(item, nbt -> {
+            ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+            if (combined.isEmpty()) {
+                compound.removeKey(NbtKeys.EMF_APPLIED_BAIT);
+            } else {
+                compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
+            }
+        });
+    }
+
+    private static void applyInitialBait(
+            ItemStack item, Bait bait, int quantity,
+            StringBuilder combined, AtomicInteger cursorModifier, AtomicBoolean maxBait) {
+
+        NBT.modify(item, nbt -> {
+            ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
+            int maxApplications = bait.getMaxApplications();
+
+            if (quantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
+                combined.append(bait.getId()).append(":").append(maxApplications);
+                cursorModifier.set(-maxApplications);
+                maxBait.set(true);
+            } else {
+                combined.append(bait.getId()).append(":").append(quantity);
+                cursorModifier.set(-quantity);
+            }
+
+            compound.setString(NbtKeys.EMF_APPLIED_BAIT, combined.toString());
+        });
+    }
+
 
     /**
      * This fetches a random bait applied to the rod, based on the application-weight of the baits (if they exist). The
@@ -254,7 +283,7 @@ public class BaitNBTManager {
         double totalWeight = baitList.stream().mapToDouble(Bait::getApplicationWeight).sum();
 
         int idx = 0;
-        for (double r = Math.random() * totalWeight; idx < baitList.size() - 1; ++idx) {
+        for (double r = EvenMoreFish.getInstance().getRandom().nextDouble() * totalWeight; idx < baitList.size() - 1; ++idx) {
             r -= baitList.get(idx).getApplicationWeight();
             if (r <= 0.0) {
                 break;
