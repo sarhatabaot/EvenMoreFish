@@ -40,6 +40,7 @@ import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Skull;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -418,12 +419,7 @@ public class FishUtils {
     }
 
     public static @Nullable Biome getBiome(@NotNull String keyString) {
-        // Force lowercase
         keyString = keyString.toLowerCase();
-        // If no namespace, assume minecraft
-        if (!keyString.contains(":")) {
-            keyString = "minecraft:" + keyString;
-        }
         // Get the key and check if null
         NamespacedKey key = NamespacedKey.fromString(keyString);
         if (key == null) {
@@ -723,6 +719,15 @@ public class FishUtils {
             amplifier - 1,
             false
         );
+    }
+
+    public static Enchantment getEnchantment(@NotNull String namespace) {
+        namespace = namespace.toLowerCase();
+        NamespacedKey key = NamespacedKey.fromString(namespace);
+        if (key == null) {
+            return null;
+        }
+        return Registry.ENCHANTMENT.get(key);
     }
 
 }
