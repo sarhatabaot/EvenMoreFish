@@ -16,7 +16,7 @@ public class QuantityItemConfig extends ItemConfig<@NotNull Integer> {
 
     @Override
     public @NotNull Integer getConfiguredValue() {
-        return section.getInt("quantity", 1);
+        return section.getInt("item.quantity", 1);
     }
 
     @Override
