@@ -11,6 +11,7 @@ import com.oheers.fish.items.configs.GlowingItemConfig;
 import com.oheers.fish.items.configs.ItemDamageItemConfig;
 import com.oheers.fish.items.configs.LoreItemConfig;
 import com.oheers.fish.items.configs.PotionMetaItemConfig;
+import com.oheers.fish.items.configs.QuantityItemConfig;
 import com.oheers.fish.items.configs.UnbreakableItemConfig;
 import com.oheers.fish.utils.ItemUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -47,6 +48,7 @@ public class ItemFactory {
     private final PotionMetaItemConfig potionMeta;
     private final EnchantmentsItemConfig enchantments;
     private final UnbreakableItemConfig unbreakable;
+    private final QuantityItemConfig quantity;
 
     private ItemFactory(@NotNull Section initialSection, @Nullable String configLocation) {
         if (configLocation == null) {
@@ -67,6 +69,7 @@ public class ItemFactory {
         this.potionMeta = new PotionMetaItemConfig(this.configuration);
         this.enchantments = new EnchantmentsItemConfig(this.configuration);
         this.unbreakable = new UnbreakableItemConfig(this.configuration);
+        this.quantity = new QuantityItemConfig(this.configuration);
 
         this.baseItem = getBaseItem();
     }
@@ -107,6 +110,7 @@ public class ItemFactory {
             potionMeta.apply(item, replacements);
             enchantments.apply(item, replacements);
             unbreakable.apply(item, replacements);
+            quantity.apply(item, replacements);
 
             if (finalChanges != null) {
                 finalChanges.accept(item);
@@ -226,6 +230,10 @@ public class ItemFactory {
 
     public UnbreakableItemConfig getUnbreakable() {
         return unbreakable;
+    }
+
+    public QuantityItemConfig getQuantity() {
+        return quantity;
     }
 
     // Base Item Methods //
