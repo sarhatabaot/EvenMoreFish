@@ -23,6 +23,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -138,38 +139,56 @@ public class Bait extends ConfigBase {
     /**
      * This fetches the boost's lore from the config and inserts the boost-rates into the {boosts} variable. This needs
      * to be called after the bait theme is set and the boosts have been initialized, since it uses those variables.
+     *
+     * @return A list of formatted Adventure components for the bait's lore
      */
     private @NotNull List<Component> createBoostLore() {
+        final EMFListMessage lore = getBaseLoreTemplate();
 
-        EMFListMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage().toListMessage();
-
-        Supplier<EMFMessage> boostsVariable = () -> {
-            EMFMessage message = EMFSingleMessage.empty();
-            List<Rarity> rarityList = getRarities();
-            if (!rarityList.isEmpty()) {
-                if (rarityList.size() > 1) {
-                    message.appendMessage(ConfigMessage.BAIT_BOOSTS_RARITIES.getMessage());
-                } else {
-                    message.appendMessage(ConfigMessage.BAIT_BOOSTS_RARITY.getMessage());
-                }
-                message.setAmount(Integer.toString(rarityList.size()));
-            }
-
-            List<Fish> fishList = getFish();
-            if (!fishList.isEmpty()) {
-                message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
-                message.setAmount(Integer.toString(fishList.size()));
-            }
-            return message;
-        };
-        lore.setVariable("{boosts}", boostsVariable.get());
-
-        Supplier<EMFListMessage> loreVariable = () -> EMFListMessage.fromStringList(itemFactory.getLore().getConfiguredValue());
-        lore.setVariable("{lore}", loreVariable.get());
-
-        lore.setVariable("{bait_theme}", "");
+        // Set dynamic variables
+        lore.setVariable("{boosts}", createBoostsVariable());
+        lore.setVariable("{lore}", createItemLoreVariable());
+        lore.setVariable("{bait_theme}", Component.empty());
 
         return lore.getComponentListMessage();
+    }
+
+    private EMFListMessage getBaseLoreTemplate() {
+        return ConfigMessage.BAIT_BAIT_LORE.getMessage().toListMessage();
+    }
+
+    private @NotNull EMFMessage createBoostsVariable() {
+        EMFMessage boostsMessage = EMFSingleMessage.empty();
+        appendRarityBoosts(boostsMessage);
+        appendFishBoosts(boostsMessage);
+        return boostsMessage;
+    }
+
+    private void appendRarityBoosts(EMFMessage message) {
+        List<Rarity> rarities = getRarities();
+        if (rarities.isEmpty()) return;
+
+        ConfigMessage boostMessage = rarities.size() > 1
+                ? ConfigMessage.BAIT_BOOSTS_RARITIES
+                : ConfigMessage.BAIT_BOOSTS_RARITY;
+
+        message.appendMessage(boostMessage.getMessage());
+        message.setAmount(Integer.toString(rarities.size()));
+    }
+
+    private void appendFishBoosts(EMFMessage message) {
+        List<Fish> fish = getFish();
+        if (fish.isEmpty()) return;
+
+        message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
+        message.setAmount(Integer.toString(fish.size()));
+    }
+
+    @Contract(pure = true)
+    private @NotNull Supplier<EMFListMessage> createItemLoreVariable() {
+        return () -> EMFListMessage.fromStringList(
+                itemFactory.getLore().getConfiguredValue()
+        );
     }
 
     public boolean isDisabled() {
@@ -314,8 +333,7 @@ public class Bait extends ConfigBase {
             EvenMoreFish.getInstance().incrementMetricBaitsUsed(1);
         } catch (MaxBaitReachedException | MaxBaitsReachedException e) {
             logger.log(Level.WARNING, e.getMessage());
-            //todo catch each individually and send the correct message to the player..
-            //player.sendMessage(ConfigMessage.M.getMessage().getRawMessage());
+            player.sendMessage(e.getConfigMessage().getMessage().getComponentMessage());
         } catch (NullPointerException exception) {
             logger.log(Level.SEVERE, exception.getMessage(), exception);
         }
