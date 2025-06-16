@@ -29,6 +29,9 @@ import java.util.function.Supplier;
 
 public class BaitNBTManager {
     public static final int UNLIMITED_BAIT = -1;
+    public static final String BAIT_SEPARATOR = ":";
+    public static final String BAIT_ENTRY_DELIMITER = ",";
+
     // Our line identifier. This is U+200C ZERO WIDTH NON-JOINER and is invisible
     public static final String LINE_IDENTIFIER = "\u200C";
 
@@ -165,10 +168,10 @@ public class BaitNBTManager {
         int maxApplications = bait.getMaxApplications();
         if (quantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
             cursorModifier.set(-maxApplications);
-            combined.append(bait.getId()).append(":").append(maxApplications);
+            combined.append(bait.getId()).append(BAIT_SEPARATOR).append(maxApplications);
             maxBait.set(true);
         } else {
-            combined.append(bait.getId()).append(":").append(quantity);
+            combined.append(bait.getId()).append(BAIT_SEPARATOR).append(quantity);
             cursorModifier.set(-quantity);
         }
     }
@@ -190,7 +193,7 @@ public class BaitNBTManager {
 
         boolean foundBait = false;
         for (String baitName : NbtUtils.getBaitArray(item)) {
-            String[] split = baitName.split(":");
+            String[] split = baitName.split(BAIT_SEPARATOR);
             String baitId = split[0];
             int baitQuantity = Integer.parseInt(split[1]);
 
@@ -202,17 +205,17 @@ public class BaitNBTManager {
                     int maxApplications = bait.getMaxApplications();
 
                     if (newQuantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
-                        combined.append(baitId).append(":").append(maxApplications).append(",");
+                        combined.append(baitId).append(BAIT_SEPARATOR).append(maxApplications).append(BAIT_ENTRY_DELIMITER);
                         cursorModifier.set(-maxApplications + (newQuantity - quantity));
                         maxBait.set(true);
                     } else if (newQuantity != 0) {
-                        combined.append(baitId).append(":").append(newQuantity).append(",");
+                        combined.append(baitId).append(BAIT_SEPARATOR).append(newQuantity).append(BAIT_ENTRY_DELIMITER);
                         cursorModifier.set(-quantity);
                     }
                 }
                 foundBait = true;
             } else {
-                combined.append(baitName).append(",");
+                combined.append(baitName).append(BAIT_ENTRY_DELIMITER);
             }
         }
         return foundBait;
@@ -238,11 +241,11 @@ public class BaitNBTManager {
             int maxApplications = bait.getMaxApplications();
 
             if (quantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
-                combined.append(bait.getId()).append(":").append(maxApplications);
+                combined.append(bait.getId()).append(BAIT_SEPARATOR).append(maxApplications);
                 cursorModifier.set(-maxApplications);
                 maxBait.set(true);
             } else {
-                combined.append(bait.getId()).append(":").append(quantity);
+                combined.append(bait.getId()).append(BAIT_SEPARATOR).append(quantity);
                 cursorModifier.set(-quantity);
             }
 
@@ -268,7 +271,7 @@ public class BaitNBTManager {
 
         for (String baitName : baitNameList) {
 
-            Bait bait = BaitManager.getInstance().getBait(baitName.split(":")[0]);
+            Bait bait = BaitManager.getInstance().getBait(baitName.split(BAIT_SEPARATOR)[0]);
             if (bait != null) {
                 baitList.add(bait);
             }
@@ -342,7 +345,7 @@ public class BaitNBTManager {
         String[] baitList = NbtUtils.getBaitArray(itemStack);
 
         for (String appliedBait : baitList) {
-            if (appliedBait.split(":")[0].equals(bait)) {
+            if (appliedBait.split(BAIT_SEPARATOR)[0].equals(bait)) {
                 return true;
             }
         }
@@ -367,7 +370,7 @@ public class BaitNBTManager {
         int totalDeleted = 0;
         String[] baitList = NbtUtils.getBaitArray(itemStack);
         for (String appliedBait : baitList) {
-            String quantityStr = appliedBait.split(":")[1];
+            String quantityStr = appliedBait.split(BAIT_SEPARATOR)[1];
             if (!quantityStr.equals("∞")) {
                 totalDeleted += Integer.parseInt(quantityStr);
             } else {
@@ -413,7 +416,7 @@ public class BaitNBTManager {
             final String[] baitRodNbt = rodNBT.split(",");
             for (String bait : baitRodNbt) {
                 EMFMessage baitFormat = ConfigMessage.BAIT_BAITS.getMessage();
-                final String[] parts = bait.split(":");
+                final String[] parts = bait.split(BAIT_SEPARATOR);
                 if (parts.length == 2) {
                     baitFormat.setAmount(parts[1]);
                 } else {
