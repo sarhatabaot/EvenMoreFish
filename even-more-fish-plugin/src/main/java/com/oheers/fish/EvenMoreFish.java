@@ -340,18 +340,9 @@ public class EvenMoreFish extends EMFPlugin {
         return dependencyManager;
     }
 
-    public ConfigurationManager getConfigurationManager() {
-        return configurationManager;
-    }
-
     public PluginDataManager getPluginDataManager() {
         return pluginDataManager;
     }
-
-    public AddonManager getAddonManager() {
-        return integrationManager.getAddonManager();
-    }
-
     public EventManager getEventManager() {
         return eventManager;
     }
