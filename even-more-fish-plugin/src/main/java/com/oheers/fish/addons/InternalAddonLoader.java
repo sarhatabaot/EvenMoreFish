@@ -1,6 +1,6 @@
 package com.oheers.fish.addons;
 
-import com.oheers.fish.DependencyManager;
+import com.oheers.fish.plugin.DependencyManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.addons.AddonLoader;
@@ -32,7 +32,6 @@ import com.oheers.fish.requirements.WorldRequirementType;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 
