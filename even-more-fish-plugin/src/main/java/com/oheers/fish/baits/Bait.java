@@ -96,7 +96,7 @@ public class Bait extends ConfigBase {
      *
      * @return An item stack representing the bait object, with nbt.
      */
-    public ItemStack create(OfflinePlayer player) {
+    public ItemStack create(@NotNull OfflinePlayer player) {
         return itemFactory.createItem(player.getUniqueId());
     }
 
