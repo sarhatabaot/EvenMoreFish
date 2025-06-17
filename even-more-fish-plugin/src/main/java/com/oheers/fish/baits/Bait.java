@@ -330,7 +330,7 @@ public class Bait extends ConfigBase {
             }
 
             fishingRod.setItemMeta(result.getFishingRod().getItemMeta());
-            EvenMoreFish.getInstance().incrementMetricBaitsUsed(1);
+            EvenMoreFish.getInstance().getMetricsManager().incrementBaitsUsed(1);
         } catch (MaxBaitReachedException | MaxBaitsReachedException e) {
             logger.log(Level.WARNING, e.getMessage());
             player.sendMessage(e.getConfigMessage().getMessage().getComponentMessage());
