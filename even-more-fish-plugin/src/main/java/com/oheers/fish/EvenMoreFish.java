@@ -86,19 +86,15 @@ import java.util.logging.Logger;
 import static com.oheers.fish.FishUtils.classExists;
 
 public class EvenMoreFish extends EMFPlugin {
-
     private final Random random = new Random();
     private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
         || classExists("io.papermc.paper.configuration.Configuration");
 
     private ItemStack customNBTRod;
-    private boolean checkingEatEvent;
-    private boolean checkingIntEvent;
     // Do some fish in some rarities have the comp-check-exempt: true.
     private boolean raritiesCompCheckExempt = false;
     private CompetitionQueue competitionQueue;
     private Logger logger;
-    private PluginManager pm;
     private int metricFishCaught = 0;
     private int metricBaitsUsed = 0;
     private int metricBaitsApplied = 0;
@@ -112,12 +108,12 @@ public class EvenMoreFish extends EMFPlugin {
     private DependencyManager dependencyManager;
     private ConfigurationManager configurationManager;
     private PluginDataManager pluginDataManager;
+    private IntegrationManager integrationManager;
+    private EventManager eventManager;
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
     private EMFAPI api;
-
-    private AddonManager addonManager;
 
 
     public static @NotNull EvenMoreFish getInstance() {
@@ -126,10 +122,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     public static TaskScheduler getScheduler() {
         return scheduler;
-    }
-
-    public AddonManager getAddonManager() {
-        return addonManager;
     }
 
     @Override
@@ -167,7 +159,6 @@ public class EvenMoreFish extends EMFPlugin {
         this.decidedRarities = new HashMap<>();
 
         this.logger = getLogger();
-        this.pm = getServer().getPluginManager();
 
         this.dependencyManager = new DependencyManager(this);
         this.dependencyManager.checkDependencies(); // need to test, order may be important, if it is, we introduce multiple stages with events
@@ -175,7 +166,8 @@ public class EvenMoreFish extends EMFPlugin {
         this.configurationManager = new ConfigurationManager(this);
         this.configurationManager.loadConfigurations(); //need to test, order may be important
 
-        loadAddonManager();
+        this.integrationManager = new IntegrationManager(this);
+        this.integrationManager.loadAddons();
 
         // could not set up economy.
         if (!Economy.getInstance().isEnabled()) {
@@ -203,8 +195,9 @@ public class EvenMoreFish extends EMFPlugin {
         AutoRunner.init();
 
         this.pluginDataManager = new PluginDataManager(this);
-
-        listeners();
+        this.eventManager = new EventManager(this);
+        this.eventManager.registerCoreListeners();
+        this.eventManager.registerOptionalListeners();
 
         registerCommands();
 
@@ -247,60 +240,10 @@ public class EvenMoreFish extends EMFPlugin {
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Disabled");
     }
 
-    private void saveAdditionalDefaultAddons() {
-        if (!MainConfig.getInstance().useAdditionalAddons()) {
-            return;
-        }
-
-        for (final String fileName : Arrays.stream(DefaultAddons.values())
-                .map(DefaultAddons::getFullFileName)
-                .toList()) {
-            final File addonFile = new File(getDataFolder(), "addons/" + fileName);
-            final File jarFile = new File(getDataFolder(), "addons/" + fileName.replace(".addon", ".jar"));
-            try {
-                this.saveResource("addons/" + fileName, true);
-                addonFile.renameTo(jarFile);
-            } catch (IllegalArgumentException e) {
-                debug(Level.WARNING, String.format("Default addon %s does not exist.", fileName));
-            }
-        }
-    }
 
     @Override
     public boolean isDebugSession() {
         return MainConfig.getInstance().debugSession();
-    }
-
-    private void listeners() {
-        if (MainConfig.getInstance().isDatabaseOnline()) {
-            pm.registerEvents(new JoinChecker(), this);
-            pm.registerEvents(this.pluginDataManager.getUserManager(), this);
-            pm.registerEvents(new EMFFishListener(),this);
-        }
-
-        pm.registerEvents(new FishingProcessor(), this);
-        pm.registerEvents(new HuntingProcessor(), this);
-        pm.registerEvents(new UpdateNotify(), this);
-        pm.registerEvents(new SkullSaver(), this);
-        pm.registerEvents(new BaitListener(), this);
-        pm.registerEvents(new ItemProtectionListener(), this);
-
-
-        optionalListeners();
-    }
-
-    private void optionalListeners() {
-        PluginManager pm = getServer().getPluginManager();
-
-        if (checkingEatEvent) {
-            pm.registerEvents(FishEatEvent.getInstance(), this);
-        }
-
-        if (checkingIntEvent) {
-            pm.registerEvents(FishInteractEvent.getInstance(), this);
-        }
-
-        dependencyManager.checkOptionalDependencies();
     }
 
     private void metrics() {
@@ -356,7 +299,8 @@ public class EvenMoreFish extends EMFPlugin {
         HandlerList.unregisterAll(FishEatEvent.getInstance());
         HandlerList.unregisterAll(FishInteractEvent.getInstance());
         HandlerList.unregisterAll(McMMOTreasureEvent.getInstance());
-        optionalListeners();
+
+        this.eventManager.registerOptionalListeners();
 
         competitionQueue.load();
 
@@ -394,22 +338,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     public ItemStack getCustomNBTRod() {
         return customNBTRod;
-    }
-
-    public boolean isCheckingEatEvent() {
-        return checkingEatEvent;
-    }
-
-    public void setCheckingEatEvent(boolean bool) {
-        this.checkingEatEvent = bool;
-    }
-
-    public boolean isCheckingIntEvent() {
-        return checkingIntEvent;
-    }
-
-    public void setCheckingIntEvent(boolean bool) {
-        this.checkingIntEvent = bool;
     }
 
     public boolean isRaritiesCompCheckExempt() {
@@ -460,16 +388,6 @@ public class EvenMoreFish extends EMFPlugin {
         return api;
     }
 
-    private void loadAddonManager() {
-        saveAdditionalDefaultAddons();
-
-        this.addonManager = new AddonManager();
-        this.addonManager.load();
-
-        // Load internal addons
-        new InternalAddonLoader().load();
-    }
-
     public List<Player> getVisibleOnlinePlayers() {
         return new ArrayList<>(Bukkit.getOnlinePlayers());
 //        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -502,7 +420,6 @@ public class EvenMoreFish extends EMFPlugin {
         return firstLoad;
     }
 
-
     public DependencyManager getDependencyManager() {
         return dependencyManager;
     }
@@ -513,5 +430,13 @@ public class EvenMoreFish extends EMFPlugin {
 
     public PluginDataManager getPluginDataManager() {
         return pluginDataManager;
+    }
+
+    public AddonManager getAddonManager() {
+        return integrationManager.getAddonManager();
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
     }
 }
