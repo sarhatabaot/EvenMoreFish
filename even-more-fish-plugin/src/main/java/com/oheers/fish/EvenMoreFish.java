@@ -100,7 +100,6 @@ public class EvenMoreFish extends EMFPlugin {
         || classExists("io.papermc.paper.configuration.Configuration");
 
     private Permission permission = null;
-    private ItemStack customNBTRod;
     private boolean checkingEatEvent;
     private boolean checkingIntEvent;
     // Do some fish in some rarities have the comp-check-exempt: true.
@@ -502,10 +501,6 @@ public class EvenMoreFish extends EMFPlugin {
         return permission;
     }
 
-    public ItemStack getCustomNBTRod() {
-        return customNBTRod;
-    }
-
     public boolean isCheckingEatEvent() {
         return checkingEatEvent;
     }
@@ -551,7 +546,7 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     public void incrementMetricBaitsUsed(int value) {
-        this.metricBaitsUsed = (metricBaitsUsed + value);
+        this.metricBaitsUsed += value;
     }
 
     public int getMetricBaitsApplied() {

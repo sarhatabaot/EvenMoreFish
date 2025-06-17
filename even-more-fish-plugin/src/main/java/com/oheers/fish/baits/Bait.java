@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.baits.configs.BaitFileUpdates;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.data.FishRarityKey;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
 import com.oheers.fish.fishing.items.Fish;
@@ -22,25 +23,27 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// TODO still uses deprecated methods
 public class Bait extends ConfigBase {
-
-    private static final Logger logger = EvenMoreFish.getInstance().getLogger();
+    private static final double DEFAULT_BOOST_RATE = 1.0;
+    private final Logger logger = EvenMoreFish.getInstance().getLogger();
+    private final FishManager fishManager;
+    private final MainConfig mainConfig;
+    private final ItemFactory itemFactory;
 
     private final @NotNull String id;
-    private final ItemFactory itemFactory;
+
+    private List<Rarity> cachedRarities;
+    private List<Fish> cachedFish;
 
     /**
      * This represents a bait, which can be used to boost the likelihood that a certain fish or fish rarity appears from
@@ -52,12 +55,19 @@ public class Bait extends ConfigBase {
      *
      * @param file The bait's config file
      */
-    public Bait(@NotNull File file) throws InvalidConfigurationException {
+    public Bait(@NotNull File file, FishManager fishManager, MainConfig mainConfig) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
         BaitFileUpdates.update(this);
         performRequiredConfigChecks();
-        this.id = Objects.requireNonNull(getConfig().getString("id"));
 
+        final String configId = getConfig().getString("id");
+        if (configId == null) {
+            throw new InvalidConfigurationException("Missing 'id' in " + getFileName());
+        }
+
+        this.id = configId;
+        this.fishManager = fishManager;
+        this.mainConfig = mainConfig;
         ItemFactory factory = ItemFactory.itemFactory(getConfig());
 
         DisplayNameItemConfig displayNameConfig = factory.getDisplayName();
@@ -86,79 +96,99 @@ public class Bait extends ConfigBase {
      *
      * @return An item stack representing the bait object, with nbt.
      */
-    public ItemStack create(OfflinePlayer player) {
+    public ItemStack create(@NotNull OfflinePlayer player) {
         return itemFactory.createItem(player.getUniqueId());
     }
+
 
     /**
      * @return All configured rarities from this bait's configuration.
      */
     public @NotNull List<Rarity> getRarities() {
-        List<String> rarityStrings = getConfig().getStringList("rarities");
-        return rarityStrings.stream()
-                .map(FishManager.getInstance()::getRarity)
-                .filter(Objects::nonNull)
-                .toList();
+        if (cachedRarities == null) {
+            List<String> rarityStrings = getConfig().getStringList("rarities");
+            this.cachedRarities = rarityStrings.stream()
+                    .map(FishManager.getInstance()::getRarity)
+                    .filter(Objects::nonNull)
+                    .toList();
+        }
+
+        return cachedRarities;
     }
 
     private @NotNull List<Fish> getFish() {
-        List<Fish> fishList = new ArrayList<>();
-        Section fishSection = getConfig().getSection("fish");
-        if (fishSection == null) {
-            return fishList;
-        }
-        for (String rarityName : fishSection.getRoutesAsStrings(false)) {
-            Rarity rarity = FishManager.getInstance().getRarity(rarityName);
-            if (rarity == null) {
-                continue;
+        if (cachedFish == null) {
+            final Section fishSection = getConfig().getSection("fish");
+            if (fishSection == null) {
+                EvenMoreFish.getInstance().debug("Fish section was null in bait. Returning empty list..");
+                return Collections.emptyList();
             }
-            List<String> fishNames = fishSection.getStringList(rarityName);
-            for (String fishName : fishNames) {
-                Fish fish = rarity.getFish(fishName);
-                if (fish == null) {
-                    continue;
-                }
-                fishList.add(fish);
-            }
+
+            this.cachedFish = getConfig().getSection("fish").getRoutesAsStrings(false).stream()
+                    .map(FishManager.getInstance()::getRarity)
+                    .filter(Objects::nonNull)
+                    .flatMap(rarity -> rarity.getFishList().stream())
+                    .filter(fish -> getConfig().getStringList("fish." + fish.getRarity().getId())
+                            .contains(fish.getName()))
+                    .toList();
         }
-        return fishList;
+
+        return cachedFish;
     }
 
     /**
      * This fetches the boost's lore from the config and inserts the boost-rates into the {boosts} variable. This needs
      * to be called after the bait theme is set and the boosts have been initialized, since it uses those variables.
+     *
+     * @return A list of formatted Adventure components for the bait's lore
      */
-    private List<Component> createBoostLore() {
+    private @NotNull List<Component> createBoostLore() {
+        final EMFListMessage lore = getBaseLoreTemplate();
 
-        EMFListMessage lore = ConfigMessage.BAIT_BAIT_LORE.getMessage().toListMessage();
-
-        Supplier<EMFMessage> boostsVariable = () -> {
-            EMFMessage message = EMFSingleMessage.empty();
-            List<Rarity> rarityList = getRarities();
-            if (!rarityList.isEmpty()) {
-                if (rarityList.size() > 1) {
-                    message.appendMessage(ConfigMessage.BAIT_BOOSTS_RARITIES.getMessage());
-                } else {
-                    message.appendMessage(ConfigMessage.BAIT_BOOSTS_RARITY.getMessage());
-                }
-                message.setAmount(Integer.toString(rarityList.size()));
-            }
-
-            List<Fish> fishList = getFish();
-            if (!fishList.isEmpty()) {
-                message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
-                message.setAmount(Integer.toString(fishList.size()));
-            }
-            return message;
-        };
-        lore.setVariable("{boosts}", boostsVariable.get());
-
-        Supplier<EMFListMessage> loreVariable = () -> EMFListMessage.fromStringList(itemFactory.getLore().getConfiguredValue());
-        lore.setVariable("{lore}", loreVariable.get());
-
-        lore.setVariable("{bait_theme}", "");
+        // Set dynamic variables
+        lore.setVariable("{boosts}", createBoostsVariable());
+        lore.setVariable("{lore}", createItemLoreVariable().get());
+        lore.setVariable("{bait_theme}", Component.empty());
 
         return lore.getComponentListMessage();
+    }
+
+    private EMFListMessage getBaseLoreTemplate() {
+        return ConfigMessage.BAIT_BAIT_LORE.getMessage().toListMessage();
+    }
+
+    private @NotNull EMFMessage createBoostsVariable() {
+        EMFMessage boostsMessage = EMFSingleMessage.empty();
+        appendRarityBoosts(boostsMessage);
+        appendFishBoosts(boostsMessage);
+        return boostsMessage;
+    }
+
+    private void appendRarityBoosts(EMFMessage message) {
+        List<Rarity> rarities = getRarities();
+        if (rarities.isEmpty()) return;
+
+        ConfigMessage boostMessage = rarities.size() > 1
+                ? ConfigMessage.BAIT_BOOSTS_RARITIES
+                : ConfigMessage.BAIT_BOOSTS_RARITY;
+
+        message.appendMessage(boostMessage.getMessage());
+        message.setAmount(Integer.toString(rarities.size()));
+    }
+
+    private void appendFishBoosts(EMFMessage message) {
+        List<Fish> fish = getFish();
+        if (fish.isEmpty()) return;
+
+        message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
+        message.setAmount(Integer.toString(fish.size()));
+    }
+
+    @Contract(pure = true)
+    private @NotNull Supplier<EMFListMessage> createItemLoreVariable() {
+        return () -> EMFListMessage.fromStringList(
+                itemFactory.getLore().getConfiguredValue()
+        );
     }
 
     public boolean isDisabled() {
@@ -173,6 +203,7 @@ public class Bait extends ConfigBase {
         return getConfig().getBoolean("disable-use-alert", false);
     }
 
+
     /**
      * This chooses a random fish based on the set boosts of the bait's config.
      * <p>
@@ -183,64 +214,136 @@ public class Bait extends ConfigBase {
      * <p>
      * * Pick a rarity, boosting all rarities referenced in the fishList, from that rarity choose a random fish, if that
      * fish is within the fishList then give it to the player as the fish roll. REMOVE BAIT
+     * <p>
+     * TLDR: Choose a fish based on the bait's configured boosts, applying probability modifications.
      *
-     * @return A chosen fish.
+     * @return The selected fish, or null if no valid fish was found
      */
     public Fish chooseFish(@NotNull Player player, @NotNull Location location) {
-        Set<Rarity> boostedRarities = new HashSet<>(getRarities());
-        List<Rarity> fishListRarities = getFish().stream().map(Fish::getRarity).toList();
+        // Step 1: Determine which rarities are boosted by this bait
+        Set<Rarity> boostedRarities = determineBoostedRarities();
 
-        boostedRarities.addAll(fishListRarities);
+        // Step 2: Select a rarity considering the boosts
+        Rarity selectedRarity = selectRarityWithBoosts(player, boostedRarities);
 
-        Rarity fishRarity = FishManager.getInstance().getRandomWeightedRarity(player, getBoostRate(), boostedRarities, Set.copyOf(FishManager.getInstance().getRarityMap().values()), null);
-        Fish fish;
+        // Step 3: Select a fish from the chosen rarity
+        Fish selectedFish = selectFishFromRarity(selectedRarity, player, location);
 
-        if (!getFish().isEmpty()) {
-            // The bait has both rarities: and fish: set but the plugin chose a rarity with no boosted fish. This ensures
-            // the method isn't given an empty list.
-            if (!fishListRarities.contains(fishRarity)) {
-                fish = FishManager.getInstance().getFish(fishRarity, location, player, MainConfig.getInstance().getBaitBoostRate(), fishRarity.getFishList(), true, null, null);
-            } else {
-                fish = FishManager.getInstance().getFish(fishRarity, location, player, MainConfig.getInstance().getBaitBoostRate(), getFish(), true, null, null);
-            }
+        // Step 4: Handle bait consumption and metadata
+        processBaitUsage(player, selectedRarity, selectedFish);
 
-            if (!getRarities().contains(fishRarity) && (fish == null || !getFish().contains(fish))) {
-                // boost effect chose a fish but the randomizer didn't pick out the right fish - they've been incorrectly boosted.
-                fish = FishManager.getInstance().getFish(fishRarity, location, player, 1, null, true, null, null);
-            } else {
-                alertUsage(player);
-            }
-        } else {
-            fish = FishManager.getInstance().getFish(fishRarity, location, player, 1, null, true, null, null);
-            if (getRarities().contains(fishRarity)) {
-                alertUsage(player);
-            }
+        return selectedFish;
+    }
+
+    private @NotNull Set<Rarity> determineBoostedRarities() {
+        Set<Rarity> boosted = new HashSet<>(getRarities());
+        getFish().stream()
+                .map(Fish::getRarity)
+                .forEach(boosted::add);
+        return boosted;
+    }
+
+    private Rarity selectRarityWithBoosts(Player player, Set<Rarity> boostedRarities) {
+        return fishManager.getRandomWeightedRarity(
+                player,
+                getBoostRate(),
+                boostedRarities,
+                Set.copyOf(fishManager.getRarityMap().values()),
+                null
+        );
+    }
+
+    private Fish selectFishFromRarity(Rarity rarity, Player player, Location location) {
+        List<Fish> eligibleFish = getEligibleFishForRarity(rarity);
+        double boostRate = shouldApplyBoost(rarity) ? mainConfig.getBaitBoostRate() : DEFAULT_BOOST_RATE;
+
+        return fishManager.getFish(
+                rarity,
+                location,
+                player,
+                boostRate,
+                eligibleFish,
+                true,
+                null,
+                null
+        );
+    }
+
+    private @Nullable List<Fish> getEligibleFishForRarity(Rarity rarity) {
+        if (getFish().isEmpty()) {
+            return null; // Let fishManager use all fish in rarity
         }
-        if (fish != null) {
-            fish.setWasBaited(true);
-            fish.setFisherman(player.getUniqueId());
+
+        // If this rarity has specifically boosted fish, use them
+        if (getFish().stream().anyMatch(f -> f.getRarity().equals(rarity))) {
+            return getFish();
         }
-        return fish;
+
+        // Otherwise use all fish from this rarity
+        return rarity.getFishList();
+    }
+
+    private boolean shouldApplyBoost(Rarity rarity) {
+        return getRarities().contains(rarity) ||
+                getFish().stream().anyMatch(f -> f.getRarity().equals(rarity));
+    }
+
+    private void processBaitUsage(Player player, Rarity rarity, Fish fish) {
+        if (fish == null) {
+            return;
+        }
+
+        fish.setWasBaited(true);
+        fish.setFisherman(player.getUniqueId());
+
+        if (shouldAlertUsage(rarity, fish)) {
+            alertUsage(player);
+        }
+    }
+
+    private boolean shouldAlertUsage(Rarity rarity, Fish fish) {
+        // Alert if either:
+        // 1. The rarity was directly boosted, or
+        // 2. The specific fish was boosted
+        return getRarities().contains(rarity) ||
+                (!getFish().isEmpty() && getFish().contains(fish));
     }
 
     public void handleFish(@NotNull Player player, @NotNull Fish fish, @NotNull ItemStack fishingRod) {
         if (!fish.isWasBaited()) {
+            EvenMoreFish.getInstance().debug("Fish: %s was not baited, ignoring..".formatted(FishRarityKey.of(fish)));
             return;
         }
+
+        EvenMoreFish.getInstance().debug("Fish: %s was baited".formatted(FishRarityKey.of(fish)));
         fish.setFisherman(player.getUniqueId());
+
+        // Only consume bait if this bait actually affected the catch
+        if (!shouldConsumeBait(fish)) {
+            return;
+        }
+
         try {
-            ApplicationResult result = BaitNBTManager.applyBaitedRodNBT(fishingRod, this, -1);
-            if (result == null) {
+            ApplicationResult result = BaitNBTManager.applyBaitedRodNBT(fishingRod, this, -1); //updates the state of the rod, if the correct fish was baited
+            if (result == null || result.getFishingRod() == null) {
                 return;
             }
-            ItemStack newFishingRod = result.getFishingRod();
-            if (newFishingRod != null) {
-                fishingRod.setItemMeta(newFishingRod.getItemMeta());
-                EvenMoreFish.getInstance().incrementMetricBaitsUsed(1);
-            }
-        } catch (MaxBaitsReachedException | MaxBaitReachedException | NullPointerException exception) {
-            EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, exception.getMessage(), exception);
+
+            fishingRod.setItemMeta(result.getFishingRod().getItemMeta());
+            EvenMoreFish.getInstance().incrementMetricBaitsUsed(1);
+        } catch (MaxBaitReachedException | MaxBaitsReachedException e) {
+            logger.log(Level.WARNING, e.getMessage());
+            player.sendMessage(e.getConfigMessage().getMessage().getComponentMessage());
+        } catch (NullPointerException exception) {
+            logger.log(Level.SEVERE, exception.getMessage(), exception);
         }
+    }
+
+    private boolean shouldConsumeBait(@NotNull Fish fish) {
+        // Consume bait if:
+        // 1. The fish's rarity is directly boosted by this bait, or
+        // 2. The specific fish is in this bait's fish list
+        return getRarities().contains(fish.getRarity()) || getFish().contains(fish);
     }
 
     /**
@@ -255,7 +358,7 @@ public class Bait extends ConfigBase {
         }
 
         EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
-        message.setBait(format(id));
+        message.setBait(format(getDisplayName()));
         message.send(player);
     }
 
@@ -277,7 +380,7 @@ public class Bait extends ConfigBase {
      * @return The x multiplier of a chance to get one of the fish in the bait's fish to appear.
      */
     public double getBoostRate() {
-        return MainConfig.getInstance().getBaitBoostRate();
+        return mainConfig.getBaitBoostRate();
     }
 
     /**
@@ -320,4 +423,17 @@ public class Bait extends ConfigBase {
         return getConfig().getBoolean("can-be-caught", true);
     }
 
+    @Override
+    public void reload(@NotNull File configFile) {
+        super.reload(configFile);
+        this.cachedFish = null;
+        this.cachedRarities = null;
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        this.cachedFish = null;
+        this.cachedRarities = null;
+    }
 }

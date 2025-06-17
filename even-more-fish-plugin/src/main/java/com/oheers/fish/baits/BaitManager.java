@@ -3,6 +3,8 @@ package com.oheers.fish.baits;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.FileUtil;
 import com.oheers.fish.baits.configs.BaitConversions;
+import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.fishing.items.FishManager;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -105,7 +107,7 @@ public class BaitManager {
             EvenMoreFish.getInstance().debug("Loading " + file.getName() + " bait");
             Bait bait;
             try {
-                bait = new Bait(file);
+                bait = new Bait(file, FishManager.getInstance(), MainConfig.getInstance());
             } catch (InvalidConfigurationException exception) {
                 return;
             }

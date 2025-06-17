@@ -104,10 +104,14 @@ dependencies {
     library(libs.jooq.meta)
     library(libs.connectors.h2)
     library(libs.maven.artifact)
+    library(libs.annotations)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
     jooqGenerator(libs.connectors.mysql)
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.0")
 }
 
 bukkit {
@@ -316,6 +320,10 @@ tasks {
         options.compilerArgs.add("-parameters")
         options.isFork = true
         options.encoding = "UTF-8"
+    }
+
+    test {
+        useJUnitPlatform();
     }
 }
 
