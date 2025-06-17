@@ -35,3 +35,4 @@ Built with [Docusaurus](https://docusaurus.io/).
 ## Debugging Issues
 Sometimes git may bug out and cause the build folder to disappear. (Happens when switching branches).
 In this case run: `git rm -r --cached docs/build` and the commit as usual.
+If experiencing any additional issues, it's recommended to run `docusaurus clear` and rebuild as well.
