@@ -141,7 +141,7 @@ public abstract class Processor<E extends Event> implements Listener {
             message.setPlayer(player);
             message.setLength(length);
 
-            EvenMoreFish.getInstance().incrementMetricFishCaught(1);
+            EvenMoreFish.getInstance().getMetricsManager().incrementFishCaught(1);
 
             fish.getDisplayName();
             message.setFishCaught(fish.getDisplayName());

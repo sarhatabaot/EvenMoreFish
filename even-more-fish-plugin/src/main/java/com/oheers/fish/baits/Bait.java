@@ -236,7 +236,7 @@ public class Bait extends ConfigBase {
             ItemStack newFishingRod = result.getFishingRod();
             if (newFishingRod != null) {
                 fishingRod.setItemMeta(newFishingRod.getItemMeta());
-                EvenMoreFish.getInstance().incrementMetricBaitsUsed(1);
+                EvenMoreFish.getInstance().getMetricsManager().incrementBaitsUsed(1);
             }
         } catch (MaxBaitsReachedException | MaxBaitReachedException | NullPointerException exception) {
             EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, exception.getMessage(), exception);

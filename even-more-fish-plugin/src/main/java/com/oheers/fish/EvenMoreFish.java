@@ -64,9 +64,6 @@ public class EvenMoreFish extends EMFPlugin {
     private boolean raritiesCompCheckExempt = false;
     private CompetitionQueue competitionQueue;
     private Logger logger;
-    private int metricFishCaught = 0;
-    private int metricBaitsUsed = 0;
-    private int metricBaitsApplied = 0;
     private boolean firstLoad = false;
 
     // this is for pre-deciding a rarity and running particles if it will be chosen
@@ -79,6 +76,7 @@ public class EvenMoreFish extends EMFPlugin {
     private PluginDataManager pluginDataManager;
     private IntegrationManager integrationManager;
     private EventManager eventManager;
+    private MetricsManager metricsManager;
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
@@ -157,9 +155,8 @@ public class EvenMoreFish extends EMFPlugin {
             isUpdateAvailable = available
         );
 
-        if (!MainConfig.getInstance().debugSession()) {
-            metrics();
-        }
+        this.metricsManager = new MetricsManager(this);
+        this.metricsManager.setupMetrics();
 
         AutoRunner.init();
 
@@ -213,32 +210,6 @@ public class EvenMoreFish extends EMFPlugin {
     @Override
     public boolean isDebugSession() {
         return MainConfig.getInstance().debugSession();
-    }
-
-    private void metrics() {
-        Metrics metrics = new Metrics(this, 11054);
-
-        metrics.addCustomChart(new SingleLineChart("fish_caught", () -> {
-            int returning = metricFishCaught;
-            metricFishCaught = 0;
-            return returning;
-        }));
-
-        metrics.addCustomChart(new SingleLineChart("baits_applied", () -> {
-            int returning = metricBaitsApplied;
-            metricBaitsApplied = 0;
-            return returning;
-        }));
-
-        metrics.addCustomChart(new SingleLineChart("baits_used", () -> {
-            int returning = metricBaitsUsed;
-            metricBaitsUsed = 0;
-            return returning;
-        }));
-
-        metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
-
-        metrics.addCustomChart(new SimplePie("paper-adapter", () -> "true"));
     }
 
     // gets called on server shutdown to simulate all players closing their Guis
@@ -321,30 +292,6 @@ public class EvenMoreFish extends EMFPlugin {
         return competitionQueue;
     }
 
-    public int getMetricFishCaught() {
-        return metricFishCaught;
-    }
-
-    public void incrementMetricFishCaught(int value) {
-        this.metricFishCaught = (metricFishCaught + value);
-    }
-
-    public int getMetricBaitsUsed() {
-        return metricBaitsUsed;
-    }
-
-    public void incrementMetricBaitsUsed(int value) {
-        this.metricBaitsUsed = (metricBaitsUsed + value);
-    }
-
-    public int getMetricBaitsApplied() {
-        return metricBaitsApplied;
-    }
-
-    public void incrementMetricBaitsApplied(int value) {
-        this.metricBaitsApplied = (metricBaitsApplied + value);
-    }
-
     public Map<UUID, Rarity> getDecidedRarities() {
         return decidedRarities;
     }
@@ -407,5 +354,9 @@ public class EvenMoreFish extends EMFPlugin {
 
     public EventManager getEventManager() {
         return eventManager;
+    }
+
+    public MetricsManager getMetricsManager() {
+        return metricsManager;
     }
 }

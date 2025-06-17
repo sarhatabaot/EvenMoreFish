@@ -71,7 +71,7 @@ public class ApplyBaitsGui extends ConfigGui {
             // Try to apply all the baits.
             try {
                 result = BaitNBTManager.applyBaitedRodNBT(handItem, bait, item.getAmount());
-                EvenMoreFish.getInstance().incrementMetricBaitsApplied(item.getAmount());
+                EvenMoreFish.getInstance().getMetricsManager().incrementBaitsApplied(item.getAmount());
                 // When a specific bait is maxed.
             } catch (MaxBaitReachedException exception) {
                 EMFMessage message = ConfigMessage.BAITS_MAXED_ON_ROD.getMessage();
