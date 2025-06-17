@@ -61,12 +61,4 @@ public class EventManager {
     public void setCheckingIntEvent(boolean checkingIntEvent) {
         this.checkingIntEvent = checkingIntEvent;
     }
-
-    public boolean isCheckingEatEvent() {
-        return checkingEatEvent;
-    }
-
-    public boolean isCheckingIntEvent() {
-        return checkingIntEvent;
-    }
 }
