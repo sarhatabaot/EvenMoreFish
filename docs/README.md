@@ -30,3 +30,8 @@ Built with [Docusaurus](https://docusaurus.io/).
    ```bash
    npm run build
    ```
+   
+
+## Debugging Issues
+Sometimes git may bug out and cause the build folder to disappear. (Happens when switching branches).
+In this case run: `git rm -r --cached docs/build` and the commit as usual.
