@@ -201,6 +201,7 @@ public class FishJournalGui extends ConfigGui {
                     meta.displayName(display.getComponentMessage());
                 }
                 meta.lore(configuredMeta.lore());
+                meta.setCustomModelData(configuredMeta.getCustomModelData());
             });
         }
 
