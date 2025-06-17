@@ -24,7 +24,9 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
     @Override
     @EventHandler(priority = EventPriority.HIGHEST)
     public void process(@NotNull PlayerFishEvent event) {
-        if (!isCustomFishAllowed(event.getPlayer()) || !Checks.canUseRod(getRod(event))) {
+        ItemStack rod = getRod(event);
+
+        if (!isCustomFishAllowed(event.getPlayer()) || !Checks.canUseRod(rod)) {
             return;
         }
 
@@ -39,7 +41,7 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
             return;
         }
 
-        ItemStack fish = getFish(event.getPlayer(), event.getHook().getLocation(), event.getPlayer().getInventory().getItemInMainHand());
+        ItemStack fish = getFish(event.getPlayer(), event.getHook().getLocation(), rod);
 
         if (fish == null) {
             return;
