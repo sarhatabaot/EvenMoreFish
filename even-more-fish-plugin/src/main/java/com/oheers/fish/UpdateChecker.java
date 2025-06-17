@@ -49,7 +49,7 @@ public class UpdateChecker {
     }
 }
 
-class UpdateNotify implements Listener {
+public class UpdateNotify implements Listener {
 
     @EventHandler
     // informs admins with emf.admin permission that the plugin needs updating

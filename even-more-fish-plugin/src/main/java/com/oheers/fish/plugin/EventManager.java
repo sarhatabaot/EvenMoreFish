@@ -2,6 +2,8 @@ package com.oheers.fish.plugin;
 
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.SkullSaver;
+import com.oheers.fish.UpdateNotify;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.config.MainConfig;
@@ -36,6 +38,8 @@ public class EventManager {
         // Always-registered listeners
         pm.registerEvents(new FishingProcessor(), plugin);
         pm.registerEvents(new HuntingProcessor(), plugin);
+        pm.registerEvents(new SkullSaver(), plugin);
+        pm.registerEvents(new UpdateNotify(), plugin);
         pm.registerEvents(new BaitListener(), plugin);
         pm.registerEvents(new ItemProtectionListener(), plugin);
     }
