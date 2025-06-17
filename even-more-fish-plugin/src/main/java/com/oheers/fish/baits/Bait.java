@@ -147,7 +147,7 @@ public class Bait extends ConfigBase {
 
         // Set dynamic variables
         lore.setVariable("{boosts}", createBoostsVariable());
-        lore.setVariable("{lore}", createItemLoreVariable());
+        lore.setVariable("{lore}", createItemLoreVariable().get());
         lore.setVariable("{bait_theme}", Component.empty());
 
         return lore.getComponentListMessage();
@@ -358,7 +358,7 @@ public class Bait extends ConfigBase {
         }
 
         EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
-        message.setBait(format(id));
+        message.setBait(format(getDisplayName()));
         message.send(player);
     }
 
