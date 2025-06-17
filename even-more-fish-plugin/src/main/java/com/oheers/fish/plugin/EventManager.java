@@ -1,6 +1,7 @@
-package com.oheers.fish;
+package com.oheers.fish.plugin;
 
 
+import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.config.MainConfig;

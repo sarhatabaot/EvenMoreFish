@@ -1,5 +1,6 @@
-package com.oheers.fish;
+package com.oheers.fish.plugin;
 
+import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.GuiFillerConfig;
 import com.oheers.fish.config.MainConfig;

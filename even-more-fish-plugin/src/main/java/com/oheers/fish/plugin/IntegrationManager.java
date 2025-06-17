@@ -1,5 +1,6 @@
-package com.oheers.fish;
+package com.oheers.fish.plugin;
 
+import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.addons.DefaultAddons;
 import com.oheers.fish.addons.InternalAddonLoader;
 import com.oheers.fish.api.addons.AddonManager;
