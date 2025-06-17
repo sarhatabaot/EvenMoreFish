@@ -36,11 +36,6 @@ import com.oheers.fish.database.model.fish.FishLog;
 import com.oheers.fish.database.model.fish.FishStats;
 import com.oheers.fish.database.model.user.UserFishStats;
 import com.oheers.fish.database.model.user.UserReport;
-import com.oheers.fish.economy.GriefPreventionEconomyType;
-import com.oheers.fish.economy.PlayerPointsEconomyType;
-import com.oheers.fish.economy.VaultEconomyType;
-import com.oheers.fish.events.AuraSkillsFishingEvent;
-import com.oheers.fish.events.AureliumSkillsFishingEvent;
 import com.oheers.fish.events.FishEatEvent;
 import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
@@ -51,8 +46,6 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.fishing.rods.RodManager;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.placeholders.PlaceholderReceiver;
-import com.oheers.fish.utils.HeadDBIntegration;
 import com.oheers.fish.utils.ItemProtectionListener;
 import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -73,7 +66,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,7 +99,7 @@ public class EvenMoreFish extends EMFPlugin {
     private boolean raritiesCompCheckExempt = false;
     private CompetitionQueue competitionQueue;
     private Logger logger;
-    private PluginManager pluginManager;
+    private PluginManager pm;
     private int metricFishCaught = 0;
     private int metricBaitsUsed = 0;
     private int metricBaitsApplied = 0;
@@ -117,12 +109,8 @@ public class EvenMoreFish extends EMFPlugin {
     // it's a work-in-progress solution and probably won't stick.
     private Map<UUID, Rarity> decidedRarities;
     private boolean isUpdateAvailable;
-    private boolean usingVault;
-    private boolean usingPAPI;
-    private boolean usingMcMMO;
-    private boolean usingHeadsDB;
-    private boolean usingPlayerPoints;
-    private boolean usingGriefPrevention;
+
+    private DependencyManager dependencyManager;
 
     private Database database;
     private HeadDatabaseAPI HDBapi;
@@ -187,11 +175,10 @@ public class EvenMoreFish extends EMFPlugin {
         this.decidedRarities = new HashMap<>();
 
         this.logger = getLogger();
-        this.pluginManager = getServer().getPluginManager();
+        this.pm = getServer().getPluginManager();
 
-        this.usingVault = Bukkit.getPluginManager().isPluginEnabled("Vault");
-        this.usingGriefPrevention = Bukkit.getPluginManager().isPluginEnabled("GriefPrevention");
-        this.usingPlayerPoints = Bukkit.getPluginManager().isPluginEnabled("PlayerPoints");
+        this.dependencyManager = new DependencyManager(this);
+        dependencyManager.checkDependencies(); // need to test, order may be important, if it is, we introduce multiple stages with events
 
         new MainConfig();
         new MessageConfig();
@@ -202,16 +189,10 @@ public class EvenMoreFish extends EMFPlugin {
         new GuiConfig();
         new GuiFillerConfig();
 
-        checkPapi();
-
-        loadEconomy();
-
         // could not set up economy.
         if (!Economy.getInstance().isEnabled()) {
             getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
         }
-
-        setupPermissions();
 
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
@@ -333,8 +314,6 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     private void listeners() {
-        PluginManager pm = getServer().getPluginManager();
-
         if (MainConfig.getInstance().isDatabaseOnline()) {
             pm.registerEvents(new JoinChecker(), this);
             pm.registerEvents(this.userManager, this);
@@ -363,28 +342,7 @@ public class EvenMoreFish extends EMFPlugin {
             pm.registerEvents(FishInteractEvent.getInstance(), this);
         }
 
-        if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
-            usingMcMMO = true;
-            if (MainConfig.getInstance().disableMcMMOTreasure()) {
-                pm.registerEvents(McMMOTreasureEvent.getInstance(), this);
-            }
-        }
-
-        if (Bukkit.getPluginManager().isPluginEnabled("HeadDatabase")) {
-            usingHeadsDB = true;
-            pm.registerEvents(new HeadDBIntegration(), this);
-        }
-
-        if (Bukkit.getPluginManager().isPluginEnabled("AureliumSkills")) {
-            if (MainConfig.getInstance().disableAureliumSkills()) {
-                pm.registerEvents(new AureliumSkillsFishingEvent(), this);
-            }
-        }
-        if (Bukkit.getPluginManager().isPluginEnabled("AuraSkills")) {
-            if (MainConfig.getInstance().disableAureliumSkills()) {
-                pm.registerEvents(new AuraSkillsFishingEvent(), this);
-            }
-        }
+        dependencyManager.checkOptionalDependencies();
     }
 
     private void metrics() {
@@ -411,15 +369,6 @@ public class EvenMoreFish extends EMFPlugin {
         metrics.addCustomChart(new SimplePie("database", () -> MainConfig.getInstance().databaseEnabled() ? "true" : "false"));
 
         metrics.addCustomChart(new SimplePie("paper-adapter", () -> "true"));
-    }
-
-    private boolean setupPermissions() {
-        if (!usingVault) {
-            return false;
-        }
-        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        permission = rsp == null ? null : rsp.getProvider();
-        return permission != null;
     }
 
     // gets called on server shutdown to simulate all players closing their Guis
@@ -487,13 +436,6 @@ public class EvenMoreFish extends EMFPlugin {
         });
     }
 
-    private void checkPapi() {
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            usingPAPI = true;
-            new PlaceholderReceiver(this).register();
-        }
-    }
-
     public Random getRandom() {
         return random;
     }
@@ -534,10 +476,6 @@ public class EvenMoreFish extends EMFPlugin {
         return competitionQueue;
     }
 
-    public PluginManager getPluginManager() {
-        return pluginManager;
-    }
-
     public int getMetricFishCaught() {
         return metricFishCaught;
     }
@@ -570,25 +508,6 @@ public class EvenMoreFish extends EMFPlugin {
         return isUpdateAvailable;
     }
 
-    public boolean isUsingVault() {return usingVault;}
-
-    public boolean isUsingPAPI() {
-        return usingPAPI;
-    }
-
-    public boolean isUsingMcMMO() {
-        return usingMcMMO;
-    }
-
-    public boolean isUsingHeadsDB() {
-        return usingHeadsDB;
-    }
-
-    public boolean isUsingPlayerPoints() {
-        return usingPlayerPoints;
-    }
-
-    public boolean isUsingGriefPrevention() {return usingGriefPrevention;}
 
     public Database getDatabase() {
         return database;
@@ -605,23 +524,6 @@ public class EvenMoreFish extends EMFPlugin {
     public EMFAPI getApi() {
         return api;
     }
-
-    private void loadEconomy() {
-        PluginManager pm = Bukkit.getPluginManager();
-
-        if (pm.isPluginEnabled("Vault")) {
-            new VaultEconomyType().register();
-        }
-
-        if (pm.isPluginEnabled("PlayerPoints")) {
-            new PlayerPointsEconomyType().register();
-        }
-
-        if (pm.isPluginEnabled("GriefPrevention")) {
-            new GriefPreventionEconomyType().register();
-        }
-    }
-
 
     private void loadAddonManager() {
         this.addonManager = new AddonManager();
@@ -685,5 +587,9 @@ public class EvenMoreFish extends EMFPlugin {
 
     public UserManager getUserManager() {
         return userManager;
+    }
+
+    public DependencyManager getDependencyManager() {
+        return dependencyManager;
     }
 }

@@ -1,5 +1,6 @@
 package com.oheers.fish.addons;
 
+import com.oheers.fish.DependencyManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.addons.AddonLoader;
@@ -103,17 +104,17 @@ public class InternalAddonLoader extends AddonLoader {
     }
 
     private void loadExternalRewardTypes() {
-        PluginManager pm = Bukkit.getPluginManager();
-        if (pm.isPluginEnabled("PlayerPoints")) {
+        DependencyManager dependencyManager = EvenMoreFish.getInstance().getDependencyManager();
+        if (dependencyManager.isUsingPlayerPoints()) {
             new PlayerPointsRewardType().register();
         }
-        if (pm.isPluginEnabled("GriefPrevention")) {
+        if (dependencyManager.isUsingGriefPrevention()) {
             new GPClaimBlocksRewardType().register();
         }
-        if (pm.isPluginEnabled("AuraSkills")) {
+        if (dependencyManager.isUsingAuraSkills()) {
             new AuraSkillsXPRewardType().register();
         }
-        if (pm.isPluginEnabled("mcMMO")) {
+        if (dependencyManager.isUsingMcMMO()) {
             new McMMOXPRewardType().register();
         }
         // Only enable the PERMISSION type if Vault perms is found.
@@ -122,7 +123,7 @@ public class InternalAddonLoader extends AddonLoader {
             new PermissionRewardType().register();
         }
         // Only enable the Money RewardType is Vault Economy is enabled.
-        if (EvenMoreFish.getInstance().isUsingVault()) {
+        if (dependencyManager.isUsingVault()) {
             RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
             if (rsp != null) {
                 new MoneyRewardType().register();

@@ -14,7 +14,7 @@ public class CommandRewardType extends RewardType {
     @Override
     public void doReward(@NotNull Player player, @NotNull String key, @NotNull String value, Location hookLocation) {
         String inputCommand = value.replace("{player}", player.getName());
-        if (EvenMoreFish.getInstance().isUsingPAPI()) inputCommand = PlaceholderAPI.setPlaceholders(player, inputCommand);
+        if (EvenMoreFish.getInstance().getDependencyManager().isUsingPAPI()) inputCommand = PlaceholderAPI.setPlaceholders(player, inputCommand);
         if (hookLocation != null) {
             final String worldName = hookLocation.getWorld() == null ? "N/A" : hookLocation.getWorld().getName();
             inputCommand = inputCommand

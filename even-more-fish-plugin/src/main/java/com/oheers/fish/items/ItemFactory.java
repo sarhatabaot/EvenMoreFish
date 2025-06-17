@@ -305,7 +305,7 @@ public class ItemFactory {
     // HeadDB
 
     private @Nullable ItemStack checkHeadDB() {
-        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) {
+        if (!EvenMoreFish.getInstance().getDependencyManager().isUsingHeadsDB()) {
             return null;
         }
         String materialStr = configuration.getString("item.headdb");
@@ -321,7 +321,7 @@ public class ItemFactory {
     }
 
     private @Nullable ItemStack checkRandomHeadDB() {
-        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) {
+        if (!EvenMoreFish.getInstance().getDependencyManager().isUsingHeadsDB()) {
             return null;
         }
         ArrayList<String> materialStrs = new ArrayList<>(configuration.getStringList("item.multiple-headdb"));

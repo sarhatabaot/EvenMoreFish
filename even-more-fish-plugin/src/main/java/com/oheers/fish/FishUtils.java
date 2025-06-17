@@ -634,7 +634,7 @@ public class FishUtils {
     }
 
     public static @NotNull Component parsePlaceholderAPI(@NotNull Component component, @Nullable OfflinePlayer target) {
-        if (!EvenMoreFish.getInstance().isUsingPAPI()) {
+        if (!EvenMoreFish.getInstance().getDependencyManager().isUsingPAPI()) {
             return component;
         }
         TextReplacementConfig trc = TextReplacementConfig.builder()

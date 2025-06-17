@@ -19,7 +19,7 @@ public class PlayerPointsRewardType extends RewardType {
             EvenMoreFish.getInstance().getLogger().warning("Invalid number specified for RewardType " + getIdentifier() + ": " + value);
             return;
         }
-        if (EvenMoreFish.getInstance().isUsingPlayerPoints()) {
+        if (EvenMoreFish.getInstance().getDependencyManager().isUsingPlayerPoints()) {
             PlayerPoints.getInstance().getAPI().give(player.getUniqueId(), amount);
         }
     }

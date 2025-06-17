@@ -82,7 +82,7 @@ public abstract class Processor<E extends Event> implements Listener {
             return null;
         }
 
-        if (EvenMoreFish.getInstance().isUsingMcMMO()
+        if (EvenMoreFish.getInstance().getDependencyManager().isUsingMcMMO()
             && ExperienceConfig.getInstance().isFishingExploitingPrevented()
             && UserManager.getPlayer(player).getFishingManager().isExploitingFishing(location.toVector())) {
             return null;

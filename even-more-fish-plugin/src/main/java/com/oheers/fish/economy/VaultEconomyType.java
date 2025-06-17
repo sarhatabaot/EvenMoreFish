@@ -22,7 +22,7 @@ public class VaultEconomyType implements EconomyType {
     public VaultEconomyType() {
         EvenMoreFish emf = EvenMoreFish.getInstance();
         emf.getLogger().log(Level.INFO, "Economy attempting to hook into Vault.");
-        if (EvenMoreFish.getInstance().isUsingVault()) {
+        if (EvenMoreFish.getInstance().getDependencyManager().isUsingVault()) {
             RegisteredServiceProvider<Economy> rsp = emf.getServer().getServicesManager().getRegistration(Economy.class);
             if (rsp == null) {
                 return;
