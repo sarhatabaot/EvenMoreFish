@@ -115,8 +115,11 @@ buildNumber.properties
 # Common working directory
 run/
 build
-
+!docs/build
+!docs/build/
+!docs/build/**
 *.addon
 
 .settings
 !gradle/*
+

@@ -1,25 +1,38 @@
 # EMF Documentation & Website
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Built with [Docusaurus](https://docusaurus.io/).
 
-### Installation
+## Quick Start
 
-```
-$ yarn
-```
+1. Install dependencies:
+   ```bash
+   yarn
+   ```
+   or
+   ```bash
+   npm install
+   ```
 
-### Local Development
+2. Run locally:
+   ```bash
+   yarn start
+   ```
+   or
+   ```bash
+   npm run start
+   ```
 
-```
-$ yarn start
-```
+3. Build for production:
+   ```bash
+   yarn build
+   ```
+   or
+   ```bash
+   npm run build
+   ```
+   
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```
-$ yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+## Debugging Issues
+Sometimes git may bug out and cause the build folder to disappear. (Happens when switching branches).
+In this case run: `git rm -r --cached docs/build` and the commit as usual.
+If experiencing any additional issues, it's recommended to run `docusaurus clear` and rebuild as well.
