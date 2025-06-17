@@ -91,7 +91,6 @@ public class EvenMoreFish extends EMFPlugin {
     private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
         || classExists("io.papermc.paper.configuration.Configuration");
 
-    private Permission permission = null;
     private ItemStack customNBTRod;
     private boolean checkingEatEvent;
     private boolean checkingIntEvent;
@@ -111,6 +110,7 @@ public class EvenMoreFish extends EMFPlugin {
     private boolean isUpdateAvailable;
 
     private DependencyManager dependencyManager;
+    private ConfigurationManager configurationManager;
 
     private Database database;
     private HeadDatabaseAPI HDBapi;
@@ -178,17 +178,13 @@ public class EvenMoreFish extends EMFPlugin {
         this.pm = getServer().getPluginManager();
 
         this.dependencyManager = new DependencyManager(this);
-        dependencyManager.checkDependencies(); // need to test, order may be important, if it is, we introduce multiple stages with events
+        this.dependencyManager.checkDependencies(); // need to test, order may be important, if it is, we introduce multiple stages with events
 
-        new MainConfig();
-        new MessageConfig();
+        this.configurationManager = new ConfigurationManager(this);
+        this.configurationManager.loadConfigurations(); //need to test, order may be important
 
-        saveAdditionalDefaultAddons();
         loadAddonManager();
-
-        new GuiConfig();
-        new GuiFillerConfig();
-
+        
         // could not set up economy.
         if (!Economy.getInstance().isEnabled()) {
             getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
@@ -389,13 +385,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         terminateGuis();
 
-        reloadConfig();
-        saveDefaultConfig();
-
-        MainConfig.getInstance().reload();
-        MessageConfig.getInstance().reload();
-        GuiConfig.getInstance().reload();
-        GuiFillerConfig.getInstance().reload();
+        this.configurationManager.reloadConfigurations();
 
         FishManager.getInstance().reload();
         BaitManager.getInstance().reload();
@@ -438,10 +428,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     public Random getRandom() {
         return random;
-    }
-
-    public Permission getPermission() {
-        return permission;
     }
 
     public ItemStack getCustomNBTRod() {
@@ -526,6 +512,8 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     private void loadAddonManager() {
+        saveAdditionalDefaultAddons();
+
         this.addonManager = new AddonManager();
         this.addonManager.load();
 

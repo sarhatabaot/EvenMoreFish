@@ -97,7 +97,7 @@ public class InternalAddonLoader extends AddonLoader {
         new WorldRequirementType().register();
 
         // Load Group RequirementType
-        Permission permission = EvenMoreFish.getInstance().getPermission();
+        Permission permission = EvenMoreFish.getInstance().getDependencyManager().getPermission();
         if (permission != null) {
             new GroupRequirementType(permission).register();
         }
@@ -118,7 +118,7 @@ public class InternalAddonLoader extends AddonLoader {
             new McMMOXPRewardType().register();
         }
         // Only enable the PERMISSION type if Vault perms is found.
-        Permission permission = EvenMoreFish.getInstance().getPermission();
+        Permission permission = EvenMoreFish.getInstance().getDependencyManager().getPermission();
         if (permission != null && permission.isEnabled()) {
             new PermissionRewardType().register();
         }

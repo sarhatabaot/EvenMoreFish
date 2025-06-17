@@ -12,7 +12,7 @@ public class PermissionRewardType extends RewardType {
 
     @Override
     public void doReward(@NotNull Player player, @NotNull String key, @NotNull String value, Location hookLocation) {
-        Permission permission = EvenMoreFish.getInstance().getPermission();
+        Permission permission = EvenMoreFish.getInstance().getDependencyManager().getPermission();
         if (permission != null) {
             permission.playerAdd(player.getPlayer(), value);
         }
