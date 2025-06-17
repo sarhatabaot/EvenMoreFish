@@ -88,7 +88,7 @@ public class FishManager {
         return rarity.getFish(fishName);
     }
 
-    public Rarity getRandomWeightedRarity(Player fisher, double boostRate, Set<Rarity> boostedRarities, Set<Rarity> totalRarities, @Nullable CustomRod customRod) {
+    public Rarity getRandomWeightedRarity(Player fisher, double boostRate, @NotNull Set<Rarity> boostedRarities, Set<Rarity> totalRarities, @Nullable CustomRod customRod) {
         if (fisher != null) {
             Map<UUID, Rarity> decidedRarities = EvenMoreFish.getInstance().getDecidedRarities();
             if (decidedRarities.containsKey(fisher.getUniqueId())) {
@@ -204,7 +204,7 @@ public class FishManager {
 
         // Protection against /emf admin reload causing the plugin to be unable to get the rarity
         if (r.getOriginalFishList().isEmpty()) {
-            r = getRandomWeightedRarity(p, 1, null, Set.copyOf(rarityMap.values()), customRod);
+            r = getRandomWeightedRarity(p, 1, Collections.emptySet(), Set.copyOf(rarityMap.values()), customRod);
         }
 
         List<Fish> customRodFish = customRod == null ? List.of() : customRod.getAllowedFish();

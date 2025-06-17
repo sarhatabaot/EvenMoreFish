@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -590,7 +591,7 @@ public class Competition {
                 this.selectedRarity = rarity;
                 return true;
             }
-            this.selectedRarity = FishManager.getInstance().getRandomWeightedRarity(null, 0, null, Set.copyOf(FishManager.getInstance().getRarityMap().values()), null);
+            this.selectedRarity = FishManager.getInstance().getRandomWeightedRarity(null, 0, Collections.emptySet(), Set.copyOf(FishManager.getInstance().getRarityMap().values()), null);
             return true;
         } catch (IllegalArgumentException exception) {
             EvenMoreFish.getInstance()
