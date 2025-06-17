@@ -28,7 +28,7 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                             if (isLogDbError(commandSender)) {
                                 return;
                             }
-                            EvenMoreFish.getInstance().getDatabase().getMigrationManager().dropFlywaySchemaHistory();
+                            EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().dropFlywaySchemaHistory();
                             commandSender.sendMessage("Dropped flyway schema history.");
                         }
                 );
@@ -43,7 +43,7 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                         return;
                     }
                     commandSender.sendMessage("Attempting to repair the migrations, check the logs.");
-                    EvenMoreFish.getInstance().getDatabase().getMigrationManager().repairFlyway();
+                    EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().repairFlyway();
                 });
     }
 
@@ -56,7 +56,7 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                         return;
                     }
                     commandSender.sendMessage("Attempting to clean flyway, check the logs.");
-                    EvenMoreFish.getInstance().getDatabase().getMigrationManager().cleanFlyway();
+                    EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().cleanFlyway();
                 });
     }
 
@@ -68,7 +68,7 @@ public class AdminDatabaseCommand extends CommandAPICommand {
                     if (isLogDbError(commandSender)) {
                         return;
                     }
-                    EvenMoreFish.getInstance().getDatabase().migrateFromDatabaseVersionToLatest();
+                    EvenMoreFish.getInstance().getPluginDataManager().getDatabase().migrateFromDatabaseVersionToLatest();
                 });
     }
 

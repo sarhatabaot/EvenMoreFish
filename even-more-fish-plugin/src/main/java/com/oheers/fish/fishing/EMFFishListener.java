@@ -42,7 +42,7 @@ public class EMFFishListener implements Listener {
             return;
         }
 
-        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
+        final int userId = EvenMoreFish.getInstance().getPluginDataManager().getUserManager().getUserId(player.getUniqueId());
 
         handleFishLog(userId, fish, catchTime);
         handleUserFishStats(userId, fish);
@@ -52,8 +52,8 @@ public class EMFFishListener implements Listener {
 
 
     private void handleUserReport(final UUID uuid, Fish fish) {
-        final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
-        final UserReport userReport = userReportDataManager.get(String.valueOf(uuid), key -> EvenMoreFish.getInstance().getDatabase().getUserReport(uuid));
+        final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getPluginDataManager().getUserReportDataManager();
+        final UserReport userReport = userReportDataManager.get(String.valueOf(uuid), key -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getUserReport(uuid));
 
         if (userReport.getShortestLength() == -1 || userReport.getShortestLength() > fish.getLength()) {
             userReport.setShortestLengthAndFish(fish);
@@ -76,11 +76,11 @@ public class EMFFishListener implements Listener {
     }
 
     private void handleFishStats(final @NotNull Fish fish) {
-        final DataManager<FishStats> fishStatsDataManager = EvenMoreFish.getInstance().getFishStatsDataManager();
+        final DataManager<FishStats> fishStatsDataManager = EvenMoreFish.getInstance().getPluginDataManager().getFishStatsDataManager();
         final FishRarityKey fishRarityKey = FishRarityKey.of(fish);
         final FishStats stats = fishStatsDataManager.getOrCreate(
                 fishRarityKey.toString(),
-                key -> EvenMoreFish.getInstance().getDatabase().getFishStats(fish.getName(),fish.getRarity().getId()),
+                key -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getFishStats(fish.getName(),fish.getRarity().getId()),
                 () -> FishStats.empty(fish,LocalDateTime.now())
         );
 
@@ -100,7 +100,7 @@ public class EMFFishListener implements Listener {
     }
 
     private void handleFishLog(final int userId, final Fish fish, final LocalDateTime catchTime) {
-        final DataManager<Collection<FishLog>> fishLogDataManager = EvenMoreFish.getInstance().getFishLogDataManager();
+        final DataManager<Collection<FishLog>> fishLogDataManager = EvenMoreFish.getInstance().getPluginDataManager().getFishLogDataManager();
         final String competitionId = Competition.getCurrentlyActive() != null ? Competition.getCurrentlyActive().getCompetitionName() : null;
         final FishLog log = new FishLog(userId, fish, catchTime, competitionId);
         final String key = UserFishRarityKey.of(userId,fish).toString();
@@ -108,10 +108,10 @@ public class EMFFishListener implements Listener {
     }
 
     private void handleUserFishStats(final int userId, final @NotNull Fish fish) {
-        final DataManager<UserFishStats> userFishStatsDataManager = EvenMoreFish.getInstance().getUserFishStatsDataManager();
+        final DataManager<UserFishStats> userFishStatsDataManager = EvenMoreFish.getInstance().getPluginDataManager().getUserFishStatsDataManager();
         final UserFishStats stats = userFishStatsDataManager.getOrCreate(
                 UserFishRarityKey.of(userId,fish).toString(),
-                id -> EvenMoreFish.getInstance().getDatabase().getUserFishStats(userId, fish.getName(), fish.getRarity().getId()),
+                id -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getUserFishStats(userId, fish.getName(), fish.getRarity().getId()),
                 () -> new UserFishStats(userId, fish, LocalDateTime.now())
         );
 

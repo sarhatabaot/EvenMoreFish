@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 public class CompetitionSavingStrategy extends HybridSavingStrategy<CompetitionReport> {
     public CompetitionSavingStrategy(long interval) {
         super(
-                competition -> EvenMoreFish.getInstance().getDatabase().updateCompetition(competition),
-                competitions -> EvenMoreFish.getInstance().getDatabase().batchUpdateCompetitions(competitions),
+                competition -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().updateCompetition(competition),
+                competitions -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().batchUpdateCompetitions(competitions),
                 interval,
                 TimeUnit.valueOf(MainConfig.getInstance().getSaveIntervalUnit())
         );

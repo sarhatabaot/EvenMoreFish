@@ -9,6 +9,6 @@ import java.util.Collection;
 
 public class FishLogSavingStrategy extends ImmediateSavingStrategy<Collection<FishLog>> {
     public FishLogSavingStrategy() {
-        super(logs -> EvenMoreFish.getInstance().getDatabase().batchInsertFishLogs(logs));
+        super(logs -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().batchInsertFishLogs(logs));
     }
 }

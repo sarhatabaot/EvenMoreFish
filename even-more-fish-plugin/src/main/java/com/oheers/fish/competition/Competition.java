@@ -194,7 +194,7 @@ public class Competition {
 
                 if (MainConfig.getInstance().isDatabaseOnline()) {
                     Competition competitionRef = this;
-                    EvenMoreFish.getInstance().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(competitionRef, competitionRef.startTime, LocalDateTime.now()));
+                    EvenMoreFish.getInstance().getPluginDataManager().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(competitionRef, competitionRef.startTime, LocalDateTime.now()));
                 }
 
                 leaderboard.clear();
@@ -371,7 +371,7 @@ public class Competition {
             return;
         }
 
-        UserReport userReport = EvenMoreFish.getInstance().getUserReportDataManager().get(String.valueOf(entry.getPlayer()));
+        UserReport userReport = EvenMoreFish.getInstance().getPluginDataManager().getUserReportDataManager().get(String.valueOf(entry.getPlayer()));
         if (userReport == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not fetch User Report for " + entry.getPlayer() + ", their data has not been modified.");
             return;

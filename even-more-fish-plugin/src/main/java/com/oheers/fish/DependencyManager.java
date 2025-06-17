@@ -168,4 +168,8 @@ public class DependencyManager {
             new PlaceholderReceiver(plugin).register();
         }
     }
+
+    public void setHDBapi(HeadDatabaseAPI HDBapi) {
+        this.HDBapi = HDBapi;
+    }
 }

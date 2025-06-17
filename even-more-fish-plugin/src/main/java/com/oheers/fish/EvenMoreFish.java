@@ -111,9 +111,7 @@ public class EvenMoreFish extends EMFPlugin {
 
     private DependencyManager dependencyManager;
     private ConfigurationManager configurationManager;
-
-    private Database database;
-    private HeadDatabaseAPI HDBapi;
+    private PluginDataManager pluginDataManager;
 
     private static EvenMoreFish instance;
     private static TaskScheduler scheduler;
@@ -121,12 +119,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     private AddonManager addonManager;
 
-    private UserManager userManager;
-    private DataManager<Collection<FishLog>> fishLogDataManager;
-    private DataManager<FishStats> fishStatsDataManager;
-    private DataManager<UserFishStats> userFishStatsDataManager;
-    private DataManager<UserReport> userReportDataManager;
-    private DataManager<CompetitionReport> competitionDataManager;
 
     public static @NotNull EvenMoreFish getInstance() {
         return instance;
@@ -184,7 +176,7 @@ public class EvenMoreFish extends EMFPlugin {
         this.configurationManager.loadConfigurations(); //need to test, order may be important
 
         loadAddonManager();
-        
+
         // could not set up economy.
         if (!Economy.getInstance().isEnabled()) {
             getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
@@ -210,31 +202,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         AutoRunner.init();
 
-        if (MainConfig.getInstance().databaseEnabled()) {
-            this.database = new Database();
-
-            this.userManager = new UserManager(database);
-            this.fishLogDataManager = new DataManager<>(new FishLogSavingStrategy(), key -> {
-                FishLogKey logKey = FishLogKey.from(key);
-                return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime()));
-            });
-            this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy(), key -> {
-                final String fishName = key.split("\\.")[0];
-                final String fishRarity = key.split("\\.")[1];
-                return EvenMoreFish.getInstance().getDatabase().getFishStats(fishName,fishRarity);
-            });
-
-            this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(MainConfig.getInstance().getUserFishStatsSaveInterval()), key -> {
-                final int userId = Integer.parseInt(key.split("\\.")[0]);
-                final String fishName = key.split("\\.")[1];
-                final String fishRarity = key.split("\\.")[2];
-                return EvenMoreFish.getInstance().getDatabase().getUserFishStats(userId, fishName, fishRarity);
-            });
-
-            this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), uuid -> EvenMoreFish.getInstance().getDatabase().getUserReport(UUID.fromString(uuid)));
-            this.competitionDataManager = new DataManager<>(new CompetitionSavingStrategy(MainConfig.getInstance().getCompetitionSaveInterval()), key -> database.getCompetitionReport(Integer.parseInt(key)));
-        }
-
+        this.pluginDataManager = new PluginDataManager(this);
 
         listeners();
 
@@ -257,11 +225,8 @@ public class EvenMoreFish extends EMFPlugin {
 
         terminateGuis();
         // Don't use the scheduler here because it will throw errors on disable
-        if (MainConfig.getInstance().databaseEnabled()) {
-            this.userReportDataManager.flush();
-            this.userFishStatsDataManager.flush();
-            this.fishStatsDataManager.flush();
-            this.competitionDataManager.flush();
+        if (this.pluginDataManager != null) {
+            this.pluginDataManager.shutdown();
         }
 
         // Ends the current competition in case the plugin is being disabled when the server will continue running
@@ -273,9 +238,6 @@ public class EvenMoreFish extends EMFPlugin {
         RewardType.unregisterAll();
         RequirementType.unregisterAll();
 
-        if (MainConfig.getInstance().isDatabaseOnline()) {
-            database.shutdown();
-        }
 
         // Make sure this is in the reverse order of loading.
         RodManager.getInstance().unload();
@@ -312,7 +274,7 @@ public class EvenMoreFish extends EMFPlugin {
     private void listeners() {
         if (MainConfig.getInstance().isDatabaseOnline()) {
             pm.registerEvents(new JoinChecker(), this);
-            pm.registerEvents(this.userManager, this);
+            pm.registerEvents(this.pluginDataManager.getUserManager(), this);
             pm.registerEvents(new EMFFishListener(),this);
         }
 
@@ -494,19 +456,6 @@ public class EvenMoreFish extends EMFPlugin {
         return isUpdateAvailable;
     }
 
-
-    public Database getDatabase() {
-        return database;
-    }
-
-    public HeadDatabaseAPI getHDBapi() {
-        return HDBapi;
-    }
-
-    public void setHDBapi(HeadDatabaseAPI api) {
-        this.HDBapi = api;
-    }
-
     public EMFAPI getApi() {
         return api;
     }
@@ -553,31 +502,16 @@ public class EvenMoreFish extends EMFPlugin {
         return firstLoad;
     }
 
-    public DataManager<Collection<FishLog>> getFishLogDataManager() {
-        return fishLogDataManager;
-    }
-
-    public DataManager<FishStats> getFishStatsDataManager() {
-        return fishStatsDataManager;
-    }
-
-    public DataManager<UserFishStats> getUserFishStatsDataManager() {
-        return userFishStatsDataManager;
-    }
-
-    public DataManager<UserReport> getUserReportDataManager() {
-        return userReportDataManager;
-    }
-
-    public DataManager<CompetitionReport> getCompetitionDataManager() {
-        return competitionDataManager;
-    }
-
-    public UserManager getUserManager() {
-        return userManager;
-    }
 
     public DependencyManager getDependencyManager() {
         return dependencyManager;
+    }
+
+    public ConfigurationManager getConfigurationManager() {
+        return configurationManager;
+    }
+
+    public PluginDataManager getPluginDataManager() {
+        return pluginDataManager;
     }
 }

@@ -166,19 +166,19 @@ public class SellHelper {
             return;
         }
 
-        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(uuid);
+        final int userId = EvenMoreFish.getInstance().getPluginDataManager().getUserManager().getUserId(uuid);
         final String transactionId = FriendlyId.createFriendlyId();
         final Timestamp timestamp = Timestamp.from(Instant.now());
 
-        EvenMoreFish.getInstance().getDatabase().createTransaction(transactionId, userId, timestamp);
+        EvenMoreFish.getInstance().getPluginDataManager().getDatabase().createTransaction(transactionId, userId, timestamp);
         for(final SoldFish fish: soldFish) {
-            EvenMoreFish.getInstance().getDatabase().createSale(transactionId, fish.getName(),fish.getRarity(), fish.getAmount(),fish.getLength(), fish.getTotalValue());
+            EvenMoreFish.getInstance().getPluginDataManager().getDatabase().createSale(transactionId, fish.getName(),fish.getRarity(), fish.getAmount(),fish.getLength(), fish.getTotalValue());
         }
 
         double moneyEarned = getTotalWorth(soldFish);
         int fishSold = calcFishSold(soldFish);
 
-        final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getUserReportDataManager();
+        final DataManager<UserReport> userReportDataManager = EvenMoreFish.getInstance().getPluginDataManager().getUserReportDataManager();
         final UserReport report = userReportDataManager.get(uuid.toString());
         report.incrementFishSold(fishSold);
         report.incrementMoneyEarned(moneyEarned);

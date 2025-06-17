@@ -43,8 +43,8 @@ public class JoinChecker implements Listener {
             return;
         }
 
-        EvenMoreFish.getInstance().getUserReportDataManager().flush();
-        EvenMoreFish.getInstance().getUserFishStatsDataManager().flush();
+        EvenMoreFish.getInstance().getPluginDataManager().getUserReportDataManager().flush();
+        EvenMoreFish.getInstance().getPluginDataManager().getUserFishStatsDataManager().flush();
         
     }
 }

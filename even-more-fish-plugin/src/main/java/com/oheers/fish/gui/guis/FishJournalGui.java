@@ -75,7 +75,7 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private ItemStack getFishItem(Fish fish, Section section) {
-        Database database = EvenMoreFish.getInstance().getDatabase();
+        Database database = EvenMoreFish.getInstance().getPluginDataManager().getDatabase();
 
         if (database == null) {
             Logging.warn("Can not show fish in the Journal Menu, please enable the database!");
@@ -115,10 +115,10 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private @NotNull EMFListMessage prepareLore(@NotNull ItemFactory factory, @NotNull Fish fish) {
-        final int userId = EvenMoreFish.getInstance().getUserManager().getUserId(player.getUniqueId());
+        final int userId = EvenMoreFish.getInstance().getPluginDataManager().getUserManager().getUserId(player.getUniqueId());
 
-        final UserFishStats userFishStats = EvenMoreFish.getInstance().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId, fish).toString());
-        final FishStats fishStats = EvenMoreFish.getInstance().getFishStatsDataManager().get(FishRarityKey.of(fish).toString());
+        final UserFishStats userFishStats = EvenMoreFish.getInstance().getPluginDataManager().getUserFishStatsDataManager().get(UserFishRarityKey.of(userId, fish).toString());
+        final FishStats fishStats = EvenMoreFish.getInstance().getPluginDataManager().getFishStatsDataManager().get(FishRarityKey.of(fish).toString());
 
         final String discoverDate = getValueOrUnknown(() -> userFishStats.getFirstCatchTime().format(DateTimeFormatter.ISO_DATE));
         final String discoverer = getValueOrUnknown(() -> FishUtils.getPlayerName(fishStats.getDiscoverer()));
@@ -171,7 +171,7 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private ItemStack getRarityItem(Rarity rarity, Section section) {
-        Database database = EvenMoreFish.getInstance().getDatabase();
+        Database database = EvenMoreFish.getInstance().getPluginDataManager().getDatabase();
         boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
 
         if (database == null) {

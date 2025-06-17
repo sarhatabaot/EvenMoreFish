@@ -8,6 +8,6 @@ import com.oheers.fish.database.model.user.UserReport;
 
 public class UserReportsSavingStrategy extends ImmediateSavingStrategy<UserReport> {
     public UserReportsSavingStrategy() {
-        super(report -> EvenMoreFish.getInstance().getDatabase().upsertUserReport(report));
+        super(report -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().upsertUserReport(report));
     }
 }
