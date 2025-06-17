@@ -2,6 +2,8 @@ package com.oheers.fish;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
+import com.oheers.fish.addons.DefaultAddons;
+import com.oheers.fish.addons.InternalAddonLoader;
 import com.oheers.fish.api.EMFAPI;
 import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.api.economy.Economy;
@@ -59,7 +61,6 @@ public class EvenMoreFish extends EMFPlugin {
     private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
         || classExists("io.papermc.paper.configuration.Configuration");
 
-    private ItemStack customNBTRod;
     // Do some fish in some rarities have the comp-check-exempt: true.
     private boolean raritiesCompCheckExempt = false;
     private CompetitionQueue competitionQueue;
@@ -276,9 +277,6 @@ public class EvenMoreFish extends EMFPlugin {
         return random;
     }
 
-    public ItemStack getCustomNBTRod() {
-        return customNBTRod;
-    }
 
     public boolean isRaritiesCompCheckExempt() {
         return raritiesCompCheckExempt;
