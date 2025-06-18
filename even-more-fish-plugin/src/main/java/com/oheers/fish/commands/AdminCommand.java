@@ -404,7 +404,7 @@ public class AdminCommand {
 
                     String databaseEngine = "N/A";
                     String databaseType = "N/A";
-                    final Database database = EvenMoreFish.getInstance().getDatabase();
+                    final Database database = EvenMoreFish.getInstance().getPluginDataManager().getDatabase();
                     if (database != null) {
                         databaseEngine = database.getDatabaseVersion();
                         databaseType = database.getType();
@@ -486,7 +486,7 @@ public class AdminCommand {
                                 .send(info.sender());
                         return;
                     }
-                    EvenMoreFish.getScheduler().runTaskAsynchronously(() -> EvenMoreFish.getInstance().getDatabase().getMigrationManager().migrateLegacy(info.sender()));
+                    EvenMoreFish.getScheduler().runTaskAsynchronously(() -> EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().migrateLegacy(info.sender()));
                 });
     }
 

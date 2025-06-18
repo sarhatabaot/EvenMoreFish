@@ -78,10 +78,10 @@ public class BaitListener implements Listener {
         try {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
                 result = BaitNBTManager.applyBaitedRodNBT(potentialFishingRod, bait, event.getCursor().getAmount());
-                EvenMoreFish.getInstance().incrementMetricBaitsApplied(event.getCursor().getAmount());
+                EvenMoreFish.getInstance().getMetricsManager().incrementBaitsApplied(event.getCursor().getAmount());
             } else {
                 result = BaitNBTManager.applyBaitedRodNBT(potentialFishingRod, bait, 1);
-                EvenMoreFish.getInstance().incrementMetricBaitsApplied(1);
+                EvenMoreFish.getInstance().getMetricsManager().incrementBaitsApplied(1);
             }
 
         } catch (MaxBaitsReachedException exception) {

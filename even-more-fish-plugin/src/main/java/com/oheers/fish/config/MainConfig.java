@@ -73,10 +73,10 @@ public class MainConfig extends ConfigBase {
     }
 
     public boolean isDatabaseOnline() {
-        if (!databaseEnabled() || EvenMoreFish.getInstance().getDatabase().getMigrationManager().usingV2())
+        if (!databaseEnabled() || EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().usingV2())
             return false;
 
-        return EvenMoreFish.getInstance().getDatabase() != null;
+        return EvenMoreFish.getInstance().getPluginDataManager().getDatabase() != null;
     }
 
     public boolean isCatchEnabled() {

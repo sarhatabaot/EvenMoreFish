@@ -223,7 +223,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
     private @Nullable String handleTotalMoneyEarned(Player player, @NotNull String identifier) {
         try {
             UUID uuid = UUID.fromString(identifier.substring("total_money_earned_".length()));
-            UserReport userReport = plugin.getUserReportDataManager().get(uuid.toString());
+            UserReport userReport = plugin.getPluginDataManager().getUserReportDataManager().get(uuid.toString());
             return userReport != null ? String.format("%.2f", userReport.getMoneyEarned()) : null;
         } catch (IllegalArgumentException e) {
             return null;
@@ -233,7 +233,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
     private @Nullable String handleTotalFishSold(Player player, @NotNull String identifier) {
         try {
             UUID uuid = UUID.fromString(identifier.substring("total_fish_sold_".length()));
-            UserReport userReport = plugin.getUserReportDataManager().get(uuid.toString());
+            UserReport userReport = plugin.getPluginDataManager().getUserReportDataManager().get(uuid.toString());
             return userReport != null ? String.valueOf(userReport.getFishSold()) : null;
         } catch (IllegalArgumentException e) {
             return null;

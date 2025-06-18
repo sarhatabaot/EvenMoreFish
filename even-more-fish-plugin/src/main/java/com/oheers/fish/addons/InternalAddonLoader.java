@@ -1,5 +1,6 @@
 package com.oheers.fish.addons;
 
+import com.oheers.fish.plugin.DependencyManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.addons.AddonLoader;
@@ -31,7 +32,6 @@ import com.oheers.fish.requirements.WorldRequirementType;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -96,33 +96,33 @@ public class InternalAddonLoader extends AddonLoader {
         new WorldRequirementType().register();
 
         // Load Group RequirementType
-        Permission permission = EvenMoreFish.getInstance().getPermission();
+        Permission permission = EvenMoreFish.getInstance().getDependencyManager().getPermission();
         if (permission != null) {
             new GroupRequirementType(permission).register();
         }
     }
 
     private void loadExternalRewardTypes() {
-        PluginManager pm = Bukkit.getPluginManager();
-        if (pm.isPluginEnabled("PlayerPoints")) {
+        DependencyManager dependencyManager = EvenMoreFish.getInstance().getDependencyManager();
+        if (dependencyManager.isUsingPlayerPoints()) {
             new PlayerPointsRewardType().register();
         }
-        if (pm.isPluginEnabled("GriefPrevention")) {
+        if (dependencyManager.isUsingGriefPrevention()) {
             new GPClaimBlocksRewardType().register();
         }
-        if (pm.isPluginEnabled("AuraSkills")) {
+        if (dependencyManager.isUsingAuraSkills()) {
             new AuraSkillsXPRewardType().register();
         }
-        if (pm.isPluginEnabled("mcMMO")) {
+        if (dependencyManager.isUsingMcMMO()) {
             new McMMOXPRewardType().register();
         }
         // Only enable the PERMISSION type if Vault perms is found.
-        Permission permission = EvenMoreFish.getInstance().getPermission();
+        Permission permission = EvenMoreFish.getInstance().getDependencyManager().getPermission();
         if (permission != null && permission.isEnabled()) {
             new PermissionRewardType().register();
         }
         // Only enable the Money RewardType is Vault Economy is enabled.
-        if (EvenMoreFish.getInstance().isUsingVault()) {
+        if (dependencyManager.isUsingVault()) {
             RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
             if (rsp != null) {
                 new MoneyRewardType().register();

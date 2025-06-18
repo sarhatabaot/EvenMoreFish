@@ -305,14 +305,14 @@ public class ItemFactory {
     // HeadDB
 
     private @Nullable ItemStack checkHeadDB() {
-        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) {
+        if (!EvenMoreFish.getInstance().getDependencyManager().isUsingHeadsDB()) {
             return null;
         }
         String materialStr = configuration.getString("item.headdb");
         if (materialStr == null) {
             return null;
         }
-        ItemStack item = EvenMoreFish.getInstance().getHDBapi().getItemHead(materialStr);
+        ItemStack item = EvenMoreFish.getInstance().getDependencyManager().getHDBapi().getItemHead(materialStr);
         if (item == null) {
             EvenMoreFish.getInstance().debug(configuration.getRouteAsString() + " has invalid headdb: " + materialStr);
             return null;
@@ -321,7 +321,7 @@ public class ItemFactory {
     }
 
     private @Nullable ItemStack checkRandomHeadDB() {
-        if (!EvenMoreFish.getInstance().isUsingHeadsDB()) {
+        if (!EvenMoreFish.getInstance().getDependencyManager().isUsingHeadsDB()) {
             return null;
         }
         ArrayList<String> materialStrs = new ArrayList<>(configuration.getStringList("item.multiple-headdb"));
@@ -329,9 +329,9 @@ public class ItemFactory {
             return null;
         }
         if (materialStrs.size() == 1) {
-            return EvenMoreFish.getInstance().getHDBapi().getItemHead(materialStrs.get(0));
+            return EvenMoreFish.getInstance().getDependencyManager().getHDBapi().getItemHead(materialStrs.get(0));
         }
-        return getRandomItem(materialStrs, EvenMoreFish.getInstance().getHDBapi()::getItemHead);
+        return getRandomItem(materialStrs, EvenMoreFish.getInstance().getDependencyManager().getHDBapi()::getItemHead);
     }
 
     // Head 64

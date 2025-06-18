@@ -355,7 +355,7 @@ public class Fish {
         // Checks if the player has actually set rewards for an eat event
         if (!configRewards.isEmpty()) {
             // Informs the main class to load up an PlayerItemConsumeEvent listener
-            EvenMoreFish.getInstance().setCheckingEatEvent(true);
+            EvenMoreFish.getInstance().getEventManager().setCheckingEatEvent(true);
             this.eventType = "eat";
             actionRewards = new ArrayList<>();
 
@@ -395,7 +395,7 @@ public class Fish {
         // Checks if the player has actually set rewards for an interact event
         if (!configRewards.isEmpty()) {
             // Informs the main class to load up an PlayerItemConsumeEvent listener
-            EvenMoreFish.getInstance().setCheckingIntEvent(true);
+            EvenMoreFish.getInstance().getEventManager().setCheckingIntEvent(true);
             this.eventType = "int";
             actionRewards = new ArrayList<>();
 

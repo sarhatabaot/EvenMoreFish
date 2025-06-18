@@ -205,7 +205,7 @@ public class MigrationManager {
      * @param initiator The person who started the migration.
      */
     public void migrateLegacy(CommandSender initiator) {
-        LegacyToV3DatabaseMigration legacy = new LegacyToV3DatabaseMigration(EvenMoreFish.getInstance().getDatabase(), this, connectionFactory);
+        LegacyToV3DatabaseMigration legacy = new LegacyToV3DatabaseMigration(EvenMoreFish.getInstance().getPluginDataManager().getDatabase(), this, connectionFactory);
         legacy.migrate(initiator);
     }
 
