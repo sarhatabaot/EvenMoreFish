@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public abstract class Processor<E extends Event> implements Listener {
             return bait.chooseFish(player, location);
         }
 
-        final Rarity fishRarity = FishManager.getInstance().getRandomWeightedRarity(player, 1, null, Set.copyOf(FishManager.getInstance().getRarityMap().values()), customRod);
+        final Rarity fishRarity = FishManager.getInstance().getRandomWeightedRarity(player, 1, Collections.emptySet(), Set.copyOf(FishManager.getInstance().getRarityMap().values()), customRod);
         if (fishRarity == null) {
             EvenMoreFish.getInstance().getLogger().severe("Could not determine a rarity for fish for " + player.getName());
             return null;

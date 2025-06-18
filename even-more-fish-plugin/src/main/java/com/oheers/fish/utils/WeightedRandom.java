@@ -26,7 +26,7 @@ public final class WeightedRandom {
             @NotNull List<T> elements,
             ToDoubleFunction<T> weightFunction,
             double boostRate,
-            Set<T> boosted,
+            @NotNull Set<T> boosted,
             @Nullable Random random
     ) {
         if (elements.isEmpty()) return null;
@@ -54,7 +54,7 @@ public final class WeightedRandom {
     }
 
     private static <T> double calcTotalWeight(@NotNull List<T> elements, ToDoubleFunction<T> weightFunction, double boostRate,
-                                       Set<T> boosted) {
+                                       @NotNull Set<T> boosted) {
         double totalWeight = 0.0;
         for (T element : elements) {
             double weight = weightFunction.applyAsDouble(element);
