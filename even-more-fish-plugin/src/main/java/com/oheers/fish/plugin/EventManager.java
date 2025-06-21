@@ -3,7 +3,6 @@ package com.oheers.fish.plugin;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.SkullSaver;
-import com.oheers.fish.UpdateNotify;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.config.MainConfig;
@@ -12,6 +11,7 @@ import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.fishing.EMFFishListener;
 import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.HuntingProcessor;
+import com.oheers.fish.update.UpdateNotify;
 import com.oheers.fish.utils.ItemProtectionListener;
 import org.bukkit.plugin.PluginManager;
 
