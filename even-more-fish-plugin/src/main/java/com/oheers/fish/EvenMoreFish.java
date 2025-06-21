@@ -2,10 +2,7 @@ package com.oheers.fish;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
-import com.oheers.fish.addons.DefaultAddons;
-import com.oheers.fish.addons.InternalAddonLoader;
 import com.oheers.fish.api.EMFAPI;
-import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementType;
@@ -25,22 +22,20 @@ import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.fishing.rods.RodManager;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.plugin.*;
+import com.oheers.fish.update.UpdateChecker;
 import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import org.apache.maven.artifact.versioning.ComparableVersion;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
-import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -152,9 +147,8 @@ public class EvenMoreFish extends EMFPlugin {
         competitionQueue.load();
 
         // check for updates on the modrinth page
-        checkUpdate().thenAccept(available ->
-            isUpdateAvailable = available
-        );
+        new UpdateChecker(this).checkUpdate().thenAccept(available -> isUpdateAvailable = available);
+
 
         this.metricsManager = new MetricsManager(this);
         this.metricsManager.setupMetrics();
@@ -261,16 +255,6 @@ public class EvenMoreFish extends EMFPlugin {
                     MainConfig.getInstance().getAdminShortcutCommandName()
             ).getCommand().register(this);
         }
-    }
-
-    // Checks for updates, surprisingly
-    @SuppressWarnings("UnstableApiUsage")
-    private CompletableFuture<Boolean> checkUpdate() {
-        return CompletableFuture.supplyAsync(() -> {
-            ComparableVersion modrinthVersion = new ComparableVersion(new UpdateChecker(this).getVersion());
-            ComparableVersion serverVersion = new ComparableVersion(getPluginMeta().getVersion());
-            return modrinthVersion.compareTo(serverVersion) > 0;
-        });
     }
 
     public Random getRandom() {
