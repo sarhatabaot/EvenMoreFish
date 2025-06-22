@@ -110,8 +110,11 @@ dependencies {
     jooqGenerator(libs.jooq.meta.extensions)
     jooqGenerator(libs.connectors.mysql)
 
+
+    testImplementation(libs.paper.api)
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
+
 }
 
 bukkit {
