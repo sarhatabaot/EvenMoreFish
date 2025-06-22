@@ -63,6 +63,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 
+@Deprecated
 public class FishUtils {
 
     private FishUtils() {
@@ -433,39 +434,6 @@ public class FishUtils {
         }
         return biome;
     }
-
-    /**
-     * Calculates the total weight of a list of fish, applying a boost to specific fish if applicable.
-     *
-     * @param fishList    The list of fish to process.
-     * @param boostRate   The boost multiplier for certain fish. If set to -1, only boosted fish are considered.
-     * @param boostedFish The list of fish that should receive the boost. Can be null if no boost is applied.
-     * @return The total calculated weight.
-     */
-    public static double getTotalWeight(List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
-        double totalWeight = 0;
-        boolean applyBoost = boostRate != -1 && boostedFish != null;
-
-        for (Fish fish : fishList) {
-            // When boostRate is -1, we need to guarantee a fish, so fishList has already been filtered
-            // to only contain boosted fish. Otherwise, check if the fish should receive a boost.
-            boolean isBoosted = applyBoost && boostedFish.contains(fish);
-
-            // If the fish has no weight, assign a default weight of 1.
-            double weight = fish.getWeight();
-            double baseWeight = (weight == 0.0d) ? 1 : weight;
-
-            // Apply the boost if applicable.
-            if (isBoosted) {
-                totalWeight += baseWeight * boostRate;
-            } else {
-                totalWeight += baseWeight;
-            }
-        }
-
-        return totalWeight;
-    }
-
 
     public static @Nullable DayOfWeek getDay(@NotNull String day) {
         try {

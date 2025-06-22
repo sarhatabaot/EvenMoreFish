@@ -3,7 +3,10 @@ package com.oheers.fish.utils;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.messages.EMFSingleMessage;
 
-public class Logging {
+public final class Logging {
+    private Logging() {
+        throw new UnsupportedOperationException();
+    }
 
     public static void info(String message) {
         EvenMoreFish.getInstance().getLogger().info(message);
