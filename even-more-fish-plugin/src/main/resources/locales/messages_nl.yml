@@ -1,24 +1,30 @@
+# If a message contains EvenMoreFish placeholders, e.g. {player} or {rarity} it also supports placeholderapi placeholders.
+# Important: Read the following if you are on a Paper server.
+# These messages are able to support the MiniMessage format (in strict mode) if you are on a Paper server.
+# You are able to mix both formats on the same line, however this is not recommended.
+# Here are the MiniMessage Docs for help with using MiniMessage: https://docs.advntr.dev/minimessage/format.html
 # Sent to players when they fish an EvenMoreFish fish
 fish-caught: '{rarity_colour}{player} <gray>heeft een {rarity_colour}{rarity} {fish} </gray><gray>van {rarity_colour}{length}cm </gray><gray>opgevist!'
 # By setting a fish's minimum-length to less than 0, you can create a lengthless fish. This is used when a player fishes a lengthless fish.
 lengthless-fish-caught: '{rarity_colour}{player} <gray>heeft een  {rarity_colour}{rarity} {fish} </gray><gray>opgevist!'
+# Sent to players when they hunt an EvenMoreFish fish
+fish-hunted: <b>{player}</b> has hunted a {length}cm <b>{rarity}</b> {fish}!
+# This is used when a player hunts a lengthless fish.
+lengthless-fish-hunted: <b>{player}</b> has hunted a <b>{rarity}</b> {fish}!
 # Sent to a player when they don't have permission to execute a command.
 no-permission: <red>Je hebt geen toegang tot dit commando.
-
 # The message to be sent when a competition starts and ends
 contest-start: <reset>Een vistoernooi is gestart voor {type}.
 contest-end: <reset>Het vistoernooi is afgelopen.
 # The message to be sent when a player joins whilst a competition is going on
 contest-join: <reset>Er is een vissenstoernooi bezig voor {type}.
-
 # Shown to players when a new player takes #1 spot, remove this value or set it to "" to disable this message
-new-first: <reset>{player} is nu nummer 1
+new-first: '<reset>{player} is nu nummer 1'
 # Should this message appear in chat (false) or above the exp bar (true)
 action-bar-message: true
 # What competition types should the action bar be used for? (recommended: MOST_FISH)
 action-bar-types:
   - MOST_FISH
-
 # What should replace the {type} variable for each competition type?
 competition-types:
   # MOST_FISH
@@ -27,6 +33,10 @@ competition-types:
   largest: de grootste vis
   # LARGEST_TOTAL_FISH
   largest-total: de grootste totale vislengte
+  # SHORTEST_FISH
+  shortest: the shortest fish
+  # SHORTEST_TOTAL_FISH
+  shortest-total: the shortest total fish length
   # SPECIFIC_FISH
   specific: '{amount} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>'
   # SPECIFIC_RARITY
@@ -34,22 +44,21 @@ competition-types:
 # Segments shown in the bossbar when competitions run
 bossbar:
   layout: '{prefix}<reset>{time-formatted}<reset>{remaining}'
-  # The abbreviations used for different units of time
+  # The abbreviations used for different units of time in the {time-formatted} variable.
   hour: <reset>{hour}u
   minute: <reset>{minute}m
   second: <reset>{second}s
   # For translating the "left" at the end e.g. "5s left" -> "5s kvar"
+  # This is the {remaining} variable.
   remaining: over
-
-# The colour of the [EvenMoreFish] prefix in commands (for when your prefix doesn't have colours)
+# The prefix shown in commands. Keeping the space in is recommended.
 prefix-regular: '<green>Vissen → '
-# The colour of the [EvenMoreFish] prefix in admin commands (for when your prefix doesn't have colours)
+# The prefix shown in admin commands.
 prefix-admin: '<red>Vissen → '
-# The colour of the [EvenMoreFish] prefix when errors occur e.g. no permission to run a command (for when your prefix doesn't have colours)
+# The prefix shown when errors occur e.g. no permission to run a command.
 prefix-error: '<red>Vissen → '
-
 # This is the format of the lore given to fish when they're caught.
-# {custom-lore} is specified in the fish.yml under the lore: section, if the fish has a lore, the lore's lines will
+# {custom-lore} is specified in the fish configs under the lore: section, if the fish has a lore, the lore's lines will
 # replace the {fish_lore}, however if it's empty the line will be removed. DO NOT ADD ANYTHING OTHER THAN THIS VARIABLE
 # TO THAT LINE.
 fish-lore:
@@ -58,148 +67,199 @@ fish-lore:
   - ''
   - '{fish_lore}'
   - '{rarity_colour}<bold>{rarity}'
-
-# Stelt in wat vervangen moet worden door de {fisherman_lore} of {length_lore} hierboven ^
+# Sets what to replace with the {fisherman_lore} or {length_lore} with above ^
 fisherman-lore:
   - <white>Gevangen door {player}
 length-lore:
   - <white>Gemeten {length}cm.
-
-# Het formaat van commando's in /emf help (deze boodschap ondersteunt geen PAPI placeholders)
-help: /{command} - {description}
-
-# Het formaat van het leaderboard na afloop van een wedstrijd (deze boodschap ondersteunt geen PAPI placeholders)
-leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-largest-total: <reset>#{position} | {player} <reset>({amount}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>vissen)
-# Als je een wedstrijd organiseert zonder leaderboard, wordt deze boodschap verzonden wanneer er een winnaar is
+# The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
+leaderboard-largest-fish: '<white>#{position} | {player} (<b>{rarity}</b> {fish}, {length}cm)'
+leaderboard-largest-total: '<white>#{position} | {player} <white>({amount}cm<white>)'
+leaderboard-most-fish: '<white>#{position} | {player} <white>({amount} <white>fish)'
+leaderboard-shortest-fish: '<white>#{position} | {player} <white>(<b>{rarity}</b> {fish}<white>, {length}cm<white>)'
+leaderboard-shortest-total: '<white>#{position} | {player} <white>({amount}cm<white>)'
+# If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} heeft de wedstrijd voor {type} gewonnen. Gefeliciteerd!
-# Dit toont het aantal spelers dat momenteel in de wedstrijd zit, stel in op "" om uit te schakelen.
+# This shows the number of players currently in the competition, set to "" to disable.
 total-players: <reset>Er zijn in totaal {amount} speler(s) in het leaderboard.
-# Het aantal posities dat wordt weergegeven in het leaderboard - kan niet minder zijn dan 1.
+# The number of positions shown in the leaderboard - can't be less than 1.
 leaderboard-count: 5
-# Als de speler niet verschijnt in /emf top, moet zijn positie dan onderaan worden weergegeven?
+# If the player doesn't appear on /emf top, should their position be displayed at the bottom?
 always-show-pos: true
-# Verzonden naar spelers wanneer niemand een record heeft behaald tijdens een wedstrijd
+# Sent to players when nobody got a record during a competition
 no-winners: <reset>Er zijn geen vangstrecords.
-# Wanneer een individuele speler geen record heeft behaald
+# When an individual player didn't get a record
 no-record: <reset>Je hebt geen vis gevangen.
-# Verzonden wanneer een beheerder probeert een wedstrijd te starten waarvan het type niet bestaat, bijv. /emf admin competition start 600 ABCDEFGH
+# Sent when an admin tries to start a competition where the type doesn't exist e.g. /emf admin competition start 600 ABCDEFGH
 invalid-type: '<reset>Dat is geen geldig type wedstrijd, beschikbare types: MEESTE_VIS, GROOTSTE_VIS, SPECIFIEKE_VIS'
-# Verzonden naar alle online spelers wanneer er niet genoeg spelers online zijn om een wedstrijd te starten
+# Sent to all online players when not enough players are on to start a competition
 not-enough-players: <reset>Er zijn niet genoeg spelers online om de geplande viswedstrijd te starten.
-# Verzonden naar alle spelers op specifieke tijden om de resterende tijd te tonen
-# {time_formatted} toont de tijd (bijv. nog 5m, nog 10m 30s)
-# {time_raw} is wat je invoert in competitions.yml
+# Sent to all players at specific times to show the remaining time left
+# {time_formatted} shows the time (e.g. 5m left, 10m 30s left)
+# {time_raw} is what you input in competitions.yml
 time-alert: <reset>Er is nog {time_formatted} over voor de wedstrijd {type}
-
+# The sell price:
+# 0 – prints a digit if provided, 0 otherwise
+# # – prints a digit if provided, nothing otherwise
+# . – indicate where to put the decimal separator
+# , – indicate where to put the grouping separator
 sell-price-format: '#,##0.0'
-
+# The message sent to players when they've sold their fish in the /emf shop
 fish-sale: <reset>Je hebt <green>{amount} </green><white>vis verkocht voor </white><green>{sell-price}</green><white>.
-
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
+help-format: '[noPrefix]<aqua>{command} <yellow>- {description}'
 help-general:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - <white>/emf top - Toont de leaderboard van een lopende competitie.
-  - <white>/emf help - Toont deze pagina.
-  - <white>/emf shop - Opent een winkel om je vissen te verkopen.
-  - <white>/emf toggle - Schakelt in of uit of je aangepaste vissen vangt.
-  - <white>/emf admin - Help-pagina voor beheerders.
-
-# Competitiehulp (/emf admin competition help)
+  title: '[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><b><green> EvenMoreFish </green></b><st><gradient:#73ff6b:#f1ffed>         '
+  top: '[noPrefix]Shows an ongoing competition''s leaderboard.'
+  help: '[noPrefix]Shows you this page.'
+  shop: '[noPrefix]Opens a shop to sell your fish.'
+  toggle: '[noPrefix]Toggles whether or not you receive custom fish.'
+  gui: '[noPrefix]Opens the Main Menu GUI.'
+  admin: '[noPrefix]Admin command help page.'
+  sellall: '[noPrefix]Sell all the fish in your inventory.'
+  next: '[noPrefix]Show how much time is until the next competition.'
+  applybaits: '[noPrefix]Apply baits to your fishing rod.'
+  journal: "[noPrefix]View a journal of caught fish and their stats."
+help-list:
+  fish: '[noPrefix]Display all fish in a specific rarity.'
+  rarities: '[noPrefix]Display all rarities.'
+# Competition help (/emf admin competition help)
 help-competition:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><red> </red></strikethrough><white> </white><bold><red>EvenMoreFish </red></bold><strikethrough><red> </red></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - <white>/emf admin competition start \<duur> \<type> - Start een competitie met opgegeven duur.
-  - <white>/emf admin competition end - Beëindigt de huidige competitie (indien aanwezig).
-
-# Beheerdershulp (/emf admin help)
+  start: '[noPrefix]Starts a competition of a specified duration'
+  end: '[noPrefix]Ends the current competition (if there is one)'
+# Admin help (/emf admin help)
 help-admin:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><red> </red></strikethrough><white> </white><bold><red>EvenMoreFish </red></bold><strikethrough><red> </red></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - <white>/emf admin competition \<start/end> \<duur> \<type> - Start of stopt een competitie.
-  - <white>/emf admin clearbait - Verwijdert alle toegepaste aas van een vishengel.
-  - <white>/emf admin reload - Herlaadt de configuratiebestanden van de plugin.
-  - <white>/emf admin version - Geeft informatie over de plugin.
-
-# Shown when the emf competition placeholders request a position in the leaderboard that doesn't exist
+  bait: '[noPrefix]Gives baits to a player.'
+  competition: '[noPrefix]Starts or stops a competition'
+  clearbaits: '[noPrefix]Removes all applied baits from a fishing rod.'
+  fish: '[noPrefix]Gives a fish to a player.'
+  nbt-rod: '[noPrefix]Gives a custom NBT rod to a player required for catching EMF fish.'
+  custom-rod: '[noPrefix]Gives a custom fishing rod to a player.'
+  reload: '[noPrefix]Reloads the plugin''s config files.'
+  migrate: '[noPrefix]Migrate the database from Legacy (V2) to V3'
+  addons: '[noPrefix]Display all addons.'
+  rewardtypes: '[noPrefix]Display all reward types.'
+  version: '[noPrefix]Displays plugin information.'
+  rawitem: '[noPrefix]Displays the item in your main hand as raw NBT.'
+# Shown when the emf %emf_competition_place_player_*% placeholder requests a position in the leaderboard that doesn't exist
 no-player-in-place: Begin met vissen om deze plek in te nemen.
-# Weergegeven wanneer de emf-competitieplaatsaanduidingen worden gebruikt wanneer er geen competitie loopt
+# Shown when the emf %emf_competition_place_fish_*% placeholder requests a position in the leaderboard that doesn't exist
+no-fish-in-place: Start fishing to take this place
+# Shown when the emf %emf_competition_place_size_*% placeholder requests a position in the leaderboard that doesn't exist
+no-size-in-place: Start fishing to take this place
+# Shown when the emf %emf_competition_place_player_*% placeholder is used when there's no competition running
 no-competition-running: Er loopt momenteel geen competitie.
-
-# Hoe moet %emf_competition_place_fish_*% worden opgemaakt?
+# Shown when the emf %emf_competition_place_fish_*% placeholder is used when there's no competition running
+no-competition-running-fish: No competition running right now.
+# Shown when the emf %emf_competition_place_size_*% placeholder is used when there's no competition running
+no-competition-running-size: No competition running right now.
+# HOw should %emf_custom_fishing_status% be formatted?
+custom-fishing-enabled: <green>Enabled
+custom-fishing-disabled: <red>Disabled
+# How should the %emf_competition_place_fish_*% be formatted?
 emf-competition-fish-format: '{rarity_colour}{length} cm <bold>{rarity}</bold> {fish}'
-# Hoe moet %emf_competition_place_fish_*% worden opgemaakt wanneer er geen lengte bij de vis staat?
+# How should the %emf_competition_place_fish_*% be formatted when there's no length on the fish?
 emf-lengthless-fish-format: '{rarity_colour}<bold>{rarity}</bold> {fish}'
-# Hoe moet %emf_competition_place_fish_*% worden opgemaakt tijdens MOST/SPECIFIC_FISH-competities?
+# How should %emf_competition_place_fish_*% be formatted during MOST/SPECIFIC_FISH competitions?
 emf-most-fish-format: '{amount} vissen'
-# Wat moet worden weergegeven voor %emf_competition_place_size_*% tijdens de MOST_FISH-competitie?
+# What should be displayed for %emf_competition_place_size_*% during the MOST_FISH competition?
 emf-size-during-most-fish: N.v.t.
-# Opmaak van de %emf_competition_time_left%-variabele
+# How the %emf_competition_time_left% variable should be formatted.
 emf-time-remaining: 'Tijd tot de volgende competitie: {days}d, {hours}u, {minutes}m.'
-# Vervangt de %emf_competition_time_left%-variabele wanneer er al een competitie aan de gang is
+# Replaces the %emf_competition_time_left% variable when there's a competition already running.
 emf-time-remaining-during-comp: Er is momenteel een competitie aan de gang.
-
-# Verzonden wanneer een speler probeert te veel soorten aas op een vishengel toe te passen, ingesteld in het algemene gedeelte van baits.yml
+# Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: <reset>Je hebt het maximale aantal soorten aas voor deze vishengel bereikt.
-# Niet te verwarren met het bovenstaande, dit wordt verzonden wanneer het maximum van een specifiek aas is bereikt. Definieer dit in baits.yml met behulp van "max-baits".
-max-bait-reached: <reset>Je hebt het maximale aantal {bait} <reset>aas bereikt dat op één hengel kan worden aangebracht.
-# Verzonden wanneer een speler aas vangt tijdens het vissen (dit kan worden uitgeschakeld door catch-percentage in te stellen op 0 in baits.yml)
-bait-catch: <reset><bold>{player} <reset>heeft <bold>{bait} <reset>aas gevangen!
-# Verzonden wanneer aas wordt toegepast en er een vis wordt gevangen.
-bait-use: '<reset>Je hebt een van het aas van je hengel gebruikt: <bold>{bait}.'
-# Verzonden wanneer iemand probeert aas te gebruiken in de creatieve modus
+# Not to be confused with the above, this is sent when the maximum of a specific bait is reached. Define this in baits.yml using "max-baits".
+max-bait-reached: <reset>Je hebt het maximale aantal {bait_theme}{bait} <reset>aas bereikt dat op één hengel kan worden aangebracht.
+# Sent when a player catches a bait from fishing (this can be disabled by setting catch-percentage to 0 in baits.yml
+bait-catch: <reset><bold>{player} <reset>heeft {bait_theme}<bold>{bait} <reset>aas gevangen!
+# Sent when a bait is applied and a fish is caught.
+bait-use: '<reset>Je hebt een van het aas van je hengel gebruikt: {bait_theme}<bold>{bait}.'
+# Sent when someone tries to use a bait in creative
 bait-survival-limited: <reset>Je moet in de <underlined>overlevingsmodus<reset> zijn om aas op vishengels toe te passen.
-
-# Weergegeven wanneer /emf toggle wordt gebruikt om in- en uit te schakelen.
+# Sent when someone tries to merge a baited rod into an unbaited rod
+bait-rod-protection: <white>Protected your baited fishing rod. If you are trying to repair it, please put it in the first slot instead.
+# Sent when someone tries to apply a bait to a fishing rod they cannot use to fish
+bait-invalid-rod: <white>You cannot apply bait to this fishing rod!
+# Shown when /emf toggle is run, to turn off and on respectively.
 toggle-off: <reset>Je vangt nu geen aangepaste vissen meer.
 toggle-on: <reset>Je vangt nu aangepaste vissen.
-
 # When trying to place a skull-fish when this is blocked in config.yml
 place-fish-blocked: <reset>Je kunt deze vis niet plaatsen.
-
 admin:
-  # Opent een winkelinventory voor een andere speler met /emf shop
+  # Opens an /emf shop for another player
   open-fish-shop: <reset>Een winkelinventaris geopend voor {player}.
-  # Wanneer een vis aan een speler wordt gegeven
+  # When a fish is given to a player
   given-player-fish: <reset>Je hebt {player} een {fish} gegeven.
-  # Wanneer aas aan een speler wordt gegeven
+  # When a bait is given to a player
   given-player-bait: <reset>Je hebt {player} {bait} gegeven.
-  # Wanneer een beheerder /emf admin bait uitvoert zonder een aasnaam op te geven.
+  # When an admin runs /emf admin bait without a bait name.
   no-bait-specified: <reset>Je moet een aasnaam opgeven.
-  # Wanneer de beheerder de opdracht /emf admin clearbaits probeert uit te voeren zonder een hengel vast te houden.
+  # When the admin tries the command /emf admin clearbaits whe not holding a fishing rod.
   must-be-holding-rod: <reset>Je moet een vishengel vasthouden om die opdracht uit te voeren.
-  # Wanneer de opdracht /emf admin clearbaits wordt uitgevoerd.
+  # When /emf admin clearbaits command is run.
   all-baits-cleared: <reset>Je hebt alle {amount} aassoorten van je vishengel verwijderd.
-  # Wanneer de opdracht /emf admin clearbaits wordt uitgevoerd, maar er geen aas op de hengel zit.
+  # /emf admin clearbaits is run, but there are no baits on the rod.
   no-baits-on-rod: <reset>De vishengel heeft geen aas aangebracht.
-
-  # Wanneer economie is uitgeschakeld voor de plugin
+  # When economy is disabled for the plugin
   economy-disabled: <reset>De economiefuncties van EvenMoreFish zijn uitgeschakeld.
-
-  # Wanneer de opgegeven speler niet kan worden gevonden bij gebruik van de -p: parameter.
+  # When the specified player can't be found when using -p: parameter.
   player-not-found: <reset>{player} kon niet worden gevonden.
-  # Wanneer het opgegeven getal in -q: geen getal is.
+  # When the specified number in -q: is not a number.
   number-format-error: <reset>{amount} is geen geldig getal.
-  # Wanneer het opgegeven getal in -q: niet binnen het minecraft stapelbereik ligt (1-64)
+  # When the specified number in -q: is not within the minecraft stack range (1-64)
   number-range-error: <reset>{amount} is geen getal tussen 1-64.
-  # Wanneer een opdracht niet vanuit de console kan worden uitgevoerd
+  # When a command cannot be run from the console
   cannot-run-on-console: <reset>De opdracht kan niet vanuit de console worden uitgevoerd.
-
-  # Verzonden wanneer er al een competitie aan de gang is bij gebruik van /emf admin competition start
+  # Sent when a competition is already running when using /emf admin competition start
   competition-already-running: <reset>Er is al een competitie aan de gang.
-  # Wanneer een ongeldig competitietype wordt geprobeerd te starten
+  # When an invalid competition type is provided
   competition-type-invalid: '<reset>Dat is geen geldig competitietype. Beschikbare types: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH'
-
-  # Wanneer de opdracht /emf admin nbt-rod wordt uitgevoerd.
-  nbt-rod-given: <reset>Je hebt {player} een NBT-hengel gegeven. Zorg ervoor dat "require-nbt-rod" op <green>waar <reset>staat om deze anders te maken dan elke andere vishengel.
-  # Wanneer de opdracht /emf admin nbt-rod wordt uitgevoerd, maar require-rod-nbt staat op false in het config.yml-bestand.
-  nbt-not-required: <reset>Stel "require-nbt-rod" in op true om deze functie te gebruiken.
-
-  # Wanneer er een Modrinth-update beschikbaar is. Vertaal de URL niet, anders wordt de pagina niet correct geopend.
+  # When an invalid competition id is provided
+  competition-id-invalid: <white>That isn't a valid competition id.
+  # When the command /emf admin custom-rod is run.
+  custom-rod-given: <white>You have given {player} a custom fishing rod.
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
   update-available: '<reset>Er is een update beschikbaar: https://modrinth.com/plugin/evenmorefish'
-
+  # When the plugin is reloaded
   reload: <reset>EvenMoreFish is succesvol herladen.
-
+  # When checking a list of registered addons. The actual list is added to the end of this message.
+  list-addons: '<white>Registered {addon-type}s: '
+# When an invalid rarity is provided for a command.
+rarity-invalid: <white>That is not a valid rarity!
+# Bait messages
+bait:
+  # How the lore should look ({baits} takes up multiple lines)
+  rod-lore:
+    - <white>
+    - '<gray>Bait Slots: <yellow>({current_baits}/{max_baits})'
+    - <white>
+    - '{baits}'
+    - <white>
+  # The default lore of the bait, changing this will not modify existing baits, but with an /emf admin reload, new baits
+  # given out will have this lore. Bait themes can be set as a colour or prefix and be used in this lore.
+  bait-lore:
+    - <white>
+    - 'Increases the catch rates for:'
+    - '{boosts}'
+    - '{lore}'
+    - <white>
+    - '<#dadada>Drop onto a fishing rod to apply,'
+    - '<#dadada>or hold <u>SHIFT</u> to apply all.'
+    - <white>
+  # How the baits should look in each line of the {baits} variable above ^. {baits} respects the display name setting,
+  # the <gold> is there for baits without a display name set.
+  baits: <gold>► {amount} {bait}
+  # These are listed in the {boosts} variable above in bait-lore
+  # boost-rarity/rarities: shown when the bait only impacts 1 rarity or when it impacts multiple rarities.
+  # boost-fish: shown when the bait impacts some fish individually.
+  boosts-rarity: '► <white>1 Rarity'
+  boosts-rarities: '► <white>{amount} Rarities'
+  boosts-fish: '► <white>{amount} Fish'
+  # This is added to the lore in place of a bait if show-unused-slots is enabled in the general section.
+  unused-slot: <gray>► ? <i>Available Slot
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 1
+version: 3

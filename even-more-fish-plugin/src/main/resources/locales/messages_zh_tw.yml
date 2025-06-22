@@ -1,29 +1,31 @@
-# 由kyle翻译 Translated by kyle.
-
-# 如果一條信息包含EvenMoreFish的佔位符，例如{player}或{rarity}，它也支持api佔位符。
-
-# 當玩家釣到EvenMoreFish的魚時發給他們。
+# If a message contains EvenMoreFish placeholders, e.g. {player} or {rarity} it also supports placeholderapi placeholders.
+# Important: Read the following if you are on a Paper server.
+# These messages are able to support the MiniMessage format (in strict mode) if you are on a Paper server.
+# You are able to mix both formats on the same line, however this is not recommended.
+# Here are the MiniMessage Docs for help with using MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# Sent to players when they fish an EvenMoreFish fish
 fish-caught: <green>{player} </green><white>捕捉到了 {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}!
-# 通過將魚的最小長度設置為小於0，你可以創建一條無長度的魚。當玩家釣到一條無長度的魚時，就會用到這一點。
+# By setting a fish's minimum-length to less than 0, you can create a lengthless fish. This is used when a player fishes a lengthless fish.
 lengthless-fish-caught: <green>{player} </green><white>捕捉到了 {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}!
-# 當玩家沒有執行命令的權限時發給他們。
+# Sent to players when they hunt an EvenMoreFish fish
+fish-hunted: <b>{player}</b> has hunted a {length}cm <b>{rarity}</b> {fish}!
+# This is used when a player hunts a lengthless fish.
+lengthless-fish-hunted: <b>{player}</b> has hunted a <b>{rarity}</b> {fish}!
+# Sent to a player when they don't have permission to execute a command.
 no-permission: <red>你沒有權限使用此指令.
-
-# 比賽開始和結束時要發送的信息
+# The message to be sent when a competition starts and ends
 contest-start: <reset>釣魚比賽開始了.
 contest-end: <reset>釣魚比賽已結束.
-# 當玩家在比賽進行中加入服務器時，將發送的信息
+# The message to be sent when a player joins whilst a competition is going on
 contest-join: <reset>釣魚比賽正在進行中.
-
-# 當有新玩家佔據No.1位置時顯示給玩家，移除此值或將其設置為""來禁用此信息。
-new-first: <reset>{player}現在成為比賽的第一名
-# 這個消息應該出現在聊天中（false）還是出現在exp bar上面（true）。
+# Shown to players when a new player takes #1 spot, remove this value or set it to "" to disable this message
+new-first: '<reset>{player}現在成為比賽的第一名'
+# Should this message appear in chat (false) or above the exp bar (true)
 action-bar-message: true
-# action bar應該用於哪些比賽類型？(推荐：MOST_FISH)
+# What competition types should the action bar be used for? (recommended: MOST_FISH)
 action-bar-types:
   - MOST_FISH
-
-# 對於每個競爭類型，應該用什麼來代替{type}變量？
+# What should replace the {type} variable for each competition type?
 competition-types:
   # MOST_FISH
   most: 最多的魚
@@ -31,162 +33,233 @@ competition-types:
   largest: 最長的魚
   # LARGEST_TOTAL_FISH
   largest-total: 魚的總長度
+  # SHORTEST_FISH
+  shortest: the shortest fish
+  # SHORTEST_TOTAL_FISH
+  shortest-total: the shortest total fish length
   # SPECIFIC_FISH
   specific: '{amount} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>'
   # SPECIFIC_RARITY
   specific-rarity: '{amount} {rarity_colour}<bold>{rarity}<reset> 鱼'
-# bossbar上面顯示的文字
+# Segments shown in the bossbar when competitions run
 bossbar:
   layout: '{prefix}<reset>{time-formatted}<reset>{remaining}'
-  # 用於不同時間單位的縮寫
+  # The abbreviations used for different units of time in the {time-formatted} variable.
   hour: <reset>{hour}時
   minute: <reset>{minute}分
   second: <reset>{second}秒
-  # 用於翻譯結尾的 "剩餘"，例如 "5s 剩餘“
+  # For translating the "left" at the end e.g. "5s left" -> "5s kvar"
+  # This is the {remaining} variable.
   remaining: 剩餘
-
-# 命令中[EvenMoreFish]前綴的顏色（當你的前綴沒有顏色時）。
+# The prefix shown in commands. Keeping the space in is recommended.
 prefix-regular: '<aqua>[釣魚大賽] '
-# 管理命令中[EvenMoreFish]前綴的顏色（當你的前綴沒有顏色時）。
+# The prefix shown in admin commands.
 prefix-admin: '<aqua>[釣魚大賽] '
-# 當發生錯誤時，[EvenMoreFish]前綴的顏色，例如，沒有運行命令的權限（當你的前綴沒有顏色時）。
+# The prefix shown when errors occur e.g. no permission to run a command.
 prefix-error: '<red>[釣魚大賽] '
-
-# 這是魚被捕獲時給予的lore的格式。
-# {custom-lore}是在fish.yml的lore:部分下指定的，如果魚有一個lore。
-# lore的行会替换{fish_lore}，但但是如果它是空的，該行將被刪除。除了這個變量之外，不要在該行中添加其他任何東西。
+# This is the format of the lore given to fish when they're caught.
+# {custom-lore} is specified in the fish configs under the lore: section, if the fish has a lore, the lore's lines will
+# replace the {fish_lore}, however if it's empty the line will be removed. DO NOT ADD ANYTHING OTHER THAN THIS VARIABLE
+# TO THAT LINE.
 fish-lore:
   - '<green>品質: {rarity_colour}{rarity}'
   - '<gold>長度: {length}cm'
-  - '<gold>捕捉者: {player}'
   - ''
   - '{fish_lore}'
-
-# 命令格式（該信息不支持papi佔位符）。
-help: /{command} - {description}
-
-# 比賽結束後排行榜的格式（此信息不支持papi佔位符）。
-leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-largest-total: <reset>#{position} | {player} <reset>({amount}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>fish)
-# 如果你正在運行一個沒有排行榜的比賽，當有獲勝者時，會發送這個消息
+  - '{fish_lore}'
+# Sets what to replace with the {fisherman_lore} or {length_lore} with above ^
+fisherman-lore:
+  - <white>Caught by {player}
+length-lore:
+  - <white>Measures {length}cm.
+# The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
+leaderboard-largest-fish: '<white>#{position} | {player} (<b>{rarity}</b> {fish}, {length}cm)'
+leaderboard-largest-total: '<white>#{position} | {player} <white>({amount}cm<white>)'
+leaderboard-most-fish: '<white>#{position} | {player} <white>({amount} <white>fish)'
+leaderboard-shortest-fish: '<white>#{position} | {player} <white>(<b>{rarity}</b> {fish}<white>, {length}cm<white>)'
+leaderboard-shortest-total: '<white>#{position} | {player} <white>({amount}cm<white>)'
+# If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} 贏得了這場比賽!
-# 這顯示了當前參加比賽的玩家數量，設置為""可禁用。
+# This shows the number of players currently in the competition, set to "" to disable.
 total-players: <reset>排行榜上共有 {amount} 個玩家.
-# 在排行榜上顯示的位置數- 不能少於1。
+# The number of positions shown in the leaderboard - can't be less than 1.
 leaderboard-count: 5
-# 如果該玩家沒有出現在/emf top, 他們的位置是否應該顯示在底部？
+# If the player doesn't appear on /emf top, should their position be displayed at the bottom?
 always-show-pos: true
-# 在比賽中沒有人得到記錄時發給玩家
+# Sent to players when nobody got a record during a competition
 no-winners: <reset>這場比賽中目前沒有任何記錄.
-# 當個別玩家沒有得到一個記錄時
+# When an individual player didn't get a record
 no-record: <reset>你還沒有釣到魚.
-# 當管理員試圖啟動一個類型不存在的比賽時發出，例如： /emf admin competition start 600 ABCDEFGH
+# Sent when an admin tries to start a competition where the type doesn't exist e.g. /emf admin competition start 600 ABCDEFGH
 invalid-type: '<reset>這不是一個可用的比賽類型，可用類型: MOST_FISH, LARGEST_FISH, SPECIFIC_FISH, LARGEST_TOTAL_FISH, SPECIFIC_RARITY'
-# 當沒有足夠的玩家開始比賽時，向所有在線玩家發送。
+# Sent to all online players when not enough players are on to start a competition
 not-enough-players: <reset>在線玩家人數不足，無法開始預定的釣魚比賽
-# 在特定時間發送給所有玩家，顯示剩餘的時間
-# {time_formatted}顯示時間（例如：還剩5分鐘，還剩10分鐘30秒）。
-# {time_raw}是你在competitions.yml中輸入的內容
+# Sent to all players at specific times to show the remaining time left
+# {time_formatted} shows the time (e.g. 5m left, 10m 30s left)
+# {time_raw} is what you input in competitions.yml
 time-alert: <reset>這場比賽還有{time_formatted} 結束
-
-# 當玩家在/emf shop中賣掉他們的魚時，向他們發送的信息。
+# The sell price:
+# 0 – prints a digit if provided, 0 otherwise
+# # – prints a digit if provided, nothing otherwise
+# . – indicate where to put the decimal separator
+# , – indicate where to put the grouping separator
+sell-price-format: '$#,##0.0'
+# The message sent to players when they've sold their fish in the /emf shop
 fish-sale: <white>你出售了 </white><green>{amount} </green><white>條魚，賺取了 </white><yellow>{sell-price} </yellow><white>塊錢！
-
-# 幫助信息
+# Help messages
+# General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
+help-format: '[noPrefix]<aqua>{command} <yellow>- {description}'
 help-general:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><aqua>釣魚大賽 </aqua></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - <white>/emf top - 顯示比賽排行榜.
-  - <white>/emf help - 顯示幫助頁面.
-  - <white>/emf shop - 打開釣魚商店.
-  - <white>/emf toggle - 切換是否釣到自定義魚類。
-  - <white>/emf admin - 管理員幫助頁面.
-
-# 競賽幫助信息
+  title: '[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><b><green> EvenMoreFish </green></b><st><gradient:#73ff6b:#f1ffed>         '
+  top: '[noPrefix]Shows an ongoing competition''s leaderboard.'
+  help: '[noPrefix]Shows you this page.'
+  shop: '[noPrefix]Opens a shop to sell your fish.'
+  toggle: '[noPrefix]Toggles whether or not you receive custom fish.'
+  gui: '[noPrefix]Opens the Main Menu GUI.'
+  admin: '[noPrefix]Admin command help page.'
+  sellall: '[noPrefix]Sell all the fish in your inventory.'
+  next: '[noPrefix]Show how much time is until the next competition.'
+  applybaits: '[noPrefix]Apply baits to your fishing rod.'
+  journal: "[noPrefix]View a journal of caught fish and their stats."
+help-list:
+  fish: '[noPrefix]Display all fish in a specific rarity.'
+  rarities: '[noPrefix]Display all rarities.'
+# Competition help (/emf admin competition help)
 help-competition:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><red> </red></strikethrough><white> </white><bold><aqua>釣魚大賽 </aqua></bold><strikethrough><red> </red></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - <white>/emf admin competition start \<duration> \<type> - 啟動一個指定期限的釣魚比賽
-  - <white>/emf admin competition end - 結束當前的釣魚比賽
-
-# 管理幫助信息
+  start: '[noPrefix]Starts a competition of a specified duration'
+  end: '[noPrefix]Ends the current competition (if there is one)'
+# Admin help (/emf admin help)
 help-admin:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><red> </red></strikethrough><white> </white><bold><aqua>釣魚大賽 </aqua></bold><strikethrough><red> </red></strikethrough><strikethrough><#ff6c66> </#ff6c66></strikethrough><strikethrough><#ff8078> </#ff8078></strikethrough><strikethrough><#ff948a> </#ff948a></strikethrough><strikethrough><#ffa69d> </#ffa69d></strikethrough><strikethrough><#ffb8b0> </#ffb8b0></strikethrough><strikethrough><#ffcac3> </#ffcac3></strikethrough><strikethrough><#ffdcd7> </#ffdcd7></strikethrough><strikethrough><#ffedeb> </#ffedeb></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - <white>/emf admin competition \<start/end> \<duration> \<type> - 開始或停止比賽
-  - <white>/emf admin clearbait - 將所有應用的魚餌從魚竿上移走
-  - <white>/emf admin reload - 重載插件配置文件
-  - <white>/emf admin version - 顯示插件版本信息
-
-# 當佔位符要求在排行榜上獲得一個不存在的位置時顯示。
+  bait: '[noPrefix]Gives baits to a player.'
+  competition: '[noPrefix]Starts or stops a competition'
+  clearbaits: '[noPrefix]Removes all applied baits from a fishing rod.'
+  fish: '[noPrefix]Gives a fish to a player.'
+  nbt-rod: '[noPrefix]Gives a custom NBT rod to a player required for catching EMF fish.'
+  custom-rod: '[noPrefix]Gives a custom fishing rod to a player.'
+  reload: '[noPrefix]Reloads the plugin''s config files.'
+  migrate: '[noPrefix]Migrate the database from Legacy (V2) to V3'
+  addons: '[noPrefix]Display all addons.'
+  rewardtypes: '[noPrefix]Display all reward types.'
+  version: '[noPrefix]Displays plugin information.'
+  rawitem: '[noPrefix]Displays the item in your main hand as raw NBT.'
+# Shown when the emf %emf_competition_place_player_*% placeholder requests a position in the leaderboard that doesn't exist
 no-player-in-place: <gray>------
-# 在沒有比賽的情況下使用比賽佔位符時顯示。
+# Shown when the emf %emf_competition_place_fish_*% placeholder requests a position in the leaderboard that doesn't exist
+no-fish-in-place: Start fishing to take this place
+# Shown when the emf %emf_competition_place_size_*% placeholder requests a position in the leaderboard that doesn't exist
+no-size-in-place: Start fishing to take this place
+# Shown when the emf %emf_competition_place_player_*% placeholder is used when there's no competition running
 no-competition-running: <gray>------
-
-# %emf_competition_place_fish_*%的格式應該是怎樣的？
+# Shown when the emf %emf_competition_place_fish_*% placeholder is used when there's no competition running
+no-competition-running-fish: No competition running right now.
+# Shown when the emf %emf_competition_place_size_*% placeholder is used when there's no competition running
+no-competition-running-size: No competition running right now.
+# HOw should %emf_custom_fishing_status% be formatted?
+custom-fishing-enabled: <green>Enabled
+custom-fishing-disabled: <red>Disabled
+# How should the %emf_competition_place_fish_*% be formatted?
 emf-competition-fish-format: '{rarity_colour} <bold>{rarity}</bold> {fish}<reset> | {rarity_colour}{length}cm'
-# 當魚上沒有長度時，%emf_competition_place_fish_*%的格式應該是怎樣的
+# How should the %emf_competition_place_fish_*% be formatted when there's no length on the fish?
 emf-lengthless-fish-format: '{rarity_colour}<bold>{rarity}</bold> {fish}'
-# 在MOST/SPECIFIC_FISH比賽期間，%emf_competition_place_fish_*%的格式應該是怎樣的？
+# How should %emf_competition_place_fish_*% be formatted during MOST/SPECIFIC_FISH competitions?
 emf-most-fish-format: '{amount} 條魚'
-# 在MOST_FISH比賽期間，%emf_competition_place_fish_*%的格式應該是怎樣的？
+# What should be displayed for %emf_competition_place_size_*% during the MOST_FISH competition?
 emf-size-during-most-fish: N/A
-# %emf_competition_time_left%的格式應該是怎樣的？
-emf-time-remaining: <aqua>距離下次釣魚大賽還有： {days}天, {hours}時, {minutes}分。
-# 当有一个比赛正在进行时，取代%emf_competition_time_left%變量。
+# How the %emf_competition_time_left% variable should be formatted.
+emf-time-remaining: '<aqua>距離下次釣魚大賽還有： {days}天, {hours}時, {minutes}分。'
+# Replaces the %emf_competition_time_left% variable when there's a competition already running.
 emf-time-remaining-during-comp: <aqua>現在有一個釣魚比賽正在進行中。
-
-# 當玩家試圖在釣竿上應用過多類型的魚餌時發出，在baits.yml的常規部分設置。
+# Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: <red>你已經達到了該釣竿的最大魚餌類型數量。
-# 不要與上述混淆，這是在達到特定誘餌的最大值時發送的。在baits.yml中使用"max-baits "來定義這個。
-max-bait-reached: <red>你已經達到了一個魚竿可以應用的 {bait} <reset>的最大數量。
-# 當玩家通過釣魚捕獲一個誘餌時發送（這可以通過在baits.yml中設置捕獲率為0來禁用）。
-bait-catch: <green>{player} </green><white>捕捉到了 <bold>{bait} </bold></white><white>!
-# 在使用魚餌並捕到魚時發送。
-bait-use: <green>你使用了一根釣竿的 <bold>{bait} </bold></green><green>誘餌.
-# 當有人試圖在創造模式中使用誘餌時發出的
+# Not to be confused with the above, this is sent when the maximum of a specific bait is reached. Define this in baits.yml using "max-baits".
+max-bait-reached: <red>你已經達到了一個魚竿可以應用的 {bait_theme}{bait} <reset>的最大數量。
+# Sent when a player catches a bait from fishing (this can be disabled by setting catch-percentage to 0 in baits.yml
+bait-catch: <green>{player} </green><white>捕捉到了 {bait_theme}<bold>{bait} </bold></white><white>!
+# Sent when a bait is applied and a fish is caught.
+bait-use: <green>你使用了一根釣竿的 {bait_theme}<bold>{bait} </bold></green><green>誘餌.
+# Sent when someone tries to use a bait in creative
 bait-survival-limited: <red>你必須在 <underlined>生存模式<reset> 中才能將魚餌應用在釣竿上。
-
-# 在運行/emf toggle時顯示，分別是關閉和開啟。
+# Sent when someone tries to merge a baited rod into an unbaited rod
+bait-rod-protection: <white>Protected your baited fishing rod. If you are trying to repair it, please put it in the first slot instead.
+# Sent when someone tries to apply a bait to a fishing rod they cannot use to fish
+bait-invalid-rod: <white>You cannot apply bait to this fishing rod!
+# Shown when /emf toggle is run, to turn off and on respectively.
 toggle-off: <red>你將不再捕獲自定義的魚。
 toggle-on: <green>現在你將捕捉到自定義的魚。
-
-# 當試圖放置一個skull-fish時阻止
+# When trying to place a skull-fish when this is blocked in config.yml
 place-fish-blocked: <red>你不能放置這條魚。
-
 admin:
-  # 為另一個玩家打開一個釣魚商店
+  # Opens an /emf shop for another player
   open-fish-shop: <green>為玩家{player}打開了釣魚商店.
-  # 當一條魚被給予給一個玩家時
+  # When a fish is given to a player
   given-player-fish: <green>你給予 {player} 一條 {fish}.
-  # 當一個誘餌被給予給一個玩家時
+  # When a bait is given to a player
   given-player-bait: <green>你给予 {player} 一個 {bait}.
-  # 當管理員運行/emf admin bait時，沒有bait名稱。
+  # When an admin runs /emf admin bait without a bait name.
   no-bait-specified: <red>你必須指定一個誘餌名稱。
-  # 當管理員在不拿魚竿的情況下嘗試/emf admin clearbaits命令。
+  # When the admin tries the command /emf admin clearbaits whe not holding a fishing rod.
   must-be-holding-rod: <red>你需要拿著一根魚竿來運行這個命令。
-  # 當/emf admin clearbaits命令被運行時。
+  # When /emf admin clearbaits command is run.
   all-baits-cleared: <green>你已經從你的釣竿上取下了 {amount} 個魚餌。
-  # /emf admin clearbaits 被運行，但魚竿上沒有魚餌。
+  # /emf admin clearbaits is run, but there are no baits on the rod.
   no-baits-on-rod: <red>釣竿上沒有應用任何魚餌。
-
-  # 當插件的經濟性被禁用時
+  # When economy is disabled for the plugin
   economy-disabled: <red>釣魚大賽的經濟功能被禁用。
-
+  # When the specified player can't be found when using -p: parameter.
   player-not-found: <red>{player} 無法找到。
+  # When the specified number in -q: is not a number.
   number-format-error: <green>{amount} 不是一個有效的數字。
+  # When the specified number in -q: is not within the minecraft stack range (1-64)
   number-range-error: <green>{amount} 不是1-64之間的數字。
-  # 當一個命令不能從控制台運行時
+  # When a command cannot be run from the console
   cannot-run-on-console: <red>命令不能從後台運行。
-
-  # 當使用/emf admin competition start時，當比賽已經在運行時發送。
+  # Sent when a competition is already running when using /emf admin competition start
   competition-already-running: <aqua>已經有一場釣魚比賽在進行了。
-  # 當一個無效的競爭類型被嘗試啟動時
-  competition-type-invalid: <green>這不是一個競爭類型，可用類型：MOST_FISH, LARGEST_FISH, SPECIFIC_FISH, LARGEST_TOTAL_FISH, SPECIFIC_RARITY
-
-  # 當有modrinth更新時，不要翻譯URL，否則它將無法引導到正確的頁面。
-  update-available: <green>釣魚大賽插件更新啦！還不來看看嗎https://modrinth.com/plugin/evenmorefish/versions?l=paper
-  # 重啟插件信息
+  # When an invalid competition type is provided
+  competition-type-invalid: '<green>這不是一個競爭類型，可用類型：MOST_FISH, LARGEST_FISH, SPECIFIC_FISH, LARGEST_TOTAL_FISH, SPECIFIC_RARITY'
+  # When an invalid competition id is provided
+  competition-id-invalid: <white>That isn't a valid competition id.
+  # When the command /emf admin custom-rod is run.
+  custom-rod-given: <white>You have given {player} a custom fishing rod.
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: '<green>釣魚大賽插件更新啦！還不來看看嗎https://modrinth.com/plugin/evenmorefish/versions?l=paper'
+  # When the plugin is reloaded
   reload: <green>成功地重新加載了插件，由Kyle翻譯。
-
+  # When checking a list of registered addons. The actual list is added to the end of this message.
+  list-addons: '<white>Registered {addon-type}s: '
+# When an invalid rarity is provided for a command.
+rarity-invalid: <white>That is not a valid rarity!
+# Bait messages
+bait:
+  # How the lore should look ({baits} takes up multiple lines)
+  rod-lore:
+    - <white>
+    - '<gray>Bait Slots: <yellow>({current_baits}/{max_baits})'
+    - <white>
+    - '{baits}'
+    - <white>
+  # The default lore of the bait, changing this will not modify existing baits, but with an /emf admin reload, new baits
+  # given out will have this lore. Bait themes can be set as a colour or prefix and be used in this lore.
+  bait-lore:
+    - <white>
+    - 'Increases the catch rates for:'
+    - '{boosts}'
+    - '{lore}'
+    - <white>
+    - '<#dadada>Drop onto a fishing rod to apply,'
+    - '<#dadada>or hold <u>SHIFT</u> to apply all.'
+    - <white>
+  # How the baits should look in each line of the {baits} variable above ^. {baits} respects the display name setting,
+  # the <gold> is there for baits without a display name set.
+  baits: <gold>► {amount} {bait}
+  # These are listed in the {boosts} variable above in bait-lore
+  # boost-rarity/rarities: shown when the bait only impacts 1 rarity or when it impacts multiple rarities.
+  # boost-fish: shown when the bait impacts some fish individually.
+  boosts-rarity: '► <white>1 Rarity'
+  boosts-rarities: '► <white>{amount} Rarities'
+  boosts-fish: '► <white>{amount} Fish'
+  # This is added to the lore in place of a bait if show-unused-slots is enabled in the general section.
+  unused-slot: <gray>► ? <i>Available Slot
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 1
+version: 3
