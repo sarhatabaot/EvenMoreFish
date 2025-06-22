@@ -1,4 +1,4 @@
-package com.oheers.fish.utils;
+package com.oheers.fish.utils.protection;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;

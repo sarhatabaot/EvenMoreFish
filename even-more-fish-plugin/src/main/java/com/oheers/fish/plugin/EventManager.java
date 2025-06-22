@@ -12,7 +12,7 @@ import com.oheers.fish.fishing.EMFFishListener;
 import com.oheers.fish.fishing.FishingProcessor;
 import com.oheers.fish.fishing.HuntingProcessor;
 import com.oheers.fish.update.UpdateNotify;
-import com.oheers.fish.utils.ItemProtectionListener;
+import com.oheers.fish.utils.protection.ItemProtectionListener;
 import org.bukkit.plugin.PluginManager;
 
 public class EventManager {

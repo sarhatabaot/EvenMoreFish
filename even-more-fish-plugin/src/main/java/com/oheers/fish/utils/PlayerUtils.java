@@ -61,33 +61,4 @@ public final class PlayerUtils {
             return null;
         }
     }
-
-    public static PotionEffect getPotionEffect(@NotNull String effectString) {
-        String[] split = effectString.split(":");
-        if (split.length != 3) {
-            Logging.error("Potion effect string is formatted incorrectly. Use \"potion:duration:amplifier\".");
-            return null;
-        }
-        PotionEffectType type = PotionEffectType.getByName(split[0]);
-        if (type == null) {
-            Logging.error("Potion effect type " + split[0] + " is not valid.");
-            return null;
-        }
-        Integer duration = NumberUtils.parseInteger(split[1]);
-        if (duration == null) {
-            Logging.error("Potion effect duration " + split[1] + " is not valid.");
-            return null;
-        }
-        Integer amplifier = NumberUtils.parseInteger(split[2]);
-        if (amplifier == null) {
-            Logging.error("Potion effect amplifier " + split[2] + " is not valid.");
-            return null;
-        }
-        return new PotionEffect(
-                type,
-                duration * 20,
-                amplifier - 1,
-                false
-        );
-    }
 }

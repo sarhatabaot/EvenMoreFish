@@ -1,6 +1,7 @@
-package com.oheers.fish.utils;
+package com.oheers.fish.utils.protection;
 
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.utils.FishUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCookEvent;

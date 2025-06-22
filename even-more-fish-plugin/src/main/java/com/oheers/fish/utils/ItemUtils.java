@@ -7,7 +7,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemUtils {
+public final class ItemUtils {
+    private ItemUtils() {
+        throw new UnsupportedOperationException();
+    }
 
     public static @NotNull Material getMaterial(@Nullable String materialName, @NotNull Material defaultMaterial) {
         Material material = getMaterial(materialName);

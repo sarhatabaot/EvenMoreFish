@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,5 +66,34 @@ public final class ItemGenerationUtils {
         } catch (IllegalArgumentException exception) {
             return new ItemStack(Material.PLAYER_HEAD);
         }
+    }
+
+    public static PotionEffect getPotionEffect(@NotNull String effectString) {
+        String[] split = effectString.split(":");
+        if (split.length != 3) {
+            Logging.error("Potion effect string is formatted incorrectly. Use \"potion:duration:amplifier\".");
+            return null;
+        }
+        PotionEffectType type = PotionEffectType.getByName(split[0]);
+        if (type == null) {
+            Logging.error("Potion effect type " + split[0] + " is not valid.");
+            return null;
+        }
+        Integer duration = NumberUtils.parseInteger(split[1]);
+        if (duration == null) {
+            Logging.error("Potion effect duration " + split[1] + " is not valid.");
+            return null;
+        }
+        Integer amplifier = NumberUtils.parseInteger(split[2]);
+        if (amplifier == null) {
+            Logging.error("Potion effect amplifier " + split[2] + " is not valid.");
+            return null;
+        }
+        return new PotionEffect(
+                type,
+                duration * 20,
+                amplifier - 1,
+                false
+        );
     }
 }
