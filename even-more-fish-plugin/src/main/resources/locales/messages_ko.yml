@@ -1,70 +1,83 @@
-# Credit to sovoro.kro.kr for this translation.
 # If a message contains EvenMoreFish placeholders, e.g. {player} or {rarity} it also supports placeholderapi placeholders.
-
+# Important: Read the following if you are on a Paper server.
+# These messages are able to support the MiniMessage format (in strict mode) if you are on a Paper server.
+# You are able to mix both formats on the same line, however this is not recommended.
+# Here are the MiniMessage Docs for help with using MiniMessage: https://docs.advntr.dev/minimessage/format.html
 # Sent to players when they fish an EvenMoreFish fish
 fish-caught: <bold>{player} <reset> {rarity_colour}{length}cm <bold>{rarity}</bold> {rarity_colour}{fish}낚았습니다!
 # By setting a fish's minimum-length to less than 0, you can create a lengthless fish. This is used when a player fishes a lengthless fish.
 lengthless-fish-caught: <bold>{player} <reset> {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}낚았습니다!
+# Sent to players when they hunt an EvenMoreFish fish
+fish-hunted: <b>{player}</b> has hunted a {length}cm <b>{rarity}</b> {fish}!
+# This is used when a player hunts a lengthless fish.
+lengthless-fish-hunted: <b>{player}</b> has hunted a <b>{rarity}</b> {fish}!
 # Sent to a player when they don't have permission to execute a command.
 no-permission: <red>이 명령어를 사용할 권한이 없습니다.
-
 # The message to be sent when a competition starts and ends
 contest-start: <reset> {type} 낚시 대회가 시작 되었습니다.
 contest-end: <reset>낚시대회가 종료되었습니다.
 # The message to be sent when a player joins whilst a competition is going on
 contest-join: <reset>{type} 낚시 대회가 진행 중입니다.
-
 # Shown to players when a new player takes #1 spot, remove this value or set it to "" to disable this message
-new-first: <reset>{player} 이제 1위입니다.
+new-first: '<reset>{player} 이제 1위입니다.'
 # Should this message appear in chat (false) or above the exp bar (true)
 action-bar-message: true
 # What competition types should the action bar be used for? (recommended: MOST_FISH)
 action-bar-types:
   - MOST_FISH
-
 # What should replace the {type} variable for each competition type?
 competition-types:
   # MOST_FISH
   most: 가장 많은 물고기 낚기
   # LARGEST_FISH
   largest: 가장 큰 물고기 낚기
+  # LARGEST_TOTAL_FISH
+  largest-total: the largest total fish length
+  # SHORTEST_FISH
+  shortest: the shortest fish
+  # SHORTEST_TOTAL_FISH
+  shortest-total: the shortest total fish length
   # SPECIFIC_FISH
   specific: '{amount} {rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>'
-
+  # SPECIFIC_RARITY
+  specific-rarity: '{amount} <b>{rarity}</b> fish'
 # Segments shown in the bossbar when competitions run
 bossbar:
   layout: '{prefix}<reset>{time-formatted}<reset>{remaining}'
-  # The abbreviations used for different units of time
+  # The abbreviations used for different units of time in the {time-formatted} variable.
   hour: <reset>{hour}시간
   minute: <reset>{minute}분
   second: <reset>{second}분
   # For translating the "left" at the end e.g. "5s left" -> "5s kvar"
+  # This is the {remaining} variable.
   remaining: 남음
-
-# The colour of the [EvenMoreFish] prefix in commands (for when your prefix doesn't have colours)
+# The prefix shown in commands. Keeping the space in is recommended.
 prefix-regular: '<green>[낚시] '
-# The colour of the [EvenMoreFish] prefix in admin commands (for when your prefix doesn't have colours)
+# The prefix shown in admin commands.
 prefix-admin: '<red>[낚시] '
-# The colour of the [EvenMoreFish] prefix when errors occur e.g. no permission to run a command (for when your prefix doesn't have colours)
+# The prefix shown when errors occur e.g. no permission to run a command.
 prefix-error: '<red>[낚시] '
-
 # This is the format of the lore given to fish when they're caught.
-# {custom-lore} is specified in the fish.yml under the lore: section, if the fish has a lore, the lore's lines will
+# {custom-lore} is specified in the fish configs under the lore: section, if the fish has a lore, the lore's lines will
 # replace the {fish_lore}, however if it's empty the line will be removed. DO NOT ADD ANYTHING OTHER THAN THIS VARIABLE
 # TO THAT LINE.
 fish-lore:
-  - <white>{player}가 잡았습니다.
-  - <reset><white>측정 {length}cm
+  - '<white>{player}가 잡았습니다.'
+  - '<reset><white>측정 {length}cm'
   - ''
   - '{fish_lore}'
   - '{rarity_colour}<bold>{rarity}'
-
-# The format of commands in /emf help (this message doesn't support papi placeholders)
-help: /{command} - {description}
-
+# Sets what to replace with the {fisherman_lore} or {length_lore} with above ^
+fisherman-lore:
+  - <white>Caught by {player}
+length-lore:
+  - <white>Measures {length}cm.
 # The format of the leaderboard after a competition is over (this message doesn't support papi placeholders)
-leaderboard-largest-fish: <reset>#{position} | {player} <reset>({rarity_colour}<bold>{rarity}</bold> {rarity_colour}{fish}<reset>, {length}cm<reset>)
-leaderboard-most-fish: <reset>#{position} | {player} <reset>({amount} <reset>fish)
+leaderboard-largest-fish: '<white>#{position} | {player} (<b>{rarity}</b> {fish}, {length}cm)'
+leaderboard-largest-total: '<white>#{position} | {player} <white>({amount}cm<white>)'
+leaderboard-most-fish: '<white>#{position} | {player} <white>({amount} <white>fish)'
+leaderboard-shortest-fish: '<white>#{position} | {player} <white>(<b>{rarity}</b> {fish}<white>, {length}cm<white>)'
+leaderboard-shortest-total: '<white>#{position} | {player} <white>({amount}cm<white>)'
 # If you're running a competition where there's no leaderboard, this message is sent when there's a winner
 single-winner: <reset>{player} {type}대회에서 우승했습니다!
 # This shows the number of players currently in the competition, set to "" to disable.
@@ -85,52 +98,168 @@ not-enough-players: <reset>낚시 대회를 시작할만큼 사람이 충분하�
 # {time_formatted} shows the time (e.g. 5m left, 10m 30s left)
 # {time_raw} is what you input in competitions.yml
 time-alert: <reset>{type}대회가 \<time>만큼 남았습니다.
-
+# The sell price:
+# 0 – prints a digit if provided, 0 otherwise
+# # – prints a digit if provided, nothing otherwise
+# . – indicate where to put the decimal separator
+# , – indicate where to put the grouping separator
+sell-price-format: '$#,##0.0'
 # The message sent to players when they've sold their fish in the /emf shop
 fish-sale: <green>{amount} </green><white>fish 를</white><green>{sell-price}</green><white>에 판매했습니다.
-
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
+help-format: '[noPrefix]<aqua>{command} <yellow>- {description}'
 help-general:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - /emf top - 진행 중인 대회의 순위표를 봅니다.
-  - /emf help - 도움말 표시.
-  - /emf shop - 물고기 상점을 엽니다.
-  - /emf admin - 관리자 설정.
-
+  title: '[noPrefix]<gradient:#f1ffed:#f1ffed><st>         </st><b><green> EvenMoreFish </green></b><st><gradient:#73ff6b:#f1ffed>         '
+  top: '[noPrefix]Shows an ongoing competition''s leaderboard.'
+  help: '[noPrefix]Shows you this page.'
+  shop: '[noPrefix]Opens a shop to sell your fish.'
+  toggle: '[noPrefix]Toggles whether or not you receive custom fish.'
+  gui: '[noPrefix]Opens the Main Menu GUI.'
+  admin: '[noPrefix]Admin command help page.'
+  sellall: '[noPrefix]Sell all the fish in your inventory.'
+  next: '[noPrefix]Show how much time is until the next competition.'
+  applybaits: '[noPrefix]Apply baits to your fishing rod.'
+  journal: "[noPrefix]View a journal of caught fish and their stats."
+help-list:
+  fish: '[noPrefix]Display all fish in a specific rarity.'
+  rarities: '[noPrefix]Display all rarities.'
 # Competition help (/emf admin competition help)
 help-competition:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - /emf admin competition start \<duration> \<type> - 지정된 시간 동안 대회를 시작합니다
-  - /emf admin competition end - 대회 종료 (if there is one)
-
+  start: '[noPrefix]Starts a competition of a specified duration'
+  end: '[noPrefix]Ends the current competition (if there is one)'
 # Admin help (/emf admin help)
 help-admin:
-  - <strikethrough><white> </white></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><#e2ffdb> </#e2ffdb></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><green> </green></strikethrough><white> </white><bold><green>EvenMoreFish </green></bold><strikethrough><green> </green></strikethrough><strikethrough><#73ff6b> </#73ff6b></strikethrough><strikethrough><#8bff7f> </#8bff7f></strikethrough><strikethrough><#9fff92> </#9fff92></strikethrough><strikethrough><#b2ffa5> </#b2ffa5></strikethrough><strikethrough><#c3ffb7> </#c3ffb7></strikethrough><strikethrough><#d3ffc9> </#d3ffc9></strikethrough><strikethrough><#f1ffed> </#f1ffed></strikethrough><strikethrough><white> </white></strikethrough><white>
-  - /emf admin competition \<start/end> \<duration> \<type> - 대회 시작 또는 중지
-  - /emf admin reload - 컨피그 파일 리로드
-  - /emf admin version - 플러그인 정보 표시.
-
-# Shown when the emf competition placeholders request a position in the leaderboard that doesn't exist
+  bait: '[noPrefix]Gives baits to a player.'
+  competition: '[noPrefix]Starts or stops a competition'
+  clearbaits: '[noPrefix]Removes all applied baits from a fishing rod.'
+  fish: '[noPrefix]Gives a fish to a player.'
+  nbt-rod: '[noPrefix]Gives a custom NBT rod to a player required for catching EMF fish.'
+  custom-rod: '[noPrefix]Gives a custom fishing rod to a player.'
+  reload: '[noPrefix]Reloads the plugin''s config files.'
+  migrate: '[noPrefix]Migrate the database from Legacy (V2) to V3'
+  addons: '[noPrefix]Display all addons.'
+  rewardtypes: '[noPrefix]Display all reward types.'
+  version: '[noPrefix]Displays plugin information.'
+  rawitem: '[noPrefix]Displays the item in your main hand as raw NBT.'
+# Shown when the emf %emf_competition_place_player_*% placeholder requests a position in the leaderboard that doesn't exist
 no-player-in-place: 차지하기 위해 낚시를 시작하세요
-# Shown when the emf competition placeholders are used when there's no competition running
+# Shown when the emf %emf_competition_place_fish_*% placeholder requests a position in the leaderboard that doesn't exist
+no-fish-in-place: Start fishing to take this place
+# Shown when the emf %emf_competition_place_size_*% placeholder requests a position in the leaderboard that doesn't exist
+no-size-in-place: Start fishing to take this place
+# Shown when the emf %emf_competition_place_player_*% placeholder is used when there's no competition running
 no-competition-running: 현재 진행 중인 대회가 없습니다.
-# Should %emf_competition_place_player_*% contain the above (false) or return null (true).
-emf-competition-player-null: false
-# Should %emf_competition_place_size_*% contain the above (false) or return null (true).
-emf-competition-size-null: true
-# Should %emf_competition_place_fish_*% contain the above (false) or return null (true).
-emf-competition-fish-null: true
+# Shown when the emf %emf_competition_place_fish_*% placeholder is used when there's no competition running
+no-competition-running-fish: No competition running right now.
+# Shown when the emf %emf_competition_place_size_*% placeholder is used when there's no competition running
+no-competition-running-size: No competition running right now.
+# HOw should %emf_custom_fishing_status% be formatted?
+custom-fishing-enabled: <green>Enabled
+custom-fishing-disabled: <red>Disabled
 # How should the %emf_competition_place_fish_*% be formatted?
 emf-competition-fish-format: '{length}cm <bold>{rarity}</bold> {fish}'
-
+# How should the %emf_competition_place_fish_*% be formatted when there's no length on the fish?
+emf-lengthless-fish-format: '<b>{rarity}</b> {fish}'
+# How should %emf_competition_place_fish_*% be formatted during MOST/SPECIFIC_FISH competitions?
+emf-most-fish-format: '{amount} fish'
+# What should be displayed for %emf_competition_place_size_*% during the MOST_FISH competition?
+emf-size-during-most-fish: N/A
+# How the %emf_competition_time_left% variable should be formatted.
+emf-time-remaining: 'Time left until next competition: {days}d, {hours}h, {minutes}m.'
+# Replaces the %emf_competition_time_left% variable when there's a competition already running.
+emf-time-remaining-during-comp: There is a competition running right now.
 # Sent when a player tries to apply too many types of baits to a fishing rod, set in the general section of baits.yml
 max-baits-reached: 이 낚싯대의 최대 미끼 유형 수에 도달했습니다.
+# Not to be confused with the above, this is sent when the maximum of a specific bait is reached. Define this in baits.yml using "max-baits".
+max-bait-reached: <white>You have reached the maximum number of {bait} <white>bait that can be applied to one rod.
 # Sent when a player catches a bait from fishing (this can be disabled by setting catch-percentage to 0 in baits.yml
-bait-catch: <bold>{player} <reset>가 <bold>{bait} <reset>미끼를 잡았습니다!
+bait-catch: <bold>{player} <reset>가 {bait_theme}<bold>{bait} <reset>미끼를 잡았습니다!
 # Sent when a bait is applied and a fish is caught.
-bait-use: '<bold>{bait} <reset>미끼 중 하나를 사용했습니다.'
-
+bait-use: '{bait_theme}<bold>{bait} <reset>미끼 중 하나를 사용했습니다.'
+# Sent when someone tries to use a bait in creative
+bait-survival-limited: <white>You must be in <u>survival or adventure mode</u> to apply baits to fishing rods.
+# Sent when someone tries to merge a baited rod into an unbaited rod
+bait-rod-protection: <white>Protected your baited fishing rod. If you are trying to repair it, please put it in the first slot instead.
+# Sent when someone tries to apply a bait to a fishing rod they cannot use to fish
+bait-invalid-rod: <white>You cannot apply bait to this fishing rod!
+# Shown when /emf toggle is run, to turn off and on respectively.
+toggle-off: <white>You will no longer catch custom fish.
+toggle-on: <white>You will now catch custom fish.
+# When trying to place a skull-fish when this is blocked in config.yml
+place-fish-blocked: <white>You cannot place this fish.
+admin:
+  # Opens an /emf shop for another player
+  open-fish-shop: <white>Opened a shop inventory for {player}.
+  # When a fish is given to a player
+  given-player-fish: <white>You have given {player} a {fish}.
+  # When a bait is given to a player
+  given-player-bait: <white>You have given {player} a {bait}.
+  # When an admin runs /emf admin bait without a bait name.
+  no-bait-specified: <white>You must specify a bait name.
+  # When the admin tries the command /emf admin clearbaits whe not holding a fishing rod.
+  must-be-holding-rod: <white>You need to be holding a fishing rod to run that command.
+  # When /emf admin clearbaits command is run.
+  all-baits-cleared: <white>You have removed all {amount} baits from your fishing rod.
+  # /emf admin clearbaits is run, but there are no baits on the rod.
+  no-baits-on-rod: <white>The fishing rod does not have any baits applied.
+  # When economy is disabled for the plugin
+  economy-disabled: <white>EvenMoreFish's economy features are disabled.
+  # When the specified player can't be found when using -p: parameter.
+  player-not-found: <white>{player} could not be found.
+  # When the specified number in -q: is not a number.
+  number-format-error: <white>{amount} is not a valid number.
+  # When the specified number in -q: is not within the minecraft stack range (1-64)
+  number-range-error: <white>{amount} is not a number between 1-64.
+  # When a command cannot be run from the console
+  cannot-run-on-console: <white>Command cannot be run from console.
+  # Sent when a competition is already running when using /emf admin competition start
+  competition-already-running: <white>There's already a competition running.
+  # When an invalid competition type is provided
+  competition-type-invalid: '<white>That isn''t a competition type. Available Types: https://evenmorefish.github.io/EvenMoreFish/docs/features/competitions/types'
+  # When an invalid competition id is provided
+  competition-id-invalid: <white>That isn't a valid competition id.
+  # When the command /emf admin custom-rod is run.
+  custom-rod-given: <white>You have given {player} a custom fishing rod.
+  # When there's a modrinth update available, don't translate the URL otherwise it won't direct to the correct page.
+  update-available: '<white>There is an update available: https://modrinth.com/plugin/evenmorefish/versions?l=paper'
+  # When the plugin is reloaded
+  reload: <white>Successfully reloaded the plugin.
+  # When checking a list of registered addons. The actual list is added to the end of this message.
+  list-addons: '<white>Registered {addon-type}s: '
+# When an invalid rarity is provided for a command.
+rarity-invalid: <white>That is not a valid rarity!
+# Bait messages
+bait:
+  # How the lore should look ({baits} takes up multiple lines)
+  rod-lore:
+    - <white>
+    - '<gray>Bait Slots: <yellow>({current_baits}/{max_baits})'
+    - <white>
+    - '{baits}'
+    - <white>
+  # The default lore of the bait, changing this will not modify existing baits, but with an /emf admin reload, new baits
+  # given out will have this lore. Bait themes can be set as a colour or prefix and be used in this lore.
+  bait-lore:
+    - <white>
+    - 'Increases the catch rates for:'
+    - '{boosts}'
+    - '{lore}'
+    - <white>
+    - '<#dadada>Drop onto a fishing rod to apply,'
+    - '<#dadada>or hold <u>SHIFT</u> to apply all.'
+    - <white>
+  # How the baits should look in each line of the {baits} variable above ^. {baits} respects the display name setting,
+  # the <gold> is there for baits without a display name set.
+  baits: <gold>► {amount} {bait}
+  # These are listed in the {boosts} variable above in bait-lore
+  # boost-rarity/rarities: shown when the bait only impacts 1 rarity or when it impacts multiple rarities.
+  # boost-fish: shown when the bait impacts some fish individually.
+  boosts-rarity: '► <white>1 Rarity'
+  boosts-rarities: '► <white>{amount} Rarities'
+  boosts-fish: '► <white>{amount} Fish'
+  # This is added to the lore in place of a bait if show-unused-slots is enabled in the general section.
+  unused-slot: <gray>► ? <i>Available Slot
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 1
+version: 3
