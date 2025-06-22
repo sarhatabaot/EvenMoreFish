@@ -1,6 +1,6 @@
 package com.oheers.fish.events;
 
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

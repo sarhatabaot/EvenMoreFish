@@ -1,6 +1,6 @@
 package com.oheers.fish.competition;
 
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;

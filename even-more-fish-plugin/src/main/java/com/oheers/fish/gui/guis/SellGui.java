@@ -1,6 +1,6 @@
 package com.oheers.fish.gui.guis;
 
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.MainConfig;

@@ -1,7 +1,7 @@
 package com.oheers.fish.requirements;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.requirement.RequirementContext;
 import com.oheers.fish.api.requirement.RequirementType;
 import org.bukkit.Location;

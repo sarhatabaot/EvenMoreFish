@@ -1,7 +1,7 @@
 package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;

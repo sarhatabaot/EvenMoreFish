@@ -1,6 +1,6 @@
 package com.oheers.fish.items.configs;
 
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.utils.Pair;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.enchantments.Enchantment;

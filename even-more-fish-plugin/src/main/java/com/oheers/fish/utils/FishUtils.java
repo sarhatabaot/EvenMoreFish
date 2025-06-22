@@ -1,9 +1,10 @@
-package com.oheers.fish;
+package com.oheers.fish.utils;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.configs.CompetitionFile;
@@ -15,8 +16,6 @@ import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
-import com.oheers.fish.utils.ItemUtils;
-import com.oheers.fish.utils.Logging;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;

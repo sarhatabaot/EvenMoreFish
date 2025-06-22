@@ -1,7 +1,7 @@
 package com.oheers.fish.competition.rewardtypes;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;

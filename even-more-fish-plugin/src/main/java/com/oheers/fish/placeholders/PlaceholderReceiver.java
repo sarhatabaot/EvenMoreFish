@@ -1,7 +1,7 @@
 package com.oheers.fish.placeholders;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.database.model.user.UserReport;

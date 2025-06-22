@@ -1,6 +1,6 @@
 package com.oheers.fish.recipe;
 
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;

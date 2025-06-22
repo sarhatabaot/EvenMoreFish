@@ -1,6 +1,5 @@
 package com.oheers.fish.utils;
 
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.MainConfig;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

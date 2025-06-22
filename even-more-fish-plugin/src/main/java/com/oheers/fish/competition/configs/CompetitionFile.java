@@ -1,7 +1,7 @@
 package com.oheers.fish.competition.configs;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.competition.Bar;
 import com.oheers.fish.competition.CompetitionType;

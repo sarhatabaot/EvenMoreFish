@@ -1,7 +1,7 @@
 package com.oheers.fish.fishing.items;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.exceptions.InvalidFishException;

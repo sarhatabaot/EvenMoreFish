@@ -2,7 +2,7 @@ package com.oheers.fish.gui.guis;
 
 import com.oheers.fish.Checks;
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.FishUtils;
+import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.baits.ApplicationResult;
 import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.BaitManager;
