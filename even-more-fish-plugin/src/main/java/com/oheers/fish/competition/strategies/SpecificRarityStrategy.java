@@ -109,8 +109,8 @@ public class SpecificRarityStrategy implements CompetitionStrategy {
      */
     @Override
     public EMFMessage getSinglePlayerLeaderboard(@NotNull CompetitionEntry entry) {
-        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
-        message.setLength(getDecimalFormat().format(entry.getValue()));
+        EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
+        message.setAmount((int) entry.getValue());
         return message;
     }
 

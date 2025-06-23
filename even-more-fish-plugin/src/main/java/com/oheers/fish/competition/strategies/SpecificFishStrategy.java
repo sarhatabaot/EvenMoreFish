@@ -105,12 +105,9 @@ public class SpecificFishStrategy implements CompetitionStrategy {
      */
     @Override
     public EMFMessage getSinglePlayerLeaderboard(@NotNull CompetitionEntry entry) {
-        Fish fish = entry.getFish();
+        EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
+        message.setAmount((int) entry.getValue());
 
-        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
-        message.setLength(getDecimalFormat().format(entry.getValue()));
-        message.setRarity(fish.getRarity().getDisplayName());
-        message.setFishCaught(fish.getDisplayName());
         return message;
     }
 
