@@ -6,6 +6,7 @@ import com.oheers.fish.api.economy.EconomyType;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import dev.dejvokep.boostedyaml.route.Route;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
+import net.kyori.adventure.bossbar.BossBar;
 import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.block.Biome;
 import org.bukkit.boss.BarStyle;
@@ -123,14 +124,13 @@ public class MainConfig extends ConfigBase {
 
     public boolean shouldProtectBaitedRods() { return getConfig().getBoolean("protect-baited-rods", true); }
 
-    public BarStyle getBarStyle() {
-        BarStyle barStyle;
+    public BossBar.Overlay getBarStyle() {
         try {
-            barStyle = BarStyle.valueOf(getConfig().getString("barstyle", "SEGMENTED_10"));
+            BarStyle style = BarStyle.valueOf(getConfig().getString("barstyle", "SEGMENTED_10"));
+            return FishUtils.modernizeBarStyle(style);
         } catch (IllegalArgumentException exception) {
-            barStyle = BarStyle.SEGMENTED_10;
+            return BossBar.Overlay.NOTCHED_10;
         }
-        return barStyle;
     }
 
     public boolean sellOverDrop() {

@@ -10,6 +10,7 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -236,13 +237,13 @@ public class CompetitionFile extends ConfigBase {
     /**
      * @return The colour of this competition's bossbar.
      */
-    public @NotNull BarColor getBossbarColour() {
+    public @NotNull BossBar.Color getBossbarColour() {
         String colour = getConfig().getString("bossbar-colour", "GREEN");
         try {
-            return BarColor.valueOf(colour.toUpperCase());
+            return BossBar.Color.valueOf(colour.toUpperCase());
         } catch (IllegalArgumentException exception) {
             EvenMoreFish.getInstance().getLogger().warning(colour + " is not a valid bossbar colour. Defaulting to GREEN.");
-            return BarColor.GREEN;
+            return BossBar.Color.GREEN;
         }
     }
 
