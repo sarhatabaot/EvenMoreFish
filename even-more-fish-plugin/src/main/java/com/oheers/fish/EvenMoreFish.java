@@ -137,6 +137,10 @@ public class EvenMoreFish extends EMFPlugin {
             getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
         }
 
+        this.eventManager = new EventManager(this);
+        this.eventManager.registerCoreListeners();
+        this.eventManager.registerOptionalListeners();
+
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
 
@@ -156,9 +160,6 @@ public class EvenMoreFish extends EMFPlugin {
         AutoRunner.init();
 
         this.pluginDataManager = new PluginDataManager(this);
-        this.eventManager = new EventManager(this);
-        this.eventManager.registerCoreListeners();
-        this.eventManager.registerOptionalListeners();
 
         registerCommands();
 
