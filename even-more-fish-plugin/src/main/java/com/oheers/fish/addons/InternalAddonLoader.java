@@ -1,6 +1,5 @@
 package com.oheers.fish.addons;
 
-import com.oheers.fish.plugin.DependencyManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.addons.AddonLoader;
@@ -17,6 +16,7 @@ import com.oheers.fish.competition.rewardtypes.external.McMMOXPRewardType;
 import com.oheers.fish.competition.rewardtypes.external.MoneyRewardType;
 import com.oheers.fish.competition.rewardtypes.external.PermissionRewardType;
 import com.oheers.fish.competition.rewardtypes.external.PlayerPointsRewardType;
+import com.oheers.fish.plugin.DependencyManager;
 import com.oheers.fish.requirements.BiomeRequirementType;
 import com.oheers.fish.requirements.BiomeSetRequirementType;
 import com.oheers.fish.requirements.DisabledRequirementType;
