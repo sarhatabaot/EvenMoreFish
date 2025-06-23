@@ -52,10 +52,9 @@ public class SpecificFishStrategy implements CompetitionStrategy {
         }
 
         CompetitionEntry entry = leaderboard.getEntry(fisher.getUniqueId());
-        float increaseAmount = 1.0f;
 
         if (entry != null) {
-            entry.incrementValue(increaseAmount);
+            entry.trackFish(fish);
             leaderboard.updateEntry(entry);
         } else {
             entry = new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType());
@@ -93,8 +92,8 @@ public class SpecificFishStrategy implements CompetitionStrategy {
      */
     @Override
     public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull CompetitionEntry entry) {
-        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
-        message.setLength(getDecimalFormat().format(entry.getValue()));
+        EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
+        message.setAmount((int) entry.getValue());
         return message;
     }
 
@@ -106,18 +105,14 @@ public class SpecificFishStrategy implements CompetitionStrategy {
      */
     @Override
     public EMFMessage getSinglePlayerLeaderboard(@NotNull CompetitionEntry entry) {
-        Fish fish = entry.getFish();
-
-        EMFMessage message = ConfigMessage.LEADERBOARD_LARGEST_FISH.getMessage();
-        message.setLength(getDecimalFormat().format(entry.getValue()));
-        message.setRarity(fish.getRarity().getDisplayName());
-        message.setFishCaught(fish.getDisplayName());
+        EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
+        message.setAmount((int) entry.getValue());
         return message;
     }
 
     @Override
     public boolean shouldUseFishLength() {
-        return true;
+        return false;
     }
 
     @Override

@@ -21,13 +21,17 @@ import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.fishing.rods.RodManager;
 import com.oheers.fish.messages.ConfigMessage;
-import com.oheers.fish.plugin.*;
+import com.oheers.fish.plugin.ConfigurationManager;
+import com.oheers.fish.plugin.DependencyManager;
+import com.oheers.fish.plugin.EventManager;
+import com.oheers.fish.plugin.IntegrationManager;
+import com.oheers.fish.plugin.MetricsManager;
+import com.oheers.fish.plugin.PluginDataManager;
 import com.oheers.fish.update.UpdateChecker;
 import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
-import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -35,7 +39,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,6 +139,10 @@ public class EvenMoreFish extends EMFPlugin {
             getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
         }
 
+        this.eventManager = new EventManager(this);
+        this.eventManager.registerCoreListeners();
+        this.eventManager.registerOptionalListeners();
+
         FishManager.getInstance().load();
         BaitManager.getInstance().load();
 
@@ -156,9 +162,6 @@ public class EvenMoreFish extends EMFPlugin {
         AutoRunner.init();
 
         this.pluginDataManager = new PluginDataManager(this);
-        this.eventManager = new EventManager(this);
-        this.eventManager.registerCoreListeners();
-        this.eventManager.registerOptionalListeners();
 
         registerCommands();
 

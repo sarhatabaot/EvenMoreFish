@@ -23,10 +23,9 @@ public class MostFishStrategy implements CompetitionStrategy {
     @Override
     public void applyToLeaderboard(Fish fish, Player fisher, Leaderboard leaderboard, Competition competition) {
         CompetitionEntry entry = leaderboard.getEntry(fisher.getUniqueId());
-        float increaseAmount = 1.0f;
 
         if (entry != null) {
-            entry.incrementValue(increaseAmount);
+            entry.trackFish(fish);
             leaderboard.updateEntry(entry);
         } else {
             leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
@@ -42,7 +41,7 @@ public class MostFishStrategy implements CompetitionStrategy {
     @Override
     public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull CompetitionEntry entry) {
         EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
-        message.setAmount(getDecimalFormat().format(entry.getValue()));
+        message.setAmount((int) entry.getValue());
         return message;
     }
 
@@ -55,7 +54,7 @@ public class MostFishStrategy implements CompetitionStrategy {
     @Override
     public EMFMessage getSinglePlayerLeaderboard(@NotNull CompetitionEntry entry) {
         EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
-        message.setAmount(getDecimalFormat().format(entry.getValue()));
+        message.setAmount((int) entry.getValue());
         return message;
     }
 

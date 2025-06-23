@@ -10,10 +10,10 @@ import com.oheers.fish.events.AureliumSkillsFishingEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
 import com.oheers.fish.placeholders.PlaceholderReceiver;
 import com.oheers.fish.utils.HeadDBIntegration;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
-import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.logging.Level;
