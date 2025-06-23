@@ -210,21 +210,22 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
 
         int place = parsePlace(identifier, "competition_place_fish_".length());
 
+        CompetitionEntry entry = activeComp.getLeaderboard().getEntry(place);
+        if (entry == null) {
+            return "";
+        }
+
         if (activeComp.getCompetitionType() == CompetitionType.LARGEST_FISH) {
             if (!leaderboardContainsPlace(activeComp, place)) {
                 return ConfigMessage.PLACEHOLDER_NO_FISH_IN_PLACE.getMessage().getLegacyMessage();
             }
 
-            CompetitionEntry entry = activeComp.getLeaderboard().getEntry(place);
-            if (entry == null) {
-                return "";
-            }
             Fish fish = entry.getFish();
             if (fish != null) {
                 return formatFishMessage(fish);
             }
         } else {
-            float value = activeComp.getLeaderboard().getEntry(place).getValue();
+            float value = entry.getValue();
             if (value != -1) {
                 return formatMostFishMessage((int) value);
             }
