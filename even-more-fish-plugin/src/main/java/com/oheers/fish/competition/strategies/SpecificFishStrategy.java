@@ -52,14 +52,12 @@ public class SpecificFishStrategy implements CompetitionStrategy {
         }
 
         CompetitionEntry entry = leaderboard.getEntry(fisher.getUniqueId());
-        float increaseAmount = 1.0f;
 
         if (entry != null) {
-            entry.incrementValue(increaseAmount);
+            entry.trackFish(fish);
             leaderboard.updateEntry(entry);
         } else {
             entry = new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType());
-            entry.setValue(1.0f);
             leaderboard.addEntry(entry);
         }
 
