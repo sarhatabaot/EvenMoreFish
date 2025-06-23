@@ -262,17 +262,6 @@ public class CompetitionFile extends ConfigBase {
     }
 
     /**
-     * @return A valid bossbar for this competition. Null if it should not be shown.
-     */
-    public @NotNull Bar createBossbar() {
-        Bar bar = new Bar();
-        bar.setShouldShow(shouldShowBossbar());
-        bar.setColour(getBossbarColour());
-        bar.setPrefix(getBossbarPrefix(), getType());
-        return bar;
-    }
-
-    /**
      * @return The amount of players required for this competition to start.
      */
     public int getPlayersNeeded() {
