@@ -41,7 +41,7 @@ public class MostFishStrategy implements CompetitionStrategy {
     @Override
     public EMFMessage getSingleConsoleLeaderboardMessage(@NotNull CompetitionEntry entry) {
         EMFMessage message = ConfigMessage.LEADERBOARD_MOST_FISH.getMessage();
-        message.setAmount(getDecimalFormat().format(entry.getValue()));
+        message.setAmount((int) entry.getValue());
         return message;
     }
 
