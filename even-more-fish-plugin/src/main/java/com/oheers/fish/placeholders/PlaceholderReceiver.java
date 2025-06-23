@@ -3,6 +3,7 @@ package com.oheers.fish.placeholders;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.competition.Competition;
+import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
@@ -149,7 +150,11 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
             return ConfigMessage.PLACEHOLDER_NO_PLAYER_IN_PLACE.getMessage().getLegacyMessage();
         }
 
-        UUID uuid = activeComp.getLeaderboard().getEntry(place).getPlayer();
+        CompetitionEntry entry = activeComp.getLeaderboard().getEntry(place);
+        if (entry == null) {
+            return "";
+        }
+        UUID uuid = entry.getPlayer();
         if (uuid != null) {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             return offlinePlayer.getName();
@@ -180,7 +185,7 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
             return ConfigMessage.PLACEHOLDER_NO_COMPETITION_RUNNING_SIZE.getMessage().getLegacyMessage();
         }
 
-        if (!isSizeCompetition(activeComp.getCompetitionType())) {
+        if (!activeComp.getCompetitionType().getStrategy().shouldUseFishLength()) {
             return ConfigMessage.PLACEHOLDER_SIZE_DURING_MOST_FISH.getMessage().getLegacyMessage();
         }
 
@@ -189,7 +194,11 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
             return ConfigMessage.PLACEHOLDER_NO_SIZE_IN_PLACE.getMessage().getLegacyMessage();
         }
 
-        float value = activeComp.getLeaderboard().getEntry(place).getValue();
+        CompetitionEntry entry = activeComp.getLeaderboard().getEntry(place);
+        if (entry == null) {
+            return "";
+        }
+        float value = entry.getValue();
         return value != -1.0f ? Double.toString(FishUtils.roundDouble(value, 1)) : "";
     }
 
@@ -206,7 +215,11 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
                 return ConfigMessage.PLACEHOLDER_NO_FISH_IN_PLACE.getMessage().getLegacyMessage();
             }
 
-            Fish fish = activeComp.getLeaderboard().getEntry(place).getFish();
+            CompetitionEntry entry = activeComp.getLeaderboard().getEntry(place);
+            if (entry == null) {
+                return "";
+            }
+            Fish fish = entry.getFish();
             if (fish != null) {
                 return formatFishMessage(fish);
             }
@@ -265,10 +278,6 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
         } catch (NumberFormatException e) {
             return -1;
         }
-    }
-
-    private boolean isSizeCompetition(CompetitionType type) {
-        return type == CompetitionType.LARGEST_FISH || type == CompetitionType.LARGEST_TOTAL;
     }
 
     private @NotNull String formatFishMessage(@NotNull Fish fish) {
