@@ -116,7 +116,7 @@ public class SpecificRarityStrategy implements CompetitionStrategy {
 
     @Override
     public boolean shouldUseFishLength() {
-        return true;
+        return false;
     }
 
     @Override
