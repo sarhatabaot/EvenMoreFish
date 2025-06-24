@@ -10,7 +10,7 @@ public class HeadDBIntegration implements Listener {
 
     @EventHandler
     public void onHDBLoad(DatabaseLoadEvent event) {
-        EvenMoreFish.getInstance().getDependencyManager().setHDBapi(new HeadDatabaseAPI());
+        EvenMoreFish.getInstance().getDependencyManager().setHdbapi(new HeadDatabaseAPI());
     }
 
 }
