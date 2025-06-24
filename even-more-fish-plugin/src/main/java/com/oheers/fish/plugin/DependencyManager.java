@@ -21,7 +21,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.logging.Level;
 
-public class DependencyManager implements Listener {
+public class DependencyManager {
     private final EvenMoreFish plugin;
     private Permission permission;
     private HeadDatabaseAPI hdbapi;
