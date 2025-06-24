@@ -501,7 +501,9 @@ public class FishUtils {
      * Gets an ItemStack from a string. If the string contains a colon, it is assumed to be an addon string.
      * @param materialString The string to parse.
      * @return The ItemStack, or null if the material is invalid.
+     * @deprecated use {@link ItemGenerationUtils#getItem(String)} instead.
      */
+    @Deprecated
     public static @Nullable ItemStack getItem(@NotNull final String materialString) {
         // Colon assumes an addon item
         if (materialString.contains(":")) {

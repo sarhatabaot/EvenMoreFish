@@ -99,6 +99,9 @@ dependencyResolutionManagement {
             version("junit", "5.11.0")
             library("junit-jupiter-api", "org.junit.jupiter","junit-jupiter-api").versionRef("junit")
             library("junit-jupiter-engine","org.junit.jupiter","junit-jupiter-engine").versionRef("junit")
+
+            version("mockito", "5.18.0")
+            library("mockito-core", "org.mockito","mockito-core").versionRef("mockito")
         }
     }
 }

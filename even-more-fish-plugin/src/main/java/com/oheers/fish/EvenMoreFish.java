@@ -153,7 +153,7 @@ public class EvenMoreFish extends EMFPlugin {
         competitionQueue.load();
 
         // check for updates on the modrinth page
-        new UpdateChecker(this).checkUpdate().thenAccept(available -> isUpdateAvailable = available);
+        new UpdateChecker(this.getPluginMeta().getVersion(), this.getLogger()).checkUpdate().thenAccept(available -> isUpdateAvailable = available);
 
 
         this.metricsManager = new MetricsManager(this);
