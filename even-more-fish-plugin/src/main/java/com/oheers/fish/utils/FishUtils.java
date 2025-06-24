@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import de.tr7zw.changeme.nbtapi.NBT;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -39,6 +40,7 @@ import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Skull;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -695,6 +697,16 @@ public class FishUtils {
             return null;
         }
         return Registry.ENCHANTMENT.get(key);
+    }
+
+    public static BossBar.Overlay modernizeBarStyle(@NotNull BarStyle style) {
+        return switch (style) {
+            case SOLID -> BossBar.Overlay.PROGRESS;
+            case SEGMENTED_6 -> BossBar.Overlay.NOTCHED_6;
+            case SEGMENTED_10 -> BossBar.Overlay.NOTCHED_10;
+            case SEGMENTED_12 -> BossBar.Overlay.NOTCHED_12;
+            case SEGMENTED_20 -> BossBar.Overlay.NOTCHED_20;
+        };
     }
 
 }

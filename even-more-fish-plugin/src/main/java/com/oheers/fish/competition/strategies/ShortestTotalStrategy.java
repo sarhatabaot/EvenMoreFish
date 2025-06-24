@@ -21,10 +21,9 @@ public class ShortestTotalStrategy implements CompetitionStrategy {
     @Override
     public void applyToLeaderboard(Fish fish, Player fisher, Leaderboard leaderboard, Competition competition) {
         CompetitionEntry entry = leaderboard.getEntry(fisher.getUniqueId());
-        float increaseAmount = fish.getLength();
 
         if (entry != null) {
-            entry.incrementValue(increaseAmount);
+            entry.trackFish(fish);
             leaderboard.updateEntry(entry);
         } else {
             leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));

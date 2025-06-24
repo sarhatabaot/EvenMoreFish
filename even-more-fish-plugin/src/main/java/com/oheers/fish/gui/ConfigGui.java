@@ -13,6 +13,7 @@ import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -155,6 +156,9 @@ public class ConfigGui {
                 if (action != null) {
                     action.accept(this, click);
                 }
+                itemSection.getStringList("click-commands").forEach(command -> {
+                    Bukkit.dispatchCommand(click.getWhoClicked(), command);
+                });
                 return true;
             });
             gui.addElement(actionElement);
@@ -164,6 +168,9 @@ public class ConfigGui {
                 if (action != null) {
                     action.accept(this, click);
                 }
+                itemSection.getStringList("click-commands").forEach(command -> {
+                    Bukkit.dispatchCommand(click.getWhoClicked(), command);
+                });
                 return true;
             });
             gui.addElement(element);

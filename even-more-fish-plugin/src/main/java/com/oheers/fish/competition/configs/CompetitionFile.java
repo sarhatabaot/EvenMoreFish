@@ -3,17 +3,16 @@ package com.oheers.fish.competition.configs;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.utils.FishUtils;
 import com.oheers.fish.api.reward.Reward;
-import com.oheers.fish.competition.Bar;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.config.ConfigBase;
 import com.oheers.fish.fishing.items.FishManager;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.EMFSingleMessage;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -236,13 +235,13 @@ public class CompetitionFile extends ConfigBase {
     /**
      * @return The colour of this competition's bossbar.
      */
-    public @NotNull BarColor getBossbarColour() {
+    public @NotNull BossBar.Color getBossbarColour() {
         String colour = getConfig().getString("bossbar-colour", "GREEN");
         try {
-            return BarColor.valueOf(colour.toUpperCase());
+            return BossBar.Color.valueOf(colour.toUpperCase());
         } catch (IllegalArgumentException exception) {
             EvenMoreFish.getInstance().getLogger().warning(colour + " is not a valid bossbar colour. Defaulting to GREEN.");
-            return BarColor.GREEN;
+            return BossBar.Color.GREEN;
         }
     }
 
@@ -259,17 +258,6 @@ public class CompetitionFile extends ConfigBase {
     public EMFSingleMessage getBossbarPrefix() {
         String prefix = getConfig().getString("bossbar-prefix", "<green><bold>Fishing Contest: ");
         return EMFSingleMessage.fromString(prefix);
-    }
-
-    /**
-     * @return A valid bossbar for this competition. Null if it should not be shown.
-     */
-    public @NotNull Bar createBossbar() {
-        Bar bar = new Bar();
-        bar.setShouldShow(shouldShowBossbar());
-        bar.setColour(getBossbarColour());
-        bar.setPrefix(getBossbarPrefix(), getType());
-        return bar;
     }
 
     /**
