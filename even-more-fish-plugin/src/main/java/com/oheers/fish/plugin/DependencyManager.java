@@ -10,9 +10,12 @@ import com.oheers.fish.events.AureliumSkillsFishingEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
 import com.oheers.fish.placeholders.PlaceholderReceiver;
 import com.oheers.fish.utils.HeadDBIntegration;
+import me.arcaniax.hdb.api.DatabaseLoadEvent;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
@@ -21,7 +24,7 @@ import java.util.logging.Level;
 public class DependencyManager {
     private final EvenMoreFish plugin;
     private Permission permission;
-    private HeadDatabaseAPI HDBapi;
+    private HeadDatabaseAPI hdbapi;
 
     // Dependency flags
     private boolean usingVault;
@@ -53,36 +56,29 @@ public class DependencyManager {
             setupVaultPermissions();
         }
 
-        if (usingHeadsDB) {
-            this.HDBapi = (HeadDatabaseAPI) pm.getPlugin("HeadDatabase");
-        }
-
         loadEconomy();
         checkPapi();
     }
 
     public void checkOptionalDependencies() {
         PluginManager pm = plugin.getServer().getPluginManager();
-        if (usingMcMMO) {
-            if (MainConfig.getInstance().disableMcMMOTreasure()) {
-                pm.registerEvents(McMMOTreasureEvent.getInstance(), plugin);
-            }
+        if (usingMcMMO && MainConfig.getInstance().disableMcMMOTreasure()) {
+            pm.registerEvents(McMMOTreasureEvent.getInstance(), plugin);
         }
+
 
         if (usingHeadsDB) {
             pm.registerEvents(new HeadDBIntegration(), plugin);
         }
 
-        if (usingAureliumSkills) {
-            if (MainConfig.getInstance().disableAureliumSkills()) {
-                pm.registerEvents(new AureliumSkillsFishingEvent(), plugin);
-            }
+        if (usingAureliumSkills && MainConfig.getInstance().disableAureliumSkills()) {
+            pm.registerEvents(new AureliumSkillsFishingEvent(), plugin);
         }
-        if (usingAuraSkills) {
-            if (MainConfig.getInstance().disableAureliumSkills()) {
-                pm.registerEvents(new AuraSkillsFishingEvent(), plugin);
-            }
+
+        if (usingAuraSkills && MainConfig.getInstance().disableAureliumSkills()) {
+            pm.registerEvents(new AuraSkillsFishingEvent(), plugin);
         }
+
     }
 
     private void setupVaultPermissions() {
@@ -124,8 +120,8 @@ public class DependencyManager {
         return permission;
     }
 
-    public HeadDatabaseAPI getHDBapi() {
-        return HDBapi;
+    public HeadDatabaseAPI getHdbapi() {
+        return hdbapi;
     }
 
     public boolean isUsingAureliumSkills() {
@@ -141,7 +137,7 @@ public class DependencyManager {
     }
 
     public boolean isHeadsDBLoaded() {
-        return usingHeadsDB && HDBapi != null;
+        return usingHeadsDB && hdbapi != null;
     }
 
     public boolean isVaultPermissionsAvailable() {
@@ -169,7 +165,7 @@ public class DependencyManager {
         }
     }
 
-    public void setHDBapi(HeadDatabaseAPI HDBapi) {
-        this.HDBapi = HDBapi;
+    public void setHdbapi(HeadDatabaseAPI hdbapi) {
+        this.hdbapi = hdbapi;
     }
 }

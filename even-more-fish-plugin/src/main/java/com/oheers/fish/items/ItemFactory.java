@@ -312,7 +312,7 @@ public class ItemFactory {
         if (materialStr == null) {
             return null;
         }
-        ItemStack item = EvenMoreFish.getInstance().getDependencyManager().getHDBapi().getItemHead(materialStr);
+        ItemStack item = EvenMoreFish.getInstance().getDependencyManager().getHdbapi().getItemHead(materialStr);
         if (item == null) {
             EvenMoreFish.getInstance().debug(configuration.getRouteAsString() + " has invalid headdb: " + materialStr);
             return null;
@@ -329,9 +329,9 @@ public class ItemFactory {
             return null;
         }
         if (materialStrs.size() == 1) {
-            return EvenMoreFish.getInstance().getDependencyManager().getHDBapi().getItemHead(materialStrs.get(0));
+            return EvenMoreFish.getInstance().getDependencyManager().getHdbapi().getItemHead(materialStrs.get(0));
         }
-        return getRandomItem(materialStrs, EvenMoreFish.getInstance().getDependencyManager().getHDBapi()::getItemHead);
+        return getRandomItem(materialStrs, EvenMoreFish.getInstance().getDependencyManager().getHdbapi()::getItemHead);
     }
 
     // Head 64
