@@ -275,7 +275,7 @@ public class FishManager {
         rarityMap.clear();
 
         File raritiesFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "rarities");
-        if (EvenMoreFish.getInstance().isFirstLoad()) {
+        if (!raritiesFolder.exists()) {
             loadDefaultFiles(raritiesFolder);
         }
         regenExampleFile(raritiesFolder);

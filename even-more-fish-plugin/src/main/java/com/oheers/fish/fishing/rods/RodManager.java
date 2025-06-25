@@ -90,7 +90,7 @@ public class RodManager {
 
     private void loadRods() {
         File rodsFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "rods");
-        if (EvenMoreFish.getInstance().isFirstLoad()) {
+        if (!rodsFolder.exists()) {
             loadDefaultFiles(rodsFolder);
         }
         regenExampleFile(rodsFolder);

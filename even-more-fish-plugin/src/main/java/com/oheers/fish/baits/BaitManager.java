@@ -93,7 +93,7 @@ public class BaitManager {
         baitMap.clear();
 
         File baitsFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "baits");
-        if (EvenMoreFish.getInstance().isFirstLoad()) {
+        if (!baitsFolder.exists()) {
             loadDefaultFiles(baitsFolder);
         }
         regenExampleFile(baitsFolder);
