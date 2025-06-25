@@ -7,6 +7,7 @@ import com.oheers.fish.commands.arguments.ArgumentHelper;
 import com.oheers.fish.commands.arguments.RarityArgument;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.gui.guis.ApplyBaitsGui;
 import com.oheers.fish.gui.guis.FishJournalGui;
@@ -216,7 +217,7 @@ public class MainCommand {
                 RarityArgument.create().setOptional(true)
             )
             .executesPlayer(info -> {
-                if (!MainConfig.getInstance().isDatabaseOnline()) {
+                if (!DatabaseUtil.isDatabaseOnline()) {
                     return;
                 }
                 Rarity rarity = info.args().getUnchecked("rarity"); // This is allowed to be null.

@@ -6,6 +6,7 @@ import com.oheers.fish.SkullSaver;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.events.FishEatEvent;
 import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.fishing.EMFFishListener;
@@ -29,7 +30,7 @@ public class EventManager {
 
     public void registerCoreListeners() {
         // Database-related listeners
-        if (MainConfig.getInstance().isDatabaseOnline()) {
+        if (DatabaseUtil.isDatabaseOnline()) {
             pm.registerEvents(new JoinChecker(), plugin);
             pm.registerEvents(plugin.getPluginDataManager().getUserManager(), plugin);
             pm.registerEvents(new EMFFishListener(), plugin);

@@ -65,4 +65,11 @@ public class DatabaseUtil {
         }
     }
 
+    public static boolean isDatabaseOnline() {
+        if (!MainConfig.getInstance().databaseEnabled() || EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().usingV2())
+            return false;
+
+        return EvenMoreFish.getInstance().getPluginDataManager().getDatabase() != null;
+    }
+
 }

@@ -2,6 +2,7 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.DatabaseUtil;
 import dev.jorel.commandapi.CommandAPICommand;
 import org.bukkit.command.CommandSender;
 
@@ -73,7 +74,7 @@ public class AdminDatabaseCommand extends CommandAPICommand {
     }
 
     private boolean isLogDbError(final CommandSender sender) {
-        if (!MainConfig.getInstance().isDatabaseOnline()) {
+        if (!DatabaseUtil.isDatabaseOnline()) {
             sender.sendMessage("Database is offline.");
             return true;
         }
