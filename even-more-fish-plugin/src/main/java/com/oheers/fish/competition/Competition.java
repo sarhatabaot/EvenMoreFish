@@ -10,6 +10,7 @@ import com.oheers.fish.competition.configs.CompetitionFile;
 import com.oheers.fish.competition.leaderboard.Leaderboard;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
+import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.model.CompetitionReport;
 import com.oheers.fish.database.model.user.UserReport;
 import com.oheers.fish.fishing.items.Fish;
@@ -193,7 +194,7 @@ public class Competition {
                     competitionType = CompetitionType.RANDOM;
                 }
 
-                if (MainConfig.getInstance().isDatabaseOnline()) {
+                if (DatabaseUtil.isDatabaseOnline()) {
                     Competition competitionRef = this;
                     EvenMoreFish.getInstance().getPluginDataManager().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(competitionRef, competitionRef.startTime, LocalDateTime.now()));
                 }
@@ -368,7 +369,7 @@ public class Competition {
     }
 
     private void handleDatabaseUpdates(CompetitionEntry entry, boolean isTopEntry) {
-        if (!MainConfig.getInstance().isDatabaseOnline()) {
+        if (!DatabaseUtil.isDatabaseOnline()) {
             return;
         }
 
@@ -398,7 +399,7 @@ public class Competition {
 
         List<CompetitionEntry> entries = leaderboard.getEntries();
 
-        if (MainConfig.getInstance().isDatabaseOnline() && !entries.isEmpty()) {
+        if (DatabaseUtil.isDatabaseOnline() && !entries.isEmpty()) {
             handleDatabaseUpdates(leaderboard.getTopEntry(), true); // Top entry
         }
 

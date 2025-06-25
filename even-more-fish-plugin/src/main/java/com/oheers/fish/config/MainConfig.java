@@ -73,6 +73,7 @@ public class MainConfig extends ConfigBase {
         return getConfig().getBoolean("random-durability", true);
     }
 
+    @Deprecated
     public boolean isDatabaseOnline() {
         if (!databaseEnabled() || EvenMoreFish.getInstance().getPluginDataManager().getDatabase().getMigrationManager().usingV2())
             return false;

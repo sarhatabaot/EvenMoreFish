@@ -4,6 +4,7 @@ package com.oheers.fish.plugin;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
+import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.data.FishLogKey;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.data.manager.UserManager;
@@ -75,7 +76,7 @@ public class PluginDataManager {
     }
 
     public void shutdown() {
-        if (database == null || !MainConfig.getInstance().isDatabaseOnline()) {
+        if (database == null || !DatabaseUtil.isDatabaseOnline()) {
             return;
         }
 

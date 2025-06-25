@@ -2,6 +2,7 @@ package com.oheers.fish.competition;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.event.EventHandler;
@@ -39,7 +40,7 @@ public class JoinChecker implements Listener {
             activeComp.getStatusBar().removePlayer(event.getPlayer());
         }
 
-        if (!MainConfig.getInstance().isDatabaseOnline()) {
+        if (!DatabaseUtil.isDatabaseOnline()) {
             return;
         }
 
