@@ -38,7 +38,7 @@ public class CompetitionQueue {
         fileMap.clear();
 
         File compsFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "competitions");
-        if (EvenMoreFish.getInstance().isFirstLoad()) {
+        if (!compsFolder.exists()) {
             loadDefaultFiles(compsFolder);
         }
         regenExampleFile(compsFolder);

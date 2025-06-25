@@ -52,6 +52,7 @@ import java.util.logging.Logger;
 import static com.oheers.fish.FishUtils.classExists;
 
 public class EvenMoreFish extends EMFPlugin {
+
     private final Random random = new Random();
     private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
         || classExists("io.papermc.paper.configuration.Configuration");
@@ -60,7 +61,6 @@ public class EvenMoreFish extends EMFPlugin {
     private boolean raritiesCompCheckExempt = false;
     private CompetitionQueue competitionQueue;
     private Logger logger;
-    private boolean firstLoad = false;
 
     // this is for pre-deciding a rarity and running particles if it will be chosen
     // it's a work-in-progress solution and probably won't stick.
@@ -112,9 +112,6 @@ public class EvenMoreFish extends EMFPlugin {
 
         CommandAPI.onEnable();
 
-        // If EMF folder does not exist, this is the first load.
-        firstLoad = !getDataFolder().exists();
-
         scheduler = UniversalScheduler.getScheduler(this);
 
         this.api = new EMFAPI();
@@ -138,17 +135,18 @@ public class EvenMoreFish extends EMFPlugin {
         }
 
         FishManager.getInstance().load();
+
+        // Always load this after FishManager
         BaitManager.getInstance().load();
 
-        // Always load this after FishManager and BaitManager
+        // Always load this after BaitManager
         RodManager.getInstance().load();
 
         competitionQueue = new CompetitionQueue();
         competitionQueue.load();
 
-        // check for updates on the modrinth page
+        // check for updates on the Modrinth page
         new UpdateChecker(this).checkUpdate().thenAccept(available -> isUpdateAvailable = available);
-
 
         this.metricsManager = new MetricsManager(this);
         this.metricsManager.setupMetrics();
@@ -163,9 +161,6 @@ public class EvenMoreFish extends EMFPlugin {
         registerCommands();
 
         logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");
-
-        // Set this to false as the plugin is now loaded.
-        firstLoad = false;
     }
 
     @Override
@@ -220,9 +215,6 @@ public class EvenMoreFish extends EMFPlugin {
     @Override
     public void reload(@Nullable CommandSender sender) {
 
-        // If EMF folder does not exist, assume first load again.
-        firstLoad = !getDataFolder().exists();
-
         terminateGuis();
 
         this.configurationManager.reloadConfigurations();
@@ -242,8 +234,7 @@ public class EvenMoreFish extends EMFPlugin {
         if (sender != null) {
             ConfigMessage.RELOAD_SUCCESS.getMessage().send(sender);
         }
-
-        firstLoad = false;
+        
     }
 
     private void registerCommands() {
@@ -314,10 +305,6 @@ public class EvenMoreFish extends EMFPlugin {
         return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, false);
     }
 
-    public boolean isFirstLoad() {
-        return firstLoad;
-    }
-
     public DependencyManager getDependencyManager() {
         return dependencyManager;
     }
@@ -325,6 +312,7 @@ public class EvenMoreFish extends EMFPlugin {
     public PluginDataManager getPluginDataManager() {
         return pluginDataManager;
     }
+
     public EventManager getEventManager() {
         return eventManager;
     }
@@ -332,4 +320,5 @@ public class EvenMoreFish extends EMFPlugin {
     public MetricsManager getMetricsManager() {
         return metricsManager;
     }
+
 }
