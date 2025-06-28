@@ -23,6 +23,13 @@ version = properties["project-version"] as String
 
 description = "A fishing extension bringing an exciting new experience to fishing."
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+}
+
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // Adventure Snapshots
@@ -128,21 +135,21 @@ bukkit {
 
     depend = listOf()
     softDepend = listOf(
-        "Vault",
-        "PlayerPoints",
-        "WorldGuard",
-        "PlaceholderAPI",
-        "RedProtect",
-        "mcMMO",
-        "AureliumSkills",
         "AuraSkills",
-        "ItemsAdder",
+        "AureliumSkills",
         "Denizen",
         "EcoItems",
-        "Oraxen",
-        "Nexo",
+        "GriefPrevention",
         "HeadDatabase",
-        "GriefPrevention"
+        "ItemsAdder",
+        "mcMMO",
+        "Nexo",
+        "Oraxen",
+        "PlayerPoints",
+        "PlaceholderAPI",
+        "RedProtect",
+        "Vault",
+        "WorldGuard"
     )
     loadBefore = listOf("AntiAC")
 
@@ -181,6 +188,14 @@ bukkit {
                 "emf.applybaits",
                 "emf.journal"
             )
+        }
+
+        register("emf.applybaits") {
+            description = "Allows users to apply baits to rods."
+        }
+
+        register("emf.journal") {
+            description = "Allows access to the fish journal."
         }
 
         register("emf.sellall") {
@@ -229,9 +244,6 @@ sourceSets {
         }
     }
 }
-tasks.named("compileJava") {
-    dependsOn(":even-more-fish-plugin:generateMysqlJooq")
-}
 
 val copyAddons by tasks.registering(Copy::class) {
     // Make sure the plugin waits for the addons to be built first
@@ -243,11 +255,16 @@ val copyAddons by tasks.registering(Copy::class) {
     into(file("src/main/resources/addons"))
 }
 
-tasks.named("processResources") {
-    dependsOn(copyAddons)
-}
 
 tasks {
+    compileJava {
+        dependsOn(":even-more-fish-plugin:generateMysqlJooq")
+    }
+
+    processResources {
+        dependsOn(copyAddons)
+    }
+
     build {
         dependsOn(
             shadowJar
@@ -373,12 +390,6 @@ publishing {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-        vendor.set(JvmVendorSpec.ADOPTIUM)
-    }
-}
 
 fun getBuildNumberOrDate(): String? {
     val currentBranch = grgit.branch.current().name
