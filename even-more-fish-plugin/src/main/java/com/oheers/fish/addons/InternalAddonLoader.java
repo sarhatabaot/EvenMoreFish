@@ -10,6 +10,7 @@ import com.oheers.fish.competition.rewardtypes.HealthRewardType;
 import com.oheers.fish.competition.rewardtypes.HungerRewardType;
 import com.oheers.fish.competition.rewardtypes.ItemRewardType;
 import com.oheers.fish.competition.rewardtypes.MessageRewardType;
+import com.oheers.fish.competition.rewardtypes.SoundRewardType;
 import com.oheers.fish.competition.rewardtypes.external.AuraSkillsXPRewardType;
 import com.oheers.fish.competition.rewardtypes.external.GPClaimBlocksRewardType;
 import com.oheers.fish.competition.rewardtypes.external.McMMOXPRewardType;
@@ -78,6 +79,7 @@ public class InternalAddonLoader extends AddonLoader {
         new ItemRewardType().register();
         new MessageRewardType().register();
         new EXPRewardType().register();
+        new SoundRewardType().register();
         loadExternalRewardTypes();
     }
 
