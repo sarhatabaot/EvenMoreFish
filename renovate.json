@@ -6,6 +6,9 @@
     ":semanticCommits",
     ":disableRateLimiting"
   ],
+  "labels": [
+    "dependencies"
+  ],
   "packageRules": [
     {
       "matchPackageNames": ["io.papermc.paper:paper-api"],
