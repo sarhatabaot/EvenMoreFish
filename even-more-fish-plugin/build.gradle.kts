@@ -41,7 +41,6 @@ repositories {
     maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://repo.minebench.de/")
     maven("https://repo.codemc.io/repository/FireML/")
-    maven("https://repo.essentialsx.net/releases/")
     maven("https://repo.aikar.co/content/groups/aikar/")
 }
 
