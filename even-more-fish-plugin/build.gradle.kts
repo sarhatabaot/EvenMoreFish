@@ -225,7 +225,9 @@ sonar {
 
 sourceSets {
     main {
-        java.srcDirs.add(File("src/main/generated"))
+        java {
+            srcDir("src/main/generated")
+        }
     }
 }
 tasks.named("compileJava") {
@@ -376,14 +378,6 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
         vendor.set(JvmVendorSpec.ADOPTIUM)
-    }
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir("src/main/generated")
-        }
     }
 }
 
