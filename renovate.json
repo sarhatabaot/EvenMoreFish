@@ -47,6 +47,10 @@
       "allowedVersions": "4.21.1"
     },
     {
+      "matchPackageNames": ["com.github.TechFortress:GriefPrevention"],
+      "allowedVersions": "~16.18.0"
+    },
+    {
       "matchPackagePrefixes": ["org.flywaydb:"],
       "groupName": "Flyway"
     },
