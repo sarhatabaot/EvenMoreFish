@@ -10,6 +10,7 @@ import java.util.*
 plugins {
     `java-library`
     `maven-publish`
+    `jvm-test-suite`
     alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
@@ -109,9 +110,6 @@ dependencies {
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
     jooqGenerator(libs.connectors.mysql)
-
-    testImplementation(libs.junit.jupiter.api)
-    testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
 bukkit {
@@ -322,8 +320,27 @@ tasks {
         options.encoding = "UTF-8"
     }
 
-    test {
-        useJUnitPlatform();
+}
+
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation(project(":even-more-fish-api"))
+                implementation(libs.junit.jupiter.api)
+                runtimeOnly(libs.junit.jupiter.engine)
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        useJUnitPlatform()
+                    }
+                }
+            }
+        }
     }
 }
 
