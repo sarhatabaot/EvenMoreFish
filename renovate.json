@@ -43,7 +43,10 @@
       "groupName": "jOOQ",
       "allowedVersions": "~3.19.0"
     },
-
+    {
+      "matchPackagePrefixes": ["nu.studer.jooq:"],
+      "allowedVersions": "~9.0"
+    },
     {
       "matchUpdateTypes": ["patch", "minor"],
       "matchCurrentVersion": "!/^0/",
