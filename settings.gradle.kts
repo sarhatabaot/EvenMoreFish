@@ -49,9 +49,9 @@ dependencyResolutionManagement {
             library("craftengine-bukkit", "net.momirealms", "craft-engine-bukkit").versionRef("craftengine")
             bundle("craftengine", listOf("craftengine-core", "craftengine-bukkit"))
 
-            library("ecoitems-api", "com.willfp:EcoItems:5.62.0")
-            library("ecoitems-libreforge", "com.willfp:libreforge:4.75.1")
-            library("ecoitems-eco", "com.willfp:eco:6.75.2")
+            library("ecoitems-api", "com.willfp:EcoItems:5.46.0")
+            library("ecoitems-libreforge", "com.willfp:libreforge:4.21.1")
+            library("ecoitems-eco", "com.willfp:eco:6.56.0")
             bundle("ecoitems", listOf("ecoitems-api", "ecoitems-libreforge", "ecoitems-eco"))
 
             library("commons-lang3", "org.apache.commons:commons-lang3:3.17.0")
