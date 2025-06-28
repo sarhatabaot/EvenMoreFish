@@ -40,7 +40,8 @@
     },
     {
       "matchPackagePrefixes": ["org.jooq:"],
-      "groupName": "jOOQ"
+      "groupName": "jOOQ",
+      "allowedVersions": "~3.19.0"
     },
 
     {
