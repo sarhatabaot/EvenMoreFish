@@ -10,6 +10,7 @@ import java.util.*
 plugins {
     `java-library`
     `maven-publish`
+    `jvm-test-suite`
     alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
@@ -21,6 +22,13 @@ group = "com.oheers.evenmorefish"
 version = properties["project-version"] as String
 
 description = "A fishing extension bringing an exciting new experience to fishing."
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -40,7 +48,6 @@ repositories {
     maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://repo.minebench.de/")
     maven("https://repo.codemc.io/repository/FireML/")
-    maven("https://repo.essentialsx.net/releases/")
     maven("https://repo.aikar.co/content/groups/aikar/")
 }
 
@@ -109,9 +116,6 @@ dependencies {
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
     jooqGenerator(libs.connectors.mysql)
-
-    testImplementation(libs.junit.jupiter.api)
-    testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
 bukkit {
@@ -131,21 +135,21 @@ bukkit {
 
     depend = listOf()
     softDepend = listOf(
-        "Vault",
-        "PlayerPoints",
-        "WorldGuard",
-        "PlaceholderAPI",
-        "RedProtect",
-        "mcMMO",
-        "AureliumSkills",
         "AuraSkills",
-        "ItemsAdder",
+        "AureliumSkills",
         "Denizen",
         "EcoItems",
-        "Oraxen",
-        "Nexo",
+        "GriefPrevention",
         "HeadDatabase",
-        "GriefPrevention"
+        "ItemsAdder",
+        "mcMMO",
+        "Nexo",
+        "Oraxen",
+        "PlayerPoints",
+        "PlaceholderAPI",
+        "RedProtect",
+        "Vault",
+        "WorldGuard"
     )
     loadBefore = listOf("AntiAC")
 
@@ -184,6 +188,14 @@ bukkit {
                 "emf.applybaits",
                 "emf.journal"
             )
+        }
+
+        register("emf.applybaits") {
+            description = "Allows users to apply baits to rods."
+        }
+
+        register("emf.journal") {
+            description = "Allows access to the fish journal."
         }
 
         register("emf.sellall") {
@@ -227,11 +239,10 @@ sonar {
 
 sourceSets {
     main {
-        java.srcDirs.add(File("src/main/generated"))
+        java {
+            srcDir("src/main/generated")
+        }
     }
-}
-tasks.named("compileJava") {
-    dependsOn(":even-more-fish-plugin:generateMysqlJooq")
 }
 
 val copyAddons by tasks.registering(Copy::class) {
@@ -244,11 +255,16 @@ val copyAddons by tasks.registering(Copy::class) {
     into(file("src/main/resources/addons"))
 }
 
-tasks.named("processResources") {
-    dependsOn(copyAddons)
-}
 
 tasks {
+    compileJava {
+        dependsOn(":even-more-fish-plugin:generateMysqlJooq")
+    }
+
+    processResources {
+        dependsOn(copyAddons)
+    }
+
     build {
         dependsOn(
             shadowJar
@@ -322,8 +338,27 @@ tasks {
         options.encoding = "UTF-8"
     }
 
-    test {
-        useJUnitPlatform();
+}
+
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation(project(":even-more-fish-api"))
+                implementation(libs.junit.jupiter.api)
+                runtimeOnly(libs.junit.jupiter.engine)
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        useJUnitPlatform()
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -355,20 +390,6 @@ publishing {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-        vendor.set(JvmVendorSpec.ADOPTIUM)
-    }
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir("src/main/generated")
-        }
-    }
-}
 
 fun getBuildNumberOrDate(): String? {
     val currentBranch = grgit.branch.current().name

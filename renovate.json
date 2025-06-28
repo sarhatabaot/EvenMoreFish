@@ -35,6 +35,22 @@
       "groupName": "WorldEdit"
     },
     {
+      "matchPackageNames": ["com.willfp:EcoItems"],
+      "allowedVersions": "5.46.0"
+    },
+    {
+      "matchPackageNames": ["com.willfp:eco"],
+      "allowedVersions": "6.56.0"
+    },
+    {
+      "matchPackageNames": ["com.willfp:libreforge"],
+      "allowedVersions": "4.21.1"
+    },
+    {
+      "matchPackageNames": ["com.github.TechFortress:GriefPrevention"],
+      "allowedVersions": "~16.18.0"
+    },
+    {
       "matchPackagePrefixes": ["org.flywaydb:"],
       "groupName": "Flyway"
     },
