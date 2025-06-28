@@ -44,7 +44,7 @@ dependencyResolutionManagement {
             library("oraxen", "io.th0rgal:oraxen:1.188.0")
             library("nexo", "com.nexomc:nexo:1.0.0")
 
-            version("craftengine", "0.0.25")
+            version("craftengine", "0.0.58.3.2")
             library("craftengine-core", "net.momirealms", "craft-engine-core").versionRef("craftengine")
             library("craftengine-bukkit", "net.momirealms", "craft-engine-bukkit").versionRef("craftengine")
             bundle("craftengine", listOf("craftengine-core", "craftengine-bukkit"))
