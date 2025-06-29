@@ -12,15 +12,16 @@ rewards:
 ```
 
 ## Default Types
-| Reward Type | Example                             | Description                                      | Available placeholders                     |
-|-------------|-------------------------------------|--------------------------------------------------|--------------------------------------------|
-| Command     | `COMMAND:msg {player} Reward Type!` | Run a command.                                   | `{player}`, `{x}`, `{y}`, `{z}`, `{world}` |
-| Effect      | `EFFECT:POISON,1,2`                 | Adds a potion effect.                            | -                                          |
-| Health      | `HEALTH:5`                          | Adds health.                                     | -                                          |
-| Hunger      | `HUNGER:20`                         | Sets hunger level                                | -                                          |
-| Items       | `ITEM:cobblestone,1`                | Gives an item (doesn't support addons - for now) | -                                          |
-| Message     | `MESSAGE:<green>Reward Type!`       | Sends a message                                  | -                                          |
-| Exp         | `EXP:5000`                          | Gives experience points.                         | -                                          |
+| Reward Type | Example                             | Description                                       | Available placeholders                     |
+|-------------|-------------------------------------|---------------------------------------------------|--------------------------------------------|
+| Command     | `COMMAND:msg {player} Reward Type!` | Run a command.                                    | `{player}`, `{x}`, `{y}`, `{z}`, `{world}` |
+| Effect      | `EFFECT:POISON,1,2`                 | Adds a potion effect.                             | -                                          |
+| Health      | `HEALTH:5`                          | Adds health.                                      | -                                          |
+| Hunger      | `HUNGER:20`                         | Sets hunger level                                 | -                                          |
+| Items       | `ITEM:cobblestone,1`                | Gives an item. This supports Item Addons.         | -                                          |
+| Message     | `MESSAGE:<green>Reward Type!`       | Sends a message                                   | -                                          |
+| Exp         | `EXP:5000`                          | Gives experience points.                          | -                                          |
+| Sound       | `SOUND:ENTITY_WOLF_GROWL,1,5`       | Plays a sound to the player. (sound,volume,pitch) | -                                          |
 
 ## External Plugin Types
 _These will only load if the relevant external plugin is installed._
