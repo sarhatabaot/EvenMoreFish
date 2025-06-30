@@ -39,7 +39,7 @@ dependencyResolutionManagement {
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.18.4")
 
             library("itemsadder-api", "com.github.LoneDev6:API-ItemsAdder:3.6.1")
-            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.0")
+            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.1-SNAPSHOT")
             library("denizen-api", "com.denizenscript:denizen:1.3.1-SNAPSHOT")
             library("oraxen", "io.th0rgal:oraxen:1.190.0")
             library("nexo", "com.nexomc:nexo:1.8.0")

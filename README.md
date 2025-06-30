@@ -8,7 +8,7 @@ plugin for your server.
 
 ---
 
-Supported Versions: 1.20.6, 1.21.1, 1.21.5 (Experimental, Dev Builds)
+Supports 1.20.1+
 
 If you encounter any issues with the plugin, please do the following before reporting the problem:
 - Create a Paper test server using one of the supported versions.
