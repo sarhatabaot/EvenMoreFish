@@ -99,6 +99,8 @@ dependencyResolutionManagement {
             version("junit", "5.13.2")
             library("junit-jupiter-api", "org.junit.jupiter","junit-jupiter-api").versionRef("junit")
             library("junit-jupiter-engine","org.junit.jupiter","junit-jupiter-engine").versionRef("junit")
+
+            library("guava", "com.google.guava:guava:33.4.8-jre")
         }
     }
 }

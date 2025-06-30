@@ -112,6 +112,7 @@ dependencies {
     library(libs.connectors.h2)
     library(libs.maven.artifact)
     library(libs.annotations)
+    library(libs.guava)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
