@@ -196,10 +196,11 @@ public class BaitNBTManager {
         for (String baitName : NbtUtils.getBaitArray(item)) {
             String[] split = baitName.split(BAIT_SEPARATOR);
             String baitId = split[0];
-            int baitQuantity = Integer.parseInt(split[1]);
+
+            int baitQuantity = "∞".equals(split[1]) ? UNLIMITED_BAIT : Integer.parseInt(split[1]);
 
             if (baitId.equals(bait.getId())) {
-                if (bait.isInfinite()) {
+                if (bait.isInfinite() || baitQuantity == UNLIMITED_BAIT) {
                     combined.append(baitId).append(":∞,");
                 } else {
                     int newQuantity = baitQuantity + quantity;
