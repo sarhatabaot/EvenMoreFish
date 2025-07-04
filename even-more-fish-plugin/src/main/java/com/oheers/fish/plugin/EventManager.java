@@ -31,12 +31,12 @@ public class EventManager {
     public void registerCoreListeners() {
         // Database-related listeners
         if (DatabaseUtil.isDatabaseOnline()) {
-            pm.registerEvents(new JoinChecker(), plugin);
             pm.registerEvents(plugin.getPluginDataManager().getUserManager(), plugin);
             pm.registerEvents(new EMFFishListener(), plugin);
         }
 
         // Always-registered listeners
+        pm.registerEvents(new JoinChecker(), plugin);
         pm.registerEvents(new FishingProcessor(), plugin);
         pm.registerEvents(new HuntingProcessor(), plugin);
         pm.registerEvents(new SkullSaver(), plugin);
