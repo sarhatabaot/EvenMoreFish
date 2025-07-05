@@ -9,6 +9,7 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,13 +76,11 @@ public class EMFSingleMessage extends EMFMessage {
             return;
         }
 
-        EMFSingleMessage copy = createCopy();
+        Component message = (audience instanceof Player player) ?
+            getComponentMessage(player) :
+            getComponentMessage();
 
-        if (perPlayer && audience instanceof Player player) {
-            copy.setPlayer(player);
-        }
-
-        audience.sendMessage(copy.getComponentMessage());
+        audience.sendMessage(message);
     }
 
     public void sendActionBar(@NotNull Audience audience) {
@@ -89,13 +88,11 @@ public class EMFSingleMessage extends EMFMessage {
             return;
         }
 
-        EMFSingleMessage copy = createCopy();
+        Component message = (audience instanceof Player player) ?
+            getComponentMessage(player) :
+            getComponentMessage();
 
-        if (perPlayer && audience instanceof Player player) {
-            copy.setPlayer(player);
-        }
-
-        audience.sendActionBar(copy.getComponentMessage());
+        audience.sendActionBar(message);
     }
 
     /**
@@ -105,18 +102,22 @@ public class EMFSingleMessage extends EMFMessage {
         return this.message;
     }
 
-    /**
-     * @return The stored Component with all variables applied..
-     */
     @Override
-    public @NotNull Component getComponentMessage() {
-        formatPlaceholderAPI();
-        return removeDefaultItalics(this.message).colorIfAbsent(NamedTextColor.WHITE);
+    public @NotNull Component getComponentMessage(@Nullable OfflinePlayer player) {
+        EMFSingleMessage copy = createCopy();
+        copy.setPlayer(player);
+        copy.formatPlaceholderAPI();
+        return removeDefaultItalics(copy.message).colorIfAbsent(NamedTextColor.WHITE);
     }
 
     @Override
     public @NotNull List<Component> getComponentListMessage() {
         return List.of(getComponentMessage());
+    }
+
+    @Override
+    public @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player) {
+        return List.of(getComponentMessage(player));
     }
 
     @Override
