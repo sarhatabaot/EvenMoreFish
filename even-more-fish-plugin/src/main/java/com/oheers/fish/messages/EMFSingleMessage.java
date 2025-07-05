@@ -31,7 +31,11 @@ public class EMFSingleMessage extends EMFMessage {
 
     @Override
     public EMFSingleMessage createCopy() {
-        return toSingleMessage();
+        EMFSingleMessage message = EMFSingleMessage.of(this.message);
+        message.perPlayer = this.perPlayer;
+        message.canSilent = this.canSilent;
+        message.relevantPlayer = this.relevantPlayer;
+        return message;
     }
 
     // Factory methods

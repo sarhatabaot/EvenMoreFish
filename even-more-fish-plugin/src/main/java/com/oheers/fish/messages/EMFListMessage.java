@@ -37,7 +37,11 @@ public class EMFListMessage extends EMFMessage {
 
     @Override
     public EMFListMessage createCopy() {
-        return toListMessage();
+        EMFListMessage message = EMFListMessage.ofList(this.message);
+        message.perPlayer = this.perPlayer;
+        message.canSilent = this.canSilent;
+        message.relevantPlayer = this.relevantPlayer;
+        return message;
     }
 
     // Factory methods
