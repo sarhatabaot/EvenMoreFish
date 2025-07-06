@@ -3,7 +3,7 @@ name: Deploy & Build Docusaurus to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'docs/**'
       - '.github/workflows/deploy.yml'  # The workflow file itself
