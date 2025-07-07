@@ -20,8 +20,9 @@ If you encounter any issues with the plugin, please do the following before repo
 
 ## 📦 Download 📦
 
-There are two sources for the plugin:
+There are three sources for the plugin:
 - [Modrinth](https://modrinth.com/plugin/evenmorefish)
+- [GitHub Releases](https://github.com/EvenMoreFish/EvenMoreFish/releases)
 - [Jenkins](https://ci.codemc.io/job/EvenMoreFish/job/EvenMoreFish/) (Experimental)
 
 ---
