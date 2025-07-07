@@ -34,7 +34,7 @@ dependencyResolutionManagement {
 
             library("mcmmo", "com.gmail.nossr50.mcMMO:mcMMO:2.2.038")
             library("aurelium-skills", "com.github.Archy-X:AureliumSkills:Beta1.2.8")
-            library("aura-skills", "dev.aurelium:auraskills-api-bukkit:2.3.3")
+            library("aura-skills", "dev.aurelium:auraskills-api-bukkit:2.3.5")
             library("headdatabase-api", "com.arcaniax:HeadDatabase-API:1.3.2")
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.18.4")
 
@@ -59,7 +59,7 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.1")
             library("annotations", "org.jetbrains:annotations:26.0.2")
 
-            version("flyway", "11.10.0")
+            version("flyway", "11.10.1")
             library("flyway-core", "org.flywaydb","flyway-core").versionRef("flyway")
             library("flyway-mysql", "org.flywaydb","flyway-mysql").versionRef("flyway")
             bundle("flyway", listOf("flyway-core", "flyway-mysql"))
@@ -76,7 +76,7 @@ dependencyResolutionManagement {
             library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.1")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
-            plugin("shadow", "com.gradleup.shadow").version("9.0.0-beta17")
+            plugin("shadow", "com.gradleup.shadow").version("9.0.0-rc1")
             plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.7.1")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
@@ -96,7 +96,7 @@ dependencyResolutionManagement {
 
             library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-4")
 
-            version("junit", "5.13.2")
+            version("junit", "5.13.3")
             library("junit-jupiter-api", "org.junit.jupiter","junit-jupiter-api").versionRef("junit")
             library("junit-jupiter-engine","org.junit.jupiter","junit-jupiter-engine").versionRef("junit")
 
