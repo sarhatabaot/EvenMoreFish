@@ -26,7 +26,7 @@ public class Rarity extends ConfigBase {
     private static final Logger logger = EvenMoreFish.getInstance().getLogger();
 
     private boolean fishWeighted;
-    private Requirement requirement = new Requirement();
+    private final Requirement requirement;
     private final List<Fish> fishList;
 
     /**
@@ -38,7 +38,8 @@ public class Rarity extends ConfigBase {
         RarityFileUpdates.update(this);
         performRequiredConfigChecks();
         updateRequirementFormats();
-        fishList = loadFish();
+        this.requirement = loadRequirements();
+        this.fishList = loadFish();
     }
 
     // Current required config: id
@@ -108,9 +109,6 @@ public class Rarity extends ConfigBase {
     }
 
     public Requirement getRequirement() {
-        if (requirement == null) {
-            requirement = loadRequirements();
-        }
         return requirement;
     }
 
