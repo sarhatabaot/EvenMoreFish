@@ -52,7 +52,12 @@
     },
     {
       "matchPackagePrefixes": ["org.flywaydb:"],
-      "groupName": "Flyway"
+      "groupName": "Flyway",
+      "allowedVersions": "~10.0.0"
+    },
+    {
+      "matchPackageNames": ["org.xerial:sqlite-jdbc"],
+      "allowedVersions": "3.47.0.0"
     },
     {
       "matchPackagePrefixes": ["org.jooq:"],
