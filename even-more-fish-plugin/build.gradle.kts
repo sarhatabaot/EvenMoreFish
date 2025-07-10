@@ -101,19 +101,21 @@ dependencies {
     implementation(libs.universalscheduler)
 
     //temp fix until dynamic gradle plugin is ready ("mirror-aware-plugin") by sarhatabaot
-    implementation(libs.flyway.core)
-    implementation(libs.flyway.mysql)
     implementation(libs.caffeine)
     implementation(libs.jooq)
     implementation(libs.jooq.codegen)
     implementation(libs.jooq.meta)
     implementation(libs.commons.lang3)
+    implementation(libs.bundles.connectors)
 
+    library(libs.bundles.flyway) {
+        exclude("org.xerial", "sqlite-jdbc")
+        exclude("com.mysql", "mysql-connector-j")
+    }
     library(libs.friendlyid)
     library(libs.hikaricp)
     library(libs.commons.codec)
     library(libs.json.simple)
-    library(libs.connectors.h2)
     library(libs.maven.artifact)
     library(libs.annotations)
     library(libs.guava)

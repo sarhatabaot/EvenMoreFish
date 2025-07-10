@@ -79,10 +79,12 @@ public class Database implements DatabaseAPI {
             return;
         }
 
+
         this.version = this.migrationManager.getDatabaseVersion().getVersion();
         migrateFromDatabaseVersionToLatest();
 
         initSettings(MainConfig.getInstance().getPrefix(), MainConfig.getInstance().getDatabase());
+
     }
 
     private void setJooqStartupProperties() {
