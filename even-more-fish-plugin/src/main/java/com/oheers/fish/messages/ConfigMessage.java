@@ -232,6 +232,7 @@ public enum ConfigMessage {
             "<gray>» (Right-click) cancel."
     ), PrefixType.NONE, false, false, "sell-gui-lore"),
     RARITY_INVALID("<white>That is not a valid rarity!", PrefixType.ERROR, false, true, "rarity-invalid"),
+    JOURNAL_DISABLED("<white>The Fishing Journal is not accessible. Please enable the plugin's database.", PrefixType.ERROR, false, true, "journal-disabled"),
     BAIT_ROD_LORE(List.of(
             "<white>",
             "<gray>Bait Slots: <yellow>({current_baits}/{max_baits})",
