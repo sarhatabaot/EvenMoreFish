@@ -218,6 +218,7 @@ public class MainCommand {
             )
             .executesPlayer(info -> {
                 if (!DatabaseUtil.isDatabaseOnline()) {
+                    ConfigMessage.JOURNAL_DISABLED.getMessage().send(info.sender());
                     return;
                 }
                 Rarity rarity = info.args().getUnchecked("rarity"); // This is allowed to be null.
