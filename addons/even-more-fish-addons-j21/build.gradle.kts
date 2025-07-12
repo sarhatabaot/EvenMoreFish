@@ -14,7 +14,6 @@ dependencies {
     compileOnly(libs.nexo)
     compileOnly(libs.oraxen)
     compileOnly(libs.bundles.craftengine)
-    compileOnly(libs.commons.lang3)
     compileOnly(project(":even-more-fish-api"))
 }
 

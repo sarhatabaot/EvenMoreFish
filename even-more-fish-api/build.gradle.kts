@@ -1,5 +1,6 @@
 plugins {
     id("com.oheers.evenmorefish.java-conventions")
+    `java-library`
 }
 
 group = "com.oheers.evenmorefish"
@@ -8,7 +9,6 @@ version = properties["project-version"] as String
 dependencies {
     compileOnly(libs.paper.api)
     compileOnly(libs.annotations)
-    compileOnly(libs.commons.lang3)
     compileOnly(libs.universalscheduler)
     compileOnly(libs.boostedyaml)
 }
@@ -44,6 +44,27 @@ publishing {
             version = project.version.toString()
 
             from(components["java"])
+        }
+    }
+}
+
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation(libs.junit.jupiter.api)
+                runtimeOnly(libs.junit.jupiter.engine)
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        useJUnitPlatform()
+                    }
+                }
+            }
         }
     }
 }

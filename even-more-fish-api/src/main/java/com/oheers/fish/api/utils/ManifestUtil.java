@@ -1,4 +1,4 @@
-package com.oheers.fish.utils;
+package com.oheers.fish.api.utils;
 
 
 import org.slf4j.Logger;
@@ -17,11 +17,15 @@ public class ManifestUtil {
     }
 
     public static String getAttributeFromManifest(final String key, final String defaultValue) {
+        return getAttributeFromManifest(ManifestUtil.class.getClassLoader(),key, defaultValue);
+    }
+
+    public static String getAttributeFromManifest(final ClassLoader classLoader, final String key, final String defaultValue) {
         if (key == null || key.isEmpty()) {
             throw new IllegalArgumentException("Key cannot be null or empty");
         }
 
-        try (InputStream inputStream = ManifestUtil.class.getClassLoader().getResourceAsStream(MANIFEST_PATH)) {
+        try (InputStream inputStream = classLoader.getResourceAsStream(MANIFEST_PATH)) {
             if (inputStream != null) {
                 Manifest manifest = new Manifest(inputStream);
                 String value = manifest.getMainAttributes().getValue(key);

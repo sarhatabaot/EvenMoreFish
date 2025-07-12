@@ -54,9 +54,7 @@ repositories {
 dependencies {
     api(project(":even-more-fish-api"))
 
-    compileOnly(libs.paper.api) {
-        exclude(group = "org.apache.commons", module = "commons-lang3")
-    }
+    compileOnly(libs.paper.api)
     compileOnly(libs.vault.api)
     compileOnly(libs.placeholder.api)
 
@@ -105,7 +103,6 @@ dependencies {
     implementation(libs.jooq)
     implementation(libs.jooq.codegen)
     implementation(libs.jooq.meta)
-    implementation(libs.commons.lang3)
     implementation(libs.bundles.connectors)
 
     library(libs.bundles.flyway) {
