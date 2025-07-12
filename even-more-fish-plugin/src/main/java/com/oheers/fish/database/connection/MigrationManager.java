@@ -4,7 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.migrate.LegacyToV3DatabaseMigration;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
-import com.oheers.fish.utils.ManifestUtil;
+import com.oheers.fish.api.utils.ManifestUtil;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.bukkit.command.CommandSender;
 import org.flywaydb.core.Flyway;

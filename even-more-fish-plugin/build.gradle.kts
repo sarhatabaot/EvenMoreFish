@@ -54,9 +54,7 @@ repositories {
 dependencies {
     api(project(":even-more-fish-api"))
 
-    compileOnly(libs.paper.api) {
-        exclude(group = "org.apache.commons", module = "commons-lang3")
-    }
+    compileOnly(libs.paper.api)
     compileOnly(libs.vault.api)
     compileOnly(libs.placeholder.api)
 
@@ -107,7 +105,6 @@ dependencies {
     implementation(libs.jooq)
     implementation(libs.jooq.codegen)
     implementation(libs.jooq.meta)
-    implementation(libs.commons.lang3)
 
     library(libs.friendlyid)
     library(libs.hikaricp)
@@ -318,6 +315,7 @@ tasks {
             attributes["Implementation-Title"] = grgit.branch.current().name
             attributes["Implementation-Version"] = buildNumberOrDate
             attributes["Database-Baseline-Version"] = "8.0"
+            attributes["Commons-Lang3-Version"] = libs.versions.commons.lang3
         }
 
         minimize()

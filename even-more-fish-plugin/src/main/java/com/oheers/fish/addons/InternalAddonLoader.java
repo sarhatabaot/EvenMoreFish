@@ -3,6 +3,7 @@ package com.oheers.fish.addons;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.addons.impl.Head64ItemAddon;
 import com.oheers.fish.api.addons.AddonLoader;
+import com.oheers.fish.api.addons.AddonMetadata;
 import com.oheers.fish.competition.rewardtypes.CommandRewardType;
 import com.oheers.fish.competition.rewardtypes.EXPRewardType;
 import com.oheers.fish.competition.rewardtypes.EffectRewardType;
@@ -39,20 +40,9 @@ import org.jetbrains.annotations.NotNull;
 public class InternalAddonLoader extends AddonLoader {
 
     @Override
-    public @NotNull String getName() {
-        return "Internal Addons";
+    public AddonMetadata getAddonMetadata() {
+        return new AddonMetadata("Internal Addons", "1.0.0", "EvenMoreFish");
     }
-
-    @Override
-    public @NotNull String getVersion() {
-        return "1.0.0";
-    }
-
-    @Override
-    public @NotNull String getAuthor() {
-        return "EvenMoreFish";
-    }
-
     @Override
     public boolean canLoad() {
         return true;

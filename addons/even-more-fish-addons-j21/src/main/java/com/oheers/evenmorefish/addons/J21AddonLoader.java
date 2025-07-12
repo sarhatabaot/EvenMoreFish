@@ -1,30 +1,20 @@
 package com.oheers.evenmorefish.addons;
 
 import com.oheers.fish.api.addons.AddonLoader;
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
-import org.jetbrains.annotations.NotNull;
+import com.oheers.fish.api.addons.AddonMetadata;
+import com.oheers.fish.api.utils.system.JavaSpecVersion;
+import com.oheers.fish.api.utils.system.SystemUtils;
+
 
 public class J21AddonLoader extends AddonLoader {
-
     @Override
-    public @NotNull String getName() {
-        return "Java 21 Addons";
-    }
-
-    @Override
-    public @NotNull String getVersion() {
-        return "1.0.0";
-    }
-
-    @Override
-    public @NotNull String getAuthor() {
-        return "EvenMoreFish";
+    public AddonMetadata getAddonMetadata() {
+        return new AddonMetadata("Java 21 Addons", "1.1.0", "EvenMoreFish");
     }
 
     @Override
     public boolean canLoad() {
-        return SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_21);
+        return SystemUtils.isJavaVersionAtLeast(JavaSpecVersion.JAVA_21);
     }
 
     @Override
