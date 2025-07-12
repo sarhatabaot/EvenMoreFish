@@ -58,7 +58,7 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.1")
             library("annotations", "org.jetbrains:annotations:26.0.2")
 
-            version("flyway", "11.10.1")
+            version("flyway", "10.22.0")
             library("flyway-core", "org.flywaydb","flyway-core").versionRef("flyway")
             library("flyway-mysql", "org.flywaydb","flyway-mysql").versionRef("flyway")
             bundle("flyway", listOf("flyway-core", "flyway-mysql"))
@@ -90,9 +90,9 @@ dependencyResolutionManagement {
             plugin("jooq", "nu.studer.jooq").version("9.0")
 
             library("connectors-mysql", "com.mysql:mysql-connector-j:9.3.0")
-            library("connectors-sqlite", "org.xerial:sqlite-jdbc:3.50.2.0")
+            library("connectors-sqlite", "org.xerial:sqlite-jdbc:3.47.0.0")
             library("connectors-h2", "com.h2database:h2:2.3.232")
-
+            bundle("connectors", listOf("connectors-mysql", "connectors-sqlite"))
             library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-4")
 
             version("junit", "5.13.3")

@@ -9,6 +9,7 @@ import com.oheers.fish.gui.guis.FishJournalGui;
 import com.oheers.fish.gui.guis.MainMenuGui;
 import com.oheers.fish.gui.guis.SellGui;
 import com.oheers.fish.items.ItemFactory;
+import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.selling.SellHelper;
 import de.themoep.inventorygui.GuiElement;
 import de.themoep.inventorygui.GuiPageElement;
@@ -160,6 +161,7 @@ public class GuiUtils {
         });
         newActionMap.put("open-journal-menu", (gui, click) -> {
             if (!DatabaseUtil.isDatabaseOnline()) {
+                ConfigMessage.JOURNAL_DISABLED.getMessage().send(click.getWhoClicked());
                 return;
             }
             if (gui != null) {

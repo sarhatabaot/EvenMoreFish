@@ -2,6 +2,7 @@ package com.oheers.fish.database.connection;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.migrate.LegacyToV3DatabaseMigration;
 import com.oheers.fish.database.strategies.DatabaseStrategyFactory;
 import com.oheers.fish.api.utils.ManifestUtil;
@@ -61,6 +62,8 @@ public class MigrationManager {
 
                 )
         );
+
+        DatabaseUtil.debugDatabaseTypeVersion(this.connectionFactory);
     }
 
     public void migrateFromVersion(String currentDbVersion, boolean baseline) {
