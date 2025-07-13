@@ -13,7 +13,7 @@ public class RegionRequirementType extends RequirementType {
 
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {
-        return FishUtils.checkRegion(context.getLocation(), values);
+        return FishUtils.checkRegion(context.getHookOrPlayerLocation(), values);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class BiomeSetRequirementType extends RequirementType {
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {
         World world = context.getWorld();
-        Location location = context.getLocation();
+        Location location = context.getHookOrPlayerLocation();
         String configLocation = context.getConfigPath();
         if (configLocation == null) {
             configLocation = "N/A";

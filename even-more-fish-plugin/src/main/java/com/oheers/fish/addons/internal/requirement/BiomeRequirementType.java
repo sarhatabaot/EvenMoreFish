@@ -7,6 +7,7 @@ import com.oheers.fish.api.requirement.RequirementType;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ public class BiomeRequirementType extends RequirementType {
     @Override
     public boolean checkRequirement(@NotNull RequirementContext context, @NotNull List<String> values) {
         World world = context.getWorld();
-        Location location = context.getLocation();
+        Location location = context.getHookOrPlayerLocation();
         String configLocation = context.getConfigPath();
         if (configLocation == null) {
             configLocation = "N/A";
