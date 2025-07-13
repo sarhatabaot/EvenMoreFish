@@ -6,6 +6,7 @@ import com.oheers.fish.api.plugin.EMFPlugin;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.logging.Level;
 
 public class AddonManager {
 
@@ -49,7 +50,7 @@ public class AddonManager {
                  InstantiationException |
                  IllegalAccessException |
                  InvocationTargetException exception) {
-            throw new RuntimeException(exception);
+            EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Could not loads addons due to an error, see the stacktrace.", exception);
         }
     }
 
