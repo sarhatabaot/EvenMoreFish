@@ -245,7 +245,7 @@ public class MainConfig extends ConfigBase {
     }
 
 
-    public int getNearbyPlayersRequirementRange() { return getConfig().getInt("requirements.nearby-players.range", 0); }
+    public int getNearbyPlayersRequirementRange() { return getConfig().getInt("requirement.nearby-players.range", 0); }
 
     public boolean isAdminShortcutCommandEnabled() {
         return adminShortcutEnabled;

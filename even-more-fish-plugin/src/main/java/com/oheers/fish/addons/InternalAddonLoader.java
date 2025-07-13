@@ -1,41 +1,40 @@
 package com.oheers.fish.addons;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.addons.impl.Head64ItemAddon;
+import com.oheers.fish.addons.internal.item.Head64ItemAddon;
 import com.oheers.fish.api.addons.AddonLoader;
 import com.oheers.fish.api.addons.AddonMetadata;
-import com.oheers.fish.competition.rewardtypes.CommandRewardType;
-import com.oheers.fish.competition.rewardtypes.EXPRewardType;
-import com.oheers.fish.competition.rewardtypes.EffectRewardType;
-import com.oheers.fish.competition.rewardtypes.HealthRewardType;
-import com.oheers.fish.competition.rewardtypes.HungerRewardType;
-import com.oheers.fish.competition.rewardtypes.ItemRewardType;
-import com.oheers.fish.competition.rewardtypes.MessageRewardType;
-import com.oheers.fish.competition.rewardtypes.SoundRewardType;
-import com.oheers.fish.competition.rewardtypes.external.AuraSkillsXPRewardType;
-import com.oheers.fish.competition.rewardtypes.external.GPClaimBlocksRewardType;
-import com.oheers.fish.competition.rewardtypes.external.McMMOXPRewardType;
-import com.oheers.fish.competition.rewardtypes.external.MoneyRewardType;
-import com.oheers.fish.competition.rewardtypes.external.PermissionRewardType;
-import com.oheers.fish.competition.rewardtypes.external.PlayerPointsRewardType;
+import com.oheers.fish.addons.internal.reward.CommandRewardType;
+import com.oheers.fish.addons.internal.reward.EXPRewardType;
+import com.oheers.fish.addons.internal.reward.EffectRewardType;
+import com.oheers.fish.addons.internal.reward.HealthRewardType;
+import com.oheers.fish.addons.internal.reward.HungerRewardType;
+import com.oheers.fish.addons.internal.reward.ItemRewardType;
+import com.oheers.fish.addons.internal.reward.MessageRewardType;
+import com.oheers.fish.addons.internal.reward.SoundRewardType;
+import com.oheers.fish.addons.external.reward.AuraSkillsXPRewardType;
+import com.oheers.fish.addons.external.reward.GPClaimBlocksRewardType;
+import com.oheers.fish.addons.external.reward.McMMOXPRewardType;
+import com.oheers.fish.addons.external.reward.MoneyRewardType;
+import com.oheers.fish.addons.external.reward.PermissionRewardType;
+import com.oheers.fish.addons.external.reward.PlayerPointsRewardType;
 import com.oheers.fish.plugin.DependencyManager;
-import com.oheers.fish.requirements.BiomeRequirementType;
-import com.oheers.fish.requirements.BiomeSetRequirementType;
-import com.oheers.fish.requirements.DisabledRequirementType;
-import com.oheers.fish.requirements.GroupRequirementType;
-import com.oheers.fish.requirements.IRLTimeRequirementType;
-import com.oheers.fish.requirements.InGameTimeRequirementType;
-import com.oheers.fish.requirements.MoonPhaseRequirementType;
-import com.oheers.fish.requirements.NearbyPlayersRequirementType;
-import com.oheers.fish.requirements.PermissionRequirementType;
-import com.oheers.fish.requirements.RegionRequirementType;
-import com.oheers.fish.requirements.WeatherRequirementType;
-import com.oheers.fish.requirements.WorldRequirementType;
+import com.oheers.fish.addons.internal.requirement.BiomeRequirementType;
+import com.oheers.fish.addons.internal.requirement.BiomeSetRequirementType;
+import com.oheers.fish.addons.internal.requirement.DisabledRequirementType;
+import com.oheers.fish.addons.internal.requirement.GroupRequirementType;
+import com.oheers.fish.addons.internal.requirement.IRLTimeRequirementType;
+import com.oheers.fish.addons.internal.requirement.InGameTimeRequirementType;
+import com.oheers.fish.addons.internal.requirement.MoonPhaseRequirementType;
+import com.oheers.fish.addons.internal.requirement.NearbyPlayersRequirementType;
+import com.oheers.fish.addons.external.requirement.PermissionRequirementType;
+import com.oheers.fish.addons.internal.requirement.RegionRequirementType;
+import com.oheers.fish.addons.internal.requirement.WeatherRequirementType;
+import com.oheers.fish.addons.internal.requirement.WorldRequirementType;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.jetbrains.annotations.NotNull;
 
 public class InternalAddonLoader extends AddonLoader {
 
@@ -43,6 +42,7 @@ public class InternalAddonLoader extends AddonLoader {
     public AddonMetadata getAddonMetadata() {
         return new AddonMetadata("Internal Addons", "1.0.0", "EvenMoreFish");
     }
+
     @Override
     public boolean canLoad() {
         return true;

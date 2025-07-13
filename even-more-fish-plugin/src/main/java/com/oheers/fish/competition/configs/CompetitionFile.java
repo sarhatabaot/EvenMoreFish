@@ -206,7 +206,7 @@ public class CompetitionFile extends ConfigBase {
     }
 
     /**
-     * @return The rewards to be given for winners of this competition.
+     * @return The reward to be given for winners of this competition.
      */
     public @NotNull Map<Integer, List<Reward>> getRewards() {
         Section section = getConfig().getSection("rewards");

@@ -129,7 +129,7 @@ public class Fish {
     }
 
     private void handleRequirements() {
-        Section requirementSection = section.getSection("requirements");
+        Section requirementSection = section.getSection("requirement");
         requirement = new Requirement();
         if (requirementSection == null) {
             return;
@@ -349,14 +349,14 @@ public class Fish {
 
     public void checkEatEvent() {
         List<String> configRewards = section.getStringList("eat-event");
-        // Checks if the player has actually set rewards for an eat event
+        // Checks if the player has actually set reward for an eat event
         if (!configRewards.isEmpty()) {
             // Informs the main class to load up an PlayerItemConsumeEvent listener
             EvenMoreFish.getInstance().getEventManager().setCheckingEatEvent(true);
             this.eventType = "eat";
             actionRewards = new ArrayList<>();
 
-            // Translates all the rewards into Reward objects and adds them to the fish.
+            // Translates all the reward into Reward objects and adds them to the fish.
             configRewards.forEach(reward -> {
                 reward = parseEventPlaceholders(reward);
                 this.actionRewards.add(new Reward(reward));
@@ -368,7 +368,7 @@ public class Fish {
         fishRewards = new ArrayList<>();
         List<String> configRewards = section.getStringList("catch-event");
         if (!configRewards.isEmpty()) {
-            // Translates all the rewards into Reward objects and adds them to the fish.
+            // Translates all the reward into Reward objects and adds them to the fish.
             configRewards.forEach(reward -> {
                 reward = parseEventPlaceholders(reward);
                 this.fishRewards.add(new Reward(reward));
@@ -389,14 +389,14 @@ public class Fish {
 
     public void checkIntEvent() {
         List<String> configRewards = section.getStringList("interact-event");
-        // Checks if the player has actually set rewards for an interact event
+        // Checks if the player has actually set reward for an interact event
         if (!configRewards.isEmpty()) {
             // Informs the main class to load up an PlayerItemConsumeEvent listener
             EvenMoreFish.getInstance().getEventManager().setCheckingIntEvent(true);
             this.eventType = "int";
             actionRewards = new ArrayList<>();
 
-            // Translates all the rewards into Reward objects and adds them to the fish.
+            // Translates all the reward into Reward objects and adds them to the fish.
             configRewards.forEach(reward -> {
                 reward = parseEventPlaceholders(reward);
                 this.actionRewards.add(new Reward(reward));
