@@ -1,7 +1,21 @@
 plugins {
     id("com.oheers.evenmorefish.java-conventions")
+    id("com.oheers.evenmorefish.emf-addon")
 }
 
+emfAddon {
+    name = "Java 17 Addons"
+    version = "1.1.0"
+    description = "Bundled Java 17 Addons"
+    authors = listOf("EvenMoreFish")
+    website = "https://github.com/EvenMoreFish/EvenMoreFish"
+    dependencies = listOf(
+        "Denizen",
+        "EcoItems",
+        "HeadDatabase",
+        "ItemsAdder"
+    )
+}
 
 repositories {
     maven("https://repo.auxilor.io/repository/maven-public/")

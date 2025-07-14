@@ -1,7 +1,20 @@
 plugins {
     id("com.oheers.evenmorefish.java-conventions")
+    id("com.oheers.evenmorefish.emf-addon")
 }
 
+emfAddon {
+    name = "Java 21 Addons"
+    version = "1.1.0"
+    authors = listOf("EvenMoreFish")
+    website = "https://github.com/EvenMoreFish/EvenMoreFish"
+    description = "Bundled Java 21 Addons"
+    dependencies = listOf(
+        "CraftEngine",
+        "Nexo",
+        "Oraxen"
+    )
+}
 
 repositories {
     maven("https://repo.nexomc.com/releases/")

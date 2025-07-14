@@ -33,15 +33,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class FileUtil {
 
@@ -133,7 +131,7 @@ public class FileUtil {
 
             InputStream stream = plugin.getResource(resourceName);
             if (stream == null) {
-                plugin.getLogger().severe("Could not retrieve " + resourceName);
+                plugin.getLogger().severe(() -> "Could not retrieve " + resourceName);
                 return null;
             }
             try {
@@ -169,7 +167,7 @@ public class FileUtil {
                 }
             }
         } catch (SecurityException exception) {
-            EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Failed to retrieve files in " + directory.getAbsolutePath() + ": Access Denied.", exception);
+            EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Failed to retrieve files in %s: Access Denied.".formatted(directory.getAbsolutePath()), exception);
         }
         return finalList;
     }
@@ -195,4 +193,24 @@ public class FileUtil {
         return false;
     }
 
+
+    /**
+     * Gets all .addon filenames from a specific path within the JAR
+     * @param clazz Any class from your plugin (used to get the ClassLoader)
+     * @param jarPath The path within the JAR (e.g. "addons")
+     * @return Set of .addon filenames (just names, not full paths)
+     * @throws IOException If there's an error reading the JAR
+     */
+    public static Set<String> getAddonFilenames(@NotNull Class<?> clazz, String jarPath) throws IOException {
+        URL jarLocation = clazz.getProtectionDomain().getCodeSource().getLocation();
+
+        try (JarFile jarFile = new JarFile(jarLocation.getPath())) {
+            return jarFile.stream()
+                    .map(JarEntry::getName)
+                    .filter(name -> name.startsWith(jarPath + "/"))
+                    .filter(name -> name.endsWith(".addon"))
+                    .map(name -> name.substring(name.lastIndexOf('/') + 1))
+                    .collect(Collectors.toSet());
+        }
+    }
 }

@@ -12,8 +12,8 @@ repositories {
 
 tasks {
     if (project.name.contains("addons")) {
-        val addonName = defaultAddonName(project.name)
         jar {
+            val addonName = defaultAddonName(project.name)
             archiveFileName.set(addonName)
         }
     }
