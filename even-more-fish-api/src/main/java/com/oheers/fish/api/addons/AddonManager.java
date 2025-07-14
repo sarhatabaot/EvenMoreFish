@@ -49,7 +49,6 @@ public class AddonManager {
             AddonLoader loaderInstance = clazz.getDeclaredConstructor(EMFPlugin.class, File.class).newInstance(plugin, addonFile);
             loaderInstance.load();
             loadedAddons.add(loaderInstance);
-            plugin.getLogger().info(() -> "Successfully loaded addon: %s v%s by %s".formatted(loaderInstance.getAddonMetadata().name(), loaderInstance.loadAddonMetadata().version(), loaderInstance.getAddonMetadata().authors()));
         } catch (Exception exception) {
             plugin.getLogger().log(Level.WARNING, "Could not load addon %s:%s".formatted(clazz.getName(), exception.getMessage()), exception);
         }

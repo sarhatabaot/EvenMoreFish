@@ -120,7 +120,7 @@ public abstract class AddonLoader {
         try {
             validateMetadata();
             loadAddons();
-            plugin.debug("Loaded Addon %s %s by %s".formatted(getAddonMetadata().name(), getAddonMetadata().version(), getAddonMetadata().authors()));
+            plugin.getLogger().info("Loaded Addon %s %s by %s".formatted(getAddonMetadata().name(), getAddonMetadata().version(), getAddonMetadata().authors()));
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to load addon %s".formatted(getAddonMetadata().name()), e);
         }
