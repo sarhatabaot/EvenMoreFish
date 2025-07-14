@@ -131,7 +131,7 @@ public class FileUtil {
 
             InputStream stream = plugin.getResource(resourceName);
             if (stream == null) {
-                plugin.getLogger().severe("Could not retrieve " + resourceName);
+                plugin.getLogger().severe(() -> "Could not retrieve " + resourceName);
                 return null;
             }
             try {
@@ -167,7 +167,7 @@ public class FileUtil {
                 }
             }
         } catch (SecurityException exception) {
-            EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Failed to retrieve files in " + directory.getAbsolutePath() + ": Access Denied.", exception);
+            EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Failed to retrieve files in %s: Access Denied.".formatted(directory.getAbsolutePath()), exception);
         }
         return finalList;
     }
@@ -213,22 +213,4 @@ public class FileUtil {
                     .collect(Collectors.toSet());
         }
     }
-
-    public static String findSimilarFilename(Set<String> filenames, String referenceFilename) {
-        int dashIndex = referenceFilename.indexOf('-');
-        int dotIndex = referenceFilename.lastIndexOf('.');
-
-        if (dashIndex == -1 || dotIndex == -1) return null;
-
-        String prefix = referenceFilename.substring(0, dashIndex + 1); // includes '-'
-        String suffix = referenceFilename.substring(dotIndex);         // includes '.addon'
-
-        return filenames.stream()
-                .filter(name -> !name.equals(referenceFilename))       // exclude self
-                .filter(name -> name.startsWith(prefix))
-                .filter(name -> name.endsWith(suffix))
-                .findFirst()
-                .orElse(null);
-    }
-
 }

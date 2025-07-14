@@ -6,7 +6,6 @@ import com.oheers.fish.api.FileUtil;
 import com.oheers.fish.api.addons.AddonManager;
 import com.oheers.fish.config.MainConfig;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

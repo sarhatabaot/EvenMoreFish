@@ -30,7 +30,7 @@ public enum JavaSpecVersion {
     JAVA_25(25.0F, "25"),
     JAVA_26(26.0F, "26"),
     JAVA_27(27.0F, "27");
-    ;
+
 
     private final float value;
     private final String name;
