@@ -13,10 +13,7 @@ public class J17AddonLoader extends AddonLoader {
         super(plugin);
     }
 
-    @Override
-    public AddonMetadata getAddonMetadata() {
-        return new AddonMetadata("Java 17 Addons", "1.1.0", "EvenMoreFish", "Bundled Java 17 Addons");
-    }
+
 
     @Override
     public boolean canLoad() {

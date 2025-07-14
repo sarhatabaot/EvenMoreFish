@@ -29,9 +29,19 @@ public abstract class EMFPlugin extends JavaPlugin {
         debug(Level.INFO, message);
     }
 
+    public void debug(final String message, Exception e) {
+        debug(Level.INFO, message, e);
+    }
+
     public void debug(final Level level, final String message) {
         if (isDebugSession()) {
             getInstance().getLogger().log(level, () -> "DEBUG %s".formatted(message));
+        }
+    }
+
+    public void debug(final Level level, final String message, Exception e) {
+        if (isDebugSession()) {
+            getInstance().getLogger().log(level, "DEBUG %s".formatted(message), e);
         }
     }
 

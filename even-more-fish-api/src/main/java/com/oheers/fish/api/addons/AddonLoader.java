@@ -3,6 +3,7 @@ package com.oheers.fish.api.addons;
 import com.oheers.fish.api.plugin.EMFPlugin;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -44,7 +45,7 @@ public abstract class AddonLoader {
      * @return The loaded metadata, or null if the file doesn't exist
      */
     private AddonMetadata loadMetadataFromProperties() {
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("META-INF/addon-loader.properties")) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF")) {
             if (input == null) {
                 return null; // File doesn't exist
             }
@@ -54,15 +55,17 @@ public abstract class AddonLoader {
 
             String name = props.getProperty("name");
             String version = props.getProperty("version");
-            String author = props.getProperty("author");
+            List<String> authors = List.of(props.getProperty("authors").split(","));
+            String website = props.getProperty("website");
             String description = props.getProperty("description", "");
+            List<String> dependencies = List.of(props.getProperty("dependencies").split(","));
 
-            if (name == null || version == null || author == null) {
-                plugin.getLogger().warning("addon-loader.properties is missing required fields (name, version, or author)");
+            if (name == null || version == null || authors.isEmpty()) {
+                plugin.getLogger().warning("MANIFEST.MF is missing required fields (name, version, or author)");
                 return null;
             }
 
-            return new AddonMetadata(name, version, author, description);
+            return new AddonMetadata(name, version, authors, description, website, dependencies);
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Failed to load addon metadata from properties file", e);
             return null;
@@ -89,7 +92,7 @@ public abstract class AddonLoader {
         try {
             validateMetadata();
             loadAddons();
-            plugin.debug("Loaded Addon %s %s by %s".formatted(getAddonMetadata().name(), getAddonMetadata().version(), getAddonMetadata().author()));
+            plugin.debug("Loaded Addon %s %s by %s".formatted(getAddonMetadata().name(), getAddonMetadata().version(), getAddonMetadata().authors()));
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to load addon %s".formatted(getAddonMetadata().name()), e);
         }

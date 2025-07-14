@@ -4,6 +4,7 @@ import com.oheers.fish.api.FileUtil;
 import com.oheers.fish.api.plugin.EMFPlugin;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,10 +26,10 @@ public class AddonManager {
     }
 
     public void load() {
-        List<File> jars = FileUtil.getFilesInDirectoryWithExtension(
+        List<File> jarFiles = FileUtil.getFilesInDirectoryWithExtension(
                 folder, ".jar", true, true);
 
-        jars.forEach(this::processJar);
+        jarFiles.forEach(this::processJar);
     }
 
     private void processJar(File jar) {
@@ -50,6 +51,8 @@ public class AddonManager {
             plugin.getLogger().log(Level.WARNING, "Could not load addon %s:%s".formatted(clazz.getName(), exception.getMessage()), exception);
         }
     }
+
+
 
     // Optional: Add method to unload all addons
     public void unloadAll() {

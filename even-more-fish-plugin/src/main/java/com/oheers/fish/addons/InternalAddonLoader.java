@@ -37,13 +37,21 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.util.List;
+
 public class InternalAddonLoader extends AddonLoader {
     public InternalAddonLoader(EMFPlugin plugin) {
         super(plugin);
     }
     @Override
     public AddonMetadata getAddonMetadata() {
-        return new AddonMetadata("Internal Addons", "1.0.0", "EvenMoreFish", "Bundled internal addons");
+        return new AddonMetadata(
+                "Internal Addons",
+                "1.0.0",
+                List.of("EvenMoreFish"),
+                "Bundled internal addons",
+                "https://github.com/EvenMoreFish/EvenMoreFish",
+                List.of("")); //many dependencies
     }
 
     @Override

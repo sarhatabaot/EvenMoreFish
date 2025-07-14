@@ -8,6 +8,9 @@ import com.oheers.fish.config.MainConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
@@ -38,25 +41,29 @@ public class IntegrationManager {
         }
 
         final Set<String> addons = getAddonFileNames();
-
         if (addons.isEmpty()) {
-            plugin.getLogger().warning(() -> "Could not find any addons.");
+            plugin.getLogger().warning("Could not find any addons.");
             return;
         }
 
-        for (String fileName: addons) {
-            File addonFile = new File(plugin.getDataFolder(), "addons/" + fileName);
+        final Path addonsDir = plugin.getDataFolder().toPath().resolve("addons");
+
+        for (String fileName : addons) {
             try {
-                plugin.saveResource("addons/" + fileName, true);
-                final File jarFile = new File(plugin.getDataFolder(), "addons/" + fileName.replace(".addon", ".jar"));
-                if (addonFile.renameTo(jarFile)) {
-                    plugin.debug(Level.INFO, "Converted addon file: " + fileName);
-                }
+                final String resourcePath = "addons/" + fileName;
+                plugin.saveResource(resourcePath, true);
+
+                final Path addonFile = addonsDir.resolve(fileName);
+                final Path jarFile = addonsDir.resolve(fileName.replace(".addon", ".jar"));
+
+                Files.move(addonFile, jarFile, StandardCopyOption.REPLACE_EXISTING);
+                plugin.debug(Level.INFO, "Converted addon file: " + fileName);
             } catch (IllegalArgumentException e) {
                 plugin.debug(Level.WARNING, "Default addon not found: " + fileName);
+            } catch (IOException e) {
+                plugin.debug(Level.WARNING, "Failed to rename addon file: " + fileName, e);
             }
         }
-
     }
 
     private Set<String> getAddonFileNames() {

@@ -214,5 +214,21 @@ public class FileUtil {
         }
     }
 
+    public static String findSimilarFilename(Set<String> filenames, String referenceFilename) {
+        int dashIndex = referenceFilename.indexOf('-');
+        int dotIndex = referenceFilename.lastIndexOf('.');
+
+        if (dashIndex == -1 || dotIndex == -1) return null;
+
+        String prefix = referenceFilename.substring(0, dashIndex + 1); // includes '-'
+        String suffix = referenceFilename.substring(dotIndex);         // includes '.addon'
+
+        return filenames.stream()
+                .filter(name -> !name.equals(referenceFilename))       // exclude self
+                .filter(name -> name.startsWith(prefix))
+                .filter(name -> name.endsWith(suffix))
+                .findFirst()
+                .orElse(null);
+    }
 
 }
