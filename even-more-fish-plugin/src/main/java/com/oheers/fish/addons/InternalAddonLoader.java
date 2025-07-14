@@ -18,6 +18,7 @@ import com.oheers.fish.addons.external.reward.McMMOXPRewardType;
 import com.oheers.fish.addons.external.reward.MoneyRewardType;
 import com.oheers.fish.addons.external.reward.PermissionRewardType;
 import com.oheers.fish.addons.external.reward.PlayerPointsRewardType;
+import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.plugin.DependencyManager;
 import com.oheers.fish.addons.internal.requirement.BiomeRequirementType;
 import com.oheers.fish.addons.internal.requirement.BiomeSetRequirementType;
@@ -37,10 +38,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class InternalAddonLoader extends AddonLoader {
-
+    public InternalAddonLoader(EMFPlugin plugin) {
+        super(plugin);
+    }
     @Override
     public AddonMetadata getAddonMetadata() {
-        return new AddonMetadata("Internal Addons", "1.0.0", "EvenMoreFish");
+        return new AddonMetadata("Internal Addons", "1.0.0", "EvenMoreFish", "Bundled internal addons");
     }
 
     @Override

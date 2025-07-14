@@ -2,6 +2,7 @@ plugins {
     id("com.oheers.evenmorefish.java-conventions")
 }
 
+version = "1.1.0"
 
 repositories {
     maven("https://repo.nexomc.com/releases/")
