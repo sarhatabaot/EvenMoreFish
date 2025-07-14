@@ -11,28 +11,16 @@ repositories {
 }
 
 tasks {
-
     if (project.name.contains("addons")) {
         jar {
-            val addonName = defaultAddonName(project.name, project.version.toString())
+            val addonName = defaultAddonName(project.name)
             archiveFileName.set(addonName)
-
-            // probably should extract this part into it's own plugin.
-            manifest {
-                val buildNumber: String? by project
-
-                attributes["name"] = project.name
-                attributes["version"] = project.version
-                attributes["description"] = project.description ?: ""
-                attributes["author"] = project.properties["author"] ?: "" //todo test for now like this
-            }
         }
-
     }
 }
 
-fun defaultAddonName(project: String, addonVersion: String): String {
+fun defaultAddonName(project: String): String {
     val jvmVersion = project.split("-")[4].uppercase()
-    return "EMF-Addons-${jvmVersion}-${addonVersion}.addon"
+    return "EMF-Addons-${jvmVersion}.addon"
 }
 
