@@ -38,15 +38,18 @@ public class AddonManager {
             plugin.getLogger().warning(() -> "No AddonLoader classes found in %s".formatted(jar.getName()));
             return;
         }
-        classes.forEach(this::loadAddonLoader);
+        for (Class<? extends AddonLoader> clazz: classes) {
+            loadAddonLoader(clazz, jar);
+        }
+
     }
 
-    private void loadAddonLoader(Class<? extends AddonLoader> clazz) {
+    private void loadAddonLoader(Class<? extends AddonLoader> clazz, File addonFile) {
         try {
-            AddonLoader loaderInstance = clazz.getDeclaredConstructor(EMFPlugin.class).newInstance(plugin);
+            AddonLoader loaderInstance = clazz.getDeclaredConstructor(EMFPlugin.class, File.class).newInstance(plugin, addonFile);
             loaderInstance.load();
             loadedAddons.add(loaderInstance);
-            plugin.getLogger().info(() -> "Successfully loaded addon: %s".formatted(clazz.getName()));
+            plugin.getLogger().info(() -> "Successfully loaded addon: %s v%s by %s".formatted(loaderInstance.getAddonMetadata().name(), loaderInstance.loadAddonMetadata().version(), loaderInstance.getAddonMetadata().authors()));
         } catch (Exception exception) {
             plugin.getLogger().log(Level.WARNING, "Could not load addon %s:%s".formatted(clazz.getName(), exception.getMessage()), exception);
         }

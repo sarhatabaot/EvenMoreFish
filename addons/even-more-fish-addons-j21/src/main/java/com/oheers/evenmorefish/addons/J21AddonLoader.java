@@ -5,10 +5,12 @@ import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.utils.system.JavaSpecVersion;
 import com.oheers.fish.api.utils.system.SystemUtils;
 
+import java.io.File;
+
 
 public class J21AddonLoader extends AddonLoader {
-    public J21AddonLoader(EMFPlugin plugin) {
-        super(plugin);
+    public J21AddonLoader(EMFPlugin plugin, File addonFile) {
+        super(plugin, addonFile);
     }
 
     @Override
@@ -23,5 +25,6 @@ public class J21AddonLoader extends AddonLoader {
         new NexoItemAddon().register();
         new OraxenItemAddon().register();
     }
+
 
 }

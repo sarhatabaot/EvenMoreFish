@@ -1,18 +1,18 @@
 package com.oheers.evenmorefish.addons;
 
 import com.oheers.fish.api.addons.AddonLoader;
-import com.oheers.fish.api.addons.AddonMetadata;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.utils.system.JavaSpecVersion;
 import com.oheers.fish.api.utils.system.SystemUtils;
 
+import java.io.File;
+
 
 public class J17AddonLoader extends AddonLoader {
 
-    public J17AddonLoader(EMFPlugin plugin) {
-        super(plugin);
+    public J17AddonLoader(EMFPlugin plugin, File addonFile) {
+        super(plugin, addonFile);
     }
-
 
 
     @Override
