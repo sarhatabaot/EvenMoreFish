@@ -107,7 +107,7 @@ alerts:
   - 7:00
   - 5:00
 
-# Configure the rewards for winning this competition.
+# Configure the reward for winning this competition.
 # All Reward Types are listed here: https://evenmorefish.github.io/EvenMoreFish/docs/configuration/reward-types
 rewards:
   # These are given to the first place winner.

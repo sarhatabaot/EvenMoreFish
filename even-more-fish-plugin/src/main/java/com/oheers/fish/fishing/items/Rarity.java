@@ -202,7 +202,7 @@ public class Rarity extends ConfigBase {
     }
 
     private Requirement loadRequirements() {
-        Section requirementSection = getConfig().getSection("requirements");
+        Section requirementSection = getConfig().getSection("requirement");
         Requirement requirement = new Requirement();
         if (requirementSection == null) {
             return requirement;
@@ -235,21 +235,21 @@ public class Rarity extends ConfigBase {
     }
 
     private void updateRequirementFormats(@NotNull Section section) {
-        Section ingameSection = section.getSection("requirements.ingame-time");
+        Section ingameSection = section.getSection("requirement.ingame-time");
         if (ingameSection != null) {
             int min = ingameSection.getInt("minTime");
             int max = ingameSection.getInt("maxTime");
             ingameSection.remove("minTime");
             ingameSection.remove("maxTime");
-            section.set("requirements.ingame-time", min + "-" + max);
+            section.set("requirement.ingame-time", min + "-" + max);
         }
-        Section irlSection = section.getSection("requirements.irl-time");
+        Section irlSection = section.getSection("requirement.irl-time");
         if (irlSection != null) {
             String min = irlSection.getString("minTime");
             String max = irlSection.getString("maxTime");
             irlSection.remove("minTime");
             irlSection.remove("maxTime");
-            section.set("requirements.irl-time", min + "-" + max);
+            section.set("requirement.irl-time", min + "-" + max);
         }
     }
 
