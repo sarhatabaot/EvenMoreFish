@@ -2,19 +2,21 @@ package com.oheers.fish.api.addons;
 
 import com.oheers.fish.api.plugin.EMFPlugin;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.io.File;
+import java.util.*;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.logging.Level;
 
 public abstract class AddonLoader {
-
+    private final File addonFile;
     private final EMFPlugin plugin;
     private AddonMetadata cachedMetadata;
 
-    protected AddonLoader(EMFPlugin plugin) {
+    protected AddonLoader(EMFPlugin plugin, File addonFile) {
         this.plugin = Objects.requireNonNull(plugin, "Plugin instance cannot be null");
+        this.addonFile = addonFile; //can be null (i.e. internal addon)
     }
 
 
@@ -25,7 +27,9 @@ public abstract class AddonLoader {
     public AddonMetadata getAddonMetadata() {
         if (cachedMetadata == null) {
             // First try to load from properties file
-            cachedMetadata = loadMetadataFromProperties();
+            if (addonFile != null) {
+                cachedMetadata = loadMetadataFromProperties(addonFile);
+            }
 
             // If not found, try the default implementation
             if (cachedMetadata == null) {
@@ -40,34 +44,58 @@ public abstract class AddonLoader {
         return cachedMetadata;
     }
 
+
     /**
      * Attempts to load metadata from META-INF/addon-loader.properties
      * @return The loaded metadata, or null if the file doesn't exist
      */
-    private AddonMetadata loadMetadataFromProperties() {
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF")) {
-            if (input == null) {
-                return null; // File doesn't exist
-            }
-
-            Properties props = new Properties();
-            props.load(input);
-
-            String name = props.getProperty("name");
-            String version = props.getProperty("version");
-            List<String> authors = List.of(props.getProperty("authors").split(","));
-            String website = props.getProperty("website");
-            String description = props.getProperty("description", "");
-            List<String> dependencies = List.of(props.getProperty("dependencies").split(","));
-
-            if (name == null || version == null || authors.isEmpty()) {
-                plugin.getLogger().warning("MANIFEST.MF is missing required fields (name, version, or author)");
+    private AddonMetadata loadMetadataFromProperties(File addonFile) {
+        try (JarFile jar = new JarFile(addonFile)) {
+            Manifest manifest = jar.getManifest();
+            if (manifest == null) {
+                plugin.getLogger().warning("No manifest found in addon: " + addonFile.getName());
                 return null;
             }
 
-            return new AddonMetadata(name, version, authors, description, website, dependencies);
+            Attributes attributes = manifest.getMainAttributes();
+
+            String name = attributes.getValue("name");
+            String version = attributes.getValue("version");
+            String authorsStr = attributes.getValue("authors");
+            String website = attributes.getValue("website");
+            String description = attributes.getValue("description");
+            String dependenciesStr = attributes.getValue("dependencies");
+
+            List<String> authors = authorsStr != null ?
+                    Arrays.stream(authorsStr.replaceAll("[\\[\\]]", "").split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .toList() :
+                    Collections.emptyList();
+
+            List<String> dependencies = dependenciesStr != null ?
+                    Arrays.stream(dependenciesStr.replaceAll("[\\[\\]]", "").split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .toList() :
+                    Collections.emptyList();
+
+            if (name == null || version == null || authors.isEmpty()) {
+                plugin.getLogger().warning("MANIFEST.MF is missing required fields (name, version, or authors)");
+                plugin.getLogger().warning(() -> "Name: %s, Version: %s, Authors: %s".formatted(name == null, version == null, authors.isEmpty()));
+                return null;
+            }
+
+            return new AddonMetadata(
+                    name,
+                    version,
+                    authors,
+                    description != null ? description : "",
+                    website,
+                    dependencies
+            );
         } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to load addon metadata from properties file", e);
+            plugin.getLogger().log(Level.WARNING, "Failed to load addon metadata from manifest file", e);
             return null;
         }
     }
@@ -92,7 +120,7 @@ public abstract class AddonLoader {
         try {
             validateMetadata();
             loadAddons();
-            plugin.debug("Loaded Addon %s %s by %s".formatted(getAddonMetadata().name(), getAddonMetadata().version(), getAddonMetadata().authors()));
+            plugin.getLogger().info("Loaded Addon %s %s by %s".formatted(getAddonMetadata().name(), getAddonMetadata().version(), getAddonMetadata().authors()));
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to load addon %s".formatted(getAddonMetadata().name()), e);
         }

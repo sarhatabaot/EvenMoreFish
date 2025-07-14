@@ -41,7 +41,7 @@ import java.util.List;
 
 public class InternalAddonLoader extends AddonLoader {
     public InternalAddonLoader(EMFPlugin plugin) {
-        super(plugin);
+        super(plugin, null);
     }
     @Override
     public AddonMetadata getAddonMetadata() {
