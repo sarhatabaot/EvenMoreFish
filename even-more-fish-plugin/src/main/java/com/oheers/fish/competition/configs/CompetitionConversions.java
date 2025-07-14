@@ -86,7 +86,7 @@ public class CompetitionConversions {
             }
         }
 
-        // Add "rewards" section if needed
+        // Add "reward" section if needed
         if (rewards != null && !config.contains("rewards")) {
             config.set("rewards", rewards);
         }

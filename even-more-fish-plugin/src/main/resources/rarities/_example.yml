@@ -33,7 +33,7 @@ permission: emf.rarity.example
 # Current supported values: CATCH, HUNT, BOTH
 catch-type: BOTH
 
-# You can set custom requirements for this rarity to appear, all possible requirements are on the wiki: https://evenmorefish.github.io/EvenMoreFish/docs/features/requirements
+# You can set custom requirement for this rarity to appear, all possible requirement are on the wiki: https://evenmorefish.github.io/EvenMoreFish/docs/features/requirements
 requirements:
   biome:
     - OCEAN
@@ -126,19 +126,19 @@ fish:
     # Should the catch message be hidden?
     silent: true
 
-    # A list of rewards to give when this fish is eaten.
+    # A list of reward to give when this fish is eaten.
     eat-event:
       - MONEY:50
 
-    # A list of rewards to give when a player right clicks with this fish.
+    # A list of reward to give when a player right clicks with this fish.
     interact-event:
       - ITEM:cobblestone,1
 
-    # A list of rewards to give when a player sells this fish.
+    # A list of reward to give when a player sells this fish.
     sell-event:
       - EXP:100
 
-    # A list of rewards to give when a player catches this fish.
+    # A list of reward to give when a player catches this fish.
     catch-event:
       - HEALTH:10
 
@@ -153,7 +153,7 @@ fish:
     # How likely is this fish to be chosen? Having a greater weight means the rarity is more likely to be chosen (the total weights don't have to add to 100)
     weight: 10
 
-    # You can set custom requirements for this fish to appear, all possible requirements are on the wiki: https://evenmorefish.github.io/EvenMoreFish/docs/features/requirements
+    # You can set custom requirement for this fish to appear, all possible requirement are on the wiki: https://evenmorefish.github.io/EvenMoreFish/docs/features/requirements
     requirements:
       biome:
         - COLD_OCEAN

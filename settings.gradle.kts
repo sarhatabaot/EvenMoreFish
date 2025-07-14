@@ -32,7 +32,7 @@ dependencyResolutionManagement {
             library("redprotect-spigot", "br.net.fabiozumbi12.RedProtect","RedProtect-Spigot-1.13").versionRef("redprotect")
             bundle("redprotect", listOf("redprotect-core", "redprotect-spigot"))
 
-            library("mcmmo", "com.gmail.nossr50.mcMMO:mcMMO:2.2.038")
+            library("mcmmo", "com.gmail.nossr50.mcMMO:mcMMO:2.2.040")
             library("aurelium-skills", "com.github.Archy-X:AureliumSkills:Beta1.2.8")
             library("aura-skills", "dev.aurelium:auraskills-api-bukkit:2.3.5")
             library("headdatabase-api", "com.arcaniax:HeadDatabase-API:1.3.2")
@@ -44,7 +44,7 @@ dependencyResolutionManagement {
             library("oraxen", "io.th0rgal:oraxen:1.190.0")
             library("nexo", "com.nexomc:nexo:1.8.0")
 
-            version("craftengine", "0.0.59")
+            version("craftengine", "0.0.60")
             library("craftengine-core", "net.momirealms", "craft-engine-core").versionRef("craftengine")
             library("craftengine-bukkit", "net.momirealms", "craft-engine-bukkit").versionRef("craftengine")
             bundle("craftengine", listOf("craftengine-core", "craftengine-bukkit"))
@@ -55,7 +55,7 @@ dependencyResolutionManagement {
             bundle("ecoitems", listOf("ecoitems-api", "ecoitems-libreforge", "ecoitems-eco"))
 
             library("commons-codec", "commons-codec:commons-codec:1.18.0")
-            library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.1")
+            library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.2")
             library("annotations", "org.jetbrains:annotations:26.0.2")
 
             version("flyway", "10.22.0")

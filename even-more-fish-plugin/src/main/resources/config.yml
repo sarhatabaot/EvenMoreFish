@@ -27,7 +27,7 @@ fishing:
   # Allows spawner fish to be ignored for hunting
   hunt-ignore-spawner-fish: true
 
-# Should competition player requirements respect vanished players?
+# Should competition player requirement respect vanished players?
 # Supports EssentialsX and CMI.
 respect-vanished: true
 

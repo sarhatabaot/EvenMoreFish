@@ -412,11 +412,11 @@ public class Competition {
                 continue;
             }
 
-            // Does the player's place have rewards?
+            // Does the player's place have reward?
             if (rewards.containsKey(rewardPlace)) {
                 rewards.get(rewardPlace).forEach(reward -> reward.rewardPlayer(player, null));
             } else {
-                // Default to participation rewards if not.
+                // Default to participation reward if not.
                 List<Reward> participation = rewards.get(-1);
                 if (participation != null) {
                     participation.forEach(reward -> reward.rewardPlayer(player, null));

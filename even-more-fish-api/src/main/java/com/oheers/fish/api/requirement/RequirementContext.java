@@ -4,6 +4,7 @@ import dev.dejvokep.boostedyaml.YamlDocument;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
@@ -74,6 +75,21 @@ public class RequirementContext {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    /**
+     * Attempts to get a location from this context.
+     * <p>
+     * If {@link #getLocation()} is null, it will try to get the player's location.
+     */
+    public @Nullable Location getHookOrPlayerLocation() {
+        if (location != null) {
+            return location;
+        }
+        if (player != null) {
+            return player.getLocation();
+        }
+        return null;
     }
 
 }
