@@ -4,7 +4,6 @@ import com.devskiller.friendly_id.FriendlyId;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.economy.Economy;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.model.user.UserReport;

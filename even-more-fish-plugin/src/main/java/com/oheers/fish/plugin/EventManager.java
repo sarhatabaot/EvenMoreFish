@@ -5,7 +5,6 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.SkullSaver;
 import com.oheers.fish.baits.BaitListener;
 import com.oheers.fish.competition.JoinChecker;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.events.FishEatEvent;
 import com.oheers.fish.events.FishInteractEvent;
