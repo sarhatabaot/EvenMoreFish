@@ -244,16 +244,13 @@ public class ItemFactory {
         if (rawValue == null) {
             return null;
         }
-        ItemStack item = null;
+
         try {
-            item = NBT.itemStackFromNBT(NBT.parseNBT(rawValue));
+            return NBT.itemStackFromNBT(NBT.parseNBT(rawValue));
         } catch (NbtApiException exception) {
             EvenMoreFish.getInstance().getLogger().severe(configuration.getRouteAsString() + " has invalid raw NBT: " + rawValue);
-        }
-        if (item == null) {
             return null;
         }
-        return item;
     }
 
 

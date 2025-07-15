@@ -5,7 +5,6 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.EMFFishEvent;
 import com.oheers.fish.api.EMFFishHuntEvent;
 import com.oheers.fish.competition.Competition;
-import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.data.FishRarityKey;
 import com.oheers.fish.database.data.UserFishRarityKey;
