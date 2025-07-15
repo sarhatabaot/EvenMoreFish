@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -221,14 +222,30 @@ public class FileUtil {
      */
     public static Set<String> getAddonFilenames(@NotNull Class<?> clazz, String jarPath) throws IOException {
         URL jarLocation = clazz.getProtectionDomain().getCodeSource().getLocation();
+        Optional<File> jarFile = fromURL(jarLocation);
+        if (jarFile.isEmpty()) {
+            return Collections.emptySet();
+        }
 
-        try (JarFile jarFile = new JarFile(jarLocation.getPath())) {
-            return jarFile.stream()
+        // Normalize the jarPath to use forward slashes and remove leading/trailing slashes
+        final String normalizedJarPath = jarPath.replace('\\', '/').replaceAll("^/+|/+$", "");
+
+        try (JarFile jar = new JarFile(jarLocation.getPath())) {
+            return jar.stream()
                     .map(JarEntry::getName)
-                    .filter(name -> name.startsWith(jarPath + "/"))
+                    .filter(name -> name.startsWith(normalizedJarPath + "/"))
                     .filter(name -> name.endsWith(".addon"))
                     .map(name -> name.substring(name.lastIndexOf('/') + 1))
                     .collect(Collectors.toSet());
+        }
+    }
+
+    private static Optional<File> fromURL(@NotNull URL jarLocation) {
+        try {
+            return Optional.of(new File(jarLocation.toURI()));
+        } catch (URISyntaxException e) {
+            EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Failed to convert JAR URL to file path",e);
+            return Optional.empty();
         }
     }
 }
