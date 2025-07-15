@@ -113,34 +113,52 @@ public class FileUtil {
                 return (loaded.asSubclass(clazz));
             }
         } catch (final NoClassDefFoundError ignored) {
+            //ignored
         }
         return null;
     }
 
     public static File loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin) {
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-        File configFile = new File(directory, fileName);
-        if (!configFile.exists()) {
-            try {
-                configFile.createNewFile();
-            } catch (IOException ex) {
-                plugin.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-            }
+        Objects.requireNonNull(directory, "directory cannot be null");
+        Objects.requireNonNull(fileName, "fileName cannot be null");
+        Objects.requireNonNull(resourceName, "resourceName cannot be null");
+        Objects.requireNonNull(plugin, "plugin cannot be null");
 
-            InputStream stream = plugin.getResource(resourceName);
-            if (stream == null) {
-                plugin.getLogger().severe(() -> "Could not retrieve " + resourceName);
+        if (!directory.exists() && !directory.mkdirs()) {
+            plugin.getLogger().severe(() -> "Could not create directory: " + directory);
+            return null; // for now, maybe Optional
+        }
+
+        File configFile = new File(directory, fileName);
+
+        // If file already exists, return it
+        if (configFile.exists()) {
+            return configFile;
+        }
+
+        try {
+            if (!configFile.createNewFile()) {
+                plugin.getLogger().severe(() -> "Could not create file: " + configFile);
                 return null;
             }
-            try {
-                Files.copy(stream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException ex) {
-                plugin.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-            }
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to create file: %s".formatted(configFile.getName()), ex);
+            return null;
         }
-        return configFile;
+
+
+        try (InputStream stream = plugin.getResource(resourceName)) {
+            if (stream == null) {
+                plugin.getLogger().severe(() -> "Resource not found: " + resourceName);
+                return null;
+            }
+
+            Files.copy(stream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return configFile;
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to copy resource %s to %s".formatted(resourceName, configFile), ex);
+            return null;
+        }
     }
 
     public static List<File> getFilesInDirectoryWithExtension(@NotNull File directory, @Nullable String extension, boolean ignoreUnderscoreFiles, boolean recursive) {
