@@ -224,18 +224,19 @@ public class FileUtil {
         URL jarLocation = clazz.getProtectionDomain().getCodeSource().getLocation();
         Optional<File> jarFile = fromURL(jarLocation);
         if (jarFile.isEmpty()) {
+            EMFPlugin.getInstance().debug("Empty Jar file");
             return Collections.emptySet();
         }
 
         // Normalize the jarPath to use forward slashes and remove leading/trailing slashes
         final String normalizedJarPath = jarPath.replace('\\', '/').replaceAll("^/+|/+$", "");
-
-        try (JarFile jar = new JarFile(jarLocation.getPath())) {
+        try (JarFile jar = new JarFile(jarFile.get())) {
             return jar.stream()
                     .map(JarEntry::getName)
                     .filter(name -> name.startsWith(normalizedJarPath + "/"))
                     .filter(name -> name.endsWith(".addon"))
                     .map(name -> name.substring(name.lastIndexOf('/') + 1))
+                    .peek(result -> EMFPlugin.getInstance().debug("Found matching addon: " + result))
                     .collect(Collectors.toSet());
         }
     }
