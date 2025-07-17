@@ -86,3 +86,90 @@ Percentage = 0.0463 × 100
 - The **Junk** item has a slightly higher chance than the **Epic** item but is still much less likely than the **Common** item.
 
 This system ensures that objects with higher weights are prioritized in the selection process.
+
+Sure! Here's a polished and properly integrated version of the **Baits** section, formatted to match the tone and structure of the rest of your document:
+
+---
+
+## Baits and Boosted Weights
+
+Baits modify the selection chances of specific items by boosting their weights. When a bait is applied, it multiplies the base weight of the affected items, effectively increasing their likelihood of being selected.
+
+---
+
+### How It Works
+
+1. **Each item has a base weight**, which defines its normal chance of being selected.
+2. **Baits can boost specific items** by increasing their effective weight.
+3. **The boost is applied** by multiplying the item's base weight by a `boostRate` if the item is in the list of `boosted` items.
+4. **Items not boosted** retain their original base weight.
+
+---
+
+### Effective Weight Calculation
+
+The effective weight of an item is determined using the following logic:
+
+```java
+private static <T> double getEffectiveWeight(
+        T element,
+        @NotNull ToDoubleFunction<T> weightFunction,
+        double boostRate,
+        Set<T> boosted
+) {
+    double baseWeight = weightFunction.applyAsDouble(element);
+    if (baseWeight <= 0.0) return 0.0;
+
+    return (boostRate != -1 && boosted.contains(element))
+            ? baseWeight * boostRate
+            : baseWeight;
+}
+```
+
+* If the item’s base weight is `0` or less, it will not be considered.
+* If the item is **in the `boosted` set** and `boostRate` is not `-1`, its weight is multiplied by the `boostRate`.
+* Otherwise, the base weight remains unchanged.
+
+---
+
+### Example
+
+Suppose you have the following bait configuration:
+
+* **Boost Rate**: `2.0`
+* **Boosted Items**: `{Epic}`
+
+And the base weights are:
+
+* **Common**: 100
+* **Epic**: 3
+* **Junk**: 5
+
+The **effective weights** would be:
+
+* **Common**: 100
+* **Epic**: 3 × 2.0 = 6
+* **Junk**: 5
+
+### Recalculated Total Weight
+
+```text
+Total Weight = 100 (Common) + 6 (Epic) + 5 (Junk)
+             = 111
+```
+
+### New Selection Chances
+
+* **Common**: 100 / 111 ≈ 90.09%
+* **Epic**: 6 / 111 ≈ 5.41%
+* **Junk**: 5 / 111 ≈ 4.50%
+
+---
+
+### Summary
+
+* Baits dynamically shift the probability distribution by increasing the weight of specific items.
+* This system allows targeted promotion of certain items without altering the base configuration.
+* It preserves the fairness and transparency of the weight system while offering additional control through boosting.
+
+---
