@@ -87,8 +87,6 @@ Percentage = 0.0463 × 100
 
 This system ensures that objects with higher weights are prioritized in the selection process.
 
-Sure! Here's a polished and properly integrated version of the **Baits** section, formatted to match the tone and structure of the rest of your document:
-
 ---
 
 ## Baits and Boosted Weights
