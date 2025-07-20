@@ -7,6 +7,7 @@ import dev.lone.itemsadder.api.CustomStack;
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemsAdderItemAddon extends ItemAddon {
 
@@ -27,17 +28,17 @@ public class ItemsAdderItemAddon extends ItemAddon {
 
     @Override
     public String getVersion() {
-        return "1.0.0";
+        return "1.0.1";
     }
 
     @Override
-    public ItemStack getItemStack(String id) {
+    public ItemStack getItemStack(@NotNull String id) {
         String[] splitMaterialValue = id.split(":");
         if (!verifyItemsFormat(splitMaterialValue)) {
             getLogger().severe(() -> String.format(
                 "Incorrect format for ItemsAdderItemAddon, use %s:namespace:id. Got %s",
                 getIdentifier(),
-                String.join(":", splitMaterialValue))
+                id)
             );
             return null;
         }
