@@ -67,7 +67,7 @@ dependencyResolutionManagement {
             library("hikaricp", "com.zaxxer:HikariCP:6.3.0")
             library("json-simple", "com.googlecode.json-simple:json-simple:1.1.1")
 
-            library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.6")
+            library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.7")
             library("playerpoints", "org.black_ixx:playerpoints:3.3.2")
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
