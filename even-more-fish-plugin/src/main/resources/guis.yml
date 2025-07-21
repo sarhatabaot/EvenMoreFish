@@ -52,72 +52,72 @@ general:
 main-menu:
   title: <dark_blue>EvenMoreFish
   layout:
-    - '126515621'
-    - 23     32
-    - 4 t s h 4
-    - 4  j b  4
-    - 23     32
-    - 1265x5621
+    - "126515621"
+    - "23     32"
+    - "4 t s h 4"
+    - "4  j b  4"
+    - "23     32"
+    - "1265x5621"
   # This should be the most used filler item.
   filler: black_stained_glass_pane
 
   fish-toggle:
     item:
       material: tropical_fish
-      displayname: <gold>»    Toggle Custom Fish
+      displayname: <gold>» Toggle Custom Fish
       lore:
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
         - <gray>Click this button to
         - <gray>toggle custom fish.
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
     character: t
     click-action: fish-toggle
 
   open-shop:
     item:
       material: gold_ingot
-      displayname: <gold>»    Open Fish Shop
+      displayname: <gold>» Open Fish Shop
       lore:
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
         - <gray>Sell the fish you catch to
         - <gray>earn a bit of extra money.
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
     character: s
     click-action: open-shop
 
   help-button:
     item:
       material: COMPASS
-      displayname: <gold>»    Command Help
+      displayname: <gold>» Command Help
       lore:
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
         - <gray>Shows a list of commands
         - <gray>that can be used to use
         - <gray>this plugin.
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
     character: h
     click-action: show-command-help
 
   open-baits:
     item:
       material: nautilus_shell
-      displayname: <gold>»    View Baits
+      displayname: "<gold>» View Baits"
       lore:
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
         - <gray>Shows all loaded baits
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
     character: b
     click-action: open-baits-menu
 
   open-journal:
     item:
       material: writable_book
-      displayname: "<gold>»    Fish Journal"
+      displayname: "<gold>» Fish Journal"
       lore:
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
         - <gray>Keep track of all the
         - <gray>fish you have caught.
-        - '<strikethrough><white>                                 '
+        - <white>----------------------------------
     character: j
     click-action: open-journal-menu
 
@@ -134,10 +134,10 @@ main-menu:
 sell-menu-normal:
   title: <bold><dark_blue>Sell Fish
   layout:
-    - iiiiiiiii
-    - iiiiiiiii
-    - iiiiiiiii
-    - '   s a   '
+    - "iiiiiiiii"
+    - "iiiiiiiii"
+    - "iiiiiiiii"
+    - "   s a   "
   filler: gray_stained_glass_pane
   # The character to use for the slots where players can place fish.
   deposit-character: i
@@ -148,9 +148,6 @@ sell-menu-normal:
       displayname: <bold><gold>SELL
       lore:
         - <dark_gray>Fish Shop
-        - ''
-        # If you are using Vault, you need to set the color of {sell-price} in config.yml's sell-price-format
-        - <gray>Total Value » </gray>{sell-price}
         - ''
         - <gray>Sell your fish here to make
         - <gray>some extra money.
@@ -169,9 +166,6 @@ sell-menu-normal:
       lore:
         - <dark_gray>Inventory
         - ''
-        # If you are using Vault, you need to set the color of {sell-all-price} in config.yml's sell-price-format
-        - <gray>Total Value » </gray><yellow>{sell-all-price}
-        - ''
         - <gray>Click this button to sell
         - <gray>the fish in your inventory to
         - <gray>make some extra money.
@@ -183,10 +177,10 @@ sell-menu-normal:
 sell-menu-confirm:
   title: <bold><green>Confirm
   layout:
-    - iiiiiiiii
-    - iiiiiiiii
-    - iiiiiiiii
-    - '   s a   '
+    - "iiiiiiiii"
+    - "iiiiiiiii"
+    - "iiiiiiiii"
+    - "   s a   "
   filler: lime_stained_glass_pane
   # The character to use for the slots where players can place fish.
   deposit-character: i
@@ -197,8 +191,6 @@ sell-menu-confirm:
       displayname: <bold><gold>CONFIRM SELL
       lore:
         - <dark_gray>Fish Shop
-        - ''
-        - <gray>Total Value » </gray><yellow>{sell-price}
         - ''
         - <gray>Sell your fish here to make
         - <gray>some extra money.
@@ -217,8 +209,6 @@ sell-menu-confirm:
       lore:
         - <dark_gray>Inventory
         - ''
-        - <gray>Total Value » </gray><yellow>{sell-all-price}
-        - ''
         - <gray>Click this button to sell
         - <gray>the fish in your inventory to
         - <gray>make some extra money.
@@ -230,11 +220,11 @@ sell-menu-confirm:
 baits-menu:
   title: <dark_blue>View Loaded Baits
   layout:
-    - '  23232  '
-    - 23 4 4 32
-    - 4 bbbbb 4
-    - 23 4 4 32
-    - p 23x32 n
+    - "  23232  "
+    - "23 4 4 32"
+    - "4 bbbbb 4"
+    - "23 4 4 32"
+    - "p 23x32 n"
   filler: black_stained_glass_pane
   # The character to use for the bait items.
   bait-character: b
@@ -270,10 +260,10 @@ baits-menu:
 apply-baits-menu:
   title: <bold><dark_blue>Apply Baits
   layout:
-    - bbbbbbbbb
-    - bbbbbbbbb
-    - bbbbbbbbb
-    - '    x   '
+    - "bbbbbbbbb"
+    - "bbbbbbbbb"
+    - "bbbbbbbbb"
+    - "    x    "
   filler: gray_stained_glass_pane
   # The character to use for the bait slots.
   bait-character: b
@@ -294,12 +284,12 @@ apply-baits-menu:
 journal-menu:
   title: <dark_blue>Fish Journal
   layout:
-    - ' 2323232 '
-    - '3rrrrrrr3'
-    - '2rrrrrrr2'
-    - '3rrrrrrr3'
-    - '2rrrrrrr2'
-    - 'p323x323n'
+    - " 2323232 "
+    - "3rrrrrrr3"
+    - "2rrrrrrr2"
+    - "3rrrrrrr3"
+    - "2rrrrrrr2"
+    - "p323x323n"
   filler: gray_stained_glass_pane
   # The character to use for rarity items
   rarity-character: r
@@ -324,7 +314,7 @@ journal-menu:
       displayname: '{rarity}'
       lore:
         - ''
-        - '<aqua>→ Click to view caught fish'
+        - <aqua>→ Click to view caught fish
 
   exit:
     item:
@@ -340,12 +330,12 @@ journal-menu:
 journal-rarity:
   title: <dark_blue>Fish Journal
   layout:
-    - '    a    '
-    - ' fffffff '
-    - ' fffffff '
-    - ' fffffff '
-    - ' fffffff '
-    - 'p   x   n'
+    - "    a    "
+    - " fffffff "
+    - " fffffff "
+    - " fffffff "
+    - " fffffff "
+    - "p   x   n"
   filler: gray_stained_glass_pane
   # The character to use for fish items
   fish-character: f

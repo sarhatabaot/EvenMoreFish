@@ -39,7 +39,7 @@ dependencyResolutionManagement {
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.18.4")
 
             library("itemsadder-api", "com.github.LoneDev6:API-ItemsAdder:3.6.1")
-            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.1")
+            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT")
             library("denizen-api", "com.denizenscript:denizen:1.3.1-SNAPSHOT")
             library("oraxen", "io.th0rgal:oraxen:1.190.0")
             library("nexo", "com.nexomc:nexo:1.8.0")
@@ -72,7 +72,7 @@ dependencyResolutionManagement {
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
-            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.1")
+            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.2")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
             plugin("shadow", "com.gradleup.shadow").version("9.0.0-rc1")
