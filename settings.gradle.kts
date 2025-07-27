@@ -39,10 +39,10 @@ dependencyResolutionManagement {
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.18.4")
 
             library("itemsadder-api", "com.github.LoneDev6:API-ItemsAdder:3.6.1")
-            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.1")
+            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT")
             library("denizen-api", "com.denizenscript:denizen:1.3.1-SNAPSHOT")
-            library("oraxen", "io.th0rgal:oraxen:1.190.0")
-            library("nexo", "com.nexomc:nexo:1.8.0")
+            library("oraxen", "io.th0rgal:oraxen:1.191.0")
+            library("nexo", "com.nexomc:nexo:1.9.0")
 
             version("craftengine", "0.0.60")
             library("craftengine-core", "net.momirealms", "craft-engine-core").versionRef("craftengine")
@@ -54,7 +54,7 @@ dependencyResolutionManagement {
             library("ecoitems-eco", "com.willfp:eco:6.56.0")
             bundle("ecoitems", listOf("ecoitems-api", "ecoitems-libreforge", "ecoitems-eco"))
 
-            library("commons-codec", "commons-codec:commons-codec:1.18.0")
+            library("commons-codec", "commons-codec:commons-codec:1.19.0")
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.2")
             library("annotations", "org.jetbrains:annotations:26.0.2")
 
@@ -64,18 +64,18 @@ dependencyResolutionManagement {
             bundle("flyway", listOf("flyway-core", "flyway-mysql"))
 
             library("friendlyid", "com.devskiller.friendly-id:friendly-id:1.1.0")
-            library("hikaricp", "com.zaxxer:HikariCP:6.3.0")
+            library("hikaricp", "com.zaxxer:HikariCP:6.3.2")
             library("json-simple", "com.googlecode.json-simple:json-simple:1.1.1")
 
-            library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.6")
+            library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.7")
             library("playerpoints", "org.black_ixx:playerpoints:3.3.2")
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
-            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.1")
+            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.2")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
-            plugin("shadow", "com.gradleup.shadow").version("9.0.0-rc1")
+            plugin("shadow", "com.gradleup.shadow").version("9.0.0-rc2")
             plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.7.1")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
@@ -95,7 +95,7 @@ dependencyResolutionManagement {
             bundle("connectors", listOf("connectors-mysql", "connectors-sqlite"))
             library("maven-artifact", "org.apache.maven:maven-artifact:4.0.0-rc-4")
 
-            version("junit", "5.13.3")
+            version("junit", "5.13.4")
             library("junit-jupiter-api", "org.junit.jupiter","junit-jupiter-api").versionRef("junit")
             library("junit-jupiter-engine","org.junit.jupiter","junit-jupiter-engine").versionRef("junit")
 
