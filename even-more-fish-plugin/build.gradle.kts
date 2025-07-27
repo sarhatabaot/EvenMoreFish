@@ -32,10 +32,15 @@ java {
 
 repositories {
     mavenCentral()
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // Adventure Snapshots
+    maven("https://jitpack.io")
+    maven("https://repo.codemc.io/repository/maven-public/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://github.com/deanveloper/SkullCreator/raw/mvn-repo/")
-    maven("https://jitpack.io")
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
@@ -48,7 +53,12 @@ repositories {
     maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://repo.minebench.de/")
     maven("https://repo.codemc.io/repository/FireML/")
-    maven("https://repo.aikar.co/content/groups/aikar/")
+    maven("https://repo.dmulloy2.net/repository/public/") {
+        name = "ProtocolLib Repo - Required by mcMMO"
+        mavenContent {
+            releasesOnly()
+        }
+    }
 }
 
 dependencies {
@@ -334,6 +344,7 @@ tasks {
         relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
         relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
         relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
+        relocate("org.jooq", "com.oheers.fish.libs.jooq")
     }
 
     compileJava {
