@@ -114,14 +114,14 @@ dependencies {
     implementation(libs.jooq.codegen)
     implementation(libs.jooq.meta)
     implementation(libs.bundles.connectors)
+    implementation(libs.hikaricp)
 
     library(libs.bundles.flyway) {
         exclude("org.xerial", "sqlite-jdbc")
         exclude("com.mysql", "mysql-connector-j")
     }
+
     library(libs.friendlyid)
-    library(libs.hikaricp)
-    library(libs.commons.codec)
     library(libs.json.simple)
     library(libs.maven.artifact)
     library(libs.annotations)
@@ -345,6 +345,7 @@ tasks {
         relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
         relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
         relocate("org.jooq", "com.oheers.fish.libs.jooq")
+        relocate("com.zaxxer", "com.oheers.fish.libs.hikaricp")
     }
 
     compileJava {
