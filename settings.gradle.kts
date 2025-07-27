@@ -54,7 +54,6 @@ dependencyResolutionManagement {
             library("ecoitems-eco", "com.willfp:eco:6.56.0")
             bundle("ecoitems", listOf("ecoitems-api", "ecoitems-libreforge", "ecoitems-eco"))
 
-            library("commons-codec", "commons-codec:commons-codec:1.19.0")
             library("caffeine", "com.github.ben-manes.caffeine:caffeine:3.2.2")
             library("annotations", "org.jetbrains:annotations:26.0.2")
 

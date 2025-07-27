@@ -25,6 +25,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
 
+/*
+Handles DB related logic.
+ */
 public class EMFFishListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
