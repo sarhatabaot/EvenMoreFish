@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 public class FishManager {
 
@@ -151,24 +152,26 @@ public class FishManager {
             return new ArrayList<>(totalRarities);
         }
 
-        List<Rarity> allowedRarities = new ArrayList<>();
-        String region = FishUtils.getRegionName(fisher.getLocation());
-        RequirementContext context = new RequirementContext(fisher.getWorld(), fisher.getLocation(), fisher, null, null);
+        Location location = fisher.getLocation();
+        RequirementContext context = new RequirementContext(
+                fisher.getWorld(),
+                location,
+                fisher,
+                null,
+                null
+        );
 
-        for (Rarity rarity : rarityMap.values()) {
-            if (shouldSkipRarity(rarity, boostRate, boostedRarities, fisher)) {
-                continue;
-            }
+        String region = FishUtils.getRegionName(location);
+        MainConfig config = MainConfig.getInstance();
 
-            if (!rarity.getRequirement().meetsRequirements(context)) {
-                continue;
-            }
-
-            double regionBoost = MainConfig.getInstance().getRegionBoost(region, rarity.getId());
-            addRarityMultipleTimes(allowedRarities, rarity, regionBoost);
-        }
-
-        return allowedRarities;
+        return rarityMap.values().stream()
+                .filter(rarity -> !shouldSkipRarity(rarity, boostRate, boostedRarities, fisher))
+                .filter(rarity -> rarity.getRequirement().meetsRequirements(context))
+                .flatMap(rarity -> {
+                    double regionBoost = config.getRegionBoost(region, rarity.getId());
+                    return Collections.nCopies((int) Math.max(1, regionBoost), rarity).stream();
+                })
+                .toList();
     }
 
     private boolean shouldSkipRarity(
@@ -181,13 +184,6 @@ public class FishManager {
         boolean lacksPermission = rarity.getPermission() != null && !fisher.hasPermission(rarity.getPermission());
         return isBoostFiltered || lacksPermission;
     }
-
-    private void addRarityMultipleTimes(List<Rarity> list, Rarity rarity, double times) {
-        for (int i = 0; i < times; i++) {
-            list.add(rarity);
-        }
-    }
-
 
 
     public Fish getRandomWeightedFish(@NotNull List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
@@ -205,55 +201,89 @@ public class FishManager {
     }
 
 
-    public Fish getFish(Rarity r, Location l, Player p, double boostRate, List<Fish> boostedFish, boolean doRequirementChecks, @Nullable Processor<?> processor, @Nullable CustomRod customRod) {
-        if (r == null) return null;
+    public Fish getFish(Rarity rarity, Location location, Player player, double boostRate, List<Fish> boostedFish, boolean doRequirementChecks, @Nullable Processor<?> processor, @Nullable CustomRod customRod) {
+        if (rarity == null) {
+            //possibly refactor to make rarity never null
+            return null;
+        }
         // will store all the fish that match the player's biome or don't discriminate biomes
 
         // Protection against /emf admin reload causing the plugin to be unable to get the rarity
-        if (r.getOriginalFishList().isEmpty()) {
-            r = getRandomWeightedRarity(p, 1, Collections.emptySet(), Set.copyOf(rarityMap.values()), customRod);
+        if (rarity.getOriginalFishList().isEmpty()) {
+            rarity = getRandomWeightedRarity(player, 1, Collections.emptySet(), Set.copyOf(rarityMap.values()), customRod);
         }
 
-        List<Fish> customRodFish = customRod == null ? List.of() : customRod.getAllowedFish();
-
-        World world = l == null ? null : l.getWorld();
-        RequirementContext context = new RequirementContext(world, l, p, null, null);
-
-        List<Fish> available = r.getFishList().stream()
-                .filter(fish -> {
-                    if (!customRodFish.isEmpty() && !customRodFish.contains(fish)) {
-                        return false;
-                    }
-                    if (!(boostRate != -1 || boostedFish == null || boostedFish.contains(fish))) {
-                        return false;
-                    }
-                    if (processor != null && !processor.canUseFish(fish)) {
-                        return false;
-                    }
-                    if (doRequirementChecks) {
-                        Requirement requirement = fish.getRequirement();
-                        return requirement.meetsRequirements(context);
-                    }
-                    return true;
-                })
+        final List<Fish> customRodFish = customRod != null ? customRod.getAllowedFish() : Collections.emptyList();
+        final World world = location == null ? null : location.getWorld();
+        final RequirementContext context = new RequirementContext(world, location, player, null, null);
+        final List<Fish> available = rarity.getFishList().stream()
+                .filter(fish -> isFishAllowedByCustomRod(fish, customRodFish))
+                .filter(fish -> isFishBoosted(fish, boostRate, boostedFish))
+                .filter(fish -> isFishAllowedByProcessor(fish, processor))
+                .filter(fish -> meetsRequirements(fish, doRequirementChecks, context))
                 .toList();
 
         // if the config doesn't define any fish that can be fished in this biome.
         if (available.isEmpty()) {
-            EvenMoreFish.getInstance().getLogger().warning("There are no fish of the rarity " + r.getId() + " that can be fished at (x=" + l.getX() + ", y=" + l.getY() + ", z=" + l.getZ() + ")");
+            String biomeName = world != null ? world.getBiome(location).name() : "unknown biome";
+            final Rarity finalRarity = rarity;
+            EvenMoreFish.getInstance().getLogger().warning(() -> "No fish of rarity %s available at (x=%.1f, y=%.1f, z=%.1f) in biome %s. Custom rod restrictions: %b".formatted(
+                    finalRarity.getId(),
+                    location.getX(),
+                    location.getY(),
+                    location.getZ(),
+                    biomeName,
+                    !customRodFish.isEmpty()));
             return null;
         }
-
-        Fish returningFish;
 
         // checks whether weight calculations need doing for fish
-        returningFish = getRandomWeightedFish(available, boostRate, boostedFish);
+        final Fish returningFish = getRandomWeightedFish(available, boostRate, boostedFish);
 
-        if (Competition.isActive() || !MainConfig.getInstance().isFishCatchOnlyInCompetition() || (EvenMoreFish.getInstance().isRaritiesCompCheckExempt() && returningFish.isCompExemptFish())) {
-            return returningFish;
-        } else {
-            return null;
+        return isFishAllowedOutsideCompetition(returningFish) ? returningFish : null;
+    }
+
+    private boolean isFishAllowedOutsideCompetition(Fish fish) {
+        return Competition.isActive()
+                || !MainConfig.getInstance().isFishCatchOnlyInCompetition()
+                || (EvenMoreFish.getInstance().isRaritiesCompCheckExempt() && fish.isCompExemptFish());
+    }
+
+    private boolean isFishAllowedByCustomRod(Fish fish, @NotNull List<Fish> customRodFish) {
+        // If no custom rod restrictions, all fish are allowed
+        if (customRodFish.isEmpty()) {
+            return true;
         }
+        // Fish must be in the custom rod's allowed list
+        return customRodFish.contains(fish);
+    }
+
+    private boolean isFishBoosted(Fish fish, double boostRate, List<Fish> boostedFish) {
+        // If boostRate is -1 (disabled) or no boosted fish list, all fish are allowed
+        if (boostRate == -1 || boostedFish == null) {
+            return true;
+        }
+        // Fish must be in the boosted list
+        return boostedFish.contains(fish);
+    }
+
+    private boolean isFishAllowedByProcessor(Fish fish, @Nullable Processor<?> processor) {
+        // If no processor restriction, all fish are allowed
+        if (processor == null) {
+            return true;
+        }
+        // Fish must be allowed by the processor
+        return processor.canUseFish(fish);
+    }
+
+    private boolean meetsRequirements(Fish fish, boolean doRequirementChecks, RequirementContext context) {
+        // Skip requirement checks if disabled
+        if (!doRequirementChecks) {
+            return true;
+        }
+        // Check fish requirements against the context
+        Requirement requirement = fish.getRequirement();
+        return requirement.meetsRequirements(context);
     }
 
     public TreeMap<String, Rarity> getRarityMap() {
