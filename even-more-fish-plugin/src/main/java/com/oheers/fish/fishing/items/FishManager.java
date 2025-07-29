@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -96,50 +97,74 @@ public class FishManager {
         return rarity.getFish(fishName);
     }
 
-    public Rarity getRandomWeightedRarity(Player fisher, double boostRate, @NotNull Set<Rarity> boostedRarities, Set<Rarity> totalRarities, @Nullable CustomRod customRod) {
-        if (fisher != null) {
-            Map<UUID, Rarity> decidedRarities = EvenMoreFish.getInstance().getDecidedRarities();
-            if (decidedRarities.containsKey(fisher.getUniqueId())) {
-                return decidedRarities.remove(fisher.getUniqueId());
-            }
+    private Rarity getPreDecidedRarity(Player player) {
+        if (player == null) return null;
+
+        Map<UUID, Rarity> decidedRarities = EvenMoreFish.getInstance().getDecidedRarities();
+        return decidedRarities.remove(player.getUniqueId());
+    }
+
+    private boolean isRarityAllowedInCompetition(Rarity rarity) {
+        boolean isCompetitionActive = Competition.isActive();
+        boolean isCompExempt = EvenMoreFish.getInstance().isRaritiesCompCheckExempt();
+        boolean hasExemptFish = rarity.hasCompExemptFish();
+
+        // Case 1: Competition is inactive & rarity has exempt fish
+        if (!isCompetitionActive && isCompExempt) {
+            return hasExemptFish;
         }
 
-        List<Rarity> allowedRarities = getAllowedRarities(fisher, boostRate, boostedRarities, totalRarities);
+        // Case 2: Always allowed if competition is active OR config allows non-competition catches
+        return isCompetitionActive || !MainConfig.getInstance().isFishCatchOnlyInCompetition();
+    }
 
-        // Remove all rarities that are not allowed by the custom rod.
-        if (customRod != null) {
-            allowedRarities.retainAll(customRod.getAllowedRarities());
-        }
-
-        if (allowedRarities.isEmpty()) {
-            String fisherName = fisher == null ? "N/A" : fisher.getName();
-            EvenMoreFish.getInstance().getLogger().severe("There are no rarities for the user " + fisherName + " to fish. They have received no fish.");
-            return null;
-        }
-
-        Rarity selected = WeightedRandom.pick(
+    private Rarity selectRandomRarity(List<Rarity> allowedRarities, double boostRate,
+                                      Set<Rarity> boostedRarities) {
+        return WeightedRandom.pick(
                 allowedRarities,
                 Rarity::getWeight,
                 boostRate,
                 boostedRarities,
                 EvenMoreFish.getInstance().getRandom()
         );
+    }
 
-        if (selected == null) {
+    public Rarity getRandomWeightedRarity(Player fisher, double boostRate,
+                                          @NotNull Set<Rarity> boostedRarities,
+                                          Set<Rarity> totalRarities,
+                                          @Nullable CustomRod customRod) {
+        // 1. Check pre-decided rarity
+        Rarity preDecided = getPreDecidedRarity(fisher);
+        if (preDecided != null) return preDecided;
+
+        // 2. Get allowed rarities (with your original logic)
+        List<Rarity> allowedRarities = getAllowedRarities(fisher, boostRate, boostedRarities, totalRarities);
+
+        // 3. Apply custom rod filter (new requirement)
+        allowedRarities = filterByCustomRod(allowedRarities, customRod);
+
+        // 4. Fail fast if no rarities left
+        if (allowedRarities.isEmpty()) {
+            String fisherName = fisher == null ? "N/A" : fisher.getName();
+            EvenMoreFish.getInstance().getLogger().severe(
+                    "No rarities available for " + fisherName + ". They received no fish."
+            );
             return null;
         }
 
-        if (!Competition.isActive() && EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) {
-            if (selected.hasCompExemptFish()) {
-                return selected;
-            }
-        }
+        // 5. Pick a random rarity (weighted)
+        Rarity selected = selectRandomRarity(allowedRarities, boostRate, boostedRarities);
+        if (selected == null) return null;
 
-        if (Competition.isActive() || !MainConfig.getInstance().isFishCatchOnlyInCompetition()) {
-            return selected;
-        }
-        return null;
+        // 6. Apply competition rules
+        return isRarityAllowedInCompetition(selected) ? selected : null;
+    }
 
+    private List<Rarity> filterByCustomRod(List<Rarity> rarities, @Nullable CustomRod customRod) {
+        if (customRod == null) return rarities;
+        return rarities.stream()
+                .filter(rarity -> customRod.getAllowedRarities().contains(rarity))
+                .toList();
     }
 
     private @NotNull List<Rarity> getAllowedRarities(
@@ -152,16 +177,15 @@ public class FishManager {
             return new ArrayList<>(totalRarities);
         }
 
-        Location location = fisher.getLocation();
         RequirementContext context = new RequirementContext(
                 fisher.getWorld(),
-                location,
+                fisher.getLocation(),
                 fisher,
                 null,
                 null
         );
 
-        String region = FishUtils.getRegionName(location);
+        String region = FishUtils.getRegionName(fisher.getLocation());
         MainConfig config = MainConfig.getInstance();
 
         return rarityMap.values().stream()
@@ -293,11 +317,11 @@ public class FishManager {
     // Loading things
 
     private void logLoadedItems() {
-        int allFish = 0;
-        for (Rarity rarity : rarityMap.values()) {
-            allFish += rarity.getOriginalFishList().size();
-        }
-        EvenMoreFish.getInstance().getLogger().info("Loaded FishManager with " + rarityMap.size() + " Rarities and " + allFish + " Fish.");
+        int totalFish = rarityMap.values().stream()
+                .mapToInt(rarity -> rarity.getOriginalFishList().size())
+                .sum();
+
+        EvenMoreFish.getInstance().getLogger().info(() -> "Loaded FishManager with %d Rarities and %d Fish.".formatted(rarityMap.size(), totalFish));
     }
 
     private void loadRarities() {
@@ -340,16 +364,76 @@ public class FishManager {
 
     private void regenExampleFile(@NotNull File targetDirectory) {
         new File(targetDirectory, "_example.yml").delete();
-        FileUtil.loadFileOrResource(targetDirectory, "_example.yml", "rarities/_example.yml", EvenMoreFish.getInstance());
+        regenExampleFiles(targetDirectory);
     }
 
+
     private void loadDefaultFiles(@NotNull File targetDirectory) {
-        EvenMoreFish.getInstance().getLogger().info("Loading default rarity configs.");
-        FileUtil.loadFileOrResource(targetDirectory, "common.yml", "rarities/common.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "junk.yml", "rarities/junk.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "rare.yml", "rarities/rare.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "epic.yml", "rarities/epic.yml", EvenMoreFish.getInstance());
-        FileUtil.loadFileOrResource(targetDirectory, "legendary.yml", "rarities/legendary.yml", EvenMoreFish.getInstance());
+        EvenMoreFish.getInstance().getLogger().info("Loading default rarity configs from jar");
+
+        loadFilesFromJarDirectory(
+                "rarities",
+                targetDirectory,
+                file -> !file.startsWith("_") && file.endsWith(".yml")
+        );
+    }
+
+    private void regenExampleFiles(@NotNull File targetDirectory) {
+        loadFilesFromJarDirectory(
+                "rarities",
+                targetDirectory,
+                file -> file.startsWith("_") && file.endsWith(".yml")
+        );
+    }
+
+    /**
+     * Generic method to load files from a jar directory with filtering
+     *
+     * @param jarDirectory The directory in the jar (e.g., "rarities")
+     * @param targetDirectory Where to copy the files
+     * @param filter Predicate to determine which files to include
+     */
+    private void loadFilesFromJarDirectory(
+            @NotNull String jarDirectory,
+            @NotNull File targetDirectory,
+            @NotNull Predicate<String> filter
+    ) {
+        getFilesFromJarDirectory(jarDirectory).stream()
+                .filter(filter)
+                .forEach(file -> {
+                    String fileName = file.substring(file.lastIndexOf('/') + 1);
+                    FileUtil.loadFileOrResource(
+                            targetDirectory,
+                            fileName,
+                            file,
+                            EvenMoreFish.getInstance()
+                    );
+                });
+    }
+
+    /**
+     * Gets all files from a specific directory in the jar
+     *
+     * @param jarDirectory The directory to scan (e.g., "rarities")
+     * @return List of file paths in format "directory/file.ext"
+     */
+    private List<String> getFilesFromJarDirectory(@NotNull String jarDirectory) {
+        try (InputStream in = EvenMoreFish.getInstance().getResource(jarDirectory);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            return reader.lines()
+                    .map(line -> jarDirectory + "/" + line)
+                    .toList();
+        } catch (IOException e) {
+            EvenMoreFish.getInstance().getLogger().warning(
+                    "Failed to read files from jar directory '" + jarDirectory + "': " + e.getMessage()
+            );
+            return Collections.emptyList();
+        } catch (NullPointerException e) {
+            EvenMoreFish.getInstance().getLogger().warning(
+                    "Directory '" + jarDirectory + "' not found in jar"
+            );
+            return Collections.emptyList();
+        }
     }
 
 }
