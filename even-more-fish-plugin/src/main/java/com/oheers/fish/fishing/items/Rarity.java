@@ -202,7 +202,7 @@ public class Rarity extends ConfigBase {
     }
 
     private Requirement loadRequirements() {
-        Section requirementSection = getConfig().getSection("requirement");
+        Section requirementSection = getConfig().getSection("requirements");
         Requirement requirement = new Requirement();
         if (requirementSection == null) {
             return requirement;

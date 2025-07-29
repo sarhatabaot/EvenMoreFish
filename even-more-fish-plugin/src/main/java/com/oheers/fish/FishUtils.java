@@ -421,9 +421,8 @@ public class FishUtils {
     }
 
     public static @Nullable Biome getBiome(@NotNull String keyString) {
-        keyString = keyString.toLowerCase();
         // Get the key and check if null
-        NamespacedKey key = NamespacedKey.fromString(keyString);
+        NamespacedKey key = NamespacedKey.fromString(keyString.toLowerCase());
         if (key == null) {
             EvenMoreFish.getInstance().getLogger().severe(keyString + " is not a valid biome.");
             return null;
