@@ -3,6 +3,7 @@ package com.oheers.fish.fishing.items;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.reward.Reward;
+import com.oheers.fish.config.ConfigUtils;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.CatchType;
 import com.oheers.fish.items.ItemFactory;
@@ -129,7 +130,7 @@ public class Fish {
     }
 
     private void handleRequirements() {
-        Section requirementSection = section.getSection("requirement");
+        Section requirementSection = ConfigUtils.getSectionOfMany(section, "requirements", "requirement");
         requirement = new Requirement();
         if (requirementSection == null) {
             return;

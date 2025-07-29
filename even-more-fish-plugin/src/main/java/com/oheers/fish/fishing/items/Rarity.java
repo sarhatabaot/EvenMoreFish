@@ -4,6 +4,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.config.ConfigBase;
+import com.oheers.fish.config.ConfigUtils;
 import com.oheers.fish.exceptions.InvalidFishException;
 import com.oheers.fish.fishing.CatchType;
 import com.oheers.fish.fishing.items.config.RarityFileUpdates;
@@ -202,7 +203,7 @@ public class Rarity extends ConfigBase {
     }
 
     private Requirement loadRequirements() {
-        Section requirementSection = getConfig().getSection("requirements");
+        Section requirementSection = ConfigUtils.getSectionOfMany(getConfig(), "requirements", "requirement");
         Requirement requirement = new Requirement();
         if (requirementSection == null) {
             return requirement;

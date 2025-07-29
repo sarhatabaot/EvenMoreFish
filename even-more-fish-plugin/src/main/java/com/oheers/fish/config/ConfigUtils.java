@@ -2,6 +2,7 @@ package com.oheers.fish.config;
 
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ConfigUtils {
 
@@ -11,6 +12,16 @@ public class ConfigUtils {
             subSection = section.createSection(path);
         }
         return subSection;
+    }
+
+    public static @Nullable Section getSectionOfMany(@NotNull Section section, @NotNull String... paths) {
+        for (String path : paths) {
+            Section sub = section.getSection(path);
+            if (sub != null) {
+                return sub;
+            }
+        }
+        return null;
     }
 
 }
