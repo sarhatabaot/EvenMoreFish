@@ -14,6 +14,10 @@ public class ConfigUtils {
         return subSection;
     }
 
+    /**
+     * Gets the first section of many paths.
+     * Useful for typos... Oops
+     */
     public static @Nullable Section getSectionOfMany(@NotNull Section section, @NotNull String... paths) {
         for (String path : paths) {
             Section sub = section.getSection(path);
