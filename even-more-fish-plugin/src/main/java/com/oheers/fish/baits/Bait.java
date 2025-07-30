@@ -67,14 +67,8 @@ public class Bait extends ConfigBase {
     public Bait(@NotNull File file, FishManager fishManager, MainConfig mainConfig) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
         BaitFileUpdates.update(this);
-        performRequiredConfigChecks();
 
-        final String configId = getConfig().getString("id");
-        if (configId == null) {
-            throw new InvalidConfigurationException("Missing 'id' in " + getFileName());
-        }
-
-        this.id = configId;
+        this.id = validateAndGetId();
 
         this.baitData = new BaitData(
                 id,
@@ -108,11 +102,14 @@ public class Bait extends ConfigBase {
     }
 
     // Current required config: id
-    private void performRequiredConfigChecks() throws InvalidConfigurationException {
-        if (getConfig().getString("id") == null) {
+    private String validateAndGetId() throws InvalidConfigurationException {
+        final String baitId = getConfig().getString("id");
+        if (baitId == null) {
             logger.warning("Rarity invalid: 'id' missing in " + getFileName());
             throw new InvalidConfigurationException("An ID has not been found in " + getFileName() + ". Please correct this.");
         }
+
+        return baitId;
     }
 
     /**
