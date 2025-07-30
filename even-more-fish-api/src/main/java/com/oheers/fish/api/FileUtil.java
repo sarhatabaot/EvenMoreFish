@@ -323,12 +323,23 @@ public class FileUtil {
         }
     }
 
-    public static void regenExampleFiles(final String sourceDirectory, final File targetDirectory) {
+    public static void regenExampleFiles(final String jarDirectory, final File targetDirectory) {
         FileUtil.loadFilesFromJarDirectory(
-                sourceDirectory,
+                jarDirectory,
                 targetDirectory,
                 file -> file.startsWith("_example") && file.endsWith(".yml"),
                 true
+        );
+    }
+
+    public static void loadDefaultFiles(final String jarDirectory, final File targetDirectory) {
+        EMFPlugin.getInstance().getLogger().info("Loading default %s configs from jar".formatted(jarDirectory));
+
+        FileUtil.loadFilesFromJarDirectory(
+                jarDirectory,
+                targetDirectory,
+                file -> !file.startsWith("_") && file.endsWith(".yml"),
+                false
         );
     }
 }

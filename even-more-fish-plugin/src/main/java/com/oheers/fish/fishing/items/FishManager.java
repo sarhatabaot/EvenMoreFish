@@ -100,7 +100,9 @@ public class FishManager {
     }
 
     private Rarity getPreDecidedRarity(Player player) {
-        if (player == null) return null;
+        if (player == null) {
+            return null;
+        }
 
         Map<UUID, Rarity> decidedRarities = EvenMoreFish.getInstance().getDecidedRarities();
         return decidedRarities.remove(player.getUniqueId());
@@ -137,7 +139,9 @@ public class FishManager {
                                           @Nullable CustomRod customRod) {
         // 1. Check pre-decided rarity
         Rarity preDecided = getPreDecidedRarity(fisher);
-        if (preDecided != null) return preDecided;
+        if (preDecided != null) {
+            return preDecided;
+        }
 
         // 2. Get allowed rarities (with your original logic)
         List<Rarity> allowedRarities = getAllowedRarities(fisher, boostRate, boostedRarities, totalRarities);
@@ -156,14 +160,18 @@ public class FishManager {
 
         // 5. Pick a random rarity (weighted)
         Rarity selected = selectRandomRarity(allowedRarities, boostRate, boostedRarities);
-        if (selected == null) return null;
+        if (selected == null) {
+            return null;
+        }
 
         // 6. Apply competition rules
         return isRarityAllowedInCompetition(selected) ? selected : null;
     }
 
     private List<Rarity> filterByCustomRod(List<Rarity> rarities, @Nullable CustomRod customRod) {
-        if (customRod == null) return rarities;
+        if (customRod == null) {
+            return rarities;
+        }
         return rarities.stream()
                 .filter(rarity -> customRod.getAllowedRarities().contains(rarity))
                 .toList();
@@ -213,7 +221,9 @@ public class FishManager {
 
 
     public Fish getRandomWeightedFish(@NotNull List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
-        if (fishList.isEmpty()) return null;
+        if (fishList.isEmpty()) {
+            return null;
+        }
 
         // Define a weight function that handles zero weights as 1
         ToDoubleFunction<Fish> weightFunction = fish -> {
@@ -259,7 +269,8 @@ public class FishManager {
                     location.getY(),
                     location.getZ(),
                     biomeName,
-                    !customRodFish.isEmpty()));
+                    !customRodFish.isEmpty()
+            ));
             return null;
         }
 
@@ -370,18 +381,7 @@ public class FishManager {
 
 
     private void loadDefaultFiles(@NotNull File targetDirectory) {
-        EvenMoreFish.getInstance().getLogger().info("Loading default rarity configs from jar");
-
-        FileUtil.loadFilesFromJarDirectory(
-                "rarities",
-                targetDirectory,
-                file -> !file.startsWith("_") && file.endsWith(".yml"),
-                false
-        );
+        FileUtil.loadDefaultFiles("rarities", targetDirectory);
     }
-
-
-
-
 
 }
