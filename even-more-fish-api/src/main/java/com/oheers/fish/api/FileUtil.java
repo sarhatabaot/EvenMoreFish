@@ -25,16 +25,14 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -119,7 +117,26 @@ public class FileUtil {
         return null;
     }
 
-    public static File loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin) {
+    /**
+     * Loads a file from the specified directory or creates it by copying from a plugin resource if it doesn't exist.
+     *
+     * <p>The method first checks if the specified directory exists, creating it if necessary. Then it checks
+     * for the existence of the target file. If the file exists, it is returned immediately. If not, the method
+     * attempts to create the file and populate it by copying from the specified plugin resource.</p>
+     *
+     * @param directory The directory where the file should be located. Will be created if it doesn't exist.
+     * @param fileName The name of the file to load or create in the directory.
+     * @param resourceName The name of the resource in the plugin's JAR file to copy if the file doesn't exist.
+     * @param plugin The plugin instance used for resource access and logging.
+     * @return The loaded or created {@link File} object, or {@code null} if any operation fails.
+     *
+     * @throws NullPointerException If any of the parameters are {@code null}.
+     *
+     * @implNote The method will attempt to create parent directories if they don't exist.
+     *           If file creation or resource copying fails, error messages will be logged
+     *           through the plugin's logger.
+     */
+    public static File loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean overwrite) {
         Objects.requireNonNull(directory, "directory cannot be null");
         Objects.requireNonNull(fileName, "fileName cannot be null");
         Objects.requireNonNull(resourceName, "resourceName cannot be null");
@@ -133,7 +150,7 @@ public class FileUtil {
         File configFile = new File(directory, fileName);
 
         // If file already exists, return it
-        if (configFile.exists()) {
+        if (configFile.exists() && !overwrite) {
             return configFile;
         }
 
@@ -160,6 +177,10 @@ public class FileUtil {
             plugin.getLogger().log(Level.SEVERE, "Failed to copy resource %s to %s".formatted(resourceName, configFile), ex);
             return null;
         }
+    }
+
+    public static File loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin) {
+        return loadFileOrResource(directory, fileName, resourceName, plugin, false);
     }
 
     public static List<File> getFilesInDirectoryWithExtension(@NotNull File directory, @Nullable String extension, boolean ignoreUnderscoreFiles, boolean recursive) {
@@ -248,5 +269,66 @@ public class FileUtil {
             EMFPlugin.getInstance().getLogger().log(Level.WARNING, "Failed to convert JAR URL to file path",e);
             return Optional.empty();
         }
+    }
+
+    /**
+     * Generic method to load files from a jar directory with filtering
+     *
+     * @param jarDirectory The directory in the jar (e.g., "rarities")
+     * @param targetDirectory Where to copy the files
+     * @param filter Predicate to determine which files to include
+     */
+    public static void loadFilesFromJarDirectory(
+            @NotNull String jarDirectory,
+            @NotNull File targetDirectory,
+            @NotNull Predicate<String> filter,
+            boolean overwrite
+    ) {
+        getFilesFromJarDirectory(jarDirectory).stream()
+                .filter(filter)
+                .forEach(file -> {
+                    String fileName = file.substring(file.lastIndexOf('/') + 1);
+                    FileUtil.loadFileOrResource(
+                            targetDirectory,
+                            fileName,
+                            file,
+                            EMFPlugin.getInstance(),
+                            overwrite
+                    );
+                });
+    }
+
+    /**
+     * Gets all files from a specific directory in the jar
+     *
+     * @param jarDirectory The directory to scan (e.g., "rarities")
+     * @return List of file paths in format "directory/file.ext"
+     */
+    public static List<String> getFilesFromJarDirectory(@NotNull String jarDirectory) {
+        try (InputStream in = EMFPlugin.getInstance().getResource(jarDirectory);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            return reader.lines()
+                    .map(line -> jarDirectory + "/" + line)
+                    .toList();
+        } catch (IOException e) {
+            EMFPlugin.getInstance().getLogger().warning(
+                    "Failed to read files from jar directory '" + jarDirectory + "': " + e.getMessage()
+            );
+            return Collections.emptyList();
+        } catch (NullPointerException e) {
+            EMFPlugin.getInstance().getLogger().warning(
+                    "Directory '" + jarDirectory + "' not found in jar"
+            );
+            return Collections.emptyList();
+        }
+    }
+
+    public static void regenExampleFiles(final String sourceDirectory, final File targetDirectory) {
+        FileUtil.loadFilesFromJarDirectory(
+                sourceDirectory,
+                targetDirectory,
+                file -> file.startsWith("_example") && file.endsWith(".yml"),
+                true
+        );
     }
 }

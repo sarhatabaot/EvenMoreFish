@@ -3,6 +3,7 @@ package com.oheers.fish.fishing.items;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.FileUtil;
+import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.Requirement;
 import com.oheers.fish.api.requirement.RequirementContext;
 import com.oheers.fish.competition.Competition;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -363,77 +365,23 @@ public class FishManager {
     }
 
     private void regenExampleFile(@NotNull File targetDirectory) {
-        new File(targetDirectory, "_example.yml").delete();
-        regenExampleFiles(targetDirectory);
+        FileUtil.regenExampleFiles("rarities", targetDirectory);
     }
 
 
     private void loadDefaultFiles(@NotNull File targetDirectory) {
         EvenMoreFish.getInstance().getLogger().info("Loading default rarity configs from jar");
 
-        loadFilesFromJarDirectory(
+        FileUtil.loadFilesFromJarDirectory(
                 "rarities",
                 targetDirectory,
-                file -> !file.startsWith("_") && file.endsWith(".yml")
+                file -> !file.startsWith("_") && file.endsWith(".yml"),
+                false
         );
     }
 
-    private void regenExampleFiles(@NotNull File targetDirectory) {
-        loadFilesFromJarDirectory(
-                "rarities",
-                targetDirectory,
-                file -> file.startsWith("_") && file.endsWith(".yml")
-        );
-    }
 
-    /**
-     * Generic method to load files from a jar directory with filtering
-     *
-     * @param jarDirectory The directory in the jar (e.g., "rarities")
-     * @param targetDirectory Where to copy the files
-     * @param filter Predicate to determine which files to include
-     */
-    private void loadFilesFromJarDirectory(
-            @NotNull String jarDirectory,
-            @NotNull File targetDirectory,
-            @NotNull Predicate<String> filter
-    ) {
-        getFilesFromJarDirectory(jarDirectory).stream()
-                .filter(filter)
-                .forEach(file -> {
-                    String fileName = file.substring(file.lastIndexOf('/') + 1);
-                    FileUtil.loadFileOrResource(
-                            targetDirectory,
-                            fileName,
-                            file,
-                            EvenMoreFish.getInstance()
-                    );
-                });
-    }
 
-    /**
-     * Gets all files from a specific directory in the jar
-     *
-     * @param jarDirectory The directory to scan (e.g., "rarities")
-     * @return List of file paths in format "directory/file.ext"
-     */
-    private List<String> getFilesFromJarDirectory(@NotNull String jarDirectory) {
-        try (InputStream in = EvenMoreFish.getInstance().getResource(jarDirectory);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            return reader.lines()
-                    .map(line -> jarDirectory + "/" + line)
-                    .toList();
-        } catch (IOException e) {
-            EvenMoreFish.getInstance().getLogger().warning(
-                    "Failed to read files from jar directory '" + jarDirectory + "': " + e.getMessage()
-            );
-            return Collections.emptyList();
-        } catch (NullPointerException e) {
-            EvenMoreFish.getInstance().getLogger().warning(
-                    "Directory '" + jarDirectory + "' not found in jar"
-            );
-            return Collections.emptyList();
-        }
-    }
+
 
 }
