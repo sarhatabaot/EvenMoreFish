@@ -1,5 +1,6 @@
 /**
- * This file is part of PlaceholderAPI
+ * This file contains parts of code from PlaceholderAPI.
+ * Specifically, parts related to finding classes.
  * <p>
  * PlaceholderAPI
  * Copyright (c) 2015 - 2021 PlaceholderAPI Team
@@ -73,10 +74,8 @@ public class FileUtil {
                     classes.add(addonClass);
                 }
             } catch (final VerifyError ex) {
-                Logger logger = Logger.getLogger("EvenMoreFish");
-                //todo, this can't be here it's blocking
-                logger.severe(() -> String.format("Failed to load addon class %s", file.getName()));
-                logger.severe(() -> String.format("Cause: %s %s", ex.getClass().getSimpleName(), ex.getMessage()));
+                EMFPlugin.getInstance().getLogger().severe(() -> String.format("Failed to load addon class %s", file.getName()));
+                EMFPlugin.getInstance().getLogger().severe(() -> String.format("Cause: %s %s", ex.getClass().getSimpleName(), ex.getMessage()));
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -138,7 +137,7 @@ public class FileUtil {
      *           If file creation or resource copying fails, error messages will be logged
      *           through the plugin's logger.
      */
-    public static File loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean overwrite) {
+    public static Optional<File> loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin, boolean overwrite) {
         Objects.requireNonNull(directory, "directory cannot be null");
         Objects.requireNonNull(fileName, "fileName cannot be null");
         Objects.requireNonNull(resourceName, "resourceName cannot be null");
@@ -146,42 +145,42 @@ public class FileUtil {
 
         if (!directory.exists() && !directory.mkdirs()) {
             plugin.getLogger().severe(() -> "Could not create directory: " + directory);
-            return null; // for now, maybe Optional
+            return Optional.empty(); // for now, maybe Optional
         }
 
         File configFile = new File(directory, fileName);
 
         // If file already exists, return it
         if (configFile.exists() && !overwrite) {
-            return configFile;
+            return Optional.of(configFile);
         }
 
         try {
             if (!configFile.createNewFile()) {
                 plugin.getLogger().severe(() -> "Could not create file: " + configFile);
-                return null;
+                return Optional.empty();
             }
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, "Failed to create file: %s".formatted(configFile.getName()), ex);
-            return null;
+            return Optional.empty();
         }
 
 
         try (InputStream stream = plugin.getResource(resourceName)) {
             if (stream == null) {
                 plugin.getLogger().severe(() -> "Resource not found: " + resourceName);
-                return null;
+                return Optional.empty();
             }
 
             Files.copy(stream, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            return configFile;
+            return Optional.of(configFile);
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, "Failed to copy resource %s to %s".formatted(resourceName, configFile), ex);
-            return null;
+            return Optional.empty();
         }
     }
 
-    public static File loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin) {
+    public static Optional<File> loadFileOrResource(@NotNull File directory, @NotNull String fileName, @NotNull String resourceName, @NotNull Plugin plugin) {
         return loadFileOrResource(directory, fileName, resourceName, plugin, false);
     }
 
@@ -191,9 +190,7 @@ public class FileUtil {
             return finalList;
         }
         try {
-            FilenameFilter filter = extension == null
-                ? null
-                : (dir, name) -> name.endsWith(extension);
+            FilenameFilter filter = extension == null ? null : (dir, name) -> name.endsWith(extension);
             File[] fileArray = directory.listFiles(filter);
             if (fileArray == null) {
                 return finalList;
@@ -323,7 +320,7 @@ public class FileUtil {
             URL dirURL = EMFPlugin.getInstance().getClass().getClassLoader().getResource(dirPath);
 
             if (dirURL == null) {
-                EMFPlugin.getInstance().getLogger().warning("Directory not found: " + dirPath);
+                EMFPlugin.getInstance().getLogger().warning(() -> "Directory not found: " + dirPath);
                 return Collections.emptyList();
             }
 
