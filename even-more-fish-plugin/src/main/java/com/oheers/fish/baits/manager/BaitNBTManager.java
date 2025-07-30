@@ -2,7 +2,7 @@ package com.oheers.fish.baits.manager;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.baits.model.ApplicationResult;
-import com.oheers.fish.baits.Bait;
+import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
@@ -121,7 +121,7 @@ public class BaitNBTManager {
      * @throws MaxBaitsReachedException When too many baits are tried to be applied to a fishing rod.
      * @throws MaxBaitReachedException  When one of the baits has hit maximum set by max-baits in baits.yml
      */
-    public static ApplicationResult applyBaitedRodNBT(ItemStack item, Bait bait, int quantity) throws MaxBaitsReachedException, MaxBaitReachedException {
+    public static ApplicationResult applyBaitedRodNBT(ItemStack item, BaitHandler bait, int quantity) throws MaxBaitsReachedException, MaxBaitReachedException {
         boolean doingLoreStuff = MainConfig.getInstance().getBaitAddToLore();
         AtomicBoolean maxBait = new AtomicBoolean(false);
         AtomicInteger cursorModifier = new AtomicInteger();
@@ -157,7 +157,7 @@ public class BaitNBTManager {
     }
 
     private static void addNewBait(
-            ItemStack item, Bait bait, int quantity,
+            ItemStack item, BaitHandler bait, int quantity,
             StringBuilder combined, AtomicInteger cursorModifier, AtomicBoolean maxBait,
             boolean doingLoreStuff) throws MaxBaitsReachedException {
 
@@ -180,7 +180,7 @@ public class BaitNBTManager {
     }
 
 
-    private static void removeOldLoreIfNecessary(@NotNull ItemStack item, Bait bait) {
+    private static void removeOldLoreIfNecessary(@NotNull ItemStack item, BaitHandler bait) {
         try {
             item.editMeta(meta -> meta.lore(deleteOldLore(item)));
         } catch (IndexOutOfBoundsException ex) {
@@ -191,7 +191,7 @@ public class BaitNBTManager {
     }
 
     private static boolean applyToExistingBaits(
-            ItemStack item, Bait bait, int quantity,
+            ItemStack item, BaitHandler bait, int quantity,
             StringBuilder combined, AtomicInteger cursorModifier, AtomicBoolean maxBait) {
 
         boolean foundBait = false;
@@ -237,7 +237,7 @@ public class BaitNBTManager {
     }
 
     private static void applyInitialBait(
-            ItemStack item, Bait bait, int quantity,
+            ItemStack item, BaitHandler bait, int quantity,
             StringBuilder combined, AtomicInteger cursorModifier, AtomicBoolean maxBait) {
 
         NBT.modify(item, nbt -> {
@@ -265,17 +265,17 @@ public class BaitNBTManager {
      * @param fishingRod The fishing rod.
      * @return A random bait applied to the fishing rod.
      */
-    public static @Nullable Bait randomBaitApplication(ItemStack fishingRod) {
+    public static @Nullable BaitHandler randomBaitApplication(ItemStack fishingRod) {
         if (fishingRod == null || fishingRod.getItemMeta() == null) {
             return null;
         }
 
         String[] baitNameList = NbtUtils.getBaitArray(fishingRod);
-        List<Bait> baitList = new ArrayList<>();
+        List<BaitHandler> baitList = new ArrayList<>();
 
         for (String baitName : baitNameList) {
 
-            Bait bait = BaitManager.getInstance().getBait(baitName.split(BAIT_SEPARATOR)[0]);
+            BaitHandler bait = BaitManager.getInstance().getBait(baitName.split(BAIT_SEPARATOR)[0]);
             if (bait != null) {
                 baitList.add(bait);
             }
@@ -289,7 +289,7 @@ public class BaitNBTManager {
 
         return WeightedRandom.pick(
                 baitList,
-                Bait::getApplicationWeight,
+                BaitHandler::getApplicationWeight,
                 EvenMoreFish.getInstance().getRandom()
         );
     }
@@ -300,11 +300,11 @@ public class BaitNBTManager {
      *
      * @return A random bait weighted by its catch-weight.
      */
-    public static @Nullable Bait randomBaitCatch() {
+    public static @Nullable BaitHandler randomBaitCatch() {
 
-        Map<String, Bait> baitMap = BaitManager.getInstance().getItemMap();
-        List<Bait> baitList = baitMap.values().stream()
-            .filter(Bait::getCanBeCaught)
+        Map<String, BaitHandler> baitMap = BaitManager.getInstance().getItemMap();
+        List<BaitHandler> baitList = baitMap.values().stream()
+            .filter(BaitHandler::getCanBeCaught)
             .toList();
         
         // Fix IndexOutOfBoundsException caused by the list being empty.
@@ -312,7 +312,7 @@ public class BaitNBTManager {
             return null;
         }
 
-        return WeightedRandom.pick(baitList, Bait::getCatchWeight, EvenMoreFish.getInstance().getRandom());
+        return WeightedRandom.pick(baitList, BaitHandler::getCatchWeight, EvenMoreFish.getInstance().getRandom());
     }
 
     /**
@@ -485,7 +485,7 @@ public class BaitNBTManager {
      * @return How the bait should look in the lore of the fishing rod, for example.
      */
     private static EMFSingleMessage getBaitFormatted(String baitID) {
-        Bait bait = BaitManager.getInstance().getBait(baitID);
+        BaitHandler bait = BaitManager.getInstance().getBait(baitID);
         if (bait == null) {
             EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
             return EMFSingleMessage.fromString("Invalid Bait");

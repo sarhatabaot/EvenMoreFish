@@ -4,7 +4,7 @@ import com.oheers.fish.Checks;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.baits.model.ApplicationResult;
-import com.oheers.fish.baits.Bait;
+import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.baits.manager.BaitNBTManager;
 import com.oheers.fish.config.GuiConfig;
@@ -59,7 +59,7 @@ public class ApplyBaitsGui extends ConfigGui {
         boolean changedRod = false;
         List<String> ignoredBaits = new ArrayList<>();
         for (ItemStack item : baitInventory.getContents()) {
-            Bait bait = BaitManager.getInstance().getBait(item);
+            BaitHandler bait = BaitManager.getInstance().getBait(item);
             if (bait == null) {
                 continue;
             }

@@ -67,7 +67,7 @@ public class BaitApplicationListener implements Listener {
         }
 
         ApplicationResult result;
-        Bait bait = BaitManager.getInstance().getBait(BaitNBTManager.getBaitName(event.getCursor()));
+        BaitHandler bait = BaitManager.getInstance().getBait(BaitNBTManager.getBaitName(event.getCursor()));
 
         if (bait == null) {
             return;

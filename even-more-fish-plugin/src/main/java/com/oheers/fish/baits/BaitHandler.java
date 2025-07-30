@@ -40,19 +40,17 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Bait extends ConfigBase {
-    private final BaitData baitData;
+public class BaitHandler extends ConfigBase {
+    private final @NotNull String id;
+    private BaitData baitData;
+    private ItemFactory itemFactory;
 
     private static final double DEFAULT_BOOST_RATE = 1.0;
     private final Logger logger = EvenMoreFish.getInstance().getLogger();
     private final FishManager fishManager;
     private final MainConfig mainConfig;
-    private final ItemFactory itemFactory;
 
-    private final @NotNull String id;
 
-    private List<Rarity> cachedRarities;
-    private List<Fish> cachedFish;
 
     /**
      * This represents a bait, which can be used to boost the likelihood that a certain fish or fish rarity appears from
@@ -64,41 +62,22 @@ public class Bait extends ConfigBase {
      *
      * @param file The bait's config file
      */
-    public Bait(@NotNull File file, FishManager fishManager, MainConfig mainConfig) throws InvalidConfigurationException {
+    public BaitHandler(@NotNull File file, FishManager fishManager, MainConfig mainConfig) throws InvalidConfigurationException {
         super(file, EvenMoreFish.getInstance(), false);
         BaitFileUpdates.update(this);
 
         this.id = validateAndGetId();
-
-        this.baitData = new BaitData(
-                id,
-                getConfig().getString("item.displayname", this.id),
-                null, // rarities
-                null, // fish
-                getConfig().getBoolean("disabled", false),
-                getConfig().getBoolean("infinite", false),
-                getConfig().getInt("max-applications", -1),
-                getConfig().getInt("drop-quantity", 1),
-                getConfig().getDouble("application-weight", 100.0),
-                getConfig().getDouble("catch-weight", 100.0),
-                getConfig().getBoolean("can-be-caught", false),
-                getConfig().getBoolean("disable-use-alert", false)
-        );
+        this.baitData = loadBaitData();
 
         this.fishManager = fishManager;
         this.mainConfig = mainConfig;
-        ItemFactory factory = ItemFactory.itemFactory(getConfig());
 
-        DisplayNameItemConfig displayNameConfig = factory.getDisplayName();
-        displayNameConfig.setEnabled(true);
-        displayNameConfig.setDefault("<yellow>" + this.id);
-
-        factory.setFinalChanges(item -> {
-            item.setAmount(getDropQuantity());
-            item.editMeta(meta -> meta.lore(createBoostLore()));
-            BaitNBTManager.applyBaitNBT(item, this.id);
-        });
-        this.itemFactory = factory;
+        this.itemFactory = new BaitItemFactory(
+                baitData.id(),
+                baitData.rarities(),
+                baitData.fish(),
+                getConfig()
+        ).createFactory();
     }
 
     // Current required config: id
@@ -121,96 +100,58 @@ public class Bait extends ConfigBase {
     public ItemStack create(@NotNull OfflinePlayer player) {
         return itemFactory.createItem(player.getUniqueId());
     }
-
+    private BaitData loadBaitData() {
+        List<Rarity> rarities = resolveRarity();
+        List<Fish> fish = resolveFish();
+        return new BaitData(
+                id,
+                getConfig().getString("item.displayname", this.id),
+                rarities,
+                fish,
+                getConfig().getBoolean("disabled", false),
+                getConfig().getBoolean("infinite", false),
+                getConfig().getInt("max-applications", -1),
+                getConfig().getInt("drop-quantity", 1),
+                getConfig().getDouble("application-weight", 100.0),
+                getConfig().getDouble("catch-weight", 100.0),
+                getConfig().getBoolean("can-be-caught", false),
+                getConfig().getBoolean("disable-use-alert", false)
+        );
+    }
 
     /**
      * @return All configured rarities from this bait's configuration.
      */
     public @NotNull List<Rarity> getRarities() {
-        if (cachedRarities == null) {
-            List<String> rarityStrings = getConfig().getStringList("rarities");
-            this.cachedRarities = rarityStrings.stream()
-                    .map(FishManager.getInstance()::getRarity)
-                    .filter(Objects::nonNull)
-                    .toList();
+        return baitData.rarities();
+    }
+
+    private List<Rarity> resolveRarity() {
+        List<String> rarityStrings = getConfig().getStringList("rarities");
+        return rarityStrings.stream()
+                .map(FishManager.getInstance()::getRarity)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private List<Fish> resolveFish() {
+        final Section fishSection = getConfig().getSection("fish");
+        if (fishSection == null) {
+            EvenMoreFish.getInstance().debug("Fish section was null in bait. Returning empty list..");
+            return Collections.emptyList();
         }
 
-        return cachedRarities;
+        return getConfig().getSection("fish").getRoutesAsStrings(false).stream()
+                .map(FishManager.getInstance()::getRarity)
+                .filter(Objects::nonNull)
+                .flatMap(rarity -> rarity.getFishList().stream())
+                .filter(fish -> getConfig().getStringList("fish." + fish.getRarity().getId())
+                        .contains(fish.getName()))
+                .toList();
     }
 
     private @NotNull List<Fish> getFish() {
-        if (cachedFish == null) {
-            final Section fishSection = getConfig().getSection("fish");
-            if (fishSection == null) {
-                EvenMoreFish.getInstance().debug("Fish section was null in bait. Returning empty list..");
-                return Collections.emptyList();
-            }
-
-            this.cachedFish = getConfig().getSection("fish").getRoutesAsStrings(false).stream()
-                    .map(FishManager.getInstance()::getRarity)
-                    .filter(Objects::nonNull)
-                    .flatMap(rarity -> rarity.getFishList().stream())
-                    .filter(fish -> getConfig().getStringList("fish." + fish.getRarity().getId())
-                            .contains(fish.getName()))
-                    .toList();
-        }
-
-        return cachedFish;
-    }
-
-    /**
-     * This fetches the boost's lore from the config and inserts the boost-rates into the {boosts} variable. This needs
-     * to be called after the bait theme is set and the boosts have been initialized, since it uses those variables.
-     *
-     * @return A list of formatted Adventure components for the bait's lore
-     */
-    private @NotNull List<Component> createBoostLore() {
-        final EMFListMessage lore = getBaseLoreTemplate();
-
-        // Set dynamic variables
-        lore.setVariable("{boosts}", createBoostsVariable());
-        lore.setVariable("{lore}", createItemLoreVariable().get());
-        lore.setVariable("{bait_theme}", Component.empty());
-
-        return lore.getComponentListMessage();
-    }
-
-    private EMFListMessage getBaseLoreTemplate() {
-        return ConfigMessage.BAIT_BAIT_LORE.getMessage().toListMessage();
-    }
-
-    private @NotNull EMFMessage createBoostsVariable() {
-        EMFMessage boostsMessage = EMFSingleMessage.empty();
-        appendRarityBoosts(boostsMessage);
-        appendFishBoosts(boostsMessage);
-        return boostsMessage;
-    }
-
-    private void appendRarityBoosts(EMFMessage message) {
-        List<Rarity> rarities = getRarities();
-        if (rarities.isEmpty()) return;
-
-        ConfigMessage boostMessage = rarities.size() > 1
-                ? ConfigMessage.BAIT_BOOSTS_RARITIES
-                : ConfigMessage.BAIT_BOOSTS_RARITY;
-
-        message.appendMessage(boostMessage.getMessage());
-        message.setAmount(Integer.toString(rarities.size()));
-    }
-
-    private void appendFishBoosts(EMFMessage message) {
-        List<Fish> fish = getFish();
-        if (fish.isEmpty()) return;
-
-        message.appendMessage(ConfigMessage.BAIT_BOOSTS_FISH.getMessage());
-        message.setAmount(Integer.toString(fish.size()));
-    }
-
-    @Contract(pure = true)
-    private @NotNull Supplier<EMFListMessage> createItemLoreVariable() {
-        return () -> EMFListMessage.fromStringList(
-                itemFactory.getLore().getConfiguredValue()
-        );
+        return baitData.fish();
     }
 
     /**
@@ -408,15 +349,25 @@ public class Bait extends ConfigBase {
     @Override
     public void reload(@NotNull File configFile) {
         super.reload(configFile);
-        this.cachedFish = null;
-        this.cachedRarities = null;
+        this.baitData = loadBaitData();
+        this.itemFactory = new BaitItemFactory(
+                baitData.id(),
+                baitData.rarities(),
+                baitData.fish(),
+                getConfig()
+        ).createFactory();
     }
 
     @Override
     public void reload() {
         super.reload();
-        this.cachedFish = null;
-        this.cachedRarities = null;
+        this.baitData = loadBaitData();
+        this.itemFactory = new BaitItemFactory(
+                baitData.id(),
+                baitData.rarities(),
+                baitData.fish(),
+                getConfig()
+        ).createFactory();
     }
 
 

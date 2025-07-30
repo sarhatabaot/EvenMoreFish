@@ -5,7 +5,7 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
-import com.oheers.fish.baits.Bait;
+import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.baits.manager.BaitNBTManager;
 import com.oheers.fish.commands.arguments.ArgumentHelper;
@@ -250,7 +250,7 @@ public class AdminCommand {
                         new EntitySelectorArgument.ManyPlayers("targets").setOptional(true)
                 )
                 .executes((sender, args) -> {
-                    final Bait bait = Objects.requireNonNull(args.getUnchecked("bait"));
+                    final BaitHandler bait = Objects.requireNonNull(args.getUnchecked("bait"));
                     final int quantity = (int) args.getOptional("quantity").orElse(1);
                     final List<Player> targets = (List<Player>) args.getOptional("targets").orElseGet(() -> {
                         if (sender instanceof Player p) {
