@@ -1,4 +1,4 @@
-package com.oheers.fish.baits;
+package com.oheers.fish.baits.model;
 
 import org.bukkit.inventory.ItemStack;
 
