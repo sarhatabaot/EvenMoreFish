@@ -36,7 +36,7 @@ public class BaitManager extends AbstractFileBasedManager<BaitHandler> {
                 file -> new BaitHandler(file, FishManager.getInstance(), MainConfig.getInstance()),
                 BaitHandler::getId,
                 bait -> {
-                    if (bait.isDisabled()) {
+                    if (bait.getBaitData().disabled()) {
                         EvenMoreFish.getInstance().debug("Skipping disabled bait: " + bait.getId());
                         return true;
                     }

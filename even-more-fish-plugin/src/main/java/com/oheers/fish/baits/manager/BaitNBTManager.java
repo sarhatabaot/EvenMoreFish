@@ -168,7 +168,7 @@ public class BaitNBTManager {
             throw new MaxBaitsReachedException("Max baits reached.", new ApplicationResult(item, cursorModifier.get()));
         }
 
-        int maxApplications = bait.getMaxApplications();
+        int maxApplications = bait.getBaitData().maxApplications();
         if (quantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
             cursorModifier.set(-maxApplications);
             combined.append(bait.getId()).append(BAIT_SEPARATOR).append(maxApplications);
@@ -202,11 +202,11 @@ public class BaitNBTManager {
             int baitQuantity = "∞".equals(split[1]) ? UNLIMITED_BAIT : Integer.parseInt(split[1]);
 
             if (baitId.equals(bait.getId())) {
-                if (bait.isInfinite() || baitQuantity == UNLIMITED_BAIT) {
+                if (bait.getBaitData().infinite() || baitQuantity == UNLIMITED_BAIT) {
                     combined.append(baitId).append(":∞,");
                 } else {
                     int newQuantity = baitQuantity + quantity;
-                    int maxApplications = bait.getMaxApplications();
+                    int maxApplications = bait.getBaitData().maxApplications();
 
                     if (newQuantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
                         combined.append(baitId).append(BAIT_SEPARATOR).append(maxApplications).append(BAIT_ENTRY_DELIMITER);
@@ -242,7 +242,7 @@ public class BaitNBTManager {
 
         NBT.modify(item, nbt -> {
             ReadWriteNBT compound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
-            int maxApplications = bait.getMaxApplications();
+            int maxApplications = bait.getBaitData().maxApplications();
 
             if (quantity > maxApplications && maxApplications != UNLIMITED_BAIT) {
                 combined.append(bait.getId()).append(BAIT_SEPARATOR).append(maxApplications);
@@ -289,7 +289,7 @@ public class BaitNBTManager {
 
         return WeightedRandom.pick(
                 baitList,
-                BaitHandler::getApplicationWeight,
+                bait -> bait.getBaitData().applicationWeight(),
                 EvenMoreFish.getInstance().getRandom()
         );
     }
@@ -304,7 +304,7 @@ public class BaitNBTManager {
 
         Map<String, BaitHandler> baitMap = BaitManager.getInstance().getItemMap();
         List<BaitHandler> baitList = baitMap.values().stream()
-            .filter(BaitHandler::getCanBeCaught)
+            .filter(bait -> bait.getBaitData().canBeCaught())
             .toList();
         
         // Fix IndexOutOfBoundsException caused by the list being empty.
@@ -312,7 +312,7 @@ public class BaitNBTManager {
             return null;
         }
 
-        return WeightedRandom.pick(baitList, BaitHandler::getCatchWeight, EvenMoreFish.getInstance().getRandom());
+        return WeightedRandom.pick(baitList, bait -> bait.getBaitData().catchWeight(), EvenMoreFish.getInstance().getRandom());
     }
 
     /**

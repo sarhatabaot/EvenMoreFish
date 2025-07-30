@@ -51,7 +51,6 @@ public class BaitHandler extends ConfigBase {
     private final MainConfig mainConfig;
 
 
-
     /**
      * This represents a bait, which can be used to boost the likelihood that a certain fish or fish rarity appears from
      * the rod. All data is fetched from the config when the Bait object is created and then can be given out using
@@ -100,6 +99,7 @@ public class BaitHandler extends ConfigBase {
     public ItemStack create(@NotNull OfflinePlayer player) {
         return itemFactory.createItem(player.getUniqueId());
     }
+
     private BaitData loadBaitData() {
         List<Rarity> rarities = resolveRarity();
         List<Fish> fish = resolveFish();
@@ -196,7 +196,7 @@ public class BaitHandler extends ConfigBase {
     private Rarity selectRarityWithBoosts(Player player, Set<Rarity> boostedRarities) {
         return fishManager.getRandomWeightedRarity(
                 player,
-                getBoostRate(),
+                mainConfig.getBaitBoostRate(),
                 boostedRarities,
                 Set.copyOf(fishManager.getRarityMap().values()),
                 null
@@ -303,20 +303,13 @@ public class BaitHandler extends ConfigBase {
      */
 
     private void alertUsage(Player player) {
-        if (shouldDisableUseAlert()) {
+        if (baitData.disableUseAlert()) {
             return;
         }
 
         EMFMessage message = ConfigMessage.BAIT_USED.getMessage();
         message.setBait(format(getDisplayName()));
         message.send(player);
-    }
-
-    /**
-     * @return The x multiplier of a chance to get one of the fish in the bait's fish to appear.
-     */
-    public double getBoostRate() {
-        return mainConfig.getBaitBoostRate();
     }
 
     /**
@@ -370,37 +363,7 @@ public class BaitHandler extends ConfigBase {
         ).createFactory();
     }
 
-
-    public boolean isDisabled() {
-        return baitData.disabled();
+    public BaitData getBaitData() {
+        return baitData;
     }
-
-    public boolean isInfinite() {
-        return baitData.infinite();
-    }
-
-    public boolean shouldDisableUseAlert() {
-        return baitData.disableUseAlert();
-    }
-
-    public double getApplicationWeight() {
-        return baitData.applicationWeight();
-    }
-
-    public double getCatchWeight() {
-        return baitData.catchWeight();
-    }
-
-    public int getMaxApplications() {
-        return baitData.maxApplications();
-    }
-
-    public int getDropQuantity() {
-        return baitData.dropQuantity();
-    }
-
-    public boolean getCanBeCaught() {
-        return baitData.canBeCaught();
-    }
-
 }
