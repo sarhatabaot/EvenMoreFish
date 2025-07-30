@@ -434,7 +434,7 @@ public class AdminCommand {
                     message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
                     message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
                     message.setVariable("{fish}", String.valueOf(fishCount));
-                    message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
+                    message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getItemMap().size()));
                     message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
                     message.setVariable("{engine}", databaseEngine);
                     message.setVariable("{type}", databaseType);

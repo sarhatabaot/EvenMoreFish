@@ -18,7 +18,9 @@ public class RodManager extends AbstractFileBasedManager<CustomRod> {
 
     private static final RodManager instance = new RodManager();
 
-    private RodManager() {}
+    private RodManager() {
+        super();
+    }
 
     public static RodManager getInstance() {
         return instance;

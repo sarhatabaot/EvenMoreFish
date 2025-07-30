@@ -32,7 +32,7 @@ public class BaitsGui extends ConfigGui {
 
         return new DynamicGuiElement(character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            BaitManager.getInstance().getBaitMap().values()
+            BaitManager.getInstance().getItemMap().values()
                 .forEach(bait -> group.addElement(new StaticGuiElement(character, bait.create(player))));
             return group;
         });

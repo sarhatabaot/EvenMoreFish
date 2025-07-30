@@ -300,7 +300,7 @@ public class BaitNBTManager {
      */
     public static @Nullable Bait randomBaitCatch() {
 
-        Map<String, Bait> baitMap = BaitManager.getInstance().getBaitMap();
+        Map<String, Bait> baitMap = BaitManager.getInstance().getItemMap();
         List<Bait> baitList = baitMap.values().stream()
             .filter(Bait::getCanBeCaught)
             .toList();

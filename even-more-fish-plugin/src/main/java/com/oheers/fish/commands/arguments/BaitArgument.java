@@ -21,7 +21,7 @@ public class BaitArgument {
             }
             return bait;
         }).replaceSuggestions(ArgumentHelper.getAsyncSuggestions(
-                info -> BaitManager.getInstance().getBaitMap().keySet().stream().map(s -> s.replace(" ", "_")).toArray(String[]::new)
+                info -> BaitManager.getInstance().getItemMap().keySet().stream().map(s -> s.replace(" ", "_")).toArray(String[]::new)
         ));
     }
 
