@@ -7,6 +7,7 @@ import java.util.List;
 
 public record BaitData(
         String id,
+        String displayName,
         List<Rarity> rarities,
         List<Fish> fish,
         boolean disabled,
