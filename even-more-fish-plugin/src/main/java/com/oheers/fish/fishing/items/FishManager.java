@@ -22,14 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
@@ -81,22 +74,80 @@ public class FishManager {
         loaded = false;
     }
 
+    // Loading things
+
+    private void logLoadedItems() {
+        int totalFish = rarityMap.values().stream()
+                .mapToInt(rarity -> rarity.getOriginalFishList().size())
+                .sum();
+
+        EvenMoreFish.getInstance().getLogger().info(() -> "Loaded FishManager with %d Rarities and %d Fish.".formatted(rarityMap.size(), totalFish));
+    }
+
+    private void loadRarities() {
+        rarityMap.clear();
+
+        File raritiesFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "rarities");
+        if (!raritiesFolder.exists()) {
+            FileUtil.loadDefaultFiles("rarities", raritiesFolder);
+        }
+
+        FileUtil.regenExampleFiles("rarities", raritiesFolder);
+        List<File> rarityFiles = FileUtil.getFilesInDirectory(raritiesFolder, true, true);
+
+        if (rarityFiles.isEmpty()) {
+            EvenMoreFish.getInstance().debug("No rarity files found in directory: " + raritiesFolder);
+            return;
+        }
+
+        rarityFiles.stream()
+                .map(this::loadRaritySafely) // Attempt to load each file into a Rarity (or null if invalid)
+                .filter(Objects::nonNull)    // Skip invalid/disabled rarities
+                .filter(rarity -> !shouldSkipRarity(rarity, rarityMap))
+                .forEach(rarity -> rarityMap.put(rarity.getId(), rarity));
+    }
+
     public boolean isLoaded() {
         return loaded;
     }
-
-    // Getters for Rarities and Fish
 
     public @Nullable Rarity getRarity(@NotNull String rarityName) {
         return rarityMap.get(rarityName);
     }
 
     public @Nullable Fish getFish(@NotNull String rarityName, @NotNull String fishName) {
-        Rarity rarity = getRarity(rarityName);
+        final Rarity rarity = getRarity(rarityName);
         if (rarity == null) {
             return null;
         }
         return rarity.getFish(fishName);
+    }
+
+    private Rarity loadRaritySafely(File file) {
+        EvenMoreFish plugin = EvenMoreFish.getInstance();
+        plugin.debug("Loading " + file.getName() + " rarity");
+
+        try {
+            return new Rarity(file);
+        } catch (InvalidConfigurationException e) {
+            plugin.getLogger().warning("Invalid configuration in file: " + file.getName());
+            plugin.getLogger().warning(e.getMessage());
+            return null; // Skip invalid files
+        }
+    }
+
+    private boolean shouldSkipRarity(Rarity rarity, Map<String, Rarity> rarityMap) {
+        if (rarity.isDisabled()) {
+            return true;
+        }
+
+        final String id = rarity.getId();
+        if (rarityMap.containsKey(id)) {
+            EvenMoreFish.getInstance().getLogger().warning("A rarity with the ID '" + id + "' already exists! Skipping.");
+            return true;
+        }
+
+        return false;
     }
 
     private Rarity getPreDecidedRarity(Player player) {
@@ -325,63 +376,6 @@ public class FishManager {
 
     public TreeMap<String, Rarity> getRarityMap() {
         return rarityMap;
-    }
-
-    // Loading things
-
-    private void logLoadedItems() {
-        int totalFish = rarityMap.values().stream()
-                .mapToInt(rarity -> rarity.getOriginalFishList().size())
-                .sum();
-
-        EvenMoreFish.getInstance().getLogger().info(() -> "Loaded FishManager with %d Rarities and %d Fish.".formatted(rarityMap.size(), totalFish));
-    }
-
-    private void loadRarities() {
-
-        rarityMap.clear();
-
-        File raritiesFolder = new File(EvenMoreFish.getInstance().getDataFolder(), "rarities");
-        if (!raritiesFolder.exists()) {
-            loadDefaultFiles(raritiesFolder);
-        }
-        regenExampleFile(raritiesFolder);
-        List<File> rarityFiles = FileUtil.getFilesInDirectory(raritiesFolder, true, true);
-
-        if (rarityFiles.isEmpty()) {
-            return;
-        }
-
-        rarityFiles.forEach(file -> {
-            EvenMoreFish.getInstance().debug("Loading " + file.getName() + " rarity");
-            Rarity rarity;
-            try {
-                rarity = new Rarity(file);
-                // Skip invalid configs.
-            } catch (InvalidConfigurationException exception) {
-                return;
-            }
-            // Skip disabled files.
-            if (rarity.isDisabled()) {
-                return;
-            }
-            // Skip duplicate IDs
-            String id = rarity.getId();
-            if (rarityMap.containsKey(id)) {
-                EvenMoreFish.getInstance().getLogger().warning("A rarity with the id: " + id + " already exists! Skipping.");
-                return;
-            }
-            rarityMap.put(id, rarity);
-        });
-    }
-
-    private void regenExampleFile(@NotNull File targetDirectory) {
-        FileUtil.regenExampleFiles("rarities", targetDirectory);
-    }
-
-
-    private void loadDefaultFiles(@NotNull File targetDirectory) {
-        FileUtil.loadDefaultFiles("rarities", targetDirectory);
     }
 
 }
