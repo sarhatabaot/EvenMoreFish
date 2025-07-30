@@ -29,6 +29,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -284,7 +286,13 @@ public class FileUtil {
             @NotNull Predicate<String> filter,
             boolean overwrite
     ) {
-        getFilesFromJarDirectory(jarDirectory).stream()
+        final List<String> fileList = getFilesFromJarDirectory(jarDirectory);
+        if (fileList.isEmpty()) {
+            EMFPlugin.getInstance().getLogger().warning(() -> "No files in jar directory, either this impl is wrong, or the path is.");
+            return;
+        }
+
+        fileList.stream()
                 .filter(filter)
                 .forEach(file -> {
                     String fileName = file.substring(file.lastIndexOf('/') + 1);
@@ -305,22 +313,58 @@ public class FileUtil {
      * @return List of file paths in format "directory/file.ext"
      */
     public static List<String> getFilesFromJarDirectory(@NotNull String jarDirectory) {
-        try (InputStream in = EMFPlugin.getInstance().getResource(jarDirectory);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            return reader.lines()
-                    .map(line -> jarDirectory + "/" + line)
-                    .toList();
-        } catch (IOException e) {
-            EMFPlugin.getInstance().getLogger().warning(
-                    "Failed to read files from jar directory '" + jarDirectory + "': " + e.getMessage()
-            );
+        try {
+            // Remove trailing slash if present
+            String dirPath = jarDirectory.endsWith("/")
+                    ? jarDirectory.substring(0, jarDirectory.length() - 1)
+                    : jarDirectory;
+
+            // Get resource URL
+            URL dirURL = EMFPlugin.getInstance().getClass().getClassLoader().getResource(dirPath);
+
+            if (dirURL == null) {
+                EMFPlugin.getInstance().getLogger().warning("Directory not found: " + dirPath);
+                return Collections.emptyList();
+            }
+
+            // Handle jar protocol
+            if ("jar".equals(dirURL.getProtocol())) {
+                return getFilesFromJar(dirURL, dirPath);
+            }
+            // Handle file protocol (for IDE/testing)
+            else if ("file".equals(dirURL.getProtocol())) {
+                return getFilesFromFileSystem(dirURL, dirPath);
+            }
+
             return Collections.emptyList();
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             EMFPlugin.getInstance().getLogger().warning(
-                    "Directory '" + jarDirectory + "' not found in jar"
+                    "Error reading jar directory '" + jarDirectory + "': " + e.getMessage()
             );
             return Collections.emptyList();
         }
+    }
+
+    private static List<String> getFilesFromJar(URL dirURL, String dirPath) throws IOException {
+        List<String> files = new ArrayList<>();
+        String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); // Strip out only the JAR file
+        try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8))) {
+            Enumeration<JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                String entry = entries.nextElement().getName();
+                if (entry.startsWith(dirPath) && !entry.equals(dirPath + "/")) {
+                    files.add(entry);
+                }
+            }
+        }
+        return files;
+    }
+
+    private static List<String> getFilesFromFileSystem(URL dirURL, String dirPath) {
+        return Arrays.stream(new File(dirURL.getPath()).listFiles())
+                .map(File::getName)
+                .map(name -> dirPath + "/" + name)
+                .toList();
     }
 
     public static void regenExampleFiles(final String jarDirectory, final File targetDirectory) {
@@ -333,7 +377,7 @@ public class FileUtil {
     }
 
     public static void loadDefaultFiles(final String jarDirectory, final File targetDirectory) {
-        EMFPlugin.getInstance().getLogger().info("Loading default %s configs from jar".formatted(jarDirectory));
+        EMFPlugin.getInstance().getLogger().info(() -> "Loading default %s configs from jar".formatted(jarDirectory));
 
         FileUtil.loadFilesFromJarDirectory(
                 jarDirectory,
