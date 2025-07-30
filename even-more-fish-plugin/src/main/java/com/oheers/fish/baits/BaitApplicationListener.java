@@ -28,7 +28,7 @@ import org.bukkit.inventory.PlayerInventory;
  * Manages bait application to rods, including NBT data conversion, game mode checks, and protection
  * against unauthorized modifications (e.g., via anvils). Also handles bait limits and player feedback.
  */
-public class BaitListener implements Listener {
+public class BaitApplicationListener implements Listener {
 
     @EventHandler
     public void onClickEvent(InventoryClickEvent event) {

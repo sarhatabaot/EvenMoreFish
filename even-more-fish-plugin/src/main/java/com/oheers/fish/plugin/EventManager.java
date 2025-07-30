@@ -3,7 +3,7 @@ package com.oheers.fish.plugin;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.SkullSaver;
-import com.oheers.fish.baits.BaitListener;
+import com.oheers.fish.baits.BaitApplicationListener;
 import com.oheers.fish.competition.JoinChecker;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.events.FishEatEvent;
@@ -40,7 +40,7 @@ public class EventManager {
         pm.registerEvents(new HuntingProcessor(), plugin);
         pm.registerEvents(new SkullSaver(), plugin);
         pm.registerEvents(new UpdateNotify(), plugin);
-        pm.registerEvents(new BaitListener(), plugin);
+        pm.registerEvents(new BaitApplicationListener(), plugin);
         pm.registerEvents(new ItemProtectionListener(), plugin);
     }
 
