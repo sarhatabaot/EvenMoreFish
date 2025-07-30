@@ -1,7 +1,7 @@
 package com.oheers.fish.commands.arguments;
 
 import com.oheers.fish.baits.Bait;
-import com.oheers.fish.baits.BaitManager;
+import com.oheers.fish.baits.manager.BaitManager;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.CustomArgument;
 import dev.jorel.commandapi.arguments.StringArgument;

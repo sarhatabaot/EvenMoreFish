@@ -5,7 +5,7 @@ import com.gmail.nossr50.util.player.UserManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.baits.Bait;
-import com.oheers.fish.baits.BaitNBTManager;
+import com.oheers.fish.baits.manager.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.fishing.items.Fish;

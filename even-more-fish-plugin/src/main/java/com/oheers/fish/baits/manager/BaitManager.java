@@ -1,7 +1,8 @@
-package com.oheers.fish.baits;
+package com.oheers.fish.baits.manager;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.AbstractFileBasedManager;
+import com.oheers.fish.baits.Bait;
 import com.oheers.fish.baits.configs.BaitConversions;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.fishing.items.FishManager;

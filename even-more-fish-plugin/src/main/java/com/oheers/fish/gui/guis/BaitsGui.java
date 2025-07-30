@@ -1,7 +1,7 @@
 package com.oheers.fish.gui.guis;
 
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.baits.BaitManager;
+import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.gui.ConfigGui;
 import de.themoep.inventorygui.DynamicGuiElement;

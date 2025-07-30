@@ -1,6 +1,8 @@
-package com.oheers.fish.baits;
+package com.oheers.fish.baits.manager;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.baits.ApplicationResult;
+import com.oheers.fish.baits.Bait;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
