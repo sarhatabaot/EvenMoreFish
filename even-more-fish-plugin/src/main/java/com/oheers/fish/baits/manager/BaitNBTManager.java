@@ -22,10 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -356,21 +353,29 @@ public class BaitNBTManager {
             return 0;
         }
 
-        int totalDeleted = 0;
         String[] baitList = NbtUtils.getBaitArray(itemStack);
-        for (String appliedBait : baitList) {
-            String quantityStr = appliedBait.split(BAIT_SEPARATOR)[1];
-            if (!quantityStr.equals("∞")) {
-                totalDeleted += Integer.parseInt(quantityStr);
-            } else {
-                totalDeleted += 1; // Count infinite baits as 1
-            }
-        }
+        int totalDeleted = Arrays.stream(baitList)
+                .filter(Objects::nonNull)
+                .mapToInt(bait -> {
+                            String[] parts = bait.split(BAIT_SEPARATOR);
+                            return getDeletedFromQuantityString(parts[1]);
+                        }
+                )
+                .sum();
+
         NBT.modify(itemStack, nbt -> {
             nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND).removeKey(NbtKeys.EMF_APPLIED_BAIT);
         });
 
         return totalDeleted;
+    }
+
+    private static int getDeletedFromQuantityString(final String quantityStr) {
+        if (!quantityStr.equals("∞")) {
+            return Integer.parseInt(quantityStr);
+        }
+
+        return  1; // Count infinite baits as 1
     }
 
     public static List<Component> newApplyLore(ItemStack itemStack) {
@@ -487,7 +492,7 @@ public class BaitNBTManager {
     private static EMFSingleMessage getBaitFormatted(String baitID) {
         BaitHandler bait = BaitManager.getInstance().getBait(baitID);
         if (bait == null) {
-            EvenMoreFish.getInstance().getLogger().warning("Bait " + baitID + " is not a valid bait!");
+            EvenMoreFish.getInstance().getLogger().warning(() -> "Bait %s is not a valid bait!".formatted(baitID));
             return EMFSingleMessage.fromString("Invalid Bait");
         }
         return EMFSingleMessage.fromString(bait.getDisplayName());
