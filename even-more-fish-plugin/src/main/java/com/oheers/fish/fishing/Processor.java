@@ -4,8 +4,8 @@ import com.gmail.nossr50.config.experience.ExperienceConfig;
 import com.gmail.nossr50.util.player.UserManager;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.baits.Bait;
-import com.oheers.fish.baits.BaitNBTManager;
+import com.oheers.fish.baits.BaitHandler;
+import com.oheers.fish.baits.manager.BaitNBTManager;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.fishing.items.Fish;
@@ -54,7 +54,7 @@ public abstract class Processor<E extends Event> implements Listener {
      * @param location The location of the fisher.
      *                 {@code @returns} A random fish without any bait application.
      */
-    protected Fish chooseFish(@NotNull Player player, @NotNull Location location, @Nullable Bait bait, @Nullable CustomRod customRod) {
+    protected Fish chooseFish(@NotNull Player player, @NotNull Location location, @Nullable BaitHandler bait, @Nullable CustomRod customRod) {
         if (bait != null && customRod == null) {
             return bait.chooseFish(player, location);
         }
@@ -91,7 +91,7 @@ public abstract class Processor<E extends Event> implements Listener {
 
         double baitCatchPercentage = MainConfig.getInstance().getBaitCatchPercentage();
         if (shouldCatchBait() && baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
-            Bait caughtBait = BaitNBTManager.randomBaitCatch();
+            BaitHandler caughtBait = BaitNBTManager.randomBaitCatch();
             if (caughtBait != null) {
                 EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
                 message.setBait(caughtBait.format(caughtBait.getId()));
@@ -102,7 +102,7 @@ public abstract class Processor<E extends Event> implements Listener {
             }
         }
 
-        Bait applyingBait = null;
+        BaitHandler applyingBait = null;
         CustomRod customRod = RodManager.getInstance().getRod(fishingRod);
 
         if (customRod == null && BaitNBTManager.isBaitedRod(fishingRod) && (!MainConfig.getInstance().getBaitCompetitionDisable() || !Competition.isActive())) {

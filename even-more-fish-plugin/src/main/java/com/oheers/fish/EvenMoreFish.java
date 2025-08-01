@@ -7,7 +7,7 @@ import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
-import com.oheers.fish.baits.BaitManager;
+import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.commands.AdminCommand;
 import com.oheers.fish.commands.MainCommand;
 import com.oheers.fish.competition.AutoRunner;

@@ -1,16 +1,16 @@
 package com.oheers.fish.commands.arguments;
 
-import com.oheers.fish.baits.Bait;
-import com.oheers.fish.baits.BaitManager;
+import com.oheers.fish.baits.BaitHandler;
+import com.oheers.fish.baits.manager.BaitManager;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.CustomArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 
 public class BaitArgument {
 
-    public static Argument<Bait> create() {
+    public static Argument<BaitHandler> create() {
         return new CustomArgument<>(new StringArgument("bait"), info -> {
-            Bait bait = BaitManager.getInstance().getBait(info.input());
+            BaitHandler bait = BaitManager.getInstance().getBait(info.input());
             if (bait == null) {
                 bait = BaitManager.getInstance().getBait(info.input().replace("_", " "));
             }
@@ -21,7 +21,7 @@ public class BaitArgument {
             }
             return bait;
         }).replaceSuggestions(ArgumentHelper.getAsyncSuggestions(
-                info -> BaitManager.getInstance().getBaitMap().keySet().stream().map(s -> s.replace(" ", "_")).toArray(String[]::new)
+                info -> BaitManager.getInstance().getItemMap().keySet().stream().map(s -> s.replace(" ", "_")).toArray(String[]::new)
         ));
     }
 

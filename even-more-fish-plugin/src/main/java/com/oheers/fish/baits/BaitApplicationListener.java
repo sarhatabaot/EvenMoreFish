@@ -2,6 +2,9 @@ package com.oheers.fish.baits;
 
 import com.oheers.fish.Checks;
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.baits.manager.BaitManager;
+import com.oheers.fish.baits.manager.BaitNBTManager;
+import com.oheers.fish.baits.model.ApplicationResult;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
@@ -28,7 +31,7 @@ import org.bukkit.inventory.PlayerInventory;
  * Manages bait application to rods, including NBT data conversion, game mode checks, and protection
  * against unauthorized modifications (e.g., via anvils). Also handles bait limits and player feedback.
  */
-public class BaitListener implements Listener {
+public class BaitApplicationListener implements Listener {
 
     @EventHandler
     public void onClickEvent(InventoryClickEvent event) {
@@ -64,7 +67,7 @@ public class BaitListener implements Listener {
         }
 
         ApplicationResult result;
-        Bait bait = BaitManager.getInstance().getBait(BaitNBTManager.getBaitName(event.getCursor()));
+        BaitHandler bait = BaitManager.getInstance().getBait(BaitNBTManager.getBaitName(event.getCursor()));
 
         if (bait == null) {
             return;

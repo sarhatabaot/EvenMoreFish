@@ -5,9 +5,9 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
-import com.oheers.fish.baits.Bait;
-import com.oheers.fish.baits.BaitManager;
-import com.oheers.fish.baits.BaitNBTManager;
+import com.oheers.fish.baits.BaitHandler;
+import com.oheers.fish.baits.manager.BaitManager;
+import com.oheers.fish.baits.manager.BaitNBTManager;
 import com.oheers.fish.commands.arguments.ArgumentHelper;
 import com.oheers.fish.commands.arguments.BaitArgument;
 import com.oheers.fish.commands.arguments.CompetitionTypeArgument;
@@ -250,7 +250,7 @@ public class AdminCommand {
                         new EntitySelectorArgument.ManyPlayers("targets").setOptional(true)
                 )
                 .executes((sender, args) -> {
-                    final Bait bait = Objects.requireNonNull(args.getUnchecked("bait"));
+                    final BaitHandler bait = Objects.requireNonNull(args.getUnchecked("bait"));
                     final int quantity = (int) args.getOptional("quantity").orElse(1);
                     final List<Player> targets = (List<Player>) args.getOptional("targets").orElseGet(() -> {
                         if (sender instanceof Player p) {
@@ -434,7 +434,7 @@ public class AdminCommand {
                     message.setVariable("{online}", String.valueOf(Bukkit.getServer().getOnlineMode()));
                     message.setVariable("{rarities}", String.valueOf(FishManager.getInstance().getRarityMap().size()));
                     message.setVariable("{fish}", String.valueOf(fishCount));
-                    message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getBaitMap().size()));
+                    message.setVariable("{baits}", String.valueOf(BaitManager.getInstance().getItemMap().size()));
                     message.setVariable("{competitions}", String.valueOf(EvenMoreFish.getInstance().getCompetitionQueue().getSize()));
                     message.setVariable("{engine}", databaseEngine);
                     message.setVariable("{type}", databaseType);

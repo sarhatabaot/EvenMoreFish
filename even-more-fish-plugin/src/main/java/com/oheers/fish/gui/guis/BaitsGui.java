@@ -1,7 +1,7 @@
 package com.oheers.fish.gui.guis;
 
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.baits.BaitManager;
+import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.gui.ConfigGui;
 import de.themoep.inventorygui.DynamicGuiElement;
@@ -32,7 +32,7 @@ public class BaitsGui extends ConfigGui {
 
         return new DynamicGuiElement(character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            BaitManager.getInstance().getBaitMap().values()
+            BaitManager.getInstance().getItemMap().values()
                 .forEach(bait -> group.addElement(new StaticGuiElement(character, bait.create(player))));
             return group;
         });

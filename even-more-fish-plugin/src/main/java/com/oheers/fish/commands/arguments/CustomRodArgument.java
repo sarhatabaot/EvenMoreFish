@@ -10,7 +10,7 @@ public class CustomRodArgument {
 
     public static Argument<CustomRod> create() {
         return new CustomArgument<>(new StringArgument("customRod"), info -> {
-            CustomRod rod = RodManager.getInstance().getRod(info.input());
+            CustomRod rod = RodManager.getInstance().getItem(info.input());
             if (rod == null) {
                 throw CustomArgument.CustomArgumentException.fromMessageBuilder(
                     new CustomArgument.MessageBuilder("Unknown custom rod: ").appendArgInput()
@@ -19,7 +19,7 @@ public class CustomRodArgument {
                 return rod;
             }
         }).replaceSuggestions(ArgumentHelper.getAsyncSuggestions(
-            info -> RodManager.getInstance().getRodMap().keySet().toArray(String[]::new)
+            info -> RodManager.getInstance().getItemMap().keySet().toArray(String[]::new)
         ));
     }
 
