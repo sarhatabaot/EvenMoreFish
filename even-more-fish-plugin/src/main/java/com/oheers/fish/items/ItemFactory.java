@@ -196,7 +196,7 @@ public class ItemFactory {
 
     // Customization Methods //
 
-    public CustomModelDataItemConfig getModelData() {
+    public CustomModelDataItemConfig getCustomModelData() {
         return customModelData;
     }
 
