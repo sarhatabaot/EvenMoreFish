@@ -83,6 +83,7 @@ public class GuiUtils {
             if (gui != null) {
                 gui.doRescue();
             }
+            click.getWhoClicked().closeInventory();
             clearHistory(click.getWhoClicked());
         });
         // Exiting a sub-menu should open the main menu
