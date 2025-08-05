@@ -5,6 +5,7 @@ import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
+import com.oheers.fish.api.utils.ManifestUtil;
 import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.baits.manager.BaitNBTManager;
@@ -29,7 +30,6 @@ import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
-import com.oheers.fish.api.utils.ManifestUtil;
 import de.tr7zw.changeme.nbtapi.NBT;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -56,7 +56,7 @@ import java.util.jar.Attributes;
 @SuppressWarnings("unchecked")
 public class AdminCommand {
 
-    private final HelpMessageBuilder helpMessageBuilder = HelpMessageBuilder.create();
+    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create();
 
     private final CommandAPICommand command;
 
@@ -88,11 +88,11 @@ public class AdminCommand {
     }
 
     private void sendHelpMessage(@NotNull CommandSender sender) {
-        helpMessageBuilder.sendMessage(sender);
+        HELP_MESSAGE.sendMessage(sender);
     }
 
     private CommandAPICommand getFish() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin fish",
                 ConfigMessage.HELP_ADMIN_FISH::getMessage
         );
@@ -202,7 +202,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getCustomRod() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             "admin custom-rod",
             ConfigMessage.HELP_ADMIN_CUSTOMROD::getMessage
         );
@@ -239,7 +239,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getBait() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin bait",
                 ConfigMessage.HELP_ADMIN_BAIT::getMessage
         );
@@ -277,7 +277,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getClearBaits() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin clearbaits",
                 ConfigMessage.HELP_ADMIN_CLEARBAITS::getMessage
         );
@@ -321,7 +321,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getReload() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin reload",
                 ConfigMessage.HELP_ADMIN_RELOAD::getMessage
         );
@@ -392,7 +392,7 @@ public class AdminCommand {
 
     @SuppressWarnings("UnstableApiUsage")
     private CommandAPICommand getVersion() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin version",
                 ConfigMessage.HELP_ADMIN_VERSION::getMessage
         );
@@ -452,7 +452,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getRewardTypes() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin rewardtypes",
                 ConfigMessage.HELP_ADMIN_REWARDTYPES::getMessage
         );
@@ -475,7 +475,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getMigrate() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin migrate",
                 ConfigMessage.HELP_ADMIN_MIGRATE::getMessage
         );
@@ -491,7 +491,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getRawItem() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin rawItem",
                 ConfigMessage.HELP_ADMIN_RAWITEM::getMessage
         );
@@ -518,7 +518,7 @@ public class AdminCommand {
     }
 
     private CommandAPICommand getHelp() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin help",
                 ConfigMessage.HELP_GENERAL_HELP::getMessage
         );
@@ -531,7 +531,7 @@ public class AdminCommand {
     // COMPETITION BRANCH
 
     private CommandAPICommand getCompetition() {
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
                 "admin competition",
                 ConfigMessage.HELP_ADMIN_COMPETITION::getMessage
         );

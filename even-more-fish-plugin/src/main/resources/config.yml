@@ -236,6 +236,9 @@ command:
     # The /emf journal command
     journal: "journal"
 
+  # Should the base command show the help text instead of opening the GUI?
+  old-base-command-behavior: false
+
 # Customizable sets of biomes for fish configuration
 biome-sets:
   # oceans biome set. you can add more sets as you please.
@@ -250,5 +253,5 @@ biome-sets:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 2
+version: 3
 

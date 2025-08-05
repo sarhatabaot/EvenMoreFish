@@ -4,7 +4,6 @@ import com.oheers.fish.api.FileUtil;
 import com.oheers.fish.api.plugin.EMFPlugin;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;

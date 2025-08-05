@@ -1,7 +1,7 @@
 package com.oheers.fish.exceptions;
 
-import com.oheers.fish.baits.model.ApplicationResult;
 import com.oheers.fish.baits.BaitHandler;
+import com.oheers.fish.baits.model.ApplicationResult;
 import com.oheers.fish.messages.ConfigMessage;
 import org.jetbrains.annotations.NotNull;
 
