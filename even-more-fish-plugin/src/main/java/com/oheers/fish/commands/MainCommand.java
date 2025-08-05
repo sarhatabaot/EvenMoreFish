@@ -52,6 +52,13 @@ public class MainCommand {
                         getJournal(),
                         new AdminCommand(adminName).getCommand()
                 )
+                .executesPlayer(info -> {
+                    if (MainConfig.getInstance().useOldBaseCommandBehavior()) {
+                        sendHelpMessage(info.sender());
+                    } else {
+                        new MainMenuGui(info.sender()).open();
+                    }
+                })
                 .executes(info -> {
                     sendHelpMessage(info.sender());
                 });

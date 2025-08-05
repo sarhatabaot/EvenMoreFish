@@ -303,6 +303,10 @@ public class MainConfig extends ConfigBase {
         return journalSubCommandName;
     }
 
+    public boolean useOldBaseCommandBehavior() {
+        return getConfig().getBoolean("command.old-base-command-behavior", false);
+    }
+
     public boolean giveStraightToInventory() {
         return getConfig().getBoolean("give-straight-to-inventory");
     }
