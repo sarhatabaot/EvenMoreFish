@@ -1,8 +1,8 @@
 package com.oheers.fish.baits.manager;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.baits.model.ApplicationResult;
 import com.oheers.fish.baits.BaitHandler;
+import com.oheers.fish.baits.model.ApplicationResult;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.exceptions.MaxBaitReachedException;
 import com.oheers.fish.exceptions.MaxBaitsReachedException;
@@ -22,7 +22,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;

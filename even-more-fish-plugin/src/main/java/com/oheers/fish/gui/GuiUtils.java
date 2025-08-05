@@ -1,6 +1,7 @@
 package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.commands.MainCommand;
 import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.gui.guis.BaitsGui;
@@ -16,7 +17,6 @@ import de.themoep.inventorygui.InventoryGui;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -115,7 +115,10 @@ public class GuiUtils {
             new SellGui(player, SellGui.SellState.NORMAL, null).open();
             clearHistory(click.getWhoClicked());
         });
-        newActionMap.put("show-command-help", (gui, click) -> Bukkit.dispatchCommand(click.getWhoClicked(), "emf help"));
+        newActionMap.put("show-command-help", (gui, click) -> {
+            click.getWhoClicked().closeInventory();
+            MainCommand.HELP_MESSAGE.sendMessage(click.getWhoClicked());
+        });
         newActionMap.put("sell-inventory", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();
             if (!(humanEntity instanceof Player player)) {

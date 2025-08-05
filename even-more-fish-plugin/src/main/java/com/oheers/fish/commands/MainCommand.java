@@ -26,14 +26,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class MainCommand {
 
-    private final HelpMessageBuilder helpMessageBuilder = HelpMessageBuilder.create();
+    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create();
 
     private final CommandAPICommand command;
 
     public MainCommand() {
         // Add the admin command to the help message
         String adminName = MainConfig.getInstance().getAdminSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             adminName,
             ConfigMessage.HELP_GENERAL_ADMIN::getMessage
         );
@@ -63,7 +63,7 @@ public class MainCommand {
 
     private CommandAPICommand getNext() {
         String name = MainConfig.getInstance().getNextSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_NEXT::getMessage
         );
@@ -78,7 +78,7 @@ public class MainCommand {
 
     private CommandAPICommand getToggle() {
         String name = MainConfig.getInstance().getToggleSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_TOGGLE::getMessage
         );
@@ -91,7 +91,7 @@ public class MainCommand {
 
     private CommandAPICommand getGui() {
         String name = MainConfig.getInstance().getGuiSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_GUI::getMessage
         );
@@ -104,7 +104,7 @@ public class MainCommand {
 
     private CommandAPICommand getHelp() {
         String name = MainConfig.getInstance().getHelpSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_HELP::getMessage
         );
@@ -117,7 +117,7 @@ public class MainCommand {
 
     private CommandAPICommand getTop() {
         String name = MainConfig.getInstance().getTopSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_TOP::getMessage
         );
@@ -135,7 +135,7 @@ public class MainCommand {
 
     private CommandAPICommand getShop() {
         String name = MainConfig.getInstance().getShopSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_SHOP::getMessage
         );
@@ -173,7 +173,7 @@ public class MainCommand {
 
     private CommandAPICommand getSellAll() {
         String name = MainConfig.getInstance().getSellAllSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_SELLALL::getMessage
         );
@@ -189,7 +189,7 @@ public class MainCommand {
 
     private CommandAPICommand getApplyBaits() {
         String name = MainConfig.getInstance().getApplyBaitsSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_APPLYBAITS::getMessage
         );
@@ -207,7 +207,7 @@ public class MainCommand {
 
     private CommandAPICommand getJournal() {
         String name = MainConfig.getInstance().getJournalSubCommandName();
-        helpMessageBuilder.addUsage(
+        HELP_MESSAGE.addUsage(
             name,
             ConfigMessage.HELP_GENERAL_JOURNAL::getMessage
         );
@@ -227,7 +227,7 @@ public class MainCommand {
     }
 
     private void sendHelpMessage(@NotNull CommandSender sender) {
-        helpMessageBuilder.sendMessage(sender);
+        HELP_MESSAGE.sendMessage(sender);
     }
 
     private boolean checkEconomy(@NotNull CommandSender sender) {

@@ -3,7 +3,10 @@ package com.oheers.fish.api.addons;
 import com.oheers.fish.api.plugin.EMFPlugin;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
