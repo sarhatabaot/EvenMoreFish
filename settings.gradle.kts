@@ -34,7 +34,7 @@ dependencyResolutionManagement {
 
             library("mcmmo", "com.gmail.nossr50.mcMMO:mcMMO:2.2.040")
             library("aurelium-skills", "com.github.Archy-X:AureliumSkills:Beta1.2.8")
-            library("aura-skills", "dev.aurelium:auraskills-api-bukkit:2.3.5")
+            library("aura-skills", "dev.aurelium:auraskills-api-bukkit:2.3.6")
             library("headdatabase-api", "com.arcaniax:HeadDatabase-API:1.3.2")
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.18.4")
 
@@ -74,7 +74,7 @@ dependencyResolutionManagement {
             library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.2")
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
-            plugin("shadow", "com.gradleup.shadow").version("9.0.0-rc2")
+            plugin("shadow", "com.gradleup.shadow").version("9.0.0")
             plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.7.1")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
@@ -88,7 +88,7 @@ dependencyResolutionManagement {
             library("jooq-meta-extensions","org.jooq","jooq-meta-extensions").versionRef("jooq")
             plugin("jooq", "nu.studer.jooq").version("9.0")
 
-            library("connectors-mysql", "com.mysql:mysql-connector-j:9.3.0")
+            library("connectors-mysql", "com.mysql:mysql-connector-j:9.4.0")
             library("connectors-sqlite", "org.xerial:sqlite-jdbc:3.47.0.0")
             library("connectors-h2", "com.h2database:h2:2.3.232")
             bundle("connectors", listOf("connectors-mysql", "connectors-sqlite"))
