@@ -12,27 +12,27 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class Leaderboard implements LeaderboardHandler {
 
     private final CompetitionType type;
-    private final List<CompetitionEntry> entries;
+    private final TreeSet<CompetitionEntry> entries;
 
     public Leaderboard(CompetitionType type) {
         this.type = type;
-        this.entries = new ArrayList<>();
+
+        Comparator<CompetitionEntry> entryComparator = type.shouldReverseLeaderboard() ?
+            Comparator.comparingDouble(CompetitionEntry::getValue) :
+            Comparator.comparingDouble(CompetitionEntry::getValue).reversed();
+        this.entries = new TreeSet<>(entryComparator);
     }
 
     @Override
     public List<CompetitionEntry> getEntries() {
-        Comparator<CompetitionEntry> entryComparator = type.shouldReverseLeaderboard() ?
-                Comparator.comparingDouble(CompetitionEntry::getValue) :
-                Comparator.comparingDouble(CompetitionEntry::getValue).reversed();
-
-        return entries.stream()
-                .sorted(entryComparator)
-                .toList();
+        return new ArrayList<>(entries);
     }
 
     @Override
