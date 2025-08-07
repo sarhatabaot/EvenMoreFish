@@ -26,8 +26,13 @@ public class LargestFishStrategy implements CompetitionStrategy {
 
         if (entry != null) {
             if (fish.getLength() > entry.getFish().getLength()) {
+                // These HAVE to be in this order, otherwise players are spammed with new first place messages
+                leaderboard.addEntry(new CompetitionEntry(
+                    fisher.getUniqueId(),
+                    fish,
+                    competition.getCompetitionType()
+                ));
                 leaderboard.removeEntry(entry);
-                leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
             }
         } else {
             leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));

@@ -26,8 +26,9 @@ public class ShortestFishStrategy implements CompetitionStrategy {
 
         if (entry != null) {
             if (fish.getLength() < entry.getFish().getLength()) {
-                leaderboard.removeEntry(entry);
+                // These HAVE to be in this order, otherwise players are spammed with new first place messages
                 leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
+                leaderboard.removeEntry(entry);
             }
         } else {
             leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
