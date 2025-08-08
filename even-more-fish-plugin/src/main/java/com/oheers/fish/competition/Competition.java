@@ -104,6 +104,7 @@ public class Competition {
 
     /**
      * Sets the maximum duration of the competition in seconds.
+     *
      * @param duration The maximum duration of the competition in seconds.
      */
     public void setMaxDuration(int duration) {
@@ -169,42 +170,75 @@ public class Competition {
     }
 
     public void end(boolean startFail) {
-        // print leaderboard
-        if (this.timingSystem != null) {
-            this.timingSystem.cancel();
+        // Print leaderboard
+        if (timingSystem != null) {
+            timingSystem.cancel();
         }
         if (statusBar != null) {
             statusBar.hide();
         }
+
+        if (startFail) {
+            active = null;
+            return;
+        }
+
         try {
-            if (!startFail) {
-                EMFCompetitionEndEvent endEvent = new EMFCompetitionEndEvent(this);
-                endEvent.callEvent();
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    ConfigMessage.COMPETITION_END.getMessage().send(player);
-                    sendLeaderboard(player);
-                }
-                if (competitionType.getStrategy().isSingleReward() && singleWinner != null) {
-                    singleReward(singleWinner);
-                } else {
-                    handleRewards();
-                }
-                if (originallyRandom) {
-                    competitionType = CompetitionType.RANDOM;
-                }
-
-                if (DatabaseUtil.isDatabaseOnline()) {
-                    Competition competitionRef = this;
-                    EvenMoreFish.getInstance().getPluginDataManager().getCompetitionDataManager().update(competitionRef.competitionName, new CompetitionReport(competitionRef, competitionRef.startTime, LocalDateTime.now()));
-                }
-
-                leaderboard.clear();
-            }
+            fireEndEvent();
+            notifyPlayers();
+            processRewards();
+            resetCompetitionTypeIfRandom();
+            updateDatabase();
+            leaderboard.clear();
         } catch (Exception exception) {
-            EvenMoreFish.getInstance().getLogger().log(Level.SEVERE, "An exception was thrown while the competition was being ended!", exception);
+            EvenMoreFish.getInstance().getLogger().log(
+                    Level.SEVERE,
+                    "An exception was thrown while the competition was being ended!",
+                    exception
+            );
         } finally {
             active = null;
         }
+    }
+
+
+    private void fireEndEvent() {
+        EMFCompetitionEndEvent endEvent = new EMFCompetitionEndEvent(this);
+        endEvent.callEvent();
+    }
+
+    private void notifyPlayers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            ConfigMessage.COMPETITION_END.getMessage().send(player);
+            sendLeaderboard(player);
+        }
+    }
+
+    private void processRewards() {
+        if (competitionType.getStrategy().isSingleReward() && singleWinner != null) {
+            singleReward(singleWinner);
+        } else {
+            handleRewards();
+        }
+    }
+
+    private void resetCompetitionTypeIfRandom() {
+        if (originallyRandom) {
+            competitionType = CompetitionType.RANDOM;
+        }
+    }
+
+    private void updateDatabase() {
+        if (!DatabaseUtil.isDatabaseOnline()) {
+            return;
+        }
+
+        EvenMoreFish plugin = EvenMoreFish.getInstance();
+        plugin.getPluginDataManager().getCompetitionDataManager().update(
+                competitionName,
+                new CompetitionReport(this, startTime, LocalDateTime.now())
+        );
+
     }
 
     // Starts a runnable to decrease the time left by 1s each second
@@ -279,8 +313,8 @@ public class Competition {
     public static boolean isDoingFirstPlaceActionBar() {
         boolean doActionBarMessage = MessageConfig.getInstance().getConfig().getBoolean("action-bar-message");
         List<String> supportedTypes = MessageConfig.getInstance()
-            .getConfig()
-            .getStringList("action-bar-types");
+                .getConfig()
+                .getStringList("action-bar-types");
         boolean isSupportedActionBarType = active != null && supportedTypes.contains(active.competitionType.toString());
         return doActionBarMessage && isSupportedActionBarType;
     }
@@ -595,8 +629,8 @@ public class Competition {
             return true;
         } catch (IllegalArgumentException exception) {
             EvenMoreFish.getInstance()
-                .getLogger()
-                .severe("Could not load: " + getCompetitionName() + " because a random rarity could not be chosen. \nIf you need support, please provide the following information:");
+                    .getLogger()
+                    .severe("Could not load: " + getCompetitionName() + " because a random rarity could not be chosen. \nIf you need support, please provide the following information:");
             EvenMoreFish.getInstance().getLogger().severe("rarities.size(): " + FishManager.getInstance().getRarityMap().size());
             EvenMoreFish.getInstance().getLogger().severe("configRarities.size(): " + configRarities.size());
             // Also log the exception
