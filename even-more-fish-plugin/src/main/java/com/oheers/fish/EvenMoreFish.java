@@ -177,15 +177,15 @@ public class EvenMoreFish extends EMFPlugin {
         CommandAPI.onDisable();
 
         terminateGuis();
-        // Don't use the scheduler here because it will throw errors on disable
-        if (this.pluginDataManager != null) {
-            this.pluginDataManager.shutdown();
-        }
-
         // Ends the current competition in case the plugin is being disabled when the server will continue running
         Competition active = Competition.getCurrentlyActive();
         if (active != null) {
             active.end(false);
+        }
+        
+        // Don't use the scheduler here because it will throw errors on disable
+        if (this.pluginDataManager != null) {
+            this.pluginDataManager.shutdown();
         }
 
         RewardType.unregisterAll();
