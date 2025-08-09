@@ -119,6 +119,9 @@ sell-price-format: $#,##0.0
 # The message sent to players when they've sold their fish in the /emf shop
 fish-sale: <white>You've sold <green>{amount} <white>fish for <green>{sell-price}<white>.
 
+# The message sent to players when they attempt to sell and there are no sellable fish
+no-sellable-fish: <white>You have nothing to sell!
+
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
 help-format: '[noPrefix]<aqua>{command} <yellow>- {description}'
@@ -301,4 +304,4 @@ bait:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 4
+version: 5

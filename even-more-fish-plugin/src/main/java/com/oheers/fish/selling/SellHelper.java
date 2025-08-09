@@ -61,13 +61,13 @@ public class SellHelper {
         this.player = player;
     }
 
-    public boolean sellFish() {
+    public void sellFish() {
 
         Economy economy = Economy.getInstance();
 
         if (!economy.isEnabled()) {
             ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
-            return false;
+            return;
         }
 
         List<SoldFish> soldFish = getTotalSoldFish();
@@ -85,12 +85,17 @@ public class SellHelper {
             }
         }
 
-        economy.deposit(this.player, totalWorth, true);
-
         if (!(inventory instanceof PlayerInventory)) {
             FishUtils.giveItems(inventory.getStorageContents(), this.player);
             inventory.clear();
         }
+
+        if (totalWorth == 0.0) {
+            ConfigMessage.NO_SELLABLE_FISH.getMessage().send(player);
+            return;
+        }
+
+        economy.deposit(this.player, totalWorth, true);
 
         // sending the sell message to the player
 
@@ -103,9 +108,6 @@ public class SellHelper {
         this.player.playSound(this.player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.06f);
 
         logSoldFish(player.getUniqueId(), soldFish);
-
-        return totalWorth != 0.0;
-
     }
 
     public List<SoldFish> getTotalSoldFish() {

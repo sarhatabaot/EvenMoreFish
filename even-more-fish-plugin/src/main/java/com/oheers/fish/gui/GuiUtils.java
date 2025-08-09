@@ -83,8 +83,7 @@ public class GuiUtils {
             if (gui != null) {
                 gui.doRescue();
             }
-            click.getWhoClicked().closeInventory();
-            clearHistory(click.getWhoClicked());
+            closeGui(click.getWhoClicked());
         });
         // Exiting a sub-menu should open the main menu
         newActionMap.put("open-main-menu", (gui, click) -> {
@@ -129,7 +128,7 @@ public class GuiUtils {
                 return;
             }
             new SellHelper(click.getWhoClicked().getInventory(), player).sellFish();
-            clearHistory(click.getWhoClicked());
+            closeGui(humanEntity);
         });
         newActionMap.put("sell-shop", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();
@@ -138,7 +137,7 @@ public class GuiUtils {
                 return;
             }
             SellHelper.sellInventoryGui(click.getGui(), click.getWhoClicked());
-            clearHistory(click.getWhoClicked());
+            closeGui(click.getWhoClicked());
         });
         newActionMap.put("sell-inventory-confirm", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();
@@ -149,11 +148,11 @@ public class GuiUtils {
             if (gui != null) {
                 gui.doRescue();
             }
-            clearHistory(click.getWhoClicked());
+            closeGui(click.getWhoClicked());
         });
         newActionMap.put("sell-shop-confirm", (gui, click) -> {
             SellHelper.sellInventoryGui(click.getGui(), click.getWhoClicked());
-            clearHistory(click.getWhoClicked());
+            closeGui(click.getWhoClicked());
         });
         newActionMap.put("open-baits-menu", (gui, click) -> {
             if (gui != null) {
@@ -182,11 +181,13 @@ public class GuiUtils {
         return newActionMap;
     }
 
-    /**
-     * Closes the given GUI after 1 tick
-     */
-    private static void clearHistory(HumanEntity entity) {
-        InventoryGui.clearHistory(entity);
+    private static void closeGui(HumanEntity human) {
+        clearHistory(human);
+        human.closeInventory();
+    }
+
+    private static void clearHistory(HumanEntity human) {
+        InventoryGui.clearHistory(human);
     }
 
 }
