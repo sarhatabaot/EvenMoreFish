@@ -85,6 +85,7 @@ public enum ConfigMessage {
             "<white>Measures {length}cm"
     ), PrefixType.NONE, false, true, "length-lore"),
     FISH_SALE("<white>You've sold <green>{amount} <white>fish for <green>{sell-price}<white>.", PrefixType.DEFAULT, true, true, "fish-sale"),
+    NO_SELLABLE_FISH("<white>You have nothing to sell!", PrefixType.ERROR, true, true, "no-sellable-fish"),
     HELP_FORMAT(
             "[noPrefix]<aqua>{command} <yellow>- {description}",
             PrefixType.DEFAULT,
