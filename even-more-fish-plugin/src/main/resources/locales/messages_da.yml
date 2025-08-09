@@ -106,6 +106,8 @@ time-alert: <reset>Der er {time_formatted} tilbage af konkurrencen om {type}
 sell-price-format: '$#,##0.0'
 # The message sent to players when they've sold their fish in the /emf shop
 fish-sale: <reset>Du har solgt <green>{amount} </green><white>fisk for </white><green>{sell-price}</green><white>.
+# The message sent to players when they attempt to sell and there are no sellable fish
+no-sellable-fish: <white>You have nothing to sell!
 # Help messages
 # General help (/emf help) - permission node dependant commands will only show if they are formatted with the forward-slash.
 help-format: '[noPrefix]<aqua>{command} <yellow>- {description}'
@@ -264,4 +266,4 @@ bait:
   unused-slot: <gray>► ? <i>Available Slot
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 4
+version: 5
