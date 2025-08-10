@@ -151,8 +151,9 @@ public class EvenMoreFish extends EMFPlugin {
         // Always load this after BaitManager
         RodManager.getInstance().load();
 
-        competitionQueue = new CompetitionQueue();
-        competitionQueue.load();
+        // Always load this after RodManager
+        this.competitionQueue = new CompetitionQueue();
+        this.competitionQueue.load();
 
         // check for updates on the Modrinth page
         new UpdateChecker(this).checkUpdate().thenAccept(available -> isUpdateAvailable = available);
@@ -193,6 +194,7 @@ public class EvenMoreFish extends EMFPlugin {
 
 
         // Make sure this is in the reverse order of loading.
+        this.competitionQueue.unload();
         RodManager.getInstance().unload();
         BaitManager.getInstance().unload();
         FishManager.getInstance().unload();
