@@ -127,13 +127,4 @@ public class Leaderboard implements LeaderboardHandler {
         return getEntries().isEmpty() ? null : getEntries().get(0);
     }
 
-    /**
-     * Updates an entry in the leaderboard by removing it, applying the changes, and re-adding it.
-     *
-     * @param entry The updated entry.
-     */
-    public void updateEntry(CompetitionEntry entry) {
-        removeEntry(entry); // Remove the current entry
-        addEntry(entry);    // Add the updated entry
-    }
 }

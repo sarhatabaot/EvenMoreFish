@@ -26,7 +26,6 @@ public class MostFishStrategy implements CompetitionStrategy {
 
         if (entry != null) {
             entry.trackFish(fish);
-            leaderboard.updateEntry(entry);
         } else {
             leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
         }
