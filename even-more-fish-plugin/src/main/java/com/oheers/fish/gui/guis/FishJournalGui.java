@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class FishJournalGui extends ConfigGui {
@@ -61,7 +62,7 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private DynamicGuiElement getFishGroup(Section section) {
-        char character = FishUtils.getCharFromString(section.getString("fish-character", "f"), 'f');
+        char character = FishUtils.getCharFromString(section.getString("fish-character"), 'f');
 
         return new DynamicGuiElement(
                 character, who -> {
@@ -141,17 +142,12 @@ public class FishJournalGui extends ConfigGui {
 
     @NotNull
     private String getValueOrUnknown(Supplier<String> supplier) {
-        try {
-            String value = supplier.get();
-            return (value == null) ? "Unknown" : value;
-        } catch (NullPointerException e) {
-            return "Unknown";
-        }
+        return Optional.ofNullable(supplier.get()).orElse("Unknown");
     }
 
 
     private DynamicGuiElement getRarityGroup(Section section) {
-        char character = FishUtils.getCharFromString(section.getString("rarity-character", "r"), 'r');
+        char character = FishUtils.getCharFromString(section.getString("rarity-character"), 'r');
 
         return new DynamicGuiElement(
             character, who -> {
@@ -211,6 +207,6 @@ public class FishJournalGui extends ConfigGui {
     }
 
     @Override
-    public void doRescue() {}
+    public void doRescue() { /* Don't rescue, view only */ }
 
 }
