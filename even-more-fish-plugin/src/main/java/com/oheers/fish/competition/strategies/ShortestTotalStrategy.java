@@ -23,7 +23,7 @@ public class ShortestTotalStrategy implements CompetitionStrategy {
         CompetitionEntry entry = leaderboard.getEntry(fisher.getUniqueId());
 
         if (entry != null) {
-            entry.trackFish(fish);
+            leaderboard.trackFish(entry, fish);
         } else {
             leaderboard.addEntry(new CompetitionEntry(fisher.getUniqueId(), fish, competition.getCompetitionType()));
         }

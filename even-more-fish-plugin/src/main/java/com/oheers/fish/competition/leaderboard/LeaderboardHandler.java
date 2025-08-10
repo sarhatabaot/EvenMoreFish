@@ -2,6 +2,7 @@ package com.oheers.fish.competition.leaderboard;
 
 import com.oheers.fish.competition.CompetitionEntry;
 import com.oheers.fish.fishing.items.Fish;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +30,8 @@ public interface LeaderboardHandler {
     void removeEntry(CompetitionEntry entry) throws Exception;
 
     CompetitionEntry getTopEntry();
+
+    CompetitionEntry trackFish(@NotNull CompetitionEntry entry, @NotNull Fish fish);
 
 }
 
