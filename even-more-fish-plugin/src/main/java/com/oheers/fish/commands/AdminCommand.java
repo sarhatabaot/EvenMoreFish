@@ -549,7 +549,7 @@ public class AdminCommand {
                         // StringArgument containing all loaded competition ids
                         ArgumentHelper.getAsyncStringsArgument(
                                 "competitionId",
-                                info -> EvenMoreFish.getInstance().getCompetitionQueue().getFileMap().keySet().toArray(String[]::new)
+                                info -> EvenMoreFish.getInstance().getCompetitionQueue().getItemMap().keySet().toArray(String[]::new)
                         ),
                         new IntegerArgument("duration", 1).setOptional(true)
                 )
@@ -560,7 +560,7 @@ public class AdminCommand {
                         ConfigMessage.COMPETITION_ALREADY_RUNNING.getMessage().send(sender);
                         return;
                     }
-                    CompetitionFile file = EvenMoreFish.getInstance().getCompetitionQueue().getFileMap().get(id);
+                    CompetitionFile file = EvenMoreFish.getInstance().getCompetitionQueue().getItemMap().get(id);
                     if (file == null) {
                         ConfigMessage.INVALID_COMPETITION_ID.getMessage().send(sender);
                         return;
