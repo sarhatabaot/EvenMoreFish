@@ -67,7 +67,7 @@ public class PluginDataManager {
 
         this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(MainConfig.getInstance().getUserFishStatsSaveInterval()), key -> {
             final UserFishRarityKey userFishRarityKey = UserFishRarityKey.from(key);
-            return database.getUserFishStats(userFishRarityKey.getUserId(), userFishRarityKey.getFishName(), userFishRarityKey.getFishRarity()));
+            return database.getUserFishStats(userFishRarityKey.getUserId(), userFishRarityKey.getFishName(), userFishRarityKey.getFishRarity());
         });
 
         this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), uuid -> database.getUserReport(UUID.fromString(uuid)));
