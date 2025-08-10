@@ -35,6 +35,13 @@ public class FishRarityKey {
         return new FishRarityKey("", "");
     }
 
+    public String getFishName() {
+        return fishName;
+    }
+
+    public String getFishRarity() {
+        return fishRarity;
+    }
 
     @Override
     public String toString() {
