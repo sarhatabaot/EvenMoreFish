@@ -3,9 +3,7 @@ title: Competition Types
 sidebar_position: 1
 ---
 ## What are they?
-There are 7 different competition types in EvenMoreFish for your players to experience, and include: MOST_FISH, LARGEST_FISH and SPECIFIC_FISH. Each competition you choose must define a competition type for it to work, however if you want to start a competition via commands, `/emf admin competition start <duration>` it will default to the LARGEST_FISH competition type. An argument after duration can be used to start a chosen competition type, as is seen in the screenshot below.
-
-![starting a fishing competition by command](https://media.discordapp.net/attachments/723194663519125618/883038254042083408/unknown.png)
+There are 7 different competition types in EvenMoreFish for your players to experience, all listed on this page. Each competition you choose must define a competition type for it to work.
 
 ## LARGEST_FISH
 As the title would suggest, the player with the largest fish caught will win the competition, and the player with the second largest fish will come second (and so on), by using `/emf top` your players will be able to view the current leaderboard - requiring they have the `emf.top` permission node.
@@ -28,7 +26,7 @@ This competition type selects a rarity at random from the list of `allowed-rarit
 ![the SPECIFIC_RARITY competition type beginning](https://media.discordapp.net/attachments/723194663519125618/981585087437086770/unknown.png)
 
 ## LARGEST_TOTAL
-When a player catches a fish, their score is increased by the size of their fish, allowing players to gradually increase their score cumulatively. At the end of the competition, the player with the highest total score will win, similar to all other competitions - it's similar to the more_fish competition in that the %emf_competition_place_fish_*% placeholder isn't able to be used too.
+When a player catches a fish, their score is increased by the size of their fish, allowing players to gradually increase their score cumulatively. At the end of the competition, the player with the highest total score will win, similar to all other competitions - it's similar to the MOST_FISH competition in that the %emf_competition_place_fish_*% placeholder will not work.
 
 ![the leaderboard from the LARGEST_TOTAL competition](https://media.discordapp.net/attachments/723194663519125618/981639014601859132/unknown.png)
 
