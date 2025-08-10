@@ -38,21 +38,6 @@ public class CompetitionEntry {
         this.time = Instant.now().toEpochMilli();
     }
 
-    /**
-     * Tracks a fish caught by the player in the competition. The value is increased based on the competition type's
-     * strategy. If the strategy uses fish length, the value will be increased by the fish's length; otherwise, it will be
-     * increased by 1.
-     * @param fish The fish to track.
-     */
-    public void trackFish(@NotNull Fish fish) {
-        if (type.getStrategy().shouldUseFishLength()) {
-            this.value += fish.getLength();
-        } else {
-            this.value += 1;
-        }
-        this.time = Instant.now().toEpochMilli();
-    }
-
     public Fish getFish() {
         return fish;
     }
@@ -76,7 +61,6 @@ public class CompetitionEntry {
     public UUID getPlayer() {
         return player;
     }
-
 
     @Override
     public String toString() {

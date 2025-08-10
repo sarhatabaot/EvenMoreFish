@@ -9,6 +9,7 @@ import com.oheers.fish.messages.abstracted.EMFMessage;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -128,12 +129,30 @@ public class Leaderboard implements LeaderboardHandler {
     }
 
     /**
-     * Updates an entry in the leaderboard by removing it, applying the changes, and re-adding it.
-     *
-     * @param entry The updated entry.
+     * Tracks a fish caught by the player in the competition. The value is increased based on the competition type's
+     * strategy. If the strategy uses fish length, the value will be increased by the fish's length; otherwise, it will be
+     * increased by 1.
+     * @param entry The entry to track the fish for.
+     * @param fish The fish to track.
+     * @return The new competition entry with the updated values.
      */
-    public void updateEntry(CompetitionEntry entry) {
-        removeEntry(entry); // Remove the current entry
-        addEntry(entry);    // Add the updated entry
+    @Override
+    public CompetitionEntry trackFish(@NotNull CompetitionEntry entry, @NotNull Fish fish) {
+        CompetitionEntry newEntry = new CompetitionEntry(entry.getPlayer(), fish, type);
+        float value = entry.getValue();
+        if (type.getStrategy().shouldUseFishLength()) {
+            value += fish.getLength();
+        } else {
+            value += 1;
+        }
+        newEntry.setValue(value);
+
+        // Add the new entry and remove the old one.
+        // It has to be in this order so the new-first message works.
+        addEntry(newEntry);
+        removeEntry(entry);
+
+        return newEntry;
     }
+
 }
