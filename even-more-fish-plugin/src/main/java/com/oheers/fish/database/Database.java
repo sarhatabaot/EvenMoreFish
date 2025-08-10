@@ -565,7 +565,7 @@ public class Database implements DatabaseAPI {
                 Optional<Record> optionalRecord = dslContext.select()
                         .from(Tables.FISH)
                         .where(Tables.FISH.FISH_NAME.eq(fishName))
-                        .and(Tables.FISH.FISH_RARITY.eq(fishName))
+                        .and(Tables.FISH.FISH_RARITY.eq(fishRarity))
                         .fetchOptional();
 
                 if (optionalRecord.isEmpty()) {
