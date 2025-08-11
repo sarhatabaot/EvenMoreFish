@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class FishJournalGui extends ConfigGui {
@@ -53,15 +55,11 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private DynamicGuiElement getGroup(Section section) {
-        if (this.rarity == null) {
-            return getRarityGroup(section);
-        } else {
-            return getFishGroup(section);
-        }
+        return (rarity == null) ? getRarityGroup(section) : getFishGroup(section);
     }
 
     private DynamicGuiElement getFishGroup(Section section) {
-        char character = FishUtils.getCharFromString(section.getString("fish-character", "f"), 'f');
+        char character = FishUtils.getCharFromString(section.getString("fish-character"), 'f');
 
         return new DynamicGuiElement(
                 character, who -> {
@@ -75,22 +73,19 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private ItemStack getFishItem(Fish fish, Section section) {
-        Database database = EvenMoreFish.getInstance().getPluginDataManager().getDatabase();
+        final Database database = requireDatabase("Can not show fish in the Journal Menu, please enable the database!");
 
         if (database == null) {
-            Logging.warn("Can not show fish in the Journal Menu, please enable the database!");
-            ItemFactory factory = ItemFactory.itemFactory(section, "undiscovered-fish");
-            return factory.createItem(player.getUniqueId());
+            return ItemFactory.itemFactory(section, "undiscovered-fish").createItem(player.getUniqueId());
         }
 
         boolean hideUndiscovered = section.getBoolean("hide-undiscovered-fish", true);
         // If undiscovered fish should be hidden
         if (hideUndiscovered && !database.userHasFish(fish, player)) {
-            ItemFactory factory = ItemFactory.itemFactory(section, "undiscovered-fish");
-            return factory.createItem(player.getUniqueId());
+            return ItemFactory.itemFactory(section, "undiscovered-fish").createItem(player.getUniqueId());
         }
 
-        ItemStack item = fish.give();
+        final ItemStack item = fish.give();
 
         item.editMeta(meta -> {
             ItemFactory factory = ItemFactory.itemFactory(section, "fish-item");
@@ -124,7 +119,8 @@ public class FishJournalGui extends ConfigGui {
         final String discoverer = getValueOrUnknown(() -> FishUtils.getPlayerName(fishStats.getDiscoverer()));
 
         EMFListMessage lore = EMFListMessage.fromStringList(
-            factory.getLore().getConfiguredValue()
+                Optional.ofNullable(factory.getLore().getConfiguredValue())
+                        .orElse(Collections.emptyList())
         );
 
         lore.setVariable("{times-caught}", getValueOrUnknown(() -> Integer.toString(userFishStats.getQuantity())));
@@ -141,17 +137,12 @@ public class FishJournalGui extends ConfigGui {
 
     @NotNull
     private String getValueOrUnknown(Supplier<String> supplier) {
-        try {
-            String value = supplier.get();
-            return (value == null) ? "Unknown" : value;
-        } catch (NullPointerException e) {
-            return "Unknown";
-        }
+        return Optional.ofNullable(supplier.get()).orElse("Unknown");
     }
 
 
     private DynamicGuiElement getRarityGroup(Section section) {
-        char character = FishUtils.getCharFromString(section.getString("rarity-character", "r"), 'r');
+        char character = FishUtils.getCharFromString(section.getString("rarity-character"), 'r');
 
         return new DynamicGuiElement(
             character, who -> {
@@ -171,24 +162,19 @@ public class FishJournalGui extends ConfigGui {
     }
 
     private ItemStack getRarityItem(Rarity rarity, Section section) {
-        Database database = EvenMoreFish.getInstance().getPluginDataManager().getDatabase();
-        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
+        final Database database = requireDatabase("Can not show rarities in the Journal Menu, please enable the database!");
 
         if (database == null) {
-            Logging.warn("Can not show rarities in the Journal Menu, please enable the database!");
-            ItemFactory factory = ItemFactory.itemFactory(section, "undiscovered-rarity");
-            return factory.createItem(player.getUniqueId());
+            return ItemFactory.itemFactory(section, "undiscovered-rarity").createItem(player.getUniqueId());
         }
 
+        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
         if (hideUndiscovered && !database.userHasRarity(rarity, player)) {
-            ItemFactory factory = ItemFactory.itemFactory(section, "undiscovered-rarity");
-            return factory.createItem(player.getUniqueId());
+            return ItemFactory.itemFactory(section, "undiscovered-rarity").createItem(player.getUniqueId());
         }
 
-        ItemStack rarityItem = rarity.getMaterial();
-
-        final ItemFactory factory = ItemFactory.itemFactory(section, "rarity-item");
-        ItemStack configuredItem = factory.createItem(player.getUniqueId());
+        final ItemStack rarityItem = rarity.getMaterial();
+        final ItemStack configuredItem = ItemFactory.itemFactory(section, "rarity-item").createItem(player.getUniqueId());
 
         // Carry the configured item's lore and display name to the rarity item
         ItemMeta configuredMeta = configuredItem.getItemMeta();
@@ -211,6 +197,15 @@ public class FishJournalGui extends ConfigGui {
     }
 
     @Override
-    public void doRescue() {}
+    public void doRescue() { /* Don't rescue, view only */ }
+
+
+    private @Nullable Database requireDatabase(String logMessage) {
+        Database db = EvenMoreFish.getInstance().getPluginDataManager().getDatabase();
+        if (db == null) {
+            Logging.warn(logMessage);
+        }
+        return db;
+    }
 
 }

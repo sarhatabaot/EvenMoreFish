@@ -9,26 +9,25 @@ import java.util.Map;
 
 public class AutoRunner {
 
-    static String timeKey;
-
-    static int lastMinute;
+    private static int lastMinute = -1;
 
     public static void init() {
-        EvenMoreFish.getScheduler().runTaskTimer(() -> {
-            // If the minute hasn't been checked against the competition queue.
-            if (!wasMinuteChecked()) {
-                int weekMinute = getCurrentTimeCode();
+        EvenMoreFish.getScheduler().runTaskTimer(
+                () -> {
+                    // If the minute hasn't been checked against the competition queue.
+                    if (!wasMinuteChecked()) {
+                        int weekMinute = getCurrentTimeCode();
 
-                // Beginning the competition set for schedule
-                Map<Integer, Competition> competitions = EvenMoreFish.getInstance().getCompetitionQueue().getCompetitions();
-                Competition competition = competitions.get(weekMinute);
-                if (competition != null) {
-                    if (!Competition.isActive()) {
-                        competition.begin();
+                        // Beginning the competition set for schedule
+                        Map<Integer, Competition> competitions = EvenMoreFish.getInstance().getCompetitionQueue().getCompetitions();
+                        Competition competition = competitions.get(weekMinute);
+                        if (competition != null && !Competition.isActive()) {
+                            competition.begin();
+                        }
+
                     }
-                }
-            }
-        }, (60 - LocalTime.now().getSecond()) * 20, 20);
+                }, (60 - LocalTime.now().getSecond()) * 20L, 20
+        );
     }
 
     /**
@@ -38,7 +37,7 @@ public class AutoRunner {
      */
     public static int getCurrentTimeCode() {
         // creates a key similar to the time key given in config.yml
-        timeKey = String.format("%02d", LocalTime.now().getHour()) + ":" + String.format("%02d", LocalTime.now().getMinute());
+        String timeKey = String.format("%02d", LocalTime.now().getHour()) + ":" + String.format("%02d", LocalTime.now().getMinute());
 
         // Obtaining how many minutes have passed since midnight last Sunday
         DayOfWeek day = LocalDate.now().getDayOfWeek();

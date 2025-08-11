@@ -6,6 +6,8 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.data.FishLogKey;
+import com.oheers.fish.database.data.FishRarityKey;
+import com.oheers.fish.database.data.UserFishRarityKey;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.data.manager.UserManager;
 import com.oheers.fish.database.data.strategy.impl.CompetitionSavingStrategy;
@@ -59,16 +61,13 @@ public class PluginDataManager {
             return Collections.singleton(database.getFishLog(logKey.getUserId(), logKey.getFishName(), logKey.getFishRarity(), logKey.getDateTime()));
         });
         this.fishStatsDataManager = new DataManager<>(new FishStatsSavingStrategy(), key -> {
-            final String fishName = key.split("\\.")[0];
-            final String fishRarity = key.split("\\.")[1];
-            return database.getFishStats(fishName,fishRarity);
+            final FishRarityKey fishRarityKey = FishRarityKey.from(key);
+            return database.getFishStats(fishRarityKey.getFishName(),fishRarityKey.getFishRarity());
         });
 
         this.userFishStatsDataManager = new DataManager<>(new UserFishStatsSavingStrategy(MainConfig.getInstance().getUserFishStatsSaveInterval()), key -> {
-            final int userId = Integer.parseInt(key.split("\\.")[0]);
-            final String fishName = key.split("\\.")[1];
-            final String fishRarity = key.split("\\.")[2];
-            return database.getUserFishStats(userId, fishName, fishRarity);
+            final UserFishRarityKey userFishRarityKey = UserFishRarityKey.from(key);
+            return database.getUserFishStats(userFishRarityKey.getUserId(), userFishRarityKey.getFishName(), userFishRarityKey.getFishRarity());
         });
 
         this.userReportDataManager = new DataManager<>(new UserReportsSavingStrategy(), uuid -> database.getUserReport(UUID.fromString(uuid)));
