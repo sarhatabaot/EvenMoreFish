@@ -10,6 +10,7 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.permissions.UserPerms;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,19 +60,20 @@ public class FishingProcessor extends Processor<PlayerFishEvent> {
             return;
         }
 
-        if (rod == null) {
-            plugin.debug("Null rod, somehow.");
+        if (!(event.getCaught() instanceof Item nonCustom)) {
+            plugin.debug("Caught entity is not an Item.");
             return;
         }
+
+        if (MainConfig.getInstance().isFishCatchOverrideOnlyFish() && !Tag.ITEMS_FISHES.isTagged(nonCustom.getItemStack().getType())) {
+            plugin.debug("Caught item is not a vanilla fish, and we have been told to skip non-fish. Skipping.");
+            return;
+        }
+
         ItemStack fish = getFish(event.getPlayer(), event.getHook().getLocation(), rod);
 
         if (fish == null) {
             plugin.debug("Could not obtain fish.");
-            return;
-        }
-
-        if (!(event.getCaught() instanceof Item nonCustom)) {
-            plugin.debug("Caught entity is not an Item.");
             return;
         }
 
