@@ -19,6 +19,8 @@ fishing:
   catch-only-in-competition: false
   # Should custom rods be required?
   require-custom-rod: false
+  # Should the plugin only override fish, keeping treasure like enchanted books?
+  only-fish: false
 
   # Should fish be caught by killing fish entities?
   hunt-enabled: false
@@ -253,5 +255,5 @@ biome-sets:
 
 # ATTENTION ATTENTION ATTENTION
 # DO NOT EDIT THIS VALUE OR THINGS WILL BREAK!!!
-version: 3
+version: 4
 

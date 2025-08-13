@@ -39,7 +39,6 @@ public class MainConfig extends ConfigBase {
     private final String applyBaitsSubCommandName;
     private final String journalSubCommandName;
 
-
     public MainConfig() {
         super("config.yml", "config.yml", EvenMoreFish.getInstance(), true);
         instance = this;
@@ -87,6 +86,10 @@ public class MainConfig extends ConfigBase {
 
     public boolean isFishCatchOnlyInCompetition() {
         return getConfig().getBoolean("fishing.catch-only-in-competition", false);
+    }
+
+    public boolean isFishCatchOverrideOnlyFish() {
+        return getConfig().getBoolean("fishing.only-fish", false);
     }
 
     public boolean isHuntEnabled() {
