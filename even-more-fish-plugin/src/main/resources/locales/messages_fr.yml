@@ -188,8 +188,6 @@ bait-invalid-rod: <white>Tu ne peux pas appliquer d'appât sur cette canne à p�
 # Shown when /emf toggle is run, to turn off and on respectively.
 toggle-off: <white>Vous n'attraperez plus de poisson personnalisé.
 toggle-on: <white>Vous allez maintenant attraper des poissons personnalisés.
-# When trying to place a skull-fish when this is blocked in config.yml
-place-fish-blocked: <white>Vous ne pouvez pas placer ce poisson.
 admin:
   # Opens an /emf shop for another player
   open-fish-shop: <white>Boutique ouverte pour {player}.

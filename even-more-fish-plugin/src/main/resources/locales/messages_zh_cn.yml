@@ -188,8 +188,6 @@ bait-invalid-rod: <white>你不能对这只钓鱼棒应用鱼饵!
 # Shown when /emf toggle is run, to turn off and on respectively.
 toggle-off: <white>您将无法再钓到自定义鱼。
 toggle-on: <white>您将无法再钓到自定义鱼。
-# When trying to place a skull-fish when this is blocked in config.yml
-place-fish-blocked: <white>你不能放置这个鱼。
 admin:
   # Opens an /emf shop for another player
   open-fish-shop: <green>为玩家{player}打开了钓鱼商店.

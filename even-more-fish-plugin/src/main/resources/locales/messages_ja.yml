@@ -188,8 +188,6 @@ bait-invalid-rod: <white>You cannot apply bait to this fishing rod!
 # Shown when /emf toggle is run, to turn off and on respectively.
 toggle-off: <reset>カスタムされた魚が釣れなくなりました。
 toggle-on: <reset>カスタムされた魚を釣れるようになりました。
-# When trying to place a skull-fish when this is blocked in config.yml
-place-fish-blocked: <reset>この魚を置くことはできません。
 admin:
   # Opens an /emf shop for another player
   open-fish-shop: <reset>{player} のショップイベントリを開きました。
