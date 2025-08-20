@@ -66,7 +66,6 @@ public enum ConfigMessage {
 
     ECONOMY_DISABLED("<white>EvenMoreFish's economy features are disabled.", PrefixType.ERROR, false, false, "admin.economy-disabled"),
 
-    FISH_CANT_BE_PLACED("<white>You cannot place this fish.", PrefixType.ERROR, true, true, "place-fish-blocked"),
     FISH_CAUGHT("<white><b>{player}</b> has fished a {length}cm <b>{rarity}</b> {fish}!", PrefixType.NONE, true, true, "fish-caught"),
     FISH_LENGTHLESS_CAUGHT("<white><b>{player}</b> has fished a <b>{rarity}</b> {fish}!", PrefixType.NONE, true, true, "lengthless-fish-caught"),
     FISH_HUNTED("<white><b>{player}</b> has hunted a {length}cm <bold>{rarity}</bold> {fish}!", PrefixType.NONE, true, true, "fish-hunted"),
