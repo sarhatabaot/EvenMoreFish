@@ -67,7 +67,6 @@ public class SkullSaver implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlace(BlockPlaceEvent event) {
-        
         if (event.isCancelled()) {
             return;
         }
@@ -80,11 +79,6 @@ public class SkullSaver implements Listener {
         }
         
         if (FishUtils.isFish(stack)) {
-            if (MainConfig.getInstance().blockPlacingHeads()) {
-                event.setCancelled(true);
-                ConfigMessage.FISH_CANT_BE_PLACED.getMessage().send(event.getPlayer());
-                return;
-            }
             
             if (block.getState() instanceof Skull sm) {
                 Fish fish = FishUtils.getFish(stack);

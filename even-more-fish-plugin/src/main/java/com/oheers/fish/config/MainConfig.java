@@ -153,10 +153,6 @@ public class MainConfig extends ConfigBase {
         return !getConfig().getBoolean("disable-db-verbose", false);
     }
 
-    public boolean blockPlacingHeads() {
-        return getConfig().getBoolean("place-head-fish", false);
-    }
-
     public boolean requireCustomRod() {
         return getConfig().getBoolean("fishing.require-custom-rod", false);
     }

@@ -212,9 +212,6 @@ bait-invalid-rod: <white>You cannot apply bait to this fishing rod!
 toggle-off: <white>You will no longer catch custom fish.
 toggle-on: <white>You will now catch custom fish.
 
-# When trying to place a skull-fish when this is blocked in config.yml
-place-fish-blocked: <white>You cannot place this fish.
-
 admin:
   # Opens an /emf shop for another player
   open-fish-shop: <white>Opened a shop inventory for {player}.

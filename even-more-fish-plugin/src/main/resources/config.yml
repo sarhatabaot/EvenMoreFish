@@ -161,9 +161,6 @@ disable-mcmmo-loot: true
 # Prevents AureliumSkills from overriding fishing loot, this means treasure won't appear when fish can.
 disable-aureliumskills-loot: true
 
-# When set to true, players won't be able to place fish that are heads, like head-64 or head-uuid.
-place-head-fish: false
-
 # Whether to protect baited fishing rods in an anvil.
 protect-baited-rods: true
 
