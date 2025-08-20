@@ -24,11 +24,7 @@ public class Leaderboard implements LeaderboardHandler {
 
     public Leaderboard(CompetitionType type) {
         this.type = type;
-
-        Comparator<CompetitionEntry> entryComparator = type.shouldReverseLeaderboard() ?
-            Comparator.comparingDouble(CompetitionEntry::getValue) :
-            Comparator.comparingDouble(CompetitionEntry::getValue).reversed();
-        this.entries = new TreeSet<>(entryComparator);
+        this.entries = new TreeSet<>(createComparator());
     }
 
     @Override
@@ -153,6 +149,16 @@ public class Leaderboard implements LeaderboardHandler {
         removeEntry(entry);
 
         return newEntry;
+    }
+
+    private Comparator<CompetitionEntry> createComparator() {
+        Comparator<CompetitionEntry> comparator = Comparator
+            // First compare the entry values
+            .comparingDouble(CompetitionEntry::getValue)
+            // If a tie, compare by the time of the most recent catch
+            .thenComparing(Comparator.comparingLong(CompetitionEntry::getTime).reversed());
+
+        return type.shouldReverseLeaderboard() ? comparator : comparator.reversed();
     }
 
 }

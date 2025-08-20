@@ -50,7 +50,7 @@ public class SkullSaver implements Listener {
             }
             stack.setItemMeta(fishItem.getItemMeta());
             block.setType(Material.AIR);
-            block.getWorld().dropItem(block.getLocation(), stack);
+            block.getWorld().dropItemNaturally(block.getLocation(), stack);
             block.getWorld().playSound(block.getLocation(), Sound.BLOCK_BONE_BLOCK_BREAK, 1, 1);
         } catch (InvalidFishException exception) {
             EvenMoreFish.getInstance().getLogger().severe(() -> String.format("Error fetching fish from config at location: " +
