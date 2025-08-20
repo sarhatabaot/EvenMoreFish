@@ -180,6 +180,11 @@ public class FishUtils {
                 .filter(Objects::nonNull)
                 .toList();
 
+        // Do not proceed if there are no valid items to give
+        if (filteredItems.isEmpty()) {
+            return;
+        }
+
         // Play item pickup sound
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.5f);
 
