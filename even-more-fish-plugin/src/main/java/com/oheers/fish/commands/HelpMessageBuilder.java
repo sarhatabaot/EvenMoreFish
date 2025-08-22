@@ -47,9 +47,13 @@ public class HelpMessageBuilder {
     public EMFMessage buildMessage() {
         final EMFListMessage message = ConfigMessage.HELP_GENERAL_TITLE.getMessage().toListMessage();
         usages.forEach((key, value) -> {
+            EMFMessage description = value.get();
+            if (description == null || description.isEmpty()) {
+                return;
+            }
             EMFMessage usage = ConfigMessage.HELP_FORMAT.getMessage();
             usage.setVariable("{command}", correctCommand(key));
-            usage.setVariable("{description}", value.get());
+            usage.setVariable("{description}", description);
             message.appendMessage(usage);
         });
         return message;
