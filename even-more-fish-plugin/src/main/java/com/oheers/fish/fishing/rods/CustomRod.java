@@ -37,12 +37,12 @@ public class CustomRod extends ConfigBase {
         this.allowedRarities = loadAllowedRarities();
         this.allowedFish = loadAllowedFish();
         this.factory = ItemFactory.itemFactory(getConfig());
-        this.factory.setFinalChanges(item -> {
+        this.factory.setFinalChanges(item ->
             NBT.modify(item, nbt -> {
                 ReadWriteNBT emfCompound = nbt.getOrCreateCompound(NbtKeys.EMF_COMPOUND);
                 emfCompound.setString(NbtKeys.EMF_ROD_ID, getId());
-            });
-        });
+            })
+        );
         this.recipe = loadRecipe();
     }
 
