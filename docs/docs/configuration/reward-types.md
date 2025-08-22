@@ -5,21 +5,21 @@ To use, change the identifier to the one you want using the table below:
 ```yaml title="Example"
 rewards:
   1:
-    - "MONEY:5000"
-    - "MESSAGE:<yellow>Congratulations!"
+    - "ITEM:diamond,5"
+    - "MESSAGE:<yellow>Congratulations, {player}!"
   2:
-    - "MONEY:2000"
+    - "ITEM:diamond,1"
 ```
 
 ## Default Types
 | Reward Type | Example                             | Description                                       | Available placeholders                     |
 |-------------|-------------------------------------|---------------------------------------------------|--------------------------------------------|
 | Command     | `COMMAND:msg {player} Reward Type!` | Run a command.                                    | `{player}`, `{x}`, `{y}`, `{z}`, `{world}` |
-| Effect      | `EFFECT:POISON,1,2`                 | Adds a potion effect.                             | -                                          |
+| Effect      | `EFFECT:POISON,1,2`                 | Adds a potion effect. (name,amplifier,duration)   | -                                          |
 | Health      | `HEALTH:5`                          | Adds health.                                      | -                                          |
 | Hunger      | `HUNGER:20`                         | Sets hunger level                                 | -                                          |
 | Items       | `ITEM:cobblestone,1`                | Gives an item. This supports Item Addons.         | -                                          |
-| Message     | `MESSAGE:<green>Reward Type!`       | Sends a message                                   | -                                          |
+| Message     | `MESSAGE:<green>Reward Type!`       | Sends a message                                   | `{player}`, PlaceholderAPI                 |
 | Exp         | `EXP:5000`                          | Gives experience points.                          | -                                          |
 | Sound       | `SOUND:ENTITY_WOLF_GROWL,1,5`       | Plays a sound to the player. (sound,volume,pitch) | -                                          |
 
