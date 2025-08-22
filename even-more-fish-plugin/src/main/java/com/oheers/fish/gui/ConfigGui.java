@@ -156,9 +156,9 @@ public class ConfigGui {
                 if (action != null) {
                     action.accept(this, click);
                 }
-                itemSection.getStringList("click-commands").forEach(command -> {
-                    Bukkit.dispatchCommand(click.getWhoClicked(), command);
-                });
+                itemSection.getStringList("click-commands").forEach(command ->
+                    Bukkit.dispatchCommand(click.getWhoClicked(), command)
+                );
                 return true;
             });
             gui.addElement(actionElement);
@@ -168,9 +168,9 @@ public class ConfigGui {
                 if (action != null) {
                     action.accept(this, click);
                 }
-                itemSection.getStringList("click-commands").forEach(command -> {
-                    Bukkit.dispatchCommand(click.getWhoClicked(), command);
-                });
+                itemSection.getStringList("click-commands").forEach(command ->
+                    Bukkit.dispatchCommand(click.getWhoClicked(), command)
+                );
                 return true;
             });
             gui.addElement(element);

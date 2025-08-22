@@ -117,12 +117,9 @@ public class Database implements DatabaseAPI {
 
     private @NotNull ConnectionFactory getConnectionFactory(final @NotNull String type) {
         return switch (type) {
-            case "mysql":
-                yield new MySqlConnectionFactory();
-            case "sqlite":
-                yield new SqliteConnectionFactory();
-            default:
-                yield new H2ConnectionFactory();
+            case "mysql" -> new MySqlConnectionFactory();
+            case "sqlite" -> new SqliteConnectionFactory();
+            default -> new H2ConnectionFactory();
         };
     }
 
