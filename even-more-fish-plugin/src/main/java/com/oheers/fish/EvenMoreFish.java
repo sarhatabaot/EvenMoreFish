@@ -93,6 +93,12 @@ public class EvenMoreFish extends EMFPlugin {
             return;
         }
 
+        if (!NBT.preloadApi()) {
+            throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
+        }
+
+        instance = this;
+
         CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
                 .shouldHookPaperReload(true)
                 .missingExecutorImplementationMessage("You are not able to use this command!");
@@ -101,12 +107,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onEnable() {
-        if (!NBT.preloadApi()) {
-            throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
-        }
-
-        instance = this;
-
         CommandAPI.onEnable();
 
         scheduler = UniversalScheduler.getScheduler(this);
