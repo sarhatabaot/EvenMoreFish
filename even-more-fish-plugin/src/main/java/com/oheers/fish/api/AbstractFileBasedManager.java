@@ -14,11 +14,20 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class AbstractFileBasedManager<T> {
+    protected AbstractFileBasedManager<?> dependency;
+
     protected final TreeMap<String, T> itemMap;
     private boolean loaded = false;
 
     protected AbstractFileBasedManager() {
         this.itemMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        this.dependency = null;
+        performPreLoadConversions();
+    }
+
+    protected AbstractFileBasedManager(AbstractFileBasedManager<?> dependency) {
+        this.itemMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        this.dependency = dependency;
         performPreLoadConversions();
     }
 
@@ -27,6 +36,14 @@ public abstract class AbstractFileBasedManager<T> {
         if (isLoaded()) {
             return;
         }
+
+        if (dependency != null && !dependency.isLoaded()) {
+            throw new IllegalStateException(
+                    this.getClass().getSimpleName() + " cannot load before "
+                            + dependency.getClass().getSimpleName()
+            );
+        }
+
         loadItems();
         logLoadedItems();
         loaded = true;

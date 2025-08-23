@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 public class CompetitionFile extends ConfigBase {
 
-    private static final Logger logger = EvenMoreFish.getInstance().getLogger();
+    private final Logger logger = getPlugin().getLogger();
 
     // We should never use the configUpdater for this.
     public CompetitionFile(@NotNull File file) throws InvalidConfigurationException {

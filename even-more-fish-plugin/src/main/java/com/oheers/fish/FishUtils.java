@@ -613,7 +613,7 @@ public class FishUtils {
      * @return The rounded float value with the provided amount of decimal places.
      */
     public static float roundFloat(final float value, int places) {
-        return new BigDecimal(value)
+        return BigDecimal.valueOf(value)
             .setScale(places, RoundingMode.HALF_UP)
             .floatValue();
     }
