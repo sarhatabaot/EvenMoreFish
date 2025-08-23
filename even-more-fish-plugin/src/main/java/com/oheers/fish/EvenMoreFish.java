@@ -50,10 +50,9 @@ import java.util.logging.Logger;
 import static com.oheers.fish.FishUtils.classExists;
 
 public class EvenMoreFish extends EMFPlugin {
-
     private final Random random = ThreadLocalRandom.current();
-    private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
-        || classExists("io.papermc.paper.configuration.Configuration");
+
+    private final NamespacedKey fishToggleKey = new NamespacedKey(this, "fish-disabled");
 
     // Do some fish in some rarities have the comp-check-exempt: true.
     private boolean raritiesCompCheckExempt = false;
@@ -87,7 +86,7 @@ public class EvenMoreFish extends EMFPlugin {
     @Override
     public void onLoad() {
         // Don't enable if the server is not using Paper.
-        if (!isPaper) {
+        if (!isPaper()) {
             getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, we recommend updating to Paper instead. https://papermc.io/downloads/paper");
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -163,7 +162,7 @@ public class EvenMoreFish extends EMFPlugin {
     @Override
     public void onDisable() {
         // If the server is not using Paper, the plugin won't have enabled in the first place.
-        if (!isPaper) {
+        if (!isPaper()) {
             return;
         }
 
@@ -255,8 +254,8 @@ public class EvenMoreFish extends EMFPlugin {
         return raritiesCompCheckExempt;
     }
 
-    public void setRaritiesCompCheckExempt(boolean bool) {
-        this.raritiesCompCheckExempt = bool;
+    public void setRaritiesCompCheckExempt(boolean exempt) {
+        this.raritiesCompCheckExempt = exempt;
     }
 
     public CompetitionQueue getCompetitionQueue() {
@@ -282,24 +281,23 @@ public class EvenMoreFish extends EMFPlugin {
     // FISH TOGGLE METHODS
 
     public void performFishToggle(@NotNull Player player) {
-        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         // If custom fishing is disabled
         if (isCustomFishingDisabled(player)) {
             // Set fish-disabled to false
-            pdc.set(key, PersistentDataType.BOOLEAN, false);
+            pdc.set(fishToggleKey, PersistentDataType.BOOLEAN, false);
             ConfigMessage.TOGGLE_ON.getMessage().send(player);
         } else {
             // Set fish-disabled to true
-            pdc.set(key, PersistentDataType.BOOLEAN, true);
+            pdc.set(fishToggleKey, PersistentDataType.BOOLEAN, true);
             ConfigMessage.TOGGLE_OFF.getMessage().send(player);
         }
     }
 
+
     public boolean isCustomFishingDisabled(@NotNull Player player) {
         PersistentDataContainer pdc = player.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(this, "fish-disabled");
-        return pdc.getOrDefault(key, PersistentDataType.BOOLEAN, false);
+        return pdc.getOrDefault(fishToggleKey, PersistentDataType.BOOLEAN, false);
     }
 
     public DependencyManager getDependencyManager() {
@@ -316,6 +314,11 @@ public class EvenMoreFish extends EMFPlugin {
 
     public MetricsManager getMetricsManager() {
         return metricsManager;
+    }
+
+    private boolean isPaper() {
+        return classExists("com.destroystokyo.paper.PaperConfig")
+                || classExists("io.papermc.paper.configuration.Configuration");
     }
 
 }

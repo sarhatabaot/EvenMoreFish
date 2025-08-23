@@ -2,6 +2,7 @@ package com.oheers.fish.fishing.rods;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.AbstractFileBasedManager;
+import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.utils.nbt.NbtKeys;
 import com.oheers.fish.utils.nbt.NbtUtils;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +14,7 @@ public class RodManager extends AbstractFileBasedManager<CustomRod> {
     private static final RodManager instance = new RodManager();
 
     private RodManager() {
-        super();
+        super(BaitManager.getInstance());
     }
 
     public static RodManager getInstance() {

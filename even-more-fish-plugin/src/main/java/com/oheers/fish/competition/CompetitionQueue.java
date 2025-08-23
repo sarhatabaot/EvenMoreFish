@@ -5,6 +5,7 @@ import com.oheers.fish.api.AbstractFileBasedManager;
 import com.oheers.fish.competition.configs.CompetitionConversions;
 import com.oheers.fish.competition.configs.CompetitionFile;
 
+import com.oheers.fish.fishing.rods.RodManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.DayOfWeek;
@@ -14,6 +15,10 @@ import java.util.logging.Level;
 public class CompetitionQueue extends AbstractFileBasedManager<CompetitionFile> {
 
     private final Map<Integer, Competition> competitions = new TreeMap<>();
+
+    public CompetitionQueue() {
+        super(RodManager.getInstance());
+    }
 
     @Override
     protected void performPreLoadConversions() {
