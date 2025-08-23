@@ -42,12 +42,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,19 +51,18 @@ import static com.oheers.fish.FishUtils.classExists;
 
 public class EvenMoreFish extends EMFPlugin {
 
-    private final Random random = new Random();
+    private final Random random = ThreadLocalRandom.current();
     private final boolean isPaper = classExists("com.destroystokyo.paper.PaperConfig")
         || classExists("io.papermc.paper.configuration.Configuration");
 
     // Do some fish in some rarities have the comp-check-exempt: true.
     private boolean raritiesCompCheckExempt = false;
     private CompetitionQueue competitionQueue;
-    private Logger logger;
 
     // this is for pre-deciding a rarity and running particles if it will be chosen
     // it's a work-in-progress solution and probably won't stick.
     private Map<UUID, Rarity> decidedRarities;
-    private boolean isUpdateAvailable;
+    private volatile boolean isUpdateAvailable;
 
     private DependencyManager dependencyManager;
     private ConfigurationManager configurationManager;
@@ -82,7 +77,7 @@ public class EvenMoreFish extends EMFPlugin {
 
 
     public static @NotNull EvenMoreFish getInstance() {
-        return instance;
+        return Objects.requireNonNull(instance, "Plugin not initialized yet!");
     }
 
     public static TaskScheduler getScheduler() {
@@ -91,6 +86,13 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onLoad() {
+        // Don't enable if the server is not using Paper.
+        if (!isPaper) {
+            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, we recommend updating to Paper instead. https://papermc.io/downloads/paper");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
                 .shouldHookPaperReload(true)
                 .missingExecutorImplementationMessage("You are not able to use this command!");
@@ -99,13 +101,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onEnable() {
-        // Don't enable if the server is not using Paper.
-        if (!isPaper) {
-            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, we recommend updating to Paper instead. https://papermc.io/downloads/paper");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         if (!NBT.preloadApi()) {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
@@ -119,9 +114,6 @@ public class EvenMoreFish extends EMFPlugin {
         this.api = new EMFAPI();
 
         this.decidedRarities = new HashMap<>();
-
-        this.logger = getLogger();
-
 
         this.configurationManager = new ConfigurationManager(this);
         this.configurationManager.loadConfigurations(); //need to test, order may be important
@@ -165,7 +157,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         registerCommands();
 
-        logger.log(Level.INFO, "EvenMoreFish by Oheers : Enabled");
+        getLogger().info(() -> "EvenMoreFish by Oheers : Enabled");
     }
 
     @Override
@@ -199,7 +191,7 @@ public class EvenMoreFish extends EMFPlugin {
         BaitManager.getInstance().unload();
         FishManager.getInstance().unload();
 
-        logger.log(Level.INFO, "EvenMoreFish by Oheers : Disabled");
+        getLogger().info(() -> "EvenMoreFish by Oheers : Disabled");
     }
 
 
@@ -235,7 +227,7 @@ public class EvenMoreFish extends EMFPlugin {
 
         this.eventManager.registerOptionalListeners();
 
-        competitionQueue.load();
+        competitionQueue.reload();
 
         if (sender != null) {
             ConfigMessage.RELOAD_SUCCESS.getMessage().send(sender);
@@ -284,8 +276,7 @@ public class EvenMoreFish extends EMFPlugin {
     }
 
     public List<Player> getVisibleOnlinePlayers() {
-        return new ArrayList<>(Bukkit.getOnlinePlayers());
-//        return MainConfig.getInstance().shouldRespectVanish() ? VanishChecker.getVisibleOnlinePlayers() : new ArrayList<>(Bukkit.getOnlinePlayers());
+        return List.copyOf(Bukkit.getOnlinePlayers());
     }
 
     // FISH TOGGLE METHODS

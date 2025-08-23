@@ -1,6 +1,5 @@
 package com.oheers.fish.config;
 
-import com.oheers.fish.EvenMoreFish;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.Settings;
@@ -88,7 +87,7 @@ public class ConfigBase {
     }
 
     public void reload() {
-        if (preventIO) {
+        if (preventIO || file == null) {
             return;
         }
         reload(this.file);
@@ -96,7 +95,7 @@ public class ConfigBase {
 
     public final YamlDocument getConfig() {
         if (this.config == null) {
-            throw new RuntimeException(getFileName() + " has not loaded properly. Please check for startup errors.");
+            throw new IllegalStateException("Config " + getFileName() + " is not loaded. Please check for startup errors.");
         }
         return this.config;
     }
@@ -150,7 +149,7 @@ public class ConfigBase {
         try {
             getConfig().save();
         } catch (IOException exception) {
-            EvenMoreFish.getInstance().getLogger().warning("Failed to save " + getFileName());
+            plugin.getLogger().warning("Failed to save " + getFileName());
         }
     }
 
@@ -161,8 +160,10 @@ public class ConfigBase {
         try {
             getConfig().update();
         } catch (IOException exception) {
-            EvenMoreFish.getInstance().getLogger().warning("Failed to update " + getFileName());
+            plugin.getLogger().warning("Failed to update " + getFileName());
         }
     }
+
+
 
 }
