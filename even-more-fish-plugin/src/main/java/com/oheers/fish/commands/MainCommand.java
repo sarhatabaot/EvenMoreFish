@@ -53,7 +53,7 @@ public class MainCommand {
                         new AdminCommand(adminName).getCommand()
                 )
                 .executesPlayer(info -> {
-                    if (MainConfig.getInstance().useOldBaseCommandBehavior()) {
+                    if (!info.sender().hasPermission(UserPerms.GUI) || MainConfig.getInstance().useOldBaseCommandBehavior()) {
                         sendHelpMessage(info.sender());
                     } else {
                         new MainMenuGui(info.sender()).open();
