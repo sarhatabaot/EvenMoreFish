@@ -236,6 +236,7 @@ command:
     journal: "journal"
 
   # Should the base command show the help text instead of opening the GUI?
+  # This is always true if the player doesn't have the /emf gui permission.
   old-base-command-behavior: false
 
 # Customizable sets of biomes for fish configuration
