@@ -78,6 +78,7 @@ dependencyResolutionManagement {
             plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.8.0")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
+            library("messagelib", "uk.firedev:MessageLib:1.0-SNAPSHOT")
 
             plugin("grgit", "org.ajoberstar.grgit").version("5.3.2")
 
