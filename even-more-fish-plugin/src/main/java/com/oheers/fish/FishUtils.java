@@ -660,14 +660,6 @@ public class FishUtils {
         return EMFMessage.PLAINTEXT_SERIALIZER.serialize(component).contains(string);
     }
 
-    public static @NotNull Component decorateIfAbsent(@NotNull Component component, @NotNull TextDecoration decoration, @NotNull TextDecoration.State state) {
-        TextDecoration.State oldState = component.decoration(decoration);
-        if (oldState == TextDecoration.State.NOT_SET) {
-            return component.decoration(decoration, state);
-        }
-        return component;
-    }
-
     /**
      * @param colour The original colour
      * @return A string turned into a format key for use in configs.
