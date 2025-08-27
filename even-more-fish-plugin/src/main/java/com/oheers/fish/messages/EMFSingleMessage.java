@@ -27,7 +27,7 @@ public class EMFSingleMessage extends EMFMessage {
 
     private ComponentSingleMessage underlying;
 
-    private EMFSingleMessage(@NotNull ComponentSingleMessage message) {
+    protected EMFSingleMessage(@NotNull ComponentSingleMessage message) {
         super();
         this.underlying = message;
     }
@@ -63,6 +63,10 @@ public class EMFSingleMessage extends EMFMessage {
         return new EMFSingleMessage(
             ComponentMessage.componentMessage(Component.empty())
         );
+    }
+
+    public static EMFSingleMessage ofUnderlying(@NotNull ComponentSingleMessage underlying) {
+        return new EMFSingleMessage(underlying);
     }
 
     public static EMFSingleMessage of(@NotNull Component component) {

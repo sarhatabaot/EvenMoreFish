@@ -65,6 +65,10 @@ public class EMFListMessage extends EMFMessage {
         );
     }
 
+    public static EMFListMessage ofUnderlying(@NotNull ComponentListMessage underlying) {
+        return new EMFListMessage(underlying);
+    }
+
     public static EMFListMessage of(@NotNull Component component) {
         return new EMFListMessage(
             ComponentMessage.componentMessage(List.of(component))

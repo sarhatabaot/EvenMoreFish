@@ -1,12 +1,9 @@
 package com.oheers.fish.messages.abstracted;
 
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -15,7 +12,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import uk.firedev.messagelib.message.ComponentListMessage;
 import uk.firedev.messagelib.message.ComponentMessage;
+import uk.firedev.messagelib.message.ComponentSingleMessage;
 import uk.firedev.messagelib.message.MessageType;
 
 import java.util.Collection;
@@ -40,6 +39,16 @@ public abstract class EMFMessage {
     protected boolean perPlayer = true;
     protected boolean canSilent = false;
     protected OfflinePlayer relevantPlayer = null;
+
+    public static EMFMessage fromUnderlying(@NotNull ComponentMessage message) {
+        if (message instanceof ComponentListMessage listMessage) {
+            return EMFListMessage.ofUnderlying(listMessage);
+        } else if (message instanceof ComponentSingleMessage singleMessage) {
+            return EMFSingleMessage.ofUnderlying(singleMessage);
+        } else {
+            throw new IllegalArgumentException("Unknown ComponentMessage type");
+        }
+    }
 
     protected EMFMessage() {}
 

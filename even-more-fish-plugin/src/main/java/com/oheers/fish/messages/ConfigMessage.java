@@ -3,6 +3,10 @@ package com.oheers.fish.messages;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MessageConfig;
 import com.oheers.fish.messages.abstracted.EMFMessage;
+import net.kyori.adventure.text.Component;
+import uk.firedev.messagelib.message.ComponentListMessage;
+import uk.firedev.messagelib.message.ComponentMessage;
+import uk.firedev.messagelib.message.ComponentSingleMessage;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -321,87 +325,61 @@ public enum ConfigMessage {
         return this.canHidePrefix;
     }
 
-    public boolean isListForm() {
-        List<String> strings = MessageConfig.getInstance().getConfig().getStringList(getId());
-        return normalList != null || !strings.isEmpty();
-    }
-
     public PrefixType getPrefixType() {
         return prefixType;
     }
 
     public EMFMessage getMessage() {
-        if (isListForm()) {
-            EMFListMessage listMessage = EMFListMessage.empty();
-            listMessage.setCanSilent(this.canSilent);
-            List<String> list = getStringList(getNormalList(), getId());
-            if (list.isEmpty()) {
-                return listMessage;
-            }
-            for (String line : list) {
-                if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                    listMessage.appendString(line.substring(10));
-                } else {
-                    EMFMessage prefix = getPrefixType().getPrefix();
-                    prefix.appendString(line);
-                    listMessage.appendMessage(prefix);
-                }
-            }
-            return listMessage;
+        ComponentMessage message = ComponentMessage.componentMessage(
+            MessageConfig.getInstance().getMessageLoader(),
+            getId()
+        );
+
+        if (message instanceof ComponentListMessage listMessage) {
+            return processList(listMessage);
+        } else if (message instanceof ComponentSingleMessage singleMessage) {
+            return processSingle(singleMessage);
         } else {
-            String line = getString(getNormal(), getId());
-            EMFSingleMessage singleMessage = EMFSingleMessage.empty();
-            singleMessage.setCanSilent(this.canSilent);
-            if (line != null && !line.isEmpty()) {
-                if (this.canHidePrefix && line.startsWith("[noPrefix]")) {
-                    singleMessage.appendString(line.substring(10));
-                } else {
-                    EMFMessage prefix = getPrefixType().getPrefix();
-                    prefix.appendString(line);
-                    singleMessage.appendMessage(prefix);
-                }
+            EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Using the default value.");
+            if (normalList != null) {
+                return processList(ComponentMessage.componentMessage(normalList));
+            } else {
+                return processSingle(ComponentMessage.componentMessage(normal));
             }
-            return singleMessage;
         }
     }
 
-    /**
-     * If there is a value in the config that matches the id of this enum, that is returned. If not though, the default
-     * value stored will be returned and a message is outputted to the console alerting of a missing value.
-     *
-     * @return The string from config that matches the value of id.
-     */
-    private String getString(String normal, String id) {
-        MessageConfig messageConfig = MessageConfig.getInstance();
-        String string = messageConfig.getConfig().getString(id, null);
-        if (string == null) {
-            EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Attempting to insert the default value.");
-            messageConfig.getConfig().set(id, normal);
-            messageConfig.save();
-            EvenMoreFish.getInstance().getLogger().info("Filled " + id + " in your messages.yml with the default value.");
-            return normal;
-        }
-        return string;
+    private EMFMessage processList(ComponentListMessage list) {
+        list = list.editAllLines(line -> {
+            // If silent, return null to remove the line.
+            if (this.canSilent && line.containsString("-s")) {
+                return null;
+            }
+
+            // If hide prefix, remove the [noPrefix] tag and don't add a prefix.
+            if (this.canHidePrefix && line.containsString("[noPrefix]")) {
+                return line.replace("[noPrefix]", "");
+            }
+            // Otherwise, add the prefix.
+            return line.prepend(getPrefixType().getPrefix());
+        });
+        return EMFListMessage.ofUnderlying(list);
     }
 
-    /**
-     * If there is a value in the config that matches the id of this enum, that is returned. If not though, the default
-     * value stored will be returned and a message is outputted to the console alerting of a missing value. This is for
-     * string values however rather than just strings.
-     *
-     * @return The string list from config that matches the value of id.
-     */
-    private List<String> getStringList(List<String> normal, String id) {
-        MessageConfig messageConfig = MessageConfig.getInstance();
-        List<String> list = messageConfig.getConfig().getStringList(id);
-        if (list.isEmpty()) {
-            EvenMoreFish.getInstance().getLogger().warning("No valid value in messages.yml for: " + id + ". Attempting to insert the default value.");
-            messageConfig.getConfig().set(id, null);
-            messageConfig.save();
-            EvenMoreFish.getInstance().getLogger().info("Filled " + id + " in your messages.yml with the default value.");
-            return normal;
+    private EMFMessage processSingle(ComponentSingleMessage single) {
+        // If silent, return an empty message.
+        if (this.canSilent && single.containsString("-s")) {
+            return EMFSingleMessage.empty();
         }
-        return list;
+
+        // If hide prefix, remove the [noPrefix] tag and don't add a prefix.
+        if (this.canHidePrefix && single.containsString("[noPrefix]")) {
+            single = single.replace("[noPrefix]", "");
+        // Otherwise, add the prefix.
+        } else {
+            single = single.prepend(getPrefixType().getPrefix());
+        }
+        return EMFSingleMessage.ofUnderlying(single);
     }
 
 }
