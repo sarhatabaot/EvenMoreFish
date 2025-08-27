@@ -1,6 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.messages.EMFConfigLoader;
 import com.oheers.fish.messages.EMFSingleMessage;
 import com.oheers.fish.messages.PrefixType;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
@@ -9,13 +10,26 @@ public class MessageConfig extends ConfigBase {
 
     private static MessageConfig instance = null;
 
+    private EMFConfigLoader messageLoader;
+
     public MessageConfig() {
         super("messages.yml", "locales/" + "messages_" + MainConfig.getInstance().getLocale() + ".yml", EvenMoreFish.getInstance(), true);
         instance = this;
+        this.messageLoader = new EMFConfigLoader(getConfig());
     }
 
     public static MessageConfig getInstance() {
         return instance;
+    }
+
+    public EMFConfigLoader getMessageLoader() {
+        return messageLoader;
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        this.messageLoader = new EMFConfigLoader(getConfig());
     }
 
     public EMFSingleMessage getSTDPrefix() {
