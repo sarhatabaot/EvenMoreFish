@@ -216,6 +216,13 @@ public abstract class EMFMessage {
      * @param replacement The replacement for the variable.
      */
     public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
+        // Explicitly handle EMFMessage replacements to avoid ending up with the toString of the object.
+        if (replacement instanceof EMFMessage emfMessage) {
+            setUnderlying(
+                getUnderlying().replace(variable, emfMessage.getUnderlying())
+            );
+            return;
+        }
         setUnderlying(
             getUnderlying().replace(variable, replacement)
         );
