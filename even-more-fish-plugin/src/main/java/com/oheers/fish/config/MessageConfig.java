@@ -32,13 +32,6 @@ public class MessageConfig extends ConfigBase {
         this.messageLoader = new EMFConfigLoader(getConfig());
     }
 
-    public EMFSingleMessage getSTDPrefix() {
-        EMFSingleMessage message = EMFSingleMessage.empty();
-        message.prependMessage(PrefixType.DEFAULT.getPrefix());
-        message.appendString("<reset>");
-        return message;
-    }
-
     public int getLeaderboardCount() {
         return getConfig().getInt("leaderboard-count", 5);
     }
