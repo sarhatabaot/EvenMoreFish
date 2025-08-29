@@ -39,7 +39,7 @@ dependencyResolutionManagement {
             library("griefprevention", "com.github.TechFortress:GriefPrevention:16.18.4")
 
             library("itemsadder-api", "com.github.LoneDev6:API-ItemsAdder:3.6.1")
-            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT")
+            library("nbt-api", "de.tr7zw:item-nbt-api:2.15.2")
             library("denizen-api", "com.denizenscript:denizen:1.3.1-SNAPSHOT")
             library("oraxen", "io.th0rgal:oraxen:1.192.0")
             library("nexo", "com.nexomc:nexo:1.10.0")
@@ -78,6 +78,7 @@ dependencyResolutionManagement {
             plugin("plugin-yml", "de.eldoria.plugin-yml.bukkit").version("0.8.0")
 
             library("boostedyaml", "dev.dejvokep:boosted-yaml:1.3.7")
+            library("messagelib", "uk.firedev:MessageLib:1.0-SNAPSHOT")
 
             plugin("grgit", "org.ajoberstar.grgit").version("5.3.2")
 

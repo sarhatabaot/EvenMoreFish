@@ -6,9 +6,7 @@ title: Messages
 
 This is the file for modifying messages sent to the players from the plugin: if you're running the server locally or
 viewing the files on a panel through FTP/SFTP, you can use a text-editor such
-as [Notepad++](https://notepad-plus-plus.org/). At some point in the very distant future I plan to add in a way of
-modifying this file using a web-editor like LuckPerms uses, but right now (and probably for quite a while) it's just the
-basic text editor.
+as [Notepad++](https://notepad-plus-plus.org/).
 
 ## The Wiki
 
@@ -30,6 +28,29 @@ someone overtakes them in the competition leaderboard (previously you had to del
 
 This stops the [EvenMoreFish] logo (or your server's equivalent) from displaying before the message. For lists like /emf
 help, you have to add one for each line of the list.
+
+***
+
+## Message Types
+
+As of 2.0.12, it is now possible to choose a message type.
+
+While a normal chat message can be configured like this:
+```
+reload: "<white>Successfully reloaded the plugin."
+```
+
+You can slightly change the configuration to choose a type like this:
+```
+reload:
+  type: subtitle
+  message: "<white>Successfully reloaded the plugin."
+```
+The list of currently supported types are:
+- chat
+- action_bar
+- title
+- subtitle
 
 ***
 

@@ -15,7 +15,7 @@ plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
-    id("org.sonarqube") version "6.3.0.5676"
+    id("org.sonarqube") version "6.2.0.5505"
 }
 
 group = "com.oheers.evenmorefish"
@@ -106,6 +106,7 @@ dependencies {
     implementation(libs.inventorygui)
     implementation(libs.boostedyaml)
     implementation(libs.vanishchecker)
+    implementation(libs.messagelib)
     implementation(libs.universalscheduler)
 
     //temp fix until dynamic gradle plugin is ready ("mirror-aware-plugin") by sarhatabaot
@@ -288,8 +289,6 @@ tasks {
             val file = project.layout.buildDirectory.file("libs/even-more-fish-plugin-${version}.jar").get()
             file.asFile.delete()
         }
-
-
     }
 
     jooq {
@@ -342,6 +341,7 @@ tasks {
         relocate("com.github.Anon8281.universalScheduler", "com.oheers.fish.libs.universalScheduler")
         relocate("de.themoep.inventorygui", "com.oheers.fish.libs.inventorygui")
         relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
+        relocate("uk.firedev.messagelib", "com.oheers.fish.libs.messagelib")
         relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
         relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
         relocate("org.jooq", "com.oheers.fish.libs.jooq")

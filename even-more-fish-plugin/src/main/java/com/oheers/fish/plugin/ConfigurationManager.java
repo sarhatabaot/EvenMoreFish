@@ -5,6 +5,11 @@ import com.oheers.fish.config.GuiConfig;
 import com.oheers.fish.config.GuiFillerConfig;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
+import com.oheers.fish.messages.EMFListMessage;
+import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.abstracted.EMFMessage;
+import com.oheers.fish.recipe.EMFShapedRecipe;
+import uk.firedev.messagelib.ObjectProcessor;
 
 import java.util.logging.Level;
 
@@ -17,6 +22,8 @@ public class ConfigurationManager {
 
     public void loadConfigurations() {
         try {
+            prepareMessageLib();
+
             new MainConfig();
             new MessageConfig();
             new GuiConfig();
@@ -44,4 +51,16 @@ public class ConfigurationManager {
             plugin.getLogger().log(Level.SEVERE, "Failed to reload configurations", e);
         }
     }
+
+    private void prepareMessageLib() {
+        ObjectProcessor.registerProcessor(
+            EMFSingleMessage.class,
+            EMFMessage::getComponentListMessage
+        );
+        ObjectProcessor.registerProcessor(
+            EMFListMessage.class,
+            EMFListMessage::getComponentListMessage
+        );
+    }
+
 }
