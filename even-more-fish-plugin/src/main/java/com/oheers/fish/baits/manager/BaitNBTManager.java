@@ -22,12 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -302,7 +297,7 @@ public class BaitNBTManager {
      *
      * @return A random bait weighted by its catch-weight.
      */
-    public static @Nullable BaitHandler randomBaitCatch() {
+    public static Optional<BaitHandler> randomBaitCatch() {
 
         Map<String, BaitHandler> baitMap = BaitManager.getInstance().getItemMap();
         List<BaitHandler> baitList = baitMap.values().stream()
@@ -311,10 +306,11 @@ public class BaitNBTManager {
         
         // Fix IndexOutOfBoundsException caused by the list being empty.
         if (baitList.isEmpty()) {
-            return null;
+
+            return Optional.empty();
         }
 
-        return WeightedRandom.pick(baitList, bait -> bait.getBaitData().catchWeight(), EvenMoreFish.getInstance().getRandom());
+        return Optional.of(WeightedRandom.pick(baitList, bait -> bait.getBaitData().catchWeight(), EvenMoreFish.getInstance().getRandom()));
     }
 
     /**

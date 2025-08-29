@@ -109,7 +109,7 @@ public class BaitHandler extends ConfigBase {
                 getConfig().getInt("drop-quantity", 1),
                 getConfig().getDouble("application-weight", 100.0),
                 getConfig().getDouble("catch-weight", 100.0),
-                getConfig().getBoolean("can-be-caught", false),
+                getConfig().getBoolean("can-be-caught", true),
                 getConfig().getBoolean("disable-use-alert", false)
         );
     }
