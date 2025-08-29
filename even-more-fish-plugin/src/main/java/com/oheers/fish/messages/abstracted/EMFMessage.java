@@ -65,7 +65,9 @@ public abstract class EMFMessage {
                 .send(player);
             return;
         }
-        getUnderlying().send(target);
+        getUnderlying()
+            .parsePlaceholderAPI(null)
+            .send(target);
     }
 
     public void send(@NotNull Collection<? extends Audience> targets) {
@@ -80,7 +82,9 @@ public abstract class EMFMessage {
                 .send(player);
             return;
         }
-        getUnderlying().messageType(MessageType.ACTION_BAR).send(target);
+        getUnderlying().messageType(MessageType.ACTION_BAR)
+            .parsePlaceholderAPI(null)
+            .send(target);
     }
 
     public void sendActionBar(@NotNull Collection<? extends Audience> targets) {
