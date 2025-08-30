@@ -11,19 +11,17 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import uk.firedev.messagelib.message.ComponentMessage;
+import uk.firedev.messagelib.message.ComponentSingleMessage;
 
 public class MessageRewardType extends RewardType {
 
-    private final LegacyComponentSerializer legacyAmpersandSerializer = LegacyComponentSerializer.legacyAmpersand();
-
     @Override
     public void doReward(@NotNull Player player, @NotNull String key, @NotNull String value, Location hookLocation) {
-        Component component = FishUtils.isLegacyString(value) ?
-                legacyAmpersandSerializer.deserialize(value) :
-                EMFSingleMessage.MINIMESSAGE.deserialize(value);
-        EMFSingleMessage message = EMFSingleMessage.of(component);
-        message.setPlayer(player);
-        message.send(player);
+        ComponentMessage.componentMessage(value)
+            .replace("{player}", player.name())
+            .parsePlaceholderAPI(player)
+            .send(player);
     }
 
     @Override

@@ -36,7 +36,6 @@ public class EMFListMessage extends EMFMessage {
     public EMFListMessage createCopy() {
         EMFListMessage newMessage = new EMFListMessage(underlying.createCopy());
         newMessage.perPlayer = this.perPlayer;
-        newMessage.canSilent = this.canSilent;
         return newMessage;
     }
 
@@ -103,18 +102,8 @@ public class EMFListMessage extends EMFMessage {
     }
 
     @Override
-    public @NotNull Component getComponentMessage() {
-        return getComponentMessage(null);
-    }
-
-    @Override
     public @NotNull Component getComponentMessage(@Nullable OfflinePlayer player) {
         return Component.join(JoinConfiguration.newlines(), getComponentListMessage(player));
-    }
-
-    @Override
-    public @NotNull List<Component> getComponentListMessage() {
-        return getComponentListMessage(null);
     }
 
     @Override
@@ -147,11 +136,6 @@ public class EMFListMessage extends EMFMessage {
     @Override
     public void formatPlaceholderAPI() {
         this.underlying = this.underlying.parsePlaceholderAPI(relevantPlayer);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return underlying.isEmpty();
     }
 
     @Override

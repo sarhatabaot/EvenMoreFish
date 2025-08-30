@@ -16,6 +16,7 @@ import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -397,7 +398,7 @@ public class BaitNBTManager {
             lore = new ArrayList<>();
         }
 
-        EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
+        EMFListMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage().toListMessage();
 
         Supplier<EMFListMessage> baitVariable = () -> {
             EMFListMessage message = EMFListMessage.empty();
@@ -464,7 +465,7 @@ public class BaitNBTManager {
 
         // Return the lore with all bait lines removed from the rod
         return lore.stream().filter(component ->
-            !EMFSingleMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER)
+            !PlainTextComponentSerializer.plainText().serialize(component).startsWith(LINE_IDENTIFIER)
         ).toList();
     }
 

@@ -52,6 +52,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import uk.firedev.messagelib.Utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -62,6 +63,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -499,12 +501,15 @@ public class FishUtils {
         }
     }
 
+    public static String getPlayerName(@Nullable OfflinePlayer player) {
+        return player == null ? null : player.getName();
+    }
+
     public static String getPlayerName(@Nullable UUID uuid) {
         if (uuid == null) {
             return null;
         }
-        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        return player.getName();
+        return getPlayerName(Bukkit.getOfflinePlayer(uuid));
     }
 
     public static String getPlayerName(@Nullable String uuidString) {
@@ -631,41 +636,11 @@ public class FishUtils {
     }
 
     /**
-     * Checks if a provided String is a legacy string by stripping MiniMessage tags and seeing if the String is the same.
-     * @return Whether this String is using legacy color codes.
-     */
-    public static boolean isLegacyString(@NotNull String string) {
-        String stripped = EMFMessage.MINIMESSAGE.stripTags(string);
-        return string.equals(stripped);
-    }
-
-    public static @NotNull Component parsePlaceholderAPI(@NotNull Component component, @Nullable OfflinePlayer target) {
-        if (!EvenMoreFish.getInstance().getDependencyManager().isUsingPAPI()) {
-            return component;
-        }
-        TextReplacementConfig trc = TextReplacementConfig.builder()
-            .match(PlaceholderAPI.getPlaceholderPattern())
-            .replacement((matchResult, builder) -> {
-                String matched = matchResult.group();
-                Component parsed = EMFMessage.LEGACY_SERIALIZER.deserialize(
-                    PlaceholderAPI.setPlaceholders(target, matched)
-                );
-                return builder.append(parsed);
-            })
-            .build();
-        return component.replaceText(trc);
-    }
-
-    public static boolean componentContainsString(@NotNull Component component, @NotNull String string) {
-        return EMFMessage.PLAINTEXT_SERIALIZER.serialize(component).contains(string);
-    }
-
-    /**
      * @param colour The original colour
      * @return A string turned into a format key for use in configs.
      */
     public static @NotNull String getFormat(@NotNull String colour) {
-        if (isLegacyString(colour)) {
+        if (Utils.isLegacy(colour)) {
             // Legacy's formatting makes this insanely simple
             return colour + "{name}";
         } else {

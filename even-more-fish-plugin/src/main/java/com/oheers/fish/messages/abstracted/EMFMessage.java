@@ -1,5 +1,6 @@
 package com.oheers.fish.messages.abstracted;
 
+import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.audience.Audience;
@@ -21,23 +22,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class EMFMessage {
 
-    public static final MiniMessage MINIMESSAGE = MiniMessage.builder()
-        .postProcessor(component -> component)
-        .build();
-    public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
-    public static final LegacyComponentSerializer LEGACY_SERIALIZER_INPUT = LegacyComponentSerializer.builder()
-        .character('&')
-        .hexColors()
-        .useUnusualXRepeatedCharacterHexFormat()
-        .build();
-    public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
-    public static final Component EMPTY = Component.empty();
-
     protected boolean perPlayer = true;
-    protected boolean canSilent = false;
     protected OfflinePlayer relevantPlayer = null;
 
     public static EMFMessage fromUnderlying(@NotNull ComponentMessage message) {
@@ -60,13 +49,15 @@ public abstract class EMFMessage {
 
     public final void send(@NotNull Audience target) {
         if (target instanceof Player player) {
-            getUnderlying().replace("{player}", player.getName())
-                .parsePlaceholderAPI(player)
+            OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
+            getUnderlying().replace("{player}", relevant.getName())
+                .parsePlaceholderAPI(relevant)
                 .send(player);
             return;
         }
-        getUnderlying()
-            .parsePlaceholderAPI(null)
+        String name = FishUtils.getPlayerName(relevantPlayer);
+        getUnderlying().replace("{player}", String.valueOf(name))
+            .parsePlaceholderAPI(relevantPlayer)
             .send(target);
     }
 
@@ -76,14 +67,17 @@ public abstract class EMFMessage {
 
     public final void sendActionBar(@NotNull Audience target) {
         if (target instanceof Player player) {
+            OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
             getUnderlying().messageType(MessageType.ACTION_BAR)
-                .replace("{player}", player.getName())
-                .parsePlaceholderAPI(player)
+                .replace("{player}", relevant.getName())
+                .parsePlaceholderAPI(relevant)
                 .send(player);
             return;
         }
+        String name = FishUtils.getPlayerName(relevantPlayer);
         getUnderlying().messageType(MessageType.ACTION_BAR)
-            .parsePlaceholderAPI(null)
+            .replace("{player}", String.valueOf(name))
+            .parsePlaceholderAPI(relevantPlayer)
             .send(target);
     }
 
@@ -119,6 +113,14 @@ public abstract class EMFMessage {
 
     public final @Nullable OfflinePlayer getRelevantPlayer() {
         return this.relevantPlayer;
+    }
+
+    /**
+     * Sets the relevant player for this message. If the relevant player exists, per-player placeholders will NOT be parsed.
+     * @param relevantPlayer The relevant player for this message
+     */
+    public final void setRelevantPlayer(@NotNull OfflinePlayer relevantPlayer) {
+        this.relevantPlayer = relevantPlayer;
     }
 
     public final boolean isEmpty() {
@@ -462,17 +464,19 @@ public abstract class EMFMessage {
     // Subclass things
 
     public EMFSingleMessage toSingleMessage() {
-        EMFSingleMessage message = EMFSingleMessage.of(getComponentMessage());
+        EMFSingleMessage message = EMFSingleMessage.ofUnderlying(
+            getUnderlying().toSingleMessage()
+        );
         message.perPlayer = this.perPlayer;
-        message.canSilent = this.canSilent;
         message.relevantPlayer = this.relevantPlayer;
         return message;
     }
 
     public EMFListMessage toListMessage() {
-        EMFListMessage message = EMFListMessage.ofList(getComponentListMessage());
+        EMFListMessage message = EMFListMessage.ofUnderlying(
+            getUnderlying().toListMessage()
+        );
         message.perPlayer = this.perPlayer;
-        message.canSilent = this.canSilent;
         message.relevantPlayer = this.relevantPlayer;
         return message;
     }

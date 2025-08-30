@@ -26,7 +26,6 @@ public class EMFSingleMessage extends EMFMessage {
     public EMFSingleMessage createCopy() {
         EMFSingleMessage newMessage = new EMFSingleMessage(underlying.createCopy());
         newMessage.perPlayer = this.perPlayer;
-        newMessage.canSilent = this.canSilent;
         return newMessage;
     }
 
@@ -94,8 +93,9 @@ public class EMFSingleMessage extends EMFMessage {
 
     @Override
     public @NotNull Component getComponentMessage(@Nullable OfflinePlayer player) {
-        return underlying.parsePlaceholderAPI(player)
-            .replace("{player}", Optional.ofNullable(player).map(OfflinePlayer::getName).orElse("null"))
+        OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
+        return underlying.parsePlaceholderAPI(relevantPlayer)
+            .replace("{player}", Optional.ofNullable(relevant).map(OfflinePlayer::getName).orElse("null"))
             .get();
     }
 
@@ -146,11 +146,6 @@ public class EMFSingleMessage extends EMFMessage {
             MiniMessage.miniMessage().serialize(underlying.get()).stripTrailing()
         );
         this.underlying = ComponentMessage.componentMessage(newComponent, underlying.messageType());
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return underlying.isEmpty();
     }
 
     @Override
