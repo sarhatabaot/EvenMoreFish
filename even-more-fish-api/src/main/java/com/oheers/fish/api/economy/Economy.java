@@ -1,24 +1,20 @@
 package com.oheers.fish.api.economy;
 
+import com.oheers.fish.api.plugin.EMFPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Economy {
 
-    private final List<EconomyType> registeredEconomies;
+    private final Set<EconomyType> registeredEconomies;
     private static Economy instance = null;
 
     private Economy() {
-        registeredEconomies = new ArrayList<>();
+        this.registeredEconomies = new HashSet<>();
     }
 
     public static Economy getInstance() {
@@ -34,12 +30,12 @@ public class Economy {
      * @return True if any registered economy is available.
      */
     public boolean isEnabled() {
-        for (EconomyType economyType : registeredEconomies) {
-            if (economyType.isAvailable()) {
-                return true;
-            }
+        if (registeredEconomies.isEmpty()) {
+            EMFPlugin.getInstance().getLogger().warning("There are no registered economies.");
+            return false;
         }
-        return false;
+
+        return registeredEconomies.stream().anyMatch(EconomyType::isAvailable);
     }
 
     public void deposit(@NotNull OfflinePlayer player, double amount, boolean applyMultiplier) {
@@ -56,13 +52,11 @@ public class Economy {
         return valuesMap;
     }
 
-    public @Nullable EconomyType getEconomyType(@NotNull String identifier) {
-        for (EconomyType type : registeredEconomies) {
-            if (type.isAvailable() && type.getIdentifier().equalsIgnoreCase(identifier)) {
-                return type;
-            }
-        }
-        return null;
+    public @NotNull Optional<EconomyType> getEconomyType(@NotNull String identifier) {
+        return registeredEconomies.stream()
+                .filter(EconomyType::isAvailable)
+                .filter(type -> type.getIdentifier().equalsIgnoreCase(identifier))
+                .findFirst();
     }
 
     public @NotNull Component getWorthFormat(double value, boolean applyMultiplier) {
@@ -74,9 +68,11 @@ public class Economy {
     }
 
     public boolean registerEconomyType(@NotNull EconomyType economyType) {
-        if (getEconomyType(economyType.getIdentifier()) != null) {
+        if (getEconomyType(economyType.getIdentifier()).isPresent()) {
+            // guessing this one is the problem
             return false;
         }
+
         return registeredEconomies.add(economyType);
     }
 
