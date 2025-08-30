@@ -28,7 +28,9 @@ import org.jetbrains.annotations.Nullable;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 
 public abstract class Processor<E extends Event> implements Listener {
 
@@ -41,7 +43,8 @@ public abstract class Processor<E extends Event> implements Listener {
     }
 
     protected boolean isCustomFishAllowed(Player player) {
-        return isEnabled() && MainConfig.getInstance().getEnabled() && (competitionOnlyCheck() || EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) && !EvenMoreFish.getInstance().isCustomFishingDisabled(player);
+        return isEnabled() && MainConfig.getInstance().getEnabled() && (competitionOnlyCheck() || EvenMoreFish.getInstance().isRaritiesCompCheckExempt()) && !EvenMoreFish.getInstance()
+                .isCustomFishingDisabled(player);
     }
 
     protected abstract boolean isEnabled();
@@ -84,22 +87,27 @@ public abstract class Processor<E extends Event> implements Listener {
         }
 
         if (EvenMoreFish.getInstance().getDependencyManager().isUsingMcMMO()
-            && ExperienceConfig.getInstance().isFishingExploitingPrevented()
-            && UserManager.getPlayer(player).getFishingManager().isExploitingFishing(location.toVector())) {
+                && ExperienceConfig.getInstance().isFishingExploitingPrevented()
+                && UserManager.getPlayer(player).getFishingManager().isExploitingFishing(location.toVector())) {
             return null;
         }
 
         double baitCatchPercentage = MainConfig.getInstance().getBaitCatchPercentage();
         if (shouldCatchBait() && baitCatchPercentage > 0 && EvenMoreFish.getInstance().getRandom().nextDouble() * 100.0 < baitCatchPercentage) {
-            BaitHandler caughtBait = BaitNBTManager.randomBaitCatch();
-            if (caughtBait != null) {
-                EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
-                message.setBait(caughtBait.format(caughtBait.getId()));
-                message.setPlayer(player);
-                message.send(player);
-
-                return caughtBait.create(player);
+            Optional<BaitHandler> caughtBait = BaitNBTManager.randomBaitCatch();
+            if (caughtBait.isEmpty()) {
+                EvenMoreFish.getInstance().debug(Level.WARNING, "Could not determine bait. This is usually a bug.");
+                return null;
             }
+
+            final BaitHandler bait = caughtBait.get();
+
+            EMFMessage message = ConfigMessage.BAIT_CAUGHT.getMessage();
+            message.setBait(bait.format(bait.getId()));
+            message.setPlayer(player);
+            message.send(player);
+
+            return bait.create(player);
         }
 
         BaitHandler applyingBait = null;
@@ -136,8 +144,8 @@ public abstract class Processor<E extends Event> implements Listener {
             String length = decimalFormat.format(fish.getLength());
 
             EMFMessage message = fish.getLength() == -1 ?
-                getLengthlessCaughtMessage().getMessage() :
-                getCaughtMessage().getMessage();
+                    getLengthlessCaughtMessage().getMessage() :
+                    getCaughtMessage().getMessage();
 
             message.setPlayer(player);
             message.setLength(length);
@@ -163,7 +171,7 @@ public abstract class Processor<E extends Event> implements Listener {
     // Checks if it should be giving the player the fish considering the fish-only-in-competition option in config.yml
     protected abstract boolean competitionOnlyCheck();
 
-    protected void competitionCheck(@NotNull Fish fish, @NotNull Player fisherman,@NotNull Location location) {
+    protected void competitionCheck(@NotNull Fish fish, @NotNull Player fisherman, @NotNull Location location) {
         final Competition active = Competition.getCurrentlyActive();
         if (active == null) {
             return;
