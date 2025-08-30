@@ -70,7 +70,7 @@ public abstract class EMFMessage {
             .send(target);
     }
 
-    public void send(@NotNull Collection<? extends Audience> targets) {
+    public final void send(@NotNull Collection<? extends Audience> targets) {
         targets.forEach(this::send);
     }
 
@@ -87,61 +87,43 @@ public abstract class EMFMessage {
             .send(target);
     }
 
-    public void sendActionBar(@NotNull Collection<? extends Audience> targets) {
+    public final void sendActionBar(@NotNull Collection<? extends Audience> targets) {
         targets.forEach(this::sendActionBar);
     }
 
-    public @NotNull Component getComponentMessage() {
+    public final @NotNull Component getComponentMessage() {
         return getComponentMessage(null);
     }
 
     public abstract @NotNull Component getComponentMessage(@Nullable OfflinePlayer player);
 
-    public @NotNull List<Component> getComponentListMessage() {
+    public final @NotNull List<Component> getComponentListMessage() {
         return getComponentListMessage(null);
     }
 
     public abstract @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player);
 
-    public @NotNull String getLegacyMessage() {
-        return LEGACY_SERIALIZER.serialize(getComponentMessage());
-    }
+    public abstract @NotNull String getLegacyMessage();
 
-    public @NotNull List<String> getLegacyListMessage() {
-        return getComponentListMessage().stream().map(LEGACY_SERIALIZER::serialize).toList();
-    }
+    public abstract @NotNull List<String> getLegacyListMessage();
 
-    public @NotNull String getPlainTextMessage() {
-        return PLAINTEXT_SERIALIZER.serialize(getComponentMessage());
-    }
+    public abstract @NotNull String getPlainTextMessage();
 
-    public @NotNull List<String> getPlainTextListMessage() {
-        return getComponentListMessage().stream().map(PLAINTEXT_SERIALIZER::serialize).toList();
-    }
+    public abstract @NotNull List<String> getPlainTextListMessage();
 
     public abstract void formatPlaceholderAPI();
 
-    public void setPerPlayer(boolean perPlayer) {
+    public final void setPerPlayer(boolean perPlayer) {
         this.perPlayer = perPlayer;
     }
 
-    public void setCanSilent(boolean canSilent) {
-        this.canSilent = canSilent;
-    }
-
-    public boolean isCanSilent() {
-        return this.canSilent;
-    }
-
-    protected boolean silentCheck(@NotNull Component component) {
-        return isCanSilent() && PLAINTEXT_SERIALIZER.serialize(component).endsWith(" -s");
-    }
-
-    public @Nullable OfflinePlayer getRelevantPlayer() {
+    public final @Nullable OfflinePlayer getRelevantPlayer() {
         return this.relevantPlayer;
     }
 
-    public abstract boolean isEmpty();
+    public final boolean isEmpty() {
+        return getUnderlying().isEmpty();
+    }
 
     public abstract boolean containsString(@NotNull String string);
 

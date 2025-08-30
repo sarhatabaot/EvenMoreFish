@@ -125,6 +125,26 @@ public class EMFListMessage extends EMFMessage {
     }
 
     @Override
+    public @NotNull String getLegacyMessage() {
+        return String.join("\n", underlying.getAsLegacy());
+    }
+
+    @Override
+    public @NotNull List<String> getLegacyListMessage() {
+        return underlying.getAsLegacy();
+    }
+
+    @Override
+    public @NotNull String getPlainTextMessage() {
+        return String.join("\n", underlying.getAsPlainText());
+    }
+
+    @Override
+    public @NotNull List<String> getPlainTextListMessage() {
+        return underlying.getAsPlainText();
+    }
+
+    @Override
     public void formatPlaceholderAPI() {
         this.underlying = this.underlying.parsePlaceholderAPI(relevantPlayer);
     }

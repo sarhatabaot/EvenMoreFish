@@ -1,26 +1,16 @@
 package com.oheers.fish.messages;
 
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.abstracted.EMFMessage;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.TextReplacementConfig;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.firedev.messagelib.message.ComponentListMessage;
 import uk.firedev.messagelib.message.ComponentMessage;
 import uk.firedev.messagelib.message.ComponentSingleMessage;
-import uk.firedev.messagelib.message.MessageType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class EMFSingleMessage extends EMFMessage {
@@ -110,13 +100,28 @@ public class EMFSingleMessage extends EMFMessage {
     }
 
     @Override
-    public @NotNull List<Component> getComponentListMessage() {
-        return List.of(getComponentMessage());
+    public @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player) {
+        return List.of(getComponentMessage(player));
     }
 
     @Override
-    public @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player) {
-        return List.of(getComponentMessage(player));
+    public @NotNull String getLegacyMessage() {
+        return underlying.getAsLegacy();
+    }
+
+    @Override
+    public @NotNull List<String> getLegacyListMessage() {
+        return List.of(underlying.getAsLegacy());
+    }
+
+    @Override
+    public @NotNull String getPlainTextMessage() {
+        return underlying.getAsPlainText();
+    }
+
+    @Override
+    public @NotNull List<String> getPlainTextListMessage() {
+        return List.of(underlying.getAsPlainText());
     }
 
     @Override
