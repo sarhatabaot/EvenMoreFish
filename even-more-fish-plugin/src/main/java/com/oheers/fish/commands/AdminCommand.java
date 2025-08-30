@@ -28,6 +28,7 @@ import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.fishing.rods.CustomRod;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
+import com.oheers.fish.messages.PrefixType;
 import com.oheers.fish.messages.abstracted.EMFMessage;
 import com.oheers.fish.permissions.AdminPerms;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -425,7 +426,7 @@ public class AdminCommand {
 
                     EMFSingleMessage message = EMFSingleMessage.fromString(msgString);
 
-                    message.setVariable("{prefix}", MessageConfig.getInstance().getSTDPrefix());
+                    message.setVariable("{prefix}", PrefixType.DEFAULT.getPrefix());
                     message.setVariable("{version}", EvenMoreFish.getInstance().getPluginMeta().getVersion());
                     message.setVariable("{branch}", getFeatureBranchName());
                     message.setVariable("{build-date}", getFeatureBranchBuildOrDate());

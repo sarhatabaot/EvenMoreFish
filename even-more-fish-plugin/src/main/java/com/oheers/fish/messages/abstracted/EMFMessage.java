@@ -1,19 +1,21 @@
 package com.oheers.fish.messages.abstracted;
 
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import uk.firedev.messagelib.message.ComponentListMessage;
+import uk.firedev.messagelib.message.ComponentMessage;
+import uk.firedev.messagelib.message.ComponentSingleMessage;
+import uk.firedev.messagelib.message.MessageType;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,31 +40,52 @@ public abstract class EMFMessage {
     protected boolean canSilent = false;
     protected OfflinePlayer relevantPlayer = null;
 
+    public static EMFMessage fromUnderlying(@NotNull ComponentMessage message) {
+        if (message instanceof ComponentListMessage listMessage) {
+            return EMFListMessage.ofUnderlying(listMessage);
+        } else if (message instanceof ComponentSingleMessage singleMessage) {
+            return EMFSingleMessage.ofUnderlying(singleMessage);
+        } else {
+            throw new IllegalArgumentException("Unknown ComponentMessage type");
+        }
+    }
+
     protected EMFMessage() {}
 
     public abstract EMFMessage createCopy();
 
-    public static Component formatString(@NotNull String message) {
-        if (FishUtils.isLegacyString(message)) {
-            return LEGACY_SERIALIZER_INPUT.deserialize(message);
-        } else {
-            return MINIMESSAGE.deserialize(
-                message.replace('§', '&')
-            );
+    public abstract @NotNull ComponentMessage getUnderlying();
+
+    public abstract void setUnderlying(@NotNull ComponentMessage message);
+
+    public final void send(@NotNull Audience target) {
+        if (target instanceof Player player) {
+            getUnderlying().replace("{player}", player.getName())
+                .parsePlaceholderAPI(player)
+                .send(player);
+            return;
         }
+        getUnderlying()
+            .parsePlaceholderAPI(null)
+            .send(target);
     }
-
-    public static @NotNull Component removeDefaultItalics(@NotNull Component component) {
-        return FishUtils.decorateIfAbsent(component, TextDecoration.ITALIC, TextDecoration.State.FALSE);
-    }
-
-    public abstract void send(@NotNull Audience target);
 
     public void send(@NotNull Collection<? extends Audience> targets) {
         targets.forEach(this::send);
     }
 
-    public abstract void sendActionBar(@NotNull Audience target);
+    public final void sendActionBar(@NotNull Audience target) {
+        if (target instanceof Player player) {
+            getUnderlying().messageType(MessageType.ACTION_BAR)
+                .replace("{player}", player.getName())
+                .parsePlaceholderAPI(player)
+                .send(player);
+            return;
+        }
+        getUnderlying().messageType(MessageType.ACTION_BAR)
+            .parsePlaceholderAPI(null)
+            .send(target);
+    }
 
     public void sendActionBar(@NotNull Collection<? extends Audience> targets) {
         targets.forEach(this::sendActionBar);
@@ -136,47 +159,67 @@ public abstract class EMFMessage {
 
     // Append
 
-    public abstract void appendString(@NotNull String string);
+    public final void appendString(@NotNull String string) {
+        setUnderlying(
+            getUnderlying().append(string)
+        );
+    }
 
-    public void appendStringList(@NotNull List<String> strings) {
+    public final void appendStringList(@NotNull List<String> strings) {
         strings.forEach(this::appendString);
     }
 
-    public abstract void appendMessage(@NotNull EMFMessage message);
+    public final void appendMessage(@NotNull EMFMessage message) {
+        setUnderlying(
+            getUnderlying().append(message.getUnderlying())
+        );
+    }
 
-    public void appendMessageList(@NotNull List<EMFMessage> messages) {
+    public final void appendMessageList(@NotNull List<EMFMessage> messages) {
         messages.forEach(this::appendMessage);
     }
 
-    public abstract void appendComponent(@NotNull Component component);
+    public final void appendComponent(@NotNull Component component) {
+        setUnderlying(
+            getUnderlying().append(component)
+        );
+    }
 
-    public void appendComponentList(@NotNull List<Component> components) {
+    public final void appendComponentList(@NotNull List<Component> components) {
         components.forEach(this::appendComponent);
     }
 
     // Prepend
 
-    public abstract void prependString(@NotNull String string);
+    public final void prependString(@NotNull String string) {
+        setUnderlying(
+            getUnderlying().prepend(string)
+        );
+    }
 
-    public void prependStringList(@NotNull List<String> strings) {
+    public final void prependStringList(@NotNull List<String> strings) {
         strings.forEach(this::prependString);
     }
 
-    public abstract void prependMessage(@NotNull EMFMessage message);
+    public final void prependMessage(@NotNull EMFMessage message) {
+        setUnderlying(
+            getUnderlying().prepend(message.getUnderlying())
+        );
+    }
 
-    public void prependMessageList(@NotNull List<EMFMessage> messages) {
+    public final void prependMessageList(@NotNull List<EMFMessage> messages) {
         messages.forEach(this::prependMessage);
     }
 
-    public abstract void prependComponent(@NotNull Component component);
-
-    public void prependComponentList(@NotNull List<Component> components) {
-        components.forEach(this::prependComponent);
+    public final void prependComponent(@NotNull Component component) {
+        setUnderlying(
+            getUnderlying().prepend(component)
+        );
     }
 
-    public abstract void decorateIfAbsent(@NotNull TextDecoration decoration, @NotNull TextDecoration.State state);
-
-    public abstract void colorIfAbsent(@NotNull TextColor color);
+    public final void prependComponentList(@NotNull List<Component> components) {
+        components.forEach(this::prependComponent);
+    }
 
     // Variables
 
@@ -186,13 +229,16 @@ public abstract class EMFMessage {
      * @param replacement The replacement for the variable.
      */
     public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
+        // Explicitly handle EMFMessage replacements to avoid ending up with the toString of the object.
         if (replacement instanceof EMFMessage emfMessage) {
-            setEMFMessageVariable(variable, emfMessage);
-        } else if (replacement instanceof Component component) {
-            setComponentVariable(variable, component);
-        } else {
-            setComponentVariable(variable, formatString(String.valueOf(replacement)));
+            setUnderlying(
+                getUnderlying().replace(variable, emfMessage.getUnderlying())
+            );
+            return;
         }
+        setUnderlying(
+            getUnderlying().replace(variable, replacement)
+        );
     }
 
     /**
@@ -203,12 +249,10 @@ public abstract class EMFMessage {
         if (variableMap == null || variableMap.isEmpty()) {
             return;
         }
-        variableMap.forEach(this::setVariable);
+        setUnderlying(
+            getUnderlying().replace(variableMap)
+        );
     }
-
-    protected abstract void setEMFMessageVariable(@NotNull final String variable, @NotNull final EMFMessage replacement);
-
-    protected abstract void setComponentVariable(@NotNull final String variable, @NotNull final Component replacement);
 
     /**
      * The player's name to replace the {player} variable. Also sets the relevantPlayer variable to this player.
