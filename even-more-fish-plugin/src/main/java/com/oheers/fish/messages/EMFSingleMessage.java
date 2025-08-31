@@ -1,26 +1,16 @@
 package com.oheers.fish.messages;
 
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.abstracted.EMFMessage;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.TextReplacementConfig;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.firedev.messagelib.message.ComponentListMessage;
 import uk.firedev.messagelib.message.ComponentMessage;
 import uk.firedev.messagelib.message.ComponentSingleMessage;
-import uk.firedev.messagelib.message.MessageType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class EMFSingleMessage extends EMFMessage {
@@ -36,7 +26,6 @@ public class EMFSingleMessage extends EMFMessage {
     public EMFSingleMessage createCopy() {
         EMFSingleMessage newMessage = new EMFSingleMessage(underlying.createCopy());
         newMessage.perPlayer = this.perPlayer;
-        newMessage.canSilent = this.canSilent;
         return newMessage;
     }
 
@@ -104,19 +93,35 @@ public class EMFSingleMessage extends EMFMessage {
 
     @Override
     public @NotNull Component getComponentMessage(@Nullable OfflinePlayer player) {
-        return underlying.parsePlaceholderAPI(player)
-            .replace("{player}", Optional.ofNullable(player).map(OfflinePlayer::getName).orElse("null"))
+        OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
+        return underlying.parsePlaceholderAPI(relevantPlayer)
+            .replace("{player}", Optional.ofNullable(relevant).map(OfflinePlayer::getName).orElse("null"))
             .get();
-    }
-
-    @Override
-    public @NotNull List<Component> getComponentListMessage() {
-        return List.of(getComponentMessage());
     }
 
     @Override
     public @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player) {
         return List.of(getComponentMessage(player));
+    }
+
+    @Override
+    public @NotNull String getLegacyMessage() {
+        return underlying.getAsLegacy();
+    }
+
+    @Override
+    public @NotNull List<String> getLegacyListMessage() {
+        return List.of(underlying.getAsLegacy());
+    }
+
+    @Override
+    public @NotNull String getPlainTextMessage() {
+        return underlying.getAsPlainText();
+    }
+
+    @Override
+    public @NotNull List<String> getPlainTextListMessage() {
+        return List.of(underlying.getAsPlainText());
     }
 
     @Override
@@ -141,11 +146,6 @@ public class EMFSingleMessage extends EMFMessage {
             MiniMessage.miniMessage().serialize(underlying.get()).stripTrailing()
         );
         this.underlying = ComponentMessage.componentMessage(newComponent, underlying.messageType());
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return underlying.isEmpty();
     }
 
     @Override

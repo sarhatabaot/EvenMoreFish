@@ -5,7 +5,6 @@ import com.oheers.fish.api.AbstractFileBasedManager;
 import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.baits.configs.BaitConversions;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.FishManager;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;

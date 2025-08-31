@@ -16,13 +16,20 @@ import com.oheers.fish.utils.nbt.NbtUtils;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -397,7 +404,7 @@ public class BaitNBTManager {
             lore = new ArrayList<>();
         }
 
-        EMFMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage();
+        EMFListMessage format = ConfigMessage.BAIT_ROD_LORE.getMessage().toListMessage();
 
         Supplier<EMFListMessage> baitVariable = () -> {
             EMFListMessage message = EMFListMessage.empty();
@@ -430,7 +437,7 @@ public class BaitNBTManager {
 
             return message;
         };
-        format.setVariable("{baits}", baitVariable.get());
+        format.setVariableWithListInsertion("{baits}", baitVariable.get());
 
         format.setCurrentBaits(Integer.toString(getNumBaitsApplied(itemStack)));
         format.setMaxBaits(Integer.toString(MainConfig.getInstance().getBaitsPerRod()));
@@ -464,7 +471,7 @@ public class BaitNBTManager {
 
         // Return the lore with all bait lines removed from the rod
         return lore.stream().filter(component ->
-            !EMFSingleMessage.MINIMESSAGE.serialize(component).startsWith(LINE_IDENTIFIER)
+            !PlainTextComponentSerializer.plainText().serialize(component).startsWith(LINE_IDENTIFIER)
         ).toList();
     }
 

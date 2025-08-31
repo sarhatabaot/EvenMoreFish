@@ -3,7 +3,6 @@ package com.oheers.fish.messages;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.config.MessageConfig;
 import com.oheers.fish.messages.abstracted.EMFMessage;
-import net.kyori.adventure.text.Component;
 import uk.firedev.messagelib.message.ComponentListMessage;
 import uk.firedev.messagelib.message.ComponentMessage;
 import uk.firedev.messagelib.message.ComponentSingleMessage;

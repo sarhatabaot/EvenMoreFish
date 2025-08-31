@@ -1,12 +1,10 @@
 package com.oheers.fish.messages.abstracted;
 
+import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -24,20 +22,7 @@ import java.util.Objects;
 
 public abstract class EMFMessage {
 
-    public static final MiniMessage MINIMESSAGE = MiniMessage.builder()
-        .postProcessor(component -> component)
-        .build();
-    public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
-    public static final LegacyComponentSerializer LEGACY_SERIALIZER_INPUT = LegacyComponentSerializer.builder()
-        .character('&')
-        .hexColors()
-        .useUnusualXRepeatedCharacterHexFormat()
-        .build();
-    public static final PlainTextComponentSerializer PLAINTEXT_SERIALIZER = PlainTextComponentSerializer.plainText();
-    public static final Component EMPTY = Component.empty();
-
     protected boolean perPlayer = true;
-    protected boolean canSilent = false;
     protected OfflinePlayer relevantPlayer = null;
 
     public static EMFMessage fromUnderlying(@NotNull ComponentMessage message) {
@@ -60,88 +45,83 @@ public abstract class EMFMessage {
 
     public final void send(@NotNull Audience target) {
         if (target instanceof Player player) {
-            getUnderlying().replace("{player}", player.getName())
-                .parsePlaceholderAPI(player)
+            OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
+            getUnderlying().replace("{player}", relevant.getName())
+                .parsePlaceholderAPI(relevant)
                 .send(player);
             return;
         }
-        getUnderlying()
-            .parsePlaceholderAPI(null)
+        String name = FishUtils.getPlayerName(relevantPlayer);
+        getUnderlying().replace("{player}", String.valueOf(name))
+            .parsePlaceholderAPI(relevantPlayer)
             .send(target);
     }
 
-    public void send(@NotNull Collection<? extends Audience> targets) {
+    public final void send(@NotNull Collection<? extends Audience> targets) {
         targets.forEach(this::send);
     }
 
     public final void sendActionBar(@NotNull Audience target) {
         if (target instanceof Player player) {
+            OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
             getUnderlying().messageType(MessageType.ACTION_BAR)
-                .replace("{player}", player.getName())
-                .parsePlaceholderAPI(player)
+                .replace("{player}", relevant.getName())
+                .parsePlaceholderAPI(relevant)
                 .send(player);
             return;
         }
+        String name = FishUtils.getPlayerName(relevantPlayer);
         getUnderlying().messageType(MessageType.ACTION_BAR)
-            .parsePlaceholderAPI(null)
+            .replace("{player}", String.valueOf(name))
+            .parsePlaceholderAPI(relevantPlayer)
             .send(target);
     }
 
-    public void sendActionBar(@NotNull Collection<? extends Audience> targets) {
+    public final void sendActionBar(@NotNull Collection<? extends Audience> targets) {
         targets.forEach(this::sendActionBar);
     }
 
-    public @NotNull Component getComponentMessage() {
+    public final @NotNull Component getComponentMessage() {
         return getComponentMessage(null);
     }
 
     public abstract @NotNull Component getComponentMessage(@Nullable OfflinePlayer player);
 
-    public @NotNull List<Component> getComponentListMessage() {
+    public final @NotNull List<Component> getComponentListMessage() {
         return getComponentListMessage(null);
     }
 
     public abstract @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player);
 
-    public @NotNull String getLegacyMessage() {
-        return LEGACY_SERIALIZER.serialize(getComponentMessage());
-    }
+    public abstract @NotNull String getLegacyMessage();
 
-    public @NotNull List<String> getLegacyListMessage() {
-        return getComponentListMessage().stream().map(LEGACY_SERIALIZER::serialize).toList();
-    }
+    public abstract @NotNull List<String> getLegacyListMessage();
 
-    public @NotNull String getPlainTextMessage() {
-        return PLAINTEXT_SERIALIZER.serialize(getComponentMessage());
-    }
+    public abstract @NotNull String getPlainTextMessage();
 
-    public @NotNull List<String> getPlainTextListMessage() {
-        return getComponentListMessage().stream().map(PLAINTEXT_SERIALIZER::serialize).toList();
-    }
+    public abstract @NotNull List<String> getPlainTextListMessage();
 
     public abstract void formatPlaceholderAPI();
 
-    public void setPerPlayer(boolean perPlayer) {
+    public final void setPerPlayer(boolean perPlayer) {
         this.perPlayer = perPlayer;
     }
 
-    public void setCanSilent(boolean canSilent) {
-        this.canSilent = canSilent;
-    }
-
-    public boolean isCanSilent() {
-        return this.canSilent;
-    }
-
-    protected boolean silentCheck(@NotNull Component component) {
-        return isCanSilent() && PLAINTEXT_SERIALIZER.serialize(component).endsWith(" -s");
-    }
-
-    public @Nullable OfflinePlayer getRelevantPlayer() {
+    public final @Nullable OfflinePlayer getRelevantPlayer() {
         return this.relevantPlayer;
     }
 
-    public abstract boolean isEmpty();
+    /**
+     * Sets the relevant player for this message. If the relevant player exists, per-player placeholders will NOT be parsed.
+     * @param relevantPlayer The relevant player for this message
+     */
+    public final void setRelevantPlayer(@NotNull OfflinePlayer relevantPlayer) {
+        this.relevantPlayer = relevantPlayer;
+    }
+
+    public final boolean isEmpty() {
+        return getUnderlying().isEmpty();
+    }
 
     public abstract boolean containsString(@NotNull String string);
 
@@ -228,14 +208,7 @@ public abstract class EMFMessage {
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
-    public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
-        // Explicitly handle EMFMessage replacements to avoid ending up with the toString of the object.
-        if (replacement instanceof EMFMessage emfMessage) {
-            setUnderlying(
-                getUnderlying().replace(variable, emfMessage.getUnderlying())
-            );
-            return;
-        }
+    public final void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
         setUnderlying(
             getUnderlying().replace(variable, replacement)
         );
@@ -245,7 +218,7 @@ public abstract class EMFMessage {
      * Formats the provided map of variables.
      * @param variableMap The map of variables and their replacements.
      */
-    public void setVariables(@Nullable Map<String, ?> variableMap) {
+    public final void setVariables(@Nullable Map<String, ?> variableMap) {
         if (variableMap == null || variableMap.isEmpty()) {
             return;
         }
@@ -480,17 +453,19 @@ public abstract class EMFMessage {
     // Subclass things
 
     public EMFSingleMessage toSingleMessage() {
-        EMFSingleMessage message = EMFSingleMessage.of(getComponentMessage());
+        EMFSingleMessage message = EMFSingleMessage.ofUnderlying(
+            getUnderlying().toSingleMessage()
+        );
         message.perPlayer = this.perPlayer;
-        message.canSilent = this.canSilent;
         message.relevantPlayer = this.relevantPlayer;
         return message;
     }
 
     public EMFListMessage toListMessage() {
-        EMFListMessage message = EMFListMessage.ofList(getComponentListMessage());
+        EMFListMessage message = EMFListMessage.ofUnderlying(
+            getUnderlying().toListMessage()
+        );
         message.perPlayer = this.perPlayer;
-        message.canSilent = this.canSilent;
         message.relevantPlayer = this.relevantPlayer;
         return message;
     }

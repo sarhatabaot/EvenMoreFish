@@ -7,8 +7,6 @@ import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.config.MessageConfig;
 import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
-import com.oheers.fish.messages.abstracted.EMFMessage;
-import com.oheers.fish.recipe.EMFShapedRecipe;
 import uk.firedev.messagelib.ObjectProcessor;
 
 import java.util.logging.Level;
@@ -55,7 +53,7 @@ public class ConfigurationManager {
     private void prepareMessageLib() {
         ObjectProcessor.registerProcessor(
             EMFSingleMessage.class,
-            EMFMessage::getComponentListMessage
+            EMFSingleMessage::getComponentListMessage
         );
         ObjectProcessor.registerProcessor(
             EMFListMessage.class,

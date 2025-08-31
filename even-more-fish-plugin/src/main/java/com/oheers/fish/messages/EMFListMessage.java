@@ -1,27 +1,18 @@
 package com.oheers.fish.messages;
 
-import com.oheers.fish.FishUtils;
 import com.oheers.fish.messages.abstracted.EMFMessage;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.TextReplacementConfig;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.firedev.messagelib.message.ComponentListMessage;
 import uk.firedev.messagelib.message.ComponentMessage;
 import uk.firedev.messagelib.message.ComponentSingleMessage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class EMFListMessage extends EMFMessage {
 
@@ -36,7 +27,6 @@ public class EMFListMessage extends EMFMessage {
     public EMFListMessage createCopy() {
         EMFListMessage newMessage = new EMFListMessage(underlying.createCopy());
         newMessage.perPlayer = this.perPlayer;
-        newMessage.canSilent = this.canSilent;
         return newMessage;
     }
 
@@ -103,18 +93,8 @@ public class EMFListMessage extends EMFMessage {
     }
 
     @Override
-    public @NotNull Component getComponentMessage() {
-        return getComponentMessage(null);
-    }
-
-    @Override
     public @NotNull Component getComponentMessage(@Nullable OfflinePlayer player) {
         return Component.join(JoinConfiguration.newlines(), getComponentListMessage(player));
-    }
-
-    @Override
-    public @NotNull List<Component> getComponentListMessage() {
-        return getComponentListMessage(null);
     }
 
     @Override
@@ -125,18 +105,44 @@ public class EMFListMessage extends EMFMessage {
     }
 
     @Override
+    public @NotNull String getLegacyMessage() {
+        return String.join("\n", underlying.getAsLegacy());
+    }
+
+    @Override
+    public @NotNull List<String> getLegacyListMessage() {
+        return underlying.getAsLegacy();
+    }
+
+    @Override
+    public @NotNull String getPlainTextMessage() {
+        return String.join("\n", underlying.getAsPlainText());
+    }
+
+    @Override
+    public @NotNull List<String> getPlainTextListMessage() {
+        return underlying.getAsPlainText();
+    }
+
+    @Override
     public void formatPlaceholderAPI() {
         this.underlying = this.underlying.parsePlaceholderAPI(relevantPlayer);
     }
 
     @Override
-    public boolean isEmpty() {
-        return underlying.isEmpty();
-    }
-
-    @Override
     public boolean containsString(@NotNull String string) {
         return underlying.toSingleMessages().stream().anyMatch(singleMessage -> singleMessage.containsString(string));
+    }
+
+    public void setVariableWithListInsertion(@NotNull String variable, @NotNull Object replacement) {
+        this.underlying = this.underlying.replaceWithListInsertion(variable, replacement);
+    }
+
+    public void setVariablesWithListInsertion(@Nullable Map<String, ?> variableMap) {
+        if (variableMap == null || variableMap.isEmpty()) {
+            return;
+        }
+        this.underlying = this.underlying.replaceWithListInsertion(variableMap);
     }
 
 }
