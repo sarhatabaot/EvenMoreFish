@@ -23,7 +23,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -431,7 +437,7 @@ public class BaitNBTManager {
 
             return message;
         };
-        format.setVariable("{baits}", baitVariable.get());
+        format.setVariableWithListInsertion("{baits}", baitVariable.get());
 
         format.setCurrentBaits(Integer.toString(getNumBaitsApplied(itemStack)));
         format.setMaxBaits(Integer.toString(MainConfig.getInstance().getBaitsPerRod()));

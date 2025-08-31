@@ -2,8 +2,6 @@ package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.messages.EMFConfigLoader;
-import com.oheers.fish.messages.EMFSingleMessage;
-import com.oheers.fish.messages.PrefixType;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
 public class MessageConfig extends ConfigBase {

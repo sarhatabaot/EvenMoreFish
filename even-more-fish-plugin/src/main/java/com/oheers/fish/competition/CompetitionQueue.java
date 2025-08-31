@@ -4,12 +4,15 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.AbstractFileBasedManager;
 import com.oheers.fish.competition.configs.CompetitionConversions;
 import com.oheers.fish.competition.configs.CompetitionFile;
-
 import com.oheers.fish.fishing.rods.RodManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 public class CompetitionQueue extends AbstractFileBasedManager<CompetitionFile> {

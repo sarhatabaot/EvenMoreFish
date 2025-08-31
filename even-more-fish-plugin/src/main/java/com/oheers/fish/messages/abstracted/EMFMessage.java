@@ -5,9 +5,6 @@ import com.oheers.fish.messages.EMFListMessage;
 import com.oheers.fish.messages.EMFSingleMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -22,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public abstract class EMFMessage {
 
@@ -212,7 +208,7 @@ public abstract class EMFMessage {
      * @param variable The variable.
      * @param replacement The replacement for the variable.
      */
-    public void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
+    public final void setVariable(@NotNull final String variable, @NotNull final Object replacement) {
         setUnderlying(
             getUnderlying().replace(variable, replacement)
         );
@@ -222,7 +218,7 @@ public abstract class EMFMessage {
      * Formats the provided map of variables.
      * @param variableMap The map of variables and their replacements.
      */
-    public void setVariables(@Nullable Map<String, ?> variableMap) {
+    public final void setVariables(@Nullable Map<String, ?> variableMap) {
         if (variableMap == null || variableMap.isEmpty()) {
             return;
         }
