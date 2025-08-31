@@ -7,18 +7,20 @@ import com.oheers.fish.economy.PlayerPointsEconomyType;
 import com.oheers.fish.economy.VaultEconomyType;
 import com.oheers.fish.events.AuraSkillsFishingEvent;
 import com.oheers.fish.events.AureliumSkillsFishingEvent;
+import com.oheers.fish.events.EconomyServiceRegisterEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
 import com.oheers.fish.placeholders.PlaceholderReceiver;
 import com.oheers.fish.utils.HeadDBIntegration;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.logging.Level;
 
-public class DependencyManager {
+public class DependencyManager implements Listener {
     private final EvenMoreFish plugin;
     private Permission permission;
     private HeadDatabaseAPI hdbapi;
@@ -74,6 +76,10 @@ public class DependencyManager {
 
         if (usingAuraSkills && MainConfig.getInstance().disableAureliumSkills()) {
             pm.registerEvents(new AuraSkillsFishingEvent(), plugin);
+        }
+
+        if (usingVault) {
+            pm.registerEvents(new EconomyServiceRegisterEvent(this),plugin);
         }
 
     }
@@ -141,9 +147,12 @@ public class DependencyManager {
         return usingVault && permission != null;
     }
 
-    private void loadEconomy() {
+    public void loadEconomy() {
         if (isUsingVault()) {
-            new VaultEconomyType().register();
+            boolean state = new VaultEconomyType().register();
+            if (state) {
+                EvenMoreFish.getInstance().getLogger().info("EvenMoreFish has successfully hooked into vault.");
+            }
         }
 
         if (isUsingPlayerPoints()) {
@@ -165,4 +174,5 @@ public class DependencyManager {
     public void setHdbapi(HeadDatabaseAPI hdbapi) {
         this.hdbapi = hdbapi;
     }
+
 }

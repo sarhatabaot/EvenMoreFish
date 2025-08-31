@@ -333,20 +333,20 @@ public class MainConfig extends ConfigBase {
     public double getRegionBoost(String region, String rarity) {
         double defaultBoostRate = 1.0;
         if (region == null || rarity == null) {
-            return 1.0; // Default boost rate is 1.0 if region or rarity is null
+            return defaultBoostRate; // Default boost rate is 1.0 if region or rarity is null
         }
 
         Section regionBoosts = getConfig().getSection("region-boosts");
         if (regionBoosts == null) {
-            return 1.0; // Default boost rate is 1.0 if not specified
+            return defaultBoostRate; // Default boost rate is 1.0 if not specified
         }
 
         Section regionSection = regionBoosts.getSection(region);
         if (regionSection == null) {
-            return 1.0; // Default boost rate is 1.0 if not specified
+            return defaultBoostRate; // Default boost rate is 1.0 if not specified
         }
 
-        return regionSection.getDouble(rarity, 1.0); // Default boost rate is 1.0 if not specified
+        return regionSection.getDouble(rarity, defaultBoostRate); // Default boost rate is 1.0 if not specified
     }
 
     public boolean isRegionBoostsEnabled() {

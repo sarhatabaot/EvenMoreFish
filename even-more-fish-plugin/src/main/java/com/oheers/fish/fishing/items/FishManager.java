@@ -276,7 +276,7 @@ public class FishManager extends AbstractFileBasedManager<Rarity> {
         String biome = location != null && location.getWorld() != null ?
                 location.getWorld().getBiome(location).name() : "unknown biome";
 
-        EvenMoreFish.getInstance().getLogger().warning(
+        EvenMoreFish.getInstance().getLogger().warning(() ->
                 "No fish available for rarity %s at %s in biome %s (Custom Rod: %b)"
                         .formatted(
                                 rarity.getId(),

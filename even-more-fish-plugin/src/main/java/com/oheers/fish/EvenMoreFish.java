@@ -129,6 +129,7 @@ public class EvenMoreFish extends EMFPlugin {
         // could not set up economy.
         if (!Economy.getInstance().isEnabled()) {
             getLogger().warning("EvenMoreFish won't be hooking into economy. If this wasn't by choice in config.yml, please install Economy handling plugins.");
+            getLogger().warning("This message may be a false positive, if you can spot a \"successfully hooked into \" message, it can be ignored.");
         }
 
         this.pluginDataManager = new PluginDataManager(this);
