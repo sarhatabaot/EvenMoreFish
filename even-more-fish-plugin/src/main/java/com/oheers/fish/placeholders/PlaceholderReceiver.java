@@ -235,8 +235,16 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
     }
 
     private @Nullable String handleTotalMoneyEarned(Player player, @NotNull String identifier) {
+        String substring = identifier.substring("total_money_earned_".length());
+        if (substring.equalsIgnoreCase("player")) {
+            if (player == null) {
+                return null;
+            }
+            UserReport userReport = plugin.getPluginDataManager().getUserReportDataManager().get(player.getUniqueId().toString());
+            return userReport != null ? String.format("%.2f", userReport.getMoneyEarned()) : null;
+        }
         try {
-            UUID uuid = UUID.fromString(identifier.substring("total_money_earned_".length()));
+            UUID uuid = UUID.fromString(substring);
             UserReport userReport = plugin.getPluginDataManager().getUserReportDataManager().get(uuid.toString());
             return userReport != null ? String.format("%.2f", userReport.getMoneyEarned()) : null;
         } catch (IllegalArgumentException e) {
@@ -245,8 +253,16 @@ public class PlaceholderReceiver extends PlaceholderExpansion {
     }
 
     private @Nullable String handleTotalFishSold(Player player, @NotNull String identifier) {
+        String substring = identifier.substring("total_fish_sold_".length());
+        if (substring.equalsIgnoreCase("player")) {
+            if (player == null) {
+                return null;
+            }
+            UserReport userReport = plugin.getPluginDataManager().getUserReportDataManager().get(player.getUniqueId().toString());
+            return userReport != null ? String.valueOf(userReport.getFishSold()) : null;
+        }
         try {
-            UUID uuid = UUID.fromString(identifier.substring("total_fish_sold_".length()));
+            UUID uuid = UUID.fromString(substring);
             UserReport userReport = plugin.getPluginDataManager().getUserReportDataManager().get(uuid.toString());
             return userReport != null ? String.valueOf(userReport.getFishSold()) : null;
         } catch (IllegalArgumentException e) {
