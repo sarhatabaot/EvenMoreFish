@@ -99,8 +99,9 @@ public class EMFListMessage extends EMFMessage {
 
     @Override
     public @NotNull List<Component> getComponentListMessage(@Nullable OfflinePlayer player) {
-        return underlying.parsePlaceholderAPI(player)
-            .replace("{player}", Optional.ofNullable(player).map(OfflinePlayer::getName).orElse("null"))
+        OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
+        return underlying.parsePlaceholderAPI(relevant)
+            .replace("{player}", Optional.ofNullable(relevant).map(OfflinePlayer::getName).orElse("null"))
             .get();
     }
 
