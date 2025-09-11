@@ -315,36 +315,40 @@ public class Fish {
      */
     private List<Component> getFishLore() {
         List<String> loreOverride = section.getStringList("lore-override");
-        EMFMessage newLoreLine;
+        EMFListMessage newLoreLine;
         if (!loreOverride.isEmpty()) {
             newLoreLine = EMFListMessage.fromStringList(loreOverride);
         } else {
-            newLoreLine = ConfigMessage.FISH_LORE.getMessage();
+            newLoreLine = ConfigMessage.FISH_LORE.getMessage().toListMessage();
         }
+
+        OfflinePlayer fishermanPlayer = getFishermanPlayer();
 
         List<String> fishLore = factory.getLore().getConfiguredValue();
         EMFListMessage fishLoreReplacement = fishLore.isEmpty() ? EMFListMessage.empty() : EMFListMessage.fromStringList(fishLore);
         newLoreLine.setVariable("{fish_lore}", fishLoreReplacement);
 
-        if (!disableFisherman && getFishermanPlayer() != null) {
-            newLoreLine.setVariable("{fisherman_lore}", ConfigMessage.FISHERMAN_LORE.getMessage().toListMessage());
+        if (!disableFisherman && fishermanPlayer != null) {
+            EMFMessage message = ConfigMessage.FISHERMAN_LORE.getMessage();
+            message.setRelevantPlayer(fishermanPlayer);
+            newLoreLine.setVariableWithListInsertion("{fisherman_lore}", message.toListMessage());
         } else {
-            newLoreLine.setVariable("{fisherman_lore}", EMFListMessage.empty());
+            newLoreLine.setVariableWithListInsertion("{fisherman_lore}", EMFListMessage.empty());
         }
 
         if (length > 0) {
-            newLoreLine.setVariable("{length_lore}", ConfigMessage.LENGTH_LORE.getMessage().toListMessage());
+            newLoreLine.setVariableWithListInsertion("{length_lore}", ConfigMessage.LENGTH_LORE.getMessage().toListMessage());
             newLoreLine.setLength(Float.toString(length));
         } else {
-            newLoreLine.setVariable("{length_lore}", EMFListMessage.empty());
+            newLoreLine.setVariableWithListInsertion("{length_lore}", EMFListMessage.empty());
         }
 
         newLoreLine.setRarity(this.rarity.getLorePrep());
 
-        if (disableFisherman) {
+        if (disableFisherman || fishermanPlayer == null) {
             return newLoreLine.getComponentListMessage();
         } else {
-            return newLoreLine.getComponentListMessage(getFishermanPlayer());
+            return newLoreLine.getComponentListMessage(fishermanPlayer);
         }
     }
 

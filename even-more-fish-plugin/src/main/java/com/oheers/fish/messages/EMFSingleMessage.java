@@ -94,7 +94,7 @@ public class EMFSingleMessage extends EMFMessage {
     @Override
     public @NotNull Component getComponentMessage(@Nullable OfflinePlayer player) {
         OfflinePlayer relevant = relevantPlayer == null ? player : relevantPlayer;
-        return underlying.parsePlaceholderAPI(relevantPlayer)
+        return underlying.parsePlaceholderAPI(relevant)
             .replace("{player}", Optional.ofNullable(relevant).map(OfflinePlayer::getName).orElse("null"))
             .get();
     }
