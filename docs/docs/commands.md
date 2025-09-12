@@ -9,18 +9,18 @@ The main command (`/emf`) can have custom aliases configured in `MainConfig`.
 
 ## EvenMoreFish Player Commands
 
-| Command              | Arguments  | Permission                                  | Description                            |
-|----------------------|------------|---------------------------------------------|----------------------------------------|
-| `/emf`               | None       | None                                        | Shows help message (default)           |
-| `/emf next`          | None       | `emf.user.next`                             | Shows when the next competition starts |
-| `/emf toggle`        | None       | `emf.user.toggle`                           | Toggles fishing rewards on/off         |
-| `/emf gui`           | None       | `emf.user.gui`                              | Opens the main menu GUI                |
-| `/emf help`          | None       | `emf.user.help`                             | Shows command help                     |
-| `/emf top`           | None       | `emf.user.top`                              | Shows competition leaderboard          |
-| `/emf shop`          | `[target]` | `emf.user.shop` (or `emf.admin` for target) | Opens fish selling GUI                 |
-| `/emf sellall`       | None       | `emf.user.sellall`                          | Sells all fish in inventory            |
-| `/emf applybaits`    | None       | `emf.user.applybaits`                       | Opens bait application GUI             |
-| `/emf journal`       | `[rarity]` | `emf.user.journal`                          | Opens fish collection journal          |
+| Command              | Arguments  | Permission                             | Description                            |
+|----------------------|------------|----------------------------------------|----------------------------------------|
+| `/emf`               | None       | None                                   | Shows help message (default)           |
+| `/emf next`          | None       | `emf.next`                             | Shows when the next competition starts |
+| `/emf toggle`        | None       | `emf.toggle`                           | Toggles fishing rewards on/off         |
+| `/emf gui`           | None       | `emf.gui`                              | Opens the main menu GUI                |
+| `/emf help`          | None       | `emf.help`                             | Shows command help                     |
+| `/emf top`           | None       | `emf.top`                              | Shows competition leaderboard          |
+| `/emf shop`          | `[target]` | `emf.shop` (or `emf.admin` for target) | Opens fish selling GUI                 |
+| `/emf sellall`       | None       | `emf.sellall`                          | Sells all fish in inventory            |
+| `/emf applybaits`    | None       | `emf.applybaits`                       | Opens bait application GUI             |
+| `/emf journal`       | `[rarity]` | `emf.journal`                          | Opens fish collection journal          |
 
 
 
