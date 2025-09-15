@@ -54,5 +54,5 @@ public class EventManager {
     public void setCheckingIntEvent(boolean checkingIntEvent) {
         this.checkingIntEvent = checkingIntEvent;
     }
-    
+
 }

@@ -215,7 +215,6 @@ public class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void reload(@Nullable CommandSender sender) {
-
         terminateGuis();
 
         this.configurationManager.reloadConfigurations();
@@ -224,7 +223,6 @@ public class EvenMoreFish extends EMFPlugin {
         BaitManager.getInstance().reload();
         RodManager.getInstance().reload();
 
-        HandlerList.unregisterAll(FishEatEvent.getInstance());
         HandlerList.unregisterAll(FishInteractEvent.getInstance());
         HandlerList.unregisterAll(McMMOTreasureEvent.getInstance());
 
