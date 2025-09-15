@@ -2,6 +2,7 @@ package com.oheers.fish.utils;
 
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.events.FishEatEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCookEvent;
@@ -32,7 +33,8 @@ public class ItemProtectionListener implements Listener {
     // Protect against consuming an EMF item.
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent event) {
-        if (!MainConfig.getInstance().blockConsume()) {
+        // If the fish has eat-event, ignore item protection.
+        if (FishEatEvent.getInstance().checkEatEvent(event) || !MainConfig.getInstance().blockConsume()) {
             return;
         }
         ItemStack item = event.getItem();
