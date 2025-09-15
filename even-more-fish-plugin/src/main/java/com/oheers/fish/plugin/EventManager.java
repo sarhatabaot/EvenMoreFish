@@ -16,10 +16,10 @@ import com.oheers.fish.utils.ItemProtectionListener;
 import org.bukkit.plugin.PluginManager;
 
 public class EventManager {
+
     private final EvenMoreFish plugin;
     private final PluginManager pm;
 
-    private boolean checkingEatEvent;
     private boolean checkingIntEvent;
 
     public EventManager(EvenMoreFish plugin) {
@@ -45,20 +45,14 @@ public class EventManager {
     }
 
     public void registerOptionalListeners() {
-        if (checkingEatEvent) {
-            pm.registerEvents(FishEatEvent.getInstance(), plugin);
-        }
         if (checkingIntEvent) {
             pm.registerEvents(FishInteractEvent.getInstance(), plugin);
         }
         plugin.getDependencyManager().checkOptionalDependencies();
     }
 
-    public void setCheckingEatEvent(boolean checkingEatEvent) {
-        this.checkingEatEvent = checkingEatEvent;
-    }
-
     public void setCheckingIntEvent(boolean checkingIntEvent) {
         this.checkingIntEvent = checkingIntEvent;
     }
+
 }

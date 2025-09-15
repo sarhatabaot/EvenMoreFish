@@ -6,20 +6,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
-public class FishEatEvent implements Listener {
+public class FishEatEvent {
 
     private static final FishEatEvent eatEvent = new FishEatEvent();
 
-    private FishEatEvent() {
-
-    }
+    private FishEatEvent() {}
 
     public static FishEatEvent getInstance() {
         return eatEvent;
     }
 
-    @EventHandler
-    public void onEatItem(final PlayerItemConsumeEvent event) {
+    public boolean checkEatEvent(PlayerItemConsumeEvent event) {
         // Checks if the eaten item is a fish
         if (FishUtils.isFish(event.getItem())) {
             // Creates a replica of the fish we can use
@@ -29,8 +26,11 @@ public class FishEatEvent implements Listener {
                 if (fish.hasEatRewards()) {
                     // Runs through each eat-event
                     fish.getActionRewards().forEach(r -> r.rewardPlayer(event.getPlayer(), null));
+                    return true;
                 }
             }
+            return false;
         }
+        return false;
     }
 }

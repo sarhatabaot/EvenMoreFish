@@ -356,8 +356,6 @@ public class Fish {
         List<String> configRewards = section.getStringList("eat-event");
         // Checks if the player has actually set reward for an eat event
         if (!configRewards.isEmpty()) {
-            // Informs the main class to load up an PlayerItemConsumeEvent listener
-            EvenMoreFish.getInstance().getEventManager().setCheckingEatEvent(true);
             this.eventType = "eat";
             actionRewards = new ArrayList<>();
 
