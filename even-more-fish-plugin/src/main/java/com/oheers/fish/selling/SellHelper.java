@@ -3,6 +3,7 @@ package com.oheers.fish.selling;
 import com.devskiller.friendly_id.FriendlyId;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.api.EMFFishSellEvent;
 import com.oheers.fish.api.economy.Economy;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.data.manager.DataManager;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,6 +74,12 @@ public class SellHelper {
 
         List<SoldFish> soldFish = getTotalSoldFish();
         double totalWorth = getTotalWorth(soldFish);
+
+        EMFFishSellEvent fishSellEvent = new EMFFishSellEvent(soldFish, player, totalWorth, LocalDateTime.now());
+        fishSellEvent.callEvent();
+        if (fishSellEvent.isCancelled()) {
+            return;
+        }
 
         // Remove sold items
         for (ItemStack item : getPossibleSales()) {
