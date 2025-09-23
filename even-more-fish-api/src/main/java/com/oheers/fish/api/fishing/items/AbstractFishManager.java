@@ -6,9 +6,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.TreeMap;
 
-public abstract class AbstractFishManager extends AbstractFileBasedManager<IRarity> {
+public abstract class AbstractFishManager<T extends IRarity> extends AbstractFileBasedManager<T> {
 
-    private static AbstractFishManager instance;
+    private static AbstractFishManager<? extends IRarity> instance;
 
     protected AbstractFishManager() {
         if (instance != null) {
@@ -17,7 +17,7 @@ public abstract class AbstractFishManager extends AbstractFileBasedManager<IRari
         instance = this;
     }
 
-    public static @NotNull AbstractFishManager getInstance() {
+    public static @NotNull AbstractFishManager<? extends IRarity> getInstance() {
         if (instance == null) {
             throw new IllegalStateException("FishManager has not been initialized yet!");
         }

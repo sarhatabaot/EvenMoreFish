@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.ToDoubleFunction;
 
-public class FishManager extends AbstractFishManager {
+public class FishManager extends AbstractFishManager<Rarity> {
 
     private static FishManager instance;
 
