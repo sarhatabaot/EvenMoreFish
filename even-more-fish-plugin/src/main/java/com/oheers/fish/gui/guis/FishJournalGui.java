@@ -182,7 +182,7 @@ public class FishJournalGui extends ConfigGui {
             return ItemFactory.itemFactory(section, "undiscovered-rarity").createItem(player.getUniqueId());
         }
 
-        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
+        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarity", true);
         if (hideUndiscovered && !database.userHasRarity(rarity, player)) {
             return ItemFactory.itemFactory(section, "undiscovered-rarity").createItem(player.getUniqueId());
         }
