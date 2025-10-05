@@ -60,6 +60,8 @@ public class Fish implements IFish {
     private final boolean disableFisherman;
     private final String displayName;
 
+    private boolean showInJournal;
+
     private int day = -1;
     private final double setWorth;
 
@@ -96,6 +98,8 @@ public class Fish implements IFish {
         this.factory = factory;
 
         this.displayName = factory.getDisplayName().getConfiguredValue();
+
+        this.showInJournal = section.getBoolean("journal", true);
 
         factory.getLore().setEnabled(!section.getBoolean("disable-lore", false));
 
@@ -587,6 +591,16 @@ public class Fish implements IFish {
             EvenMoreFish.getInstance().getLogger().warning("Fish " + getName() + " has an incorrect catch-type. Defaulting to its rarity's catch-type.");
             return rarity.getCatchType();
         }
+    }
+
+    @Override
+    public boolean getShowInJournal() {
+        return showInJournal;
+    }
+
+    @Override
+    public void setShowInJournal(boolean showInJournal) {
+        this.showInJournal = showInJournal;
     }
 
     @Override
