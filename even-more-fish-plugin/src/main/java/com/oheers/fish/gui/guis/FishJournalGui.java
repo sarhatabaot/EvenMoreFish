@@ -64,9 +64,16 @@ public class FishJournalGui extends ConfigGui {
         return new DynamicGuiElement(
                 character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            this.rarity.getFishList().forEach(fish ->
-                    group.addElement(new StaticGuiElement(character, getFishItem(fish, section)))
-            );
+            this.rarity.getFishList().forEach(fish -> {
+                if (!fish.getShowInJournal()) {
+                    return;
+                }
+                ItemStack item = getFishItem(fish, section);
+                if (item.isEmpty()) {
+                    return;
+                }
+                group.addElement(new StaticGuiElement(character, item));
+            });
             return group;
         }
         );
@@ -147,15 +154,22 @@ public class FishJournalGui extends ConfigGui {
         return new DynamicGuiElement(
             character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            FishManager.getInstance().getRarityMap().values().forEach(rarity ->
+            FishManager.getInstance().getRarityMap().values().forEach(rarity -> {
+                if (!rarity.getShowInJournal()) {
+                    return;
+                }
+                ItemStack item = getRarityItem(rarity, section);
+                if (item.isEmpty()) {
+                    return;
+                }
                 group.addElement(
                     new StaticGuiElement(
-                        character, getRarityItem(rarity, section), click -> {
+                        character, item, click -> {
                         new FishJournalGui(player, rarity).open();
                         return true;
                     })
-                )
-            );
+                );
+            });
             return group;
         }
         );

@@ -29,6 +29,7 @@ public class Rarity extends ConfigBase implements IRarity {
     private static final Logger logger = EvenMoreFish.getInstance().getLogger();
 
     private boolean fishWeighted;
+    private boolean showInJournal = true;
     private final Requirement requirement;
     private final List<Fish> fishList;
 
@@ -43,6 +44,7 @@ public class Rarity extends ConfigBase implements IRarity {
         updateRequirementFormats();
         this.requirement = loadRequirements();
         this.fishList = loadFish();
+        this.showInJournal = getConfig().getBoolean("journal", true);
     }
 
     // Current required config: id
@@ -186,6 +188,16 @@ public class Rarity extends ConfigBase implements IRarity {
     public @NotNull ItemStack getMaterial() {
         ItemStack item = FishUtils.getItem(getConfig().getString("material"));
         return item == null ? new ItemStack(Material.COD) : item;
+    }
+
+    @Override
+    public boolean getShowInJournal() {
+        return showInJournal;
+    }
+
+    @Override
+    public void setShowInJournal(boolean showInJournal) {
+        this.showInJournal = showInJournal;
     }
 
     // External variables
