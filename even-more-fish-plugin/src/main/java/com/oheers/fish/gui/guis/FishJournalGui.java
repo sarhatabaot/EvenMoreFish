@@ -28,13 +28,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 
 public class FishJournalGui extends ConfigGui {
 
     private final Rarity rarity;
+    private final SortType sortType;
 
     public FishJournalGui(@NotNull HumanEntity player, @Nullable Rarity rarity) {
         super(
@@ -51,6 +56,9 @@ public class FishJournalGui extends ConfigGui {
         Section config = getGuiConfig();
         if (config != null) {
             getGui().addElement(getGroup(config));
+            sortType = SortType.fromString(config.getString("sort-type"));
+        } else {
+            sortType = SortType.ALPHABETICAL;
         }
     }
 
@@ -64,7 +72,7 @@ public class FishJournalGui extends ConfigGui {
         return new DynamicGuiElement(
                 character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            this.rarity.getFishList().forEach(fish -> {
+            sortType.sortFish(this.rarity.getFishList()).forEach(fish -> {
                 if (!fish.getShowInJournal()) {
                     return;
                 }
@@ -154,7 +162,7 @@ public class FishJournalGui extends ConfigGui {
         return new DynamicGuiElement(
             character, who -> {
             GuiElementGroup group = new GuiElementGroup(character);
-            FishManager.getInstance().getRarityMap().values().forEach(rarity -> {
+            sortType.sortRarities(FishManager.getInstance().getRarityMap().values()).forEach(rarity -> {
                 if (!rarity.getShowInJournal()) {
                     return;
                 }
@@ -182,7 +190,7 @@ public class FishJournalGui extends ConfigGui {
             return ItemFactory.itemFactory(section, "undiscovered-rarity").createItem(player.getUniqueId());
         }
 
-        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarities", true);
+        boolean hideUndiscovered = section.getBoolean("hide-undiscovered-rarity", true);
         if (hideUndiscovered && !database.userHasRarity(rarity, player)) {
             return ItemFactory.itemFactory(section, "undiscovered-rarity").createItem(player.getUniqueId());
         }
@@ -220,6 +228,43 @@ public class FishJournalGui extends ConfigGui {
             Logging.warn(logMessage);
         }
         return db;
+    }
+
+    public enum SortType {
+        ALPHABETICAL(Comparator.comparing(Rarity::getId), Comparator.comparing(Fish::getName)),
+        WEIGHT(Comparator.comparingDouble(Rarity::getWeight).reversed(), Comparator.comparingDouble(Fish::getWeight).reversed());
+
+        private final Comparator<Rarity> rarityComparator;
+        private final Comparator<Fish> fishComparator;
+
+        SortType(Comparator<Rarity> rarityComparator, Comparator<Fish> fishComparator) {
+            this.rarityComparator = rarityComparator;
+            this.fishComparator = fishComparator;
+        }
+
+        public TreeSet<Rarity> sortRarities(@NotNull Collection<Rarity> collection) {
+            TreeSet<Rarity> set = new TreeSet<>(rarityComparator);
+            set.addAll(collection);
+            return set;
+        }
+
+        public TreeSet<Fish> sortFish(@NotNull Collection<Fish> collection) {
+            TreeSet<Fish> set = new TreeSet<>(fishComparator);
+            set.addAll(collection);
+            return set;
+        }
+
+        public static SortType fromString(@Nullable String string) {
+            if (string == null) {
+                return ALPHABETICAL;
+            }
+            try {
+                return valueOf(string.toUpperCase());
+            } catch (IllegalArgumentException exception) {
+                return ALPHABETICAL;
+            }
+        }
+
     }
 
 }
