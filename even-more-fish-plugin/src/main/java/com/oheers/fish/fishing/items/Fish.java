@@ -495,7 +495,7 @@ public class Fish implements IFish {
 
     @Override
     public @NotNull List<Reward> getSellRewards() {
-        return sellRewards == null ? new ArrayList<>() : fishRewards;
+        return sellRewards == null ? new ArrayList<>() : sellRewards;
     }
 
     @Override
