@@ -5,6 +5,7 @@ import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.EMFFishSellEvent;
 import com.oheers.fish.api.economy.Economy;
+import com.oheers.fish.api.reward.Reward;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.database.data.manager.DataManager;
 import com.oheers.fish.database.model.user.UserReport;
@@ -76,8 +77,7 @@ public class SellHelper {
         double totalWorth = getTotalWorth(soldFish);
 
         EMFFishSellEvent fishSellEvent = new EMFFishSellEvent(soldFish, player, totalWorth, LocalDateTime.now());
-        fishSellEvent.callEvent();
-        if (fishSellEvent.isCancelled()) {
+        if (!fishSellEvent.callEvent()) {
             return;
         }
 
