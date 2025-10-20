@@ -1,5 +1,6 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import nu.studer.gradle.jooq.JooqExtension
+import org.gradle.api.internal.artifacts.dependencies.DefaultImmutableVersionConstraint.strictly
 import org.jooq.meta.jaxb.Property
 import java.time.Instant
 import java.time.ZoneId
@@ -15,7 +16,7 @@ plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
-    id("org.sonarqube") version "6.3.1.5724"
+    alias(libs.plugins.sonar)
 }
 
 group = "com.oheers.evenmorefish"
@@ -30,36 +31,6 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven("https://jitpack.io")
-    maven("https://repo.codemc.io/repository/maven-public/")
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://github.com/deanveloper/SkullCreator/raw/mvn-repo/")
-    maven("https://maven.enginehub.org/repo/")
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
-    maven("https://libraries.minecraft.net/")
-    maven("https://nexus.neetgames.com/repository/maven-releases/")
-    maven("https://repo.codemc.org/repository/maven-public/")
-    maven("https://repo.spongepowered.org/maven/")
-    maven("https://repo.essentialsx.net/releases/")
-    maven("https://repo.auxilor.io/repository/maven-public/")
-    maven("https://repo.rosewooddev.io/repository/public/")
-    maven("https://repo.minebench.de/")
-    maven("https://repo.codemc.io/repository/FireML/")
-    maven("https://repo.dmulloy2.net/repository/public/") {
-        name = "ProtocolLib Repo - Required by mcMMO"
-        mavenContent {
-            releasesOnly()
-        }
-    }
-}
 
 dependencies {
     api(project(":even-more-fish-api"))
@@ -68,20 +39,13 @@ dependencies {
     compileOnly(libs.vault.api)
     compileOnly(libs.placeholder.api)
 
-    compileOnly(libs.worldguard.core) {
+    compileOnly(libs.bundles.worldguard) {
         exclude("com.sk89q.worldedit", "worldedit-core")
-    }
-    compileOnly(libs.worldguard.bukkit) {
         exclude("org.spigotmc", "spigot-api")
     }
-    compileOnly(libs.worldedit.core)
-    compileOnly(libs.worldedit.bukkit)
 
-    compileOnly(libs.redprotect.core) {
-        exclude("net.ess3", "EssentialsX")
-        exclude("org.spigotmc", "spigot-api")
-    }
-    compileOnly(libs.redprotect.spigot) {
+    compileOnly(libs.bundles.worldedit)
+    compileOnly(libs.bundles.redprotect) {
         exclude("net.ess3", "EssentialsX")
         exclude("org.spigotmc", "spigot-api")
         exclude("com.destroystokyo.paper", "paper-api")
@@ -90,6 +54,7 @@ dependencies {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldguard", "worldguard-bukkit")
     }
+
     compileOnly(libs.aura.skills)
     compileOnly(libs.aurelium.skills)
 
@@ -102,14 +67,15 @@ dependencies {
 
     implementation(libs.nbt.api)
     implementation(libs.bstats)
-    implementation(libs.commandapi)
+    implementation(libs.commandsapi)  {
+        version { strictly("10.1.2") } // or "11.0.0" depending on module
+    }
     implementation(libs.inventorygui)
     implementation(libs.boostedyaml)
     implementation(libs.vanishchecker)
     implementation(libs.messagelib)
     implementation(libs.universalscheduler)
 
-    //temp fix until dynamic gradle plugin is ready ("mirror-aware-plugin") by sarhatabaot
     implementation(libs.caffeine)
     implementation(libs.jooq)
     implementation(libs.jooq.codegen)
@@ -123,7 +89,6 @@ dependencies {
     }
 
     library(libs.friendlyid)
-    library(libs.json.simple)
     library(libs.maven.artifact)
     library(libs.annotations)
     library(libs.guava)
@@ -292,7 +257,7 @@ tasks {
     }
 
     jooq {
-        version.set(libs.versions.jooq)
+        version.set(libs.versions.jooq.toString())
 
         val dialects = listOf("mysql")
         val latestSchema = "V8_1__Create_Tables.sql"
@@ -319,8 +284,6 @@ tasks {
     shadowJar {
         val buildNumberOrDate = getBuildNumberOrDate()
         manifest {
-            val buildNumber: String? by project
-
             attributes["Specification-Title"] = "EvenMoreFish"
             attributes["Specification-Version"] = project.version
             attributes["Implementation-Title"] = grgit.branch.current().name
