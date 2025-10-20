@@ -1,4 +1,10 @@
+import org.gradle.kotlin.dsl.mavenCentral
+
 rootProject.name = "even-more-fish"
+
+pluginManagement {
+    includeBuild("build-logic")
+}
 
 // Addons
 include(":addons:even-more-fish-addons-j17")
@@ -7,9 +13,41 @@ include(":addons:even-more-fish-addons-j21")
 // Plugin Stuff
 include(":even-more-fish-api")
 include(":even-more-fish-database-extras")
-include(":even-more-fish-plugin")
+include(":even-more-fish-plugin") //"core"
+include(":even-more-fish-plugin-1-20")
+include(":even-more-fish-plugin-1-21")
 
 dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven("https://jitpack.io")
+        maven("https://repo.codemc.io/repository/maven-public/")
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+            mavenContent {
+                snapshotsOnly()
+            }
+        }
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://github.com/deanveloper/SkullCreator/raw/mvn-repo/")
+        maven("https://maven.enginehub.org/repo/")
+        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+        maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
+        maven("https://libraries.minecraft.net/")
+        maven("https://nexus.neetgames.com/repository/maven-releases/")
+        maven("https://repo.codemc.org/repository/maven-public/")
+        maven("https://repo.spongepowered.org/maven/")
+        maven("https://repo.essentialsx.net/releases/")
+        maven("https://repo.auxilor.io/repository/maven-public/")
+        maven("https://repo.rosewooddev.io/repository/public/")
+        maven("https://repo.minebench.de/")
+        maven("https://repo.codemc.io/repository/FireML/")
+        maven("https://repo.dmulloy2.net/repository/public/") {
+            name = "ProtocolLib Repo - Required by mcMMO"
+            mavenContent {
+                releasesOnly()
+            }
+        }
+    }
     versionCatalogs {
         create("libs") {
             library("paper-api", "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
@@ -64,14 +102,16 @@ dependencyResolutionManagement {
 
             library("friendlyid", "com.devskiller.friendly-id:friendly-id:1.1.0")
             library("hikaricp", "com.zaxxer:HikariCP:7.0.2")
-            library("json-simple", "com.googlecode.json-simple:json-simple:1.1.1")
 
             library("universalscheduler", "com.github.Anon8281:UniversalScheduler:0.1.7")
             library("playerpoints", "org.black_ixx:playerpoints:3.3.3")
 
             library("vanishchecker", "uk.firedev:VanishChecker:1.0.5")
 
-            library("commandapi", "dev.jorel:commandapi-bukkit-shade:10.1.2")
+            library("commandsapi", "dev.jorel","commandapi-bukkit-shade").withoutVersion()
+            version("commandsapi_twenty", "10.1.2")
+            version("commandsapi_twentyone", "11.0.0")
+
             library("inventorygui", "de.themoep:inventorygui:1.6.4-SNAPSHOT")
 
             plugin("shadow", "com.gradleup.shadow").version("9.2.2")
@@ -100,6 +140,8 @@ dependencyResolutionManagement {
             library("junit-jupiter-engine","org.junit.jupiter","junit-jupiter-engine").versionRef("junit")
 
             library("guava", "com.google.guava:guava:33.5.0-jre")
+
+            plugin("sonar", "org.sonarqube").version("6.3.1.5724")
         }
     }
 }
