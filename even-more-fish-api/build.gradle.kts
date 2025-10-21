@@ -1,5 +1,7 @@
 plugins {
     id("com.oheers.evenmorefish.java-conventions")
+    id("com.oheers.evenmorefish.publishing-conventions")
+
     `java-library`
 }
 
@@ -22,21 +24,6 @@ java {
 }
 
 publishing {
-    repositories { // Copied directly from CodeMC's docs
-        maven {
-            url = uri("https://repo.codemc.io/repository/EvenMoreFish/")
-
-            val mavenUsername = System.getenv("JENKINS_USERNAME")
-            val mavenPassword = System.getenv("JENKINS_PASSWORD")
-
-            if (mavenUsername != null && mavenPassword != null) {
-                credentials {
-                    username = mavenUsername
-                    password = mavenPassword
-                }
-            }
-        }
-    }
     publications {
         create<MavenPublication>("api") {
             groupId = project.group.toString()
@@ -47,6 +34,7 @@ publishing {
         }
     }
 }
+
 
 testing {
     suites {

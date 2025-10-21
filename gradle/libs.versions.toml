@@ -89,8 +89,12 @@ junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.re
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 
 # CommandAPI
-commandsapi = { module = "dev.jorel:commandapi-bukkit-shade",  version = { strictly = "[10.1.2, 11.0.0["}}
+commandsapi-bukkit = { module = "dev.jorel:commandapi-bukkit-shade", version = "10.1.2" }
+commandsapi-paper = { module = "dev.jorel:commandapi-paper-core", version = "11.0.0" }
 
+plugin-yml = { module = "de.eldoria.plugin-yml.bukkit:de.eldoria.plugin-yml.bukkit.gradle.plugin", version.ref = "plugin-yml"}
+shadow =  {module = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin", version.ref = "shadow"}
+grgit = { module = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin", version.ref = "grgit"}
 [bundles]
 worldguard = ["worldguard-core", "worldguard-bukkit"]
 worldedit = ["worldedit-core", "worldedit-bukkit"]
@@ -102,8 +106,8 @@ connectors = ["connectors-mysql", "connectors-sqlite"]
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "9.2.2" }
-plugin-yml = { id = "de.eldoria.plugin-yml.bukkit", version = "0.8.0" }
+plugin-yml = { id = "de.eldoria.plugin-yml.bukkit", version.ref = "plugin-yml" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
 jooq = { id = "nu.studer.jooq", version = "9.0" }
 sonar = { id = "org.sonarqube", version = "6.3.1.5724" }
-foojay-resolver = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "0.8.0" }
+run-paper = { id = "xyz.jpenilla.run-paper", version = "2.3.1"}
