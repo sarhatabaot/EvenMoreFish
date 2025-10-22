@@ -21,7 +21,8 @@ dependencies {
         }
     }
 
-
+    compileOnly(libs.strokk.annotations)
+    annotationProcessor(libs.strokk.processor)
 }
 
 afterEvaluate {
