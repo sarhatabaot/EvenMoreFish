@@ -33,7 +33,7 @@ public class RarityArgument implements CustomArgumentType.Converted<Rarity, Stri
     @NotNull
     @Override
     public ArgumentType<String> getNativeType() {
-        return StringArgumentType.word();
+        return StringArgumentType.string();
     }
 
     @NotNull

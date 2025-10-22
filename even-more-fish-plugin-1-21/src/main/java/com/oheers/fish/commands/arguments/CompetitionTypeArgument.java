@@ -33,7 +33,7 @@ public class CompetitionTypeArgument implements CustomArgumentType.Converted<Com
     @NotNull
     @Override
     public ArgumentType<String> getNativeType() {
-        return StringArgumentType.word();
+        return StringArgumentType.string();
     }
 
     @NotNull

@@ -33,7 +33,7 @@ public class FishArgument implements CustomArgumentType.Converted<Fish, String> 
     @NotNull
     @Override
     public ArgumentType<String> getNativeType() {
-        return StringArgumentType.word();
+        return StringArgumentType.string();
     }
 
     @NotNull

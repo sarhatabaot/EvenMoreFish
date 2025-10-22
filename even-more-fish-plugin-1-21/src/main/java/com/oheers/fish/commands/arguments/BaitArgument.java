@@ -36,7 +36,7 @@ public class BaitArgument implements CustomArgumentType.Converted<BaitHandler, S
     @NotNull
     @Override
     public ArgumentType<String> getNativeType() {
-        return StringArgumentType.word();
+        return StringArgumentType.string();
     }
 
     @NotNull

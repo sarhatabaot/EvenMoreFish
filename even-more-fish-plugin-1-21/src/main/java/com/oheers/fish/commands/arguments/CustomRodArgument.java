@@ -33,7 +33,7 @@ public class CustomRodArgument implements CustomArgumentType.Converted<CustomRod
     @NotNull
     @Override
     public ArgumentType<String> getNativeType() {
-        return StringArgumentType.word();
+        return StringArgumentType.string();
     }
 
     @NotNull
