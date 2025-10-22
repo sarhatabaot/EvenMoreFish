@@ -72,12 +72,12 @@ dependencies {
 
     api(libs.nbt.api)
     api(libs.boostedyaml)
+    api(libs.universalscheduler)
 
     implementation(libs.bstats)
     implementation(libs.inventorygui)
     implementation(libs.vanishchecker)
     implementation(libs.messagelib)
-    implementation(libs.universalscheduler)
 
     implementation(libs.caffeine)
     implementation(libs.jooq)

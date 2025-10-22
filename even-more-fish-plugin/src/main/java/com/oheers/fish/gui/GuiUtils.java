@@ -117,7 +117,8 @@ public class GuiUtils {
         newActionMap.put("show-command-help", (gui, click) -> {
             click.getWhoClicked().closeInventory();
             if (click.getWhoClicked() instanceof Player player) {
-                player.performCommand("/ %s %s".formatted(
+                //todo test
+                player.performCommand("%s %s".formatted(
                                 MainConfig.getInstance().getMainCommandName(),
                                 MainConfig.getInstance().getHelpSubCommandName()
                 ));
