@@ -1,8 +1,8 @@
 package com.oheers.fish.gui;
 
 import com.oheers.fish.EvenMoreFish;
-import com.oheers.fish.commands.MainCommand;
 import com.oheers.fish.config.GuiConfig;
+import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.gui.guis.BaitsGui;
 import com.oheers.fish.gui.guis.FishJournalGui;
@@ -116,7 +116,14 @@ public class GuiUtils {
         });
         newActionMap.put("show-command-help", (gui, click) -> {
             click.getWhoClicked().closeInventory();
-            MainCommand.HELP_MESSAGE.sendMessage(click.getWhoClicked());
+            if (click.getWhoClicked() instanceof Player player) {
+                player.performCommand("/ %s %s".formatted(
+                                MainConfig.getInstance().getMainCommandName(),
+                                MainConfig.getInstance().getHelpSubCommandName()
+                ));
+            }
+
+            //MainCommand.HELP_MESSAGE.sendMessage(click.getWhoClicked());
         });
         newActionMap.put("sell-inventory", (gui, click) -> {
             HumanEntity humanEntity = click.getWhoClicked();

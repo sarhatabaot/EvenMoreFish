@@ -8,13 +8,10 @@ import com.oheers.fish.api.plugin.EMFPlugin;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.baits.manager.BaitManager;
-import com.oheers.fish.commands.AdminCommand;
-import com.oheers.fish.commands.MainCommand;
 import com.oheers.fish.competition.AutoRunner;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionQueue;
 import com.oheers.fish.config.MainConfig;
-import com.oheers.fish.events.FishEatEvent;
 import com.oheers.fish.events.FishInteractEvent;
 import com.oheers.fish.events.McMMOTreasureEvent;
 import com.oheers.fish.fishing.items.FishManager;
@@ -30,8 +27,7 @@ import com.oheers.fish.plugin.PluginDataManager;
 import com.oheers.fish.update.UpdateChecker;
 import de.themoep.inventorygui.InventoryGui;
 import de.tr7zw.changeme.nbtapi.NBT;
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPIBukkitConfig;
+
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -52,7 +48,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.oheers.fish.FishUtils.classExists;
 
-public class EvenMoreFish extends EMFPlugin {
+public abstract class EvenMoreFish extends EMFPlugin {
     private final Random random = ThreadLocalRandom.current();
 
     private final NamespacedKey fishToggleKey = new NamespacedKey(this, "fish-disabled");
@@ -77,6 +73,10 @@ public class EvenMoreFish extends EMFPlugin {
     private static TaskScheduler scheduler;
     private EMFAPI api;
 
+// TODO We already assign this in EMFPlugin.
+//    public static EvenMoreFish getInstance() {
+//        return (EvenMoreFish) EMFPlugin.getInstance();
+//    }
 
     public static @NotNull EvenMoreFish getInstance() {
         return Objects.requireNonNull(instance, "Plugin not initialized yet!");
@@ -101,15 +101,21 @@ public class EvenMoreFish extends EMFPlugin {
 
         instance = this;
 
-        CommandAPIBukkitConfig config = new CommandAPIBukkitConfig(this)
-                .shouldHookPaperReload(true)
-                .missingExecutorImplementationMessage("You are not able to use this command!");
-        CommandAPI.onLoad(config);
+        loadCommands();
     }
+
+    /**
+     * Stuff to do onLoad() with commands
+     */
+    public abstract void loadCommands();
+
+    public abstract void enableCommands();
+
+    public abstract void registerCommands();
 
     @Override
     public void onEnable() {
-        CommandAPI.onEnable();
+        enableCommands();
 
         scheduler = UniversalScheduler.getScheduler(this);
 
@@ -168,6 +174,8 @@ public class EvenMoreFish extends EMFPlugin {
         getLogger().info(() -> "EvenMoreFish by Oheers : Enabled");
     }
 
+    public abstract void disableCommands();
+
     @Override
     public void onDisable() {
         // If the server is not using Paper, the plugin won't have enabled in the first place.
@@ -175,7 +183,7 @@ public class EvenMoreFish extends EMFPlugin {
             return;
         }
 
-        CommandAPI.onDisable();
+        disableCommands();
 
         terminateGuis();
         // Ends the current competition in case the plugin is being disabled when the server will continue running
@@ -239,17 +247,6 @@ public class EvenMoreFish extends EMFPlugin {
             ConfigMessage.RELOAD_SUCCESS.getMessage().send(sender);
         }
         
-    }
-
-    private void registerCommands() {
-        new MainCommand().getCommand().register(this);
-
-        // Shortcut command for /emf admin
-        if (MainConfig.getInstance().isAdminShortcutCommandEnabled()) {
-            new AdminCommand(
-                    MainConfig.getInstance().getAdminShortcutCommandName()
-            ).getCommand().register(this);
-        }
     }
 
     public Random getRandom() {

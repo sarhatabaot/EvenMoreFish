@@ -9,7 +9,11 @@ group = "com.oheers.evenmorefish"
 version = properties["project-version"] as String
 
 dependencies {
-    compileOnly(libs.paper.api)
+    compileOnly(libs.paper.api) {
+        version {
+            strictly("1.20.1-R0.1-SNAPSHOT")
+        }
+    }
     compileOnly(libs.annotations)
     compileOnly(libs.universalscheduler)
     compileOnly(libs.boostedyaml)

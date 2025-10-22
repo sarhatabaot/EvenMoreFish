@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     implementation(files(rootProject.file("gradle/libs.versions.toml")))
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
+    implementation(libs.kotlin.gradle.plugin)
     implementation(libs.plugin.yml)
     implementation(libs.shadow)
     implementation(libs.grgit)

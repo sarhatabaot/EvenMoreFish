@@ -1,26 +1,25 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import nu.studer.gradle.jooq.JooqExtension
-import org.gradle.api.internal.artifacts.dependencies.DefaultImmutableVersionConstraint.strictly
 import org.jooq.meta.jaxb.Property
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 plugins {
     `java-library`
     `maven-publish`
     `jvm-test-suite`
-    alias(libs.plugins.plugin.yml)
-    alias(libs.plugins.shadow)
-    alias(libs.plugins.grgit)
+    //alias(libs.plugins.plugin.yml)
+    //alias(libs.plugins.shadow)
+    //alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
     alias(libs.plugins.sonar)
+    id("com.oheers.evenmorefish.plugin-yml-conventions")
+    id("com.oheers.evenmorefish.shadow-conventions")
+    id("com.oheers.evenmorefish.publishing-conventions")
 }
 
 group = "com.oheers.evenmorefish"
 version = properties["project-version"] as String
+
+extra["variant"] = "core"
 
 description = "A fishing extension bringing an exciting new experience to fishing."
 
@@ -35,7 +34,13 @@ java {
 dependencies {
     api(project(":even-more-fish-api"))
 
-    compileOnly(libs.paper.api)
+
+    compileOnly(libs.paper.api) {
+        version {
+            strictly("1.20.1-R0.1-SNAPSHOT")
+        }
+    }
+
     compileOnly(libs.vault.api)
     compileOnly(libs.placeholder.api)
 
@@ -65,13 +70,11 @@ dependencies {
     compileOnly(libs.headdatabase.api)
     compileOnly(libs.playerpoints)
 
-    implementation(libs.nbt.api)
+    api(libs.nbt.api)
+    api(libs.boostedyaml)
+
     implementation(libs.bstats)
-    implementation(libs.commandsapi)  {
-        version { strictly("10.1.2") } // or "11.0.0" depending on module
-    }
     implementation(libs.inventorygui)
-    implementation(libs.boostedyaml)
     implementation(libs.vanishchecker)
     implementation(libs.messagelib)
     implementation(libs.universalscheduler)
@@ -98,123 +101,13 @@ dependencies {
     jooqGenerator(libs.connectors.mysql)
 }
 
-bukkit {
-    name = "EvenMoreFish"
-    author = "Oheers"
-    // This is being used for developers instead of contributors
-    contributors = listOf(
-        "FireML",
-        "sarhatabaot"
-    )
-    main = "com.oheers.fish.EvenMoreFish"
-    version = project.version.toString()
-    description = project.description.toString()
-    website = "https://github.com/EvenMoreFish/EvenMoreFish"
-    apiVersion = "1.20"
-    foliaSupported = true
-
-    depend = listOf()
-    softDepend = listOf(
-        "AuraSkills",
-        "AureliumSkills",
-        "Denizen",
-        "EcoItems",
-        "GriefPrevention",
-        "HeadDatabase",
-        "ItemsAdder",
-        "mcMMO",
-        "Nexo",
-        "Oraxen",
-        "PlayerPoints",
-        "PlaceholderAPI",
-        "RedProtect",
-        "Vault",
-        "WorldGuard"
-    )
-    loadBefore = listOf("AntiAC")
-
-    permissions {
-        register("emf.*") {
-            children = listOf(
-                "emf.admin",
-                "emf.user"
-            )
-        }
-
-        register("emf.admin") {
-            children = listOf(
-                "emf.admin.update.notify",
-                "emf.admin.migrate"
-            )
-        }
-
-        register("emf.admin.update.notify") {
-            description = "Allows users to be notified about updates."
-        }
-
-        register("emf.admin.migrate") {
-            description = "Allows users to use the migrate command."
-        }
-
-        register("emf.user") {
-            children = listOf(
-                "emf.toggle",
-                "emf.top",
-                "emf.shop",
-                "emf.use_rod",
-                "emf.sellall",
-                "emf.help",
-                "emf.next",
-                "emf.applybaits",
-                "emf.journal"
-            )
-        }
-
-        register("emf.applybaits") {
-            description = "Allows users to apply baits to rods."
-        }
-
-        register("emf.journal") {
-            description = "Allows access to the fish journal."
-        }
-
-        register("emf.sellall") {
-            description = "Allows users to use sellall."
-        }
-        register("emf.toggle") {
-            description = "Allows users to toggle emf."
-        }
-
-        register("emf.top") {
-            description = "Allows users to use /emf top."
-        }
-
-        register("emf.shop") {
-            description = "Allows users to use /emf shop."
-        }
-
-        register("emf.use_rod") {
-            description = "Allows users to use emf rods."
-        }
-
-        register("emf.next") {
-            description = "Allows users to see when the next competition will be."
-        }
-
-        register("emf.help") {
-            description = "Allows users to see the help messages."
-            default = BukkitPluginDescription.Permission.Default.TRUE
-        }
-
-    }
-}
 
 sonar {
-  properties {
-    property("sonar.projectKey", "EvenMoreFish_EvenMoreFish")
-    property("sonar.organization", "evenmorefish")
-    property("sonar.host.url", "https://sonarcloud.io")
-  }
+    properties {
+        property("sonar.projectKey", "EvenMoreFish_EvenMoreFish")
+        property("sonar.organization", "evenmorefish")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 sourceSets {
@@ -257,7 +150,7 @@ tasks {
     }
 
     jooq {
-        version.set(libs.versions.jooq.toString())
+        version.set(libs.versions.jooq.asProvider().get())
 
         val dialects = listOf("mysql")
         val latestSchema = "V8_1__Create_Tables.sql"
@@ -276,39 +169,7 @@ tasks {
             for (file in File(project.projectDir, "src/main/resources/addons").listFiles()!!) {
                 file.delete()
             }
-
         }
-
-    }
-
-    shadowJar {
-        val buildNumberOrDate = getBuildNumberOrDate()
-        manifest {
-            attributes["Specification-Title"] = "EvenMoreFish"
-            attributes["Specification-Version"] = project.version
-            attributes["Implementation-Title"] = grgit.branch.current().name
-            attributes["Implementation-Version"] = buildNumberOrDate
-            attributes["Database-Baseline-Version"] = "8.0"
-        }
-
-        minimize()
-
-        exclude("LICENSE")
-        exclude("META-INF/**")
-
-        archiveFileName.set("even-more-fish-${project.version}-${buildNumberOrDate}.jar")
-        archiveClassifier.set("shadow")
-
-        relocate("de.tr7zw.changeme.nbtapi", "com.oheers.fish.utils.nbtapi")
-        relocate("org.bstats", "com.oheers.fish.libs.bstats")
-        relocate("com.github.Anon8281.universalScheduler", "com.oheers.fish.libs.universalScheduler")
-        relocate("de.themoep.inventorygui", "com.oheers.fish.libs.inventorygui")
-        relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
-        relocate("uk.firedev.messagelib", "com.oheers.fish.libs.messagelib")
-        relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
-        relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
-        relocate("org.jooq", "com.oheers.fish.libs.jooq")
-        relocate("com.zaxxer", "com.oheers.fish.libs.hikaricp")
     }
 
     compileJava {
@@ -342,50 +203,18 @@ testing {
 }
 
 publishing {
-    repositories { // Copied directly from CodeMC's docs
-        maven {
-            url = uri("https://repo.codemc.io/repository/EvenMoreFish/")
-
-            val mavenUsername = System.getenv("JENKINS_USERNAME")
-            val mavenPassword = System.getenv("JENKINS_PASSWORD")
-
-            if (mavenUsername != null && mavenPassword != null) {
-                credentials {
-                    username = mavenUsername
-                    password = mavenPassword
-                }
-            }
-        }
-    }
     publications {
-        create<MavenPublication>("plugin") {
+        create<MavenPublication>("core") {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
 
-            // Publish the fat jar so all relocated dependencies are available
-            from(components["shadow"])
+            from(components["java"])
         }
     }
 }
 
 
-fun getBuildNumberOrDate(): String? {
-    val currentBranch = grgit.branch.current().name
-    if (currentBranch.equals("head", ignoreCase = true) || currentBranch.equals("master", ignoreCase = true)) {
-        val buildNumber: String? by project
-        if (buildNumber == null)
-            return "RELEASE"
-
-        return buildNumber
-    }
-
-    val time = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm", Locale.ENGLISH)
-        .withZone(ZoneId.systemDefault())
-        .format(Instant.now())
-
-    return time
-}
 
 fun JooqExtension.configureDialect(dialect: String, latestSchema: String) {
     configurations {

@@ -1,30 +1,47 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
-    id("java")
+    id("java-library")
     id("com.oheers.evenmorefish.plugin-yml-conventions")
     id("com.oheers.evenmorefish.shadow-conventions")
     alias(libs.plugins.run.paper)
 }
 
 group = "com.oheers.evenmorefish"
+version = properties["project-version"] as String
 
 extra["variant"] = "1.20"
 
+afterEvaluate {
+    bukkit {
+        main = "com.oheers.fish.EMFModule"
+    }
+}
 dependencies {
-    implementation(project(":even-more-fish-plugin")) //rename to core later
+    compileOnly(libs.paper.api) {
+        version {
+            strictly("1.20.1-R0.1-SNAPSHOT")
+        }
+    }
+
+    api(project(":even-more-fish-plugin"))
     implementation(libs.commandsapi.bukkit)
 }
 
+tasks.named<ShadowJar>("shadowJar") {
+    from(project(":even-more-fish-plugin").sourceSets["main"].output)
+    relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
+}
+
 tasks {
+    build {
+        dependsOn(shadowJar)
+    }
     // Quick manual testing, don't use this in ci/cd
     runServer {
         minecraftVersion("1.20.1")
         jvmArgs("-Dcom.mojang.eula.agree=true")
     }
-
-    shadowJar {
-        relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
-    }
-
 }
 
 tasks.test {

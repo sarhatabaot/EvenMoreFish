@@ -49,5 +49,6 @@ dependencyResolutionManagement {
                 releasesOnly()
             }
         }
+        maven("https://eldonexus.de/repository/maven-public/")
     }
 }
