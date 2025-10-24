@@ -14,7 +14,7 @@ jooq-plugin = "9.0"
 sonar = "6.3.1.5724"
 foojay-resolver = "0.8.0"
 
-strokk-commands = "0.5.0"
+strokk-commands = "1.5.0"
 
 [libraries]
 # Paper & Core APIs

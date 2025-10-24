@@ -22,14 +22,15 @@ include(":even-more-fish-plugin-1-21")
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        maven("https://jitpack.io")
-        maven("https://repo.codemc.io/repository/maven-public/")
+        maven("https://eldonexus.de/repository/maven-public/")
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
             mavenContent {
                 snapshotsOnly()
             }
         }
         maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://jitpack.io")
+        maven("https://repo.codemc.io/repository/maven-public/")
         maven("https://github.com/deanveloper/SkullCreator/raw/mvn-repo/")
         maven("https://maven.enginehub.org/repo/")
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
@@ -49,6 +50,6 @@ dependencyResolutionManagement {
                 releasesOnly()
             }
         }
-        maven("https://eldonexus.de/repository/maven-public/")
+        maven("https://jitpack.io")
     }
 }

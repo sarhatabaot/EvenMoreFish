@@ -1,4 +1,190 @@
 package com.oheers.fish.commands;
 
+import com.oheers.fish.Checks;
+import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.economy.Economy;
+import com.oheers.fish.commands.arguments.RarityArgument;
+import com.oheers.fish.competition.Competition;
+import com.oheers.fish.config.MainConfig;
+import com.oheers.fish.database.DatabaseUtil;
+import com.oheers.fish.fishing.items.Rarity;
+import com.oheers.fish.gui.guis.ApplyBaitsGui;
+import com.oheers.fish.gui.guis.FishJournalGui;
+import com.oheers.fish.gui.guis.MainMenuGui;
+import com.oheers.fish.gui.guis.SellGui;
+import com.oheers.fish.messages.ConfigMessage;
+import com.oheers.fish.messages.PrefixType;
+import com.oheers.fish.messages.abstracted.EMFMessage;
+import com.oheers.fish.permissions.AdminPerms;
+import com.oheers.fish.permissions.UserPerms;
+import com.oheers.fish.selling.SellHelper;
+import net.strokkur.commands.annotations.*;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+@Command("emf")
 public class MainCommand {
+    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create();
+
+    public MainCommand() {
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getHelpSubCommandName(),
+                ConfigMessage.HELP_GENERAL_HELP::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getGuiSubCommandName(),
+                ConfigMessage.HELP_GENERAL_GUI::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getTopSubCommandName(),
+                ConfigMessage.HELP_GENERAL_TOP::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getSellAllSubCommandName(),
+                ConfigMessage.HELP_GENERAL_SELLALL::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getApplyBaitsSubCommandName(),
+                ConfigMessage.HELP_GENERAL_APPLYBAITS::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getJournalSubCommandName(),
+                ConfigMessage.HELP_GENERAL_JOURNAL::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getNextSubCommandName(),
+                ConfigMessage.HELP_GENERAL_NEXT::getMessage
+        );
+        HELP_MESSAGE.addUsage(
+                MainConfig.getInstance().getToggleSubCommandName(),
+                ConfigMessage.HELP_GENERAL_TOGGLE::getMessage
+        );
+    }
+
+    @DefaultExecutes
+    public void onDefault(CommandSender sender) {
+        // Guard clauses for conditions that require help message
+        if (!sender.hasPermission(UserPerms.GUI) || MainConfig.getInstance().useOldBaseCommandBehavior()) {
+            HELP_MESSAGE.sendMessage(sender);
+            return;
+        }
+
+        if (!(sender instanceof Player player)) {
+            HELP_MESSAGE.sendMessage(sender);
+            return;
+        }
+
+        // All conditions passed - open GUI
+        new MainMenuGui(player).open();
+    }
+
+    @Executes("next")
+    @Permission(UserPerms.NEXT)
+    public void onNext(CommandSender sender) {
+        EMFMessage message = Competition.getNextCompetitionMessage();
+        message.prependMessage(PrefixType.DEFAULT.getPrefix());
+        message.send(sender);
+    }
+
+    @Executes("toggle")
+    @Permission(UserPerms.TOGGLE)
+    public void onToggle(Player player) {
+        EvenMoreFish.getInstance().performFishToggle(player);
+    }
+
+    @Executes("help")
+    @Permission(UserPerms.HELP)
+    public void onHelp(CommandSender sender) {
+        HELP_MESSAGE.sendMessage(sender);
+    }
+
+    @Executes("gui")
+    @Permission(UserPerms.GUI)
+    public void onGui(Player player) {
+        new MainMenuGui(player).open();
+    }
+
+    @Executes("top")
+    @Permission(UserPerms.TOP)
+    public void onTop(CommandSender sender) {
+        Competition active = Competition.getCurrentlyActive();
+        if (active == null) {
+            ConfigMessage.NO_COMPETITION_RUNNING.getMessage().send(sender);
+            return;
+        }
+
+        active.sendLeaderboard(sender);
+    }
+
+    @Executes("sellall")
+    @Permission(UserPerms.SELL_ALL)
+    public void onSellAll(Player player) {
+        if (CommandUtils.isEconomyEnabled(player)) {
+            new SellHelper(player.getInventory(), player).sellFish();
+        }
+    }
+
+    @Executes("applybaits")
+    @Permission(UserPerms.APPLYBAITS)
+    public void onApplyBaits(Player player) {
+        if (!Checks.canUseRod(player.getInventory().getItemInMainHand())) {
+            ConfigMessage.BAIT_INVALID_ROD.getMessage().send(player);
+            return;
+        }
+        new ApplyBaitsGui(player, null).open();
+    }
+
+    @Subcommand("journal")
+    @Permission(UserPerms.JOURNAL)
+    public record JournalCommand(Player player, Rarity rarity) {
+
+        @Executes
+        public void execute(Player player) {
+            if (!DatabaseUtil.isDatabaseOnline()) {
+                ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
+                return;
+            }
+            new FishJournalGui(player, null).open();
+        }
+
+        @Executes
+        public void execute(Player player, Rarity rarity) {
+            if (!DatabaseUtil.isDatabaseOnline()) {
+                ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
+                return;
+            }
+            new FishJournalGui(player, rarity).open();
+        }
+    }
+
+
+    @Subcommand("shop")
+    @Permission(UserPerms.SHOP)
+    record ShopCommand(Player player, Player target) {
+
+        @Executes
+        void execute(Player player) {
+            if (!Economy.getInstance().isEnabled()) {
+                ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
+                return;
+            };
+
+            new SellGui(player, SellGui.SellState.NORMAL, null).open();
+        }
+        @Executes
+        @Permission(AdminPerms.ADMIN)
+        void execute(CommandSender sender, Player target) {
+            if (!Economy.getInstance().isEnabled()) {
+                ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
+                return;
+            };
+
+            new SellGui(target, SellGui.SellState.NORMAL, null).open();
+            EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
+            message.setPlayer(target);
+            message.send(sender);
+        }
+    }
+
+
 }
