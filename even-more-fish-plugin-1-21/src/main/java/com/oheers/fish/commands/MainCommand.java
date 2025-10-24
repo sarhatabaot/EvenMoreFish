@@ -19,8 +19,10 @@ import com.oheers.fish.permissions.AdminPerms;
 import com.oheers.fish.permissions.UserPerms;
 import com.oheers.fish.selling.SellHelper;
 import net.strokkur.commands.annotations.*;
+import net.strokkur.commands.annotations.arguments.CustomArg;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Command("emf")
 public class MainCommand {
@@ -61,9 +63,11 @@ public class MainCommand {
         );
     }
 
+    @Subcommand("admin")
+    AdminCommand adminCommand;
+
     @DefaultExecutes
-    public void onDefault(CommandSender sender) {
-        // Guard clauses for conditions that require help message
+    public void onDefault(@NotNull CommandSender sender) {
         if (!sender.hasPermission(UserPerms.GUI) || MainConfig.getInstance().useOldBaseCommandBehavior()) {
             HELP_MESSAGE.sendMessage(sender);
             return;
@@ -74,7 +78,6 @@ public class MainCommand {
             return;
         }
 
-        // All conditions passed - open GUI
         new MainMenuGui(player).open();
     }
 
@@ -88,7 +91,7 @@ public class MainCommand {
 
     @Executes("toggle")
     @Permission(UserPerms.TOGGLE)
-    public void onToggle(Player player) {
+    public void onToggle(CommandSender sender, @Executor Player player) {
         EvenMoreFish.getInstance().performFishToggle(player);
     }
 
@@ -100,7 +103,7 @@ public class MainCommand {
 
     @Executes("gui")
     @Permission(UserPerms.GUI)
-    public void onGui(Player player) {
+    public void onGui(CommandSender sender, @Executor Player player) {
         new MainMenuGui(player).open();
     }
 
@@ -118,7 +121,7 @@ public class MainCommand {
 
     @Executes("sellall")
     @Permission(UserPerms.SELL_ALL)
-    public void onSellAll(Player player) {
+    public void onSellAll(CommandSender sender, @Executor Player player) {
         if (CommandUtils.isEconomyEnabled(player)) {
             new SellHelper(player.getInventory(), player).sellFish();
         }
@@ -126,7 +129,7 @@ public class MainCommand {
 
     @Executes("applybaits")
     @Permission(UserPerms.APPLYBAITS)
-    public void onApplyBaits(Player player) {
+    public void onApplyBaits(CommandSender sender, @NotNull @Executor Player player) {
         if (!Checks.canUseRod(player.getInventory().getItemInMainHand())) {
             ConfigMessage.BAIT_INVALID_ROD.getMessage().send(player);
             return;
@@ -136,10 +139,10 @@ public class MainCommand {
 
     @Subcommand("journal")
     @Permission(UserPerms.JOURNAL)
-    public record JournalCommand(Player player, Rarity rarity) {
+    public record JournalCommand(Player player) {
 
         @Executes
-        public void execute(Player player) {
+        public void execute(CommandSender sender, @Executor Player player) {
             if (!DatabaseUtil.isDatabaseOnline()) {
                 ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
                 return;
@@ -148,7 +151,7 @@ public class MainCommand {
         }
 
         @Executes
-        public void execute(Player player, Rarity rarity) {
+        public void execute(CommandSender sender, @Executor Player player, @CustomArg(RarityArgument.class) Rarity rarity) {
             if (!DatabaseUtil.isDatabaseOnline()) {
                 ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
                 return;
@@ -163,7 +166,7 @@ public class MainCommand {
     record ShopCommand(Player player, Player target) {
 
         @Executes
-        void execute(Player player) {
+        void execute(CommandSender sender, @Executor Player player) {
             if (!Economy.getInstance().isEnabled()) {
                 ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
                 return;
@@ -173,7 +176,7 @@ public class MainCommand {
         }
         @Executes
         @Permission(AdminPerms.ADMIN)
-        void execute(CommandSender sender, Player target) {
+        void execute(CommandSender sender, @Executor Player player, Player target) {
             if (!Economy.getInstance().isEnabled()) {
                 ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
                 return;

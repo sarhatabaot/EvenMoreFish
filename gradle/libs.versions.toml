@@ -116,5 +116,5 @@ shadow = { id = "com.gradleup.shadow", version = "9.2.2" }
 plugin-yml = { id = "de.eldoria.plugin-yml.bukkit", version.ref = "plugin-yml" }
 grgit = { id = "org.ajoberstar.grgit", version = "5.3.3" }
 jooq = { id = "nu.studer.jooq", version = "9.0" }
-sonar = { id = "org.sonarqube", version = "6.3.1.5724" }
+sonar = { id = "org.sonarqube", version.ref = "sonar" }
 run-paper = { id = "xyz.jpenilla.run-paper", version = "2.3.1"}
