@@ -26,45 +26,19 @@ import org.jetbrains.annotations.NotNull;
 
 @Command("emf")
 public class MainCommand {
-    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create();
+    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create()
+            .addUsage(MainConfig.getInstance().getHelpSubCommandName(), ConfigMessage.HELP_GENERAL_HELP::getMessage)
+            .addUsage(MainConfig.getInstance().getGuiSubCommandName(), ConfigMessage.HELP_GENERAL_GUI::getMessage)
+            .addUsage(MainConfig.getInstance().getTopSubCommandName(), ConfigMessage.HELP_GENERAL_TOP::getMessage)
+            .addUsage(MainConfig.getInstance().getSellAllSubCommandName(), ConfigMessage.HELP_GENERAL_SELLALL::getMessage)
+            .addUsage(MainConfig.getInstance().getApplyBaitsSubCommandName(), ConfigMessage.HELP_GENERAL_APPLYBAITS::getMessage)
+            .addUsage(MainConfig.getInstance().getJournalSubCommandName(), ConfigMessage.HELP_GENERAL_JOURNAL::getMessage)
+            .addUsage(MainConfig.getInstance().getNextSubCommandName(), ConfigMessage.HELP_GENERAL_NEXT::getMessage)
+            .addUsage(MainConfig.getInstance().getToggleSubCommandName(), ConfigMessage.HELP_GENERAL_TOGGLE::getMessage);
 
-    public MainCommand() {
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getHelpSubCommandName(),
-                ConfigMessage.HELP_GENERAL_HELP::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getGuiSubCommandName(),
-                ConfigMessage.HELP_GENERAL_GUI::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getTopSubCommandName(),
-                ConfigMessage.HELP_GENERAL_TOP::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getSellAllSubCommandName(),
-                ConfigMessage.HELP_GENERAL_SELLALL::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getApplyBaitsSubCommandName(),
-                ConfigMessage.HELP_GENERAL_APPLYBAITS::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getJournalSubCommandName(),
-                ConfigMessage.HELP_GENERAL_JOURNAL::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getNextSubCommandName(),
-                ConfigMessage.HELP_GENERAL_NEXT::getMessage
-        );
-        HELP_MESSAGE.addUsage(
-                MainConfig.getInstance().getToggleSubCommandName(),
-                ConfigMessage.HELP_GENERAL_TOGGLE::getMessage
-        );
-    }
 
     @Subcommand("admin")
-    AdminCommand adminCommand;
+    AdminCommand adminCommand = new AdminCommand();
 
     @DefaultExecutes
     public void onDefault(@NotNull CommandSender sender) {
