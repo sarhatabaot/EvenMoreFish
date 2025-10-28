@@ -1,6 +1,7 @@
 package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
+import net.strokkur.commands.annotations.DefaultExecutes;
 import net.strokkur.commands.annotations.Executes;
 import net.strokkur.commands.annotations.Permission;
 import org.bukkit.command.CommandSender;
@@ -46,5 +47,10 @@ public class AdminDatabaseCommand {
             return;
         }
         EvenMoreFish.getInstance().getPluginDataManager().getDatabase().migrateFromDatabaseVersionToLatest();
+    }
+
+    @DefaultExecutes
+    public void onHelp(CommandSender sender) {
+        sender.sendMessage("Available Commands: migrate-to-latest, clean-flyway, repair-flyway, drop-flyway");
     }
 }
