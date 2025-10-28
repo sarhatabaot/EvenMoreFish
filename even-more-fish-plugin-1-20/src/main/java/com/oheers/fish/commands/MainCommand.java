@@ -140,6 +140,7 @@ public class MainCommand {
             });
     }
 
+
     private CommandAPICommand getShop() {
         String name = MainConfig.getInstance().getShopSubCommandName();
         HELP_MESSAGE.addUsage(
@@ -160,7 +161,7 @@ public class MainCommand {
                     }
                     player = p;
                 }
-                if (!checkEconomy(player)) {
+                if (CommandUtils.isEconomyDisabled(player)) {
                     return;
                 }
                 if (sender == player) {
@@ -178,6 +179,7 @@ public class MainCommand {
             });
     }
 
+
     private CommandAPICommand getSellAll() {
         String name = MainConfig.getInstance().getSellAllSubCommandName();
         HELP_MESSAGE.addUsage(
@@ -188,11 +190,12 @@ public class MainCommand {
             .withPermission(UserPerms.SELL_ALL)
             .executesPlayer(info -> {
                 Player player = info.sender();
-                if (checkEconomy(player)) {
+                if (CommandUtils.isEconomyEnabled(player)) {
                     new SellHelper(player.getInventory(), player).sellFish();
                 }
             });
     }
+
 
     private CommandAPICommand getApplyBaits() {
         String name = MainConfig.getInstance().getApplyBaitsSubCommandName();
@@ -211,6 +214,7 @@ public class MainCommand {
                 new ApplyBaitsGui(player, null).open();
             });
     }
+
 
     private CommandAPICommand getJournal() {
         String name = MainConfig.getInstance().getJournalSubCommandName();
@@ -236,13 +240,4 @@ public class MainCommand {
     private void sendHelpMessage(@NotNull CommandSender sender) {
         HELP_MESSAGE.sendMessage(sender);
     }
-
-    private boolean checkEconomy(@NotNull CommandSender sender) {
-        if (!Economy.getInstance().isEnabled()) {
-            ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
-            return false;
-        }
-        return true;
-    }
-
 }
