@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandUtils {
 
@@ -36,10 +37,15 @@ public class CommandUtils {
     }
 
     public static String getPlayersVariable(List<Player> players) {
-        if (players.size() == Bukkit.getOnlinePlayers().size()) {
+        int size = players.size();
+        if (size == 0) {
+            return "No Players.";
+        } else if (size == 1) {
+            return players.get(0).getName();
+        } else if (size == Bukkit.getOnlinePlayers().size()) {
             return "All Players";
         } else {
-            return String.join(", ", players.stream().map(Player::getName).toList());
+            return players.stream().map(Player::getName).collect(Collectors.joining(", "));
         }
     }
 
