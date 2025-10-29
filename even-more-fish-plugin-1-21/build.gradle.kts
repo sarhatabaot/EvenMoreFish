@@ -34,6 +34,9 @@ afterEvaluate {
 
 tasks.named<ShadowJar>("shadowJar") {
     dependsOn(":even-more-fish-plugin:shadowJar")
+    manifest {
+        attributes["paperweight-mappings-namespace"] = "mojang"
+    }
 }
 
 tasks {
