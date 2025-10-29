@@ -28,7 +28,12 @@ afterEvaluate {
         exclude("LICENSE")
         exclude("META-INF/**")
 
-        archiveFileName.set("even-more-fish-${project.version}-${variant}-${buildNumberOrDate}.jar")
+        if (variant == "core") {
+            archiveFileName.set("even-more-fish-plugin-${project.version}.jar")
+        } else {
+            archiveFileName.set("even-more-fish-${project.version}-${variant}-${buildNumberOrDate}.jar")
+        }
+
         archiveClassifier.set("shadow")
 
         relocate("de.tr7zw.changeme.nbtapi", "com.oheers.fish.utils.nbtapi")

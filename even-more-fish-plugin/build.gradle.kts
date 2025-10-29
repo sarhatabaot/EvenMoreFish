@@ -1,4 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import nu.studer.gradle.jooq.JooqExtension
+import org.gradle.kotlin.dsl.named
 import org.jooq.meta.jaxb.Property
 
 
@@ -143,10 +145,6 @@ tasks {
             shadowJar
         )
 
-        doLast {
-            val file = project.layout.buildDirectory.file("libs/even-more-fish-plugin-${version}.jar").get()
-            file.asFile.delete()
-        }
     }
 
     jooq {
