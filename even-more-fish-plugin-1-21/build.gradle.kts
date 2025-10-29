@@ -32,6 +32,10 @@ afterEvaluate {
     }
 }
 
+tasks.named<ShadowJar>("shadowJar") {
+    dependsOn(":even-more-fish-plugin:shadowJar")
+}
+
 tasks {
     build {
         dependsOn(shadowJar)
