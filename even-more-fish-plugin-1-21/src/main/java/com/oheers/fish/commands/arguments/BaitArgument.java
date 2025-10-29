@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("UnstableApiUsage")
 public class BaitArgument implements CustomArgumentType.Converted<BaitHandler, String>{
     private static final DynamicCommandExceptionType NOT_BAIT = new DynamicCommandExceptionType(
             obj -> MessageComponentSerializer.message().serialize(Component.text(obj + " is not a valid bait!"))

@@ -1,6 +1,8 @@
-package com.oheers.fish.commands;
+package com.oheers.fish.commands.admin.subcommand;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.commands.CommandUtils;
+import com.oheers.fish.commands.admin.AdminCommand;
 import net.strokkur.commands.annotations.DefaultExecutes;
 import net.strokkur.commands.annotations.Executes;
 import net.strokkur.commands.annotations.Permission;
@@ -8,7 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class AdminDatabaseCommand {
+public class DatabaseSubcommand {
+
+    @DefaultExecutes
+    public void onDefault(CommandSender sender) {
+        AdminCommand.sendHelpMessage(sender);
+    }
 
     @Executes("drop-flyway")
     @Permission("emf.admin.debug.database.flyway")

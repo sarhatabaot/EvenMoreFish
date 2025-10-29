@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("UnstableApiUsage")
 public class CompetitionTypeArgument implements CustomArgumentType.Converted<CompetitionType, String> {
     private static final DynamicCommandExceptionType UNKNOWN_TYPE = new DynamicCommandExceptionType(
             obj -> MessageComponentSerializer.message().serialize(Component.text(obj + " is not a valid competition type!"))

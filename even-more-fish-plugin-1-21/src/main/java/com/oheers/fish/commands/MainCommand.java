@@ -3,6 +3,7 @@ package com.oheers.fish.commands;
 import com.oheers.fish.Checks;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.economy.Economy;
+import com.oheers.fish.commands.admin.AdminCommand;
 import com.oheers.fish.commands.arguments.RarityArgument;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
@@ -140,7 +141,7 @@ public class MainCommand {
     record ShopCommand(Player player, Player target) {
 
         @Executes
-        void execute(CommandSender sender, @Executor Player player) {
+        public void execute(CommandSender sender, @Executor Player player) {
             if (!Economy.getInstance().isEnabled()) {
                 ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
                 return;
@@ -150,7 +151,7 @@ public class MainCommand {
         }
         @Executes
         @Permission(AdminPerms.ADMIN)
-        void execute(CommandSender sender, @Executor Player player, Player target) {
+        public void execute(CommandSender sender, @Executor Player player, Player target) {
             if (!Economy.getInstance().isEnabled()) {
                 ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
                 return;
