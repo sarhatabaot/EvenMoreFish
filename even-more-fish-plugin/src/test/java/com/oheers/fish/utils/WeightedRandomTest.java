@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WeightedRandomTest {
 
     record TestItem(String name, double weight) {
-        
+
         @Override
             public String toString() {
                 return name;

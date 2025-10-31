@@ -73,11 +73,6 @@ public abstract class EvenMoreFish extends EMFPlugin {
     private static TaskScheduler scheduler;
     private EMFAPI api;
 
-// TODO We already assign this in EMFPlugin.
-//    public static EvenMoreFish getInstance() {
-//        return (EvenMoreFish) EMFPlugin.getInstance();
-//    }
-
     public static @NotNull EvenMoreFish getInstance() {
         return Objects.requireNonNull(instance, "Plugin not initialized yet!");
     }
@@ -88,19 +83,10 @@ public abstract class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onLoad() {
-        // Don't enable if the server is not using Paper.
-        if (!isPaper()) {
-            getLogger().severe("Spigot detected! EvenMoreFish no longer runs on Spigot, we recommend updating to Paper instead. https://papermc.io/downloads/paper");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         if (!NBT.preloadApi()) {
             throw new RuntimeException("NBT-API wasn't initialized properly, disabling the plugin");
         }
-
         instance = this;
-
         loadCommands();
     }
 
@@ -178,11 +164,6 @@ public abstract class EvenMoreFish extends EMFPlugin {
 
     @Override
     public void onDisable() {
-        // If the server is not using Paper, the plugin won't have enabled in the first place.
-        if (!isPaper()) {
-            return;
-        }
-
         disableCommands();
 
         terminateGuis();
@@ -314,11 +295,6 @@ public abstract class EvenMoreFish extends EMFPlugin {
 
     public MetricsManager getMetricsManager() {
         return metricsManager;
-    }
-
-    private boolean isPaper() {
-        return classExists("com.destroystokyo.paper.PaperConfig")
-                || classExists("io.papermc.paper.configuration.Configuration");
     }
 
 }
