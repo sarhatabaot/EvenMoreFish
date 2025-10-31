@@ -2,7 +2,7 @@ package com.oheers.fish.items;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.config.ConfigUtils;
+import com.oheers.fish.api.config.ConfigUtils;
 import com.oheers.fish.items.configs.CustomModelDataItemConfig;
 import com.oheers.fish.items.configs.DisplayNameItemConfig;
 import com.oheers.fish.items.configs.DyeColourItemConfig;

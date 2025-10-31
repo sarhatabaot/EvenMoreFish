@@ -24,6 +24,9 @@ dependencies {
         }
     }
 
+    library(libs.boostedyaml)
+    compileOnlyApi(libs.boostedyaml)
+
     api(project(":even-more-fish-plugin"))
     implementation(libs.commandsapi.bukkit)
 }

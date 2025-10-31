@@ -42,7 +42,6 @@ afterEvaluate {
         relocate("de.themoep.inventorygui", "com.oheers.fish.libs.inventorygui")
         relocate("uk.firedev.vanishchecker", "com.oheers.fish.libs.vanishchecker")
         relocate("uk.firedev.messagelib", "com.oheers.fish.libs.messagelib")
-        relocate("dev.dejvokep.boostedyaml", "com.oheers.fish.libs.boostedyaml")
         relocate("org.jooq", "com.oheers.fish.libs.jooq")
         relocate("com.zaxxer", "com.oheers.fish.libs.hikaricp")
     }

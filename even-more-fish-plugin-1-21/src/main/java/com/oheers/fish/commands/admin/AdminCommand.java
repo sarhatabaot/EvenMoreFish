@@ -14,7 +14,7 @@ import com.oheers.fish.commands.admin.subcommand.FishSubcommand;
 import com.oheers.fish.commands.admin.subcommand.ListSubcommand;
 import com.oheers.fish.commands.arguments.BaitArgument;
 import com.oheers.fish.commands.arguments.CustomRodArgument;
-import com.oheers.fish.config.ConfigBase;
+import com.oheers.fish.api.config.ConfigBase;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.fishing.items.FishManager;

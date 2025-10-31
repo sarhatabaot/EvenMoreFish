@@ -73,7 +73,6 @@ dependencies {
     compileOnly(libs.playerpoints)
 
     api(libs.nbt.api)
-    api(libs.boostedyaml)
     api(libs.universalscheduler)
 
     implementation(libs.bstats)
@@ -97,6 +96,8 @@ dependencies {
     library(libs.maven.artifact)
     library(libs.annotations)
     library(libs.guava)
+
+    compileOnly(libs.boostedyaml)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)

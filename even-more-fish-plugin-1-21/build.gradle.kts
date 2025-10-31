@@ -21,6 +21,9 @@ dependencies {
         }
     }
 
+    library(libs.boostedyaml)
+    compileOnlyApi(libs.boostedyaml)
+
     compileOnly(libs.strokk.annotations)
     annotationProcessor(libs.strokk.processor)
 }
