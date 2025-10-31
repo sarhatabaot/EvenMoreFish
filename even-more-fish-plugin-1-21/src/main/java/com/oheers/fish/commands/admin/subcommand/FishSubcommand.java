@@ -9,6 +9,8 @@ import com.oheers.fish.fishing.items.Fish;
 import com.oheers.fish.fishing.items.Rarity;
 import com.oheers.fish.messages.ConfigMessage;
 import com.oheers.fish.messages.abstracted.EMFMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.strokkur.commands.annotations.DefaultExecutes;
 import net.strokkur.commands.annotations.Executes;
 import net.strokkur.commands.annotations.arguments.CustomArg;
@@ -27,7 +29,14 @@ public class FishSubcommand {
     }
 
     @Executes
-    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) Fish initialFish, @IntArg(min = 1) int amount, List<Player> targets) {
+    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) int amount, List<Player> targets) {
+        Fish initialFish = rarity.getFish(fishStr);
+        if (initialFish == null) {
+            // This will look the same as a brigadier error
+            sender.sendMessage(Component.text("Invalid Fish: " + fishStr).color(NamedTextColor.RED));
+            return;
+        }
+
         targets.forEach(target -> {
             Fish fish = initialFish.createCopy();
             fish.init();
@@ -52,17 +61,17 @@ public class FishSubcommand {
     }
 
     @Executes
-    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) Fish initialFish, @IntArg(min = 1) Integer amount) {
+    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) Integer amount) {
         if (sender instanceof Player player) {
-            execute(sender, rarity, initialFish, amount, List.of(player));
+            execute(sender, rarity, fishStr, amount, List.of(player));
             return;
         }
         ConfigMessage.ADMIN_CANT_BE_CONSOLE.getMessage().send(sender);
     }
 
     @Executes
-    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) Fish initialFish) {
-        execute(sender, rarity, initialFish, 1);
+    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr) {
+        execute(sender, rarity, fishStr, 1);
     }
 
 }
