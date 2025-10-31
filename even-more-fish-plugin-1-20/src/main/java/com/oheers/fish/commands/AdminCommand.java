@@ -332,7 +332,7 @@ public class AdminCommand {
         listMessage.setVariable("{addon-type}", RewardType.class.getSimpleName());
         builder.append(listMessage.getComponentMessage());
 
-        RewardType.getLoadedTypes().forEach((string, rewardType) -> {
+        EMFRegistry.REWARD_TYPE.getRegistry().forEach((string, rewardType) -> {
             Component show = EMFSingleMessage.fromString(
                     "Author: " + rewardType.getAuthor() + "\n" +
                             "Registered Plugin: " + rewardType.getPlugin().getName()

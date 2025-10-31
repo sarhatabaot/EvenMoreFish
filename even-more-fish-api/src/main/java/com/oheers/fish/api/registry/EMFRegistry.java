@@ -2,6 +2,8 @@ package com.oheers.fish.api.registry;
 
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.requirement.RequirementTypeRegistry;
+import com.oheers.fish.api.reward.RewardType;
+import com.oheers.fish.api.reward.RewardTypeRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,6 +12,7 @@ import java.util.Map;
 public interface EMFRegistry<T extends RegistryItem> {
 
     EMFRegistry<RequirementType> REQUIREMENT_TYPE = RequirementTypeRegistry.getInstance();
+    EMFRegistry<RewardType> REWARD_TYPE = RewardTypeRegistry.getInstance();
 
     /**
      * @return An immutable copy of the current registry.

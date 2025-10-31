@@ -197,8 +197,6 @@ public abstract class EvenMoreFish extends EMFPlugin {
             this.pluginDataManager.shutdown();
         }
 
-        RewardType.unregisterAll();
-
         // Make sure this is in the reverse order of loading.
         this.competitionQueue.unload();
         RodManager.getInstance().unload();

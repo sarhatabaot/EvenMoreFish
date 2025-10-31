@@ -1,15 +1,13 @@
 package com.oheers.fish.api.requirement;
 
-import com.oheers.fish.api.plugin.EMFPlugin;
+import com.oheers.fish.api.registry.EMFRegistry;
 import com.oheers.fish.api.registry.RegistryItem;
-import org.bukkit.Registry;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * A way to check if a player meets a certain requirement.
@@ -42,7 +40,7 @@ public abstract class RequirementType implements RegistryItem {
     public abstract @NotNull Plugin getPlugin();
 
     public boolean register() {
-        return RequirementTypeRegistry.getInstance().register(this);
+        return EMFRegistry.REQUIREMENT_TYPE.register(this);
     }
 
     public boolean unregister() {
@@ -70,31 +68,31 @@ public abstract class RequirementType implements RegistryItem {
     /**
      * @deprecated Use {@link RequirementTypeRegistry#getRegistry()} instead.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "2.1.0")
     public static Map<String, RequirementType> getLoadedTypes() {
-        return RequirementTypeRegistry.getInstance().getRegistry();
+        return EMFRegistry.REQUIREMENT_TYPE.getRegistry();
     }
 
     /**
      * @deprecated This method now does nothing as clearing the registry is unsupported.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "2.1.0")
     public static void unregisterAll() {}
 
     /**
      * @deprecated Use {@link RequirementTypeRegistry#get(String)} instead.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "2.1.0")
     public static @Nullable RequirementType get(@NotNull String identifier) {
-        return RequirementTypeRegistry.getInstance().get(identifier);
+        return EMFRegistry.REQUIREMENT_TYPE.get(identifier);
     }
 
     /**
      * @deprecated Use {@link RequirementTypeRegistry#unregister(String)} instead.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "2.1.0")
     public static boolean unregister(@NotNull String identifier) {
-        return RequirementTypeRegistry.getInstance().unregister(identifier);
+        return EMFRegistry.REQUIREMENT_TYPE.unregister(identifier);
     }
 
 }
