@@ -1,10 +1,14 @@
-package com.oheers.fish.commands;
+package com.oheers.fish.commands.main;
 
 import com.oheers.fish.Checks;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.api.economy.Economy;
+import com.oheers.fish.commands.CommandUtils;
+import com.oheers.fish.commands.HelpMessageBuilder;
 import com.oheers.fish.commands.admin.AdminCommand;
 import com.oheers.fish.commands.arguments.RarityArgument;
+import com.oheers.fish.commands.main.subcommand.JournalSubcommand;
+import com.oheers.fish.commands.main.subcommand.ShopSubcommand;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.config.MainConfig;
 import com.oheers.fish.database.DatabaseUtil;
@@ -27,7 +31,8 @@ import org.jetbrains.annotations.NotNull;
 
 @Command("emf")
 public class MainCommand {
-    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create()
+
+    private static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create()
             .addUsage(MainConfig.getInstance().getHelpSubCommandName(), ConfigMessage.HELP_GENERAL_HELP::getMessage)
             .addUsage(MainConfig.getInstance().getGuiSubCommandName(), ConfigMessage.HELP_GENERAL_GUI::getMessage)
             .addUsage(MainConfig.getInstance().getTopSubCommandName(), ConfigMessage.HELP_GENERAL_TOP::getMessage)
@@ -41,15 +46,21 @@ public class MainCommand {
     @Subcommand("admin")
     AdminCommand adminCommand = new AdminCommand();
 
+    @Subcommand("shop")
+    ShopSubcommand shopSubcommand = new ShopSubcommand();
+
+    @Subcommand("journal")
+    JournalSubcommand journalSubcommand = new JournalSubcommand();
+
     @DefaultExecutes
     public void onDefault(@NotNull CommandSender sender) {
         if (!sender.hasPermission(UserPerms.GUI) || MainConfig.getInstance().useOldBaseCommandBehavior()) {
-            HELP_MESSAGE.sendMessage(sender);
+            sendHelpMessage(sender);
             return;
         }
 
         if (!(sender instanceof Player player)) {
-            HELP_MESSAGE.sendMessage(sender);
+            sendHelpMessage(sender);
             return;
         }
 
@@ -73,7 +84,7 @@ public class MainCommand {
     @Executes("help")
     @Permission(UserPerms.HELP)
     public void onHelp(CommandSender sender) {
-        HELP_MESSAGE.sendMessage(sender);
+        sendHelpMessage(sender);
     }
 
     @Executes("gui")
@@ -112,48 +123,8 @@ public class MainCommand {
         new ApplyBaitsGui(player, null).open();
     }
 
-    @Executes("journal")
-    @Permission(UserPerms.JOURNAL)
-    public void onJournal(CommandSender sender, @Executor Player player) {
-        if (!DatabaseUtil.isDatabaseOnline()) {
-            ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
-            return;
-        }
-        new FishJournalGui(player, null).open();
-    }
-
-    @Executes("journal")
-    @Permission(UserPerms.JOURNAL)
-    public void onJournal(CommandSender sender, @Executor Player player, @CustomArg(RarityArgument.class) Rarity rarity) {
-        if (!DatabaseUtil.isDatabaseOnline()) {
-            ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
-            return;
-        }
-        new FishJournalGui(player, rarity).open();
-    }
-
-    @Executes("shop")
-    @Permission(UserPerms.SHOP)
-    public void onShop(CommandSender sender, @Executor Player player) {
-        if (!Economy.getInstance().isEnabled()) {
-            ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
-            return;
-        };
-        new SellGui(player, SellGui.SellState.NORMAL, null).open();
-    }
-
-    @Executes("shop")
-    @Permission(AdminPerms.ADMIN)
-    public void onShop(CommandSender sender, @Executor Player player, Player target) {
-        if (!Economy.getInstance().isEnabled()) {
-            ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
-            return;
-        };
-
-        new SellGui(target, SellGui.SellState.NORMAL, null).open();
-        EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
-        message.setPlayer(target);
-        message.send(sender);
+    public static void sendHelpMessage(CommandSender sender) {
+        HELP_MESSAGE.sendMessage(sender);
     }
 
 }

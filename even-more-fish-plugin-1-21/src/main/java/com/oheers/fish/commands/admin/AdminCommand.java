@@ -52,7 +52,7 @@ import java.util.jar.Attributes;
 @Permission(AdminPerms.ADMIN)
 public class AdminCommand {
 
-    public static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create()
+    private static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create()
         .addUsage("admin fish", ConfigMessage.HELP_ADMIN_FISH::getMessage);
 
     @Subcommand("database")
