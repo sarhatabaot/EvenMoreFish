@@ -372,7 +372,7 @@ public class AdminCommand {
         listMessage.setVariable("{addon-type}", ItemAddon.class.getSimpleName());
         builder.append(listMessage.getComponentMessage());
 
-        ItemAddon.getLoadedAddons().forEach((string, itemAddon) -> {
+        EMFRegistry.ITEM_ADDON.getRegistry().forEach((string, itemAddon) -> {
             Component show = EMFSingleMessage.fromString(
                     "Author: " + itemAddon.getAuthor()
             ).getComponentMessage();
