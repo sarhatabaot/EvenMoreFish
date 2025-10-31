@@ -4,6 +4,7 @@ import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.registry.EMFRegistry;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
+import com.oheers.fish.commands.CommandUtils;
 import com.oheers.fish.commands.admin.AdminCommand;
 import com.oheers.fish.commands.arguments.RarityArgument;
 import com.oheers.fish.fishing.items.Fish;
@@ -71,76 +72,17 @@ public class ListSubcommand {
 
     @Executes("rewardTypes")
     public void onRewardTypes(CommandSender sender) {
-        listRewardTypes(sender);
+        CommandUtils.listRewardTypes(sender);
     }
 
     @Executes("requirementTypes")
     public void onRequirementTypes(CommandSender sender) {
-        listRequirementTypes(sender);
+        CommandUtils.listRequirementTypes(sender);
     }
 
     @Executes("itemAddons")
     public void onItemAddons(CommandSender sender) {
-        listItemAddons(sender);
-    }
-
-    private void listRewardTypes(@NotNull Audience audience) {
-        TextComponent.Builder builder = Component.text();
-
-        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
-        listMessage.setVariable("{addon-type}", RewardType.class.getSimpleName());
-        builder.append(listMessage.getComponentMessage());
-
-        EMFRegistry.REWARD_TYPE.getRegistry().forEach((string, rewardType) -> {
-            Component show = EMFSingleMessage.fromString(
-                "Author: " + rewardType.getAuthor() + "\n" +
-                    "Registered Plugin: " + rewardType.getPlugin().getName()
-            ).getComponentMessage();
-
-            TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
-            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-            builder.append(typeBuilder).append(Component.text(", "));
-        });
-        audience.sendMessage(builder.build());
-    }
-
-    private void listRequirementTypes(@NotNull Audience audience) {
-        TextComponent.Builder builder = Component.text();
-
-        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
-        listMessage.setVariable("{addon-type}", RequirementType.class.getSimpleName());
-        builder.append(listMessage.getComponentMessage());
-
-        EMFRegistry.REQUIREMENT_TYPE.getRegistry().forEach((string, requirementType) -> {
-            Component show = EMFSingleMessage.fromString(
-                "Author: " + requirementType.getAuthor() + "\n" +
-                    "Registered Plugin: " + requirementType.getPlugin().getName()
-            ).getComponentMessage();
-
-            TextComponent.Builder typeBuilder = Component.text().content(requirementType.getIdentifier());
-            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-            builder.append(typeBuilder).append(Component.text(", "));
-        });
-        audience.sendMessage(builder.build());
-    }
-
-    private void listItemAddons(@NotNull Audience audience) {
-        TextComponent.Builder builder = Component.text();
-
-        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
-        listMessage.setVariable("{addon-type}", ItemAddon.class.getSimpleName());
-        builder.append(listMessage.getComponentMessage());
-
-        EMFRegistry.ITEM_ADDON.getRegistry().forEach((string, itemAddon) -> {
-            Component show = EMFSingleMessage.fromString(
-                "Author: " + itemAddon.getAuthor()
-            ).getComponentMessage();
-
-            TextComponent.Builder typeBuilder = Component.text().content(itemAddon.getIdentifier());
-            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-            builder.append(typeBuilder).append(Component.text(", "));
-        });
-        audience.sendMessage(builder.build());
+        CommandUtils.listItemAddons(sender);
     }
 
 }
