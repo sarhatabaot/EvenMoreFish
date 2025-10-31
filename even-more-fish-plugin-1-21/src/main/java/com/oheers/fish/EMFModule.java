@@ -1,9 +1,8 @@
 package com.oheers.fish;
 
-
-
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.oheers.fish.commands.MainCommandBrigadier;
+import com.oheers.fish.commands.admin.AdminCommandBrigadier;
+import com.oheers.fish.commands.main.MainCommandBrigadier;
 import com.oheers.fish.config.MainConfig;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -30,8 +29,9 @@ public class EMFModule extends EvenMoreFish{
             if (adminShortcut == null) {
                 return;
             }
-            LiteralCommandNode<CommandSourceStack> admin = MainCommandBrigadier.create();
-            Commands.literal(adminShortcut).redirect(admin);
+            LiteralCommandNode<CommandSourceStack> admin = AdminCommandBrigadier.create();
+            LiteralCommandNode<CommandSourceStack> redirect = Commands.literal(adminShortcut).redirect(admin).build();
+            event.registrar().register(redirect);
         }));
     }
 
