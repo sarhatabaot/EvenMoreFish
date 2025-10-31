@@ -19,6 +19,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -51,6 +52,14 @@ public class FishArgument implements CustomArgumentType.Converted<String, String
     @Override
     public String convert(String nativeType) {
         return nativeType;
+    }
+
+    public static @Nullable Fish resolveFish(@NotNull Rarity rarity, @NotNull String fishStr) {
+        Fish fish = rarity.getFish(fishStr);
+        if (fish == null) {
+            fish = rarity.getFish(fishStr.replace("_", " "));
+        }
+        return fish;
     }
 
 }

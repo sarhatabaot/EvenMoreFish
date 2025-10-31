@@ -30,7 +30,7 @@ public class FishSubcommand {
 
     @Executes
     public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) int amount, List<Player> targets) {
-        Fish initialFish = rarity.getFish(fishStr);
+        Fish initialFish = FishArgument.resolveFish(rarity, fishStr);
         if (initialFish == null) {
             // This will look the same as a brigadier error
             sender.sendMessage(Component.text("Invalid Fish: " + fishStr).color(NamedTextColor.RED));
