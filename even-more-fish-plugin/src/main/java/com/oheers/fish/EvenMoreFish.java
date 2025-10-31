@@ -198,8 +198,6 @@ public abstract class EvenMoreFish extends EMFPlugin {
         }
 
         RewardType.unregisterAll();
-        RequirementType.unregisterAll();
-
 
         // Make sure this is in the reverse order of loading.
         this.competitionQueue.unload();

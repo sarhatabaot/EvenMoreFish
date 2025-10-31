@@ -1,6 +1,7 @@
 package com.oheers.fish.commands.admin.subcommand;
 
 import com.oheers.fish.api.addons.ItemAddon;
+import com.oheers.fish.api.registry.EMFRegistry;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.commands.admin.AdminCommand;
@@ -110,7 +111,7 @@ public class ListSubcommand {
         listMessage.setVariable("{addon-type}", RequirementType.class.getSimpleName());
         builder.append(listMessage.getComponentMessage());
 
-        RequirementType.getLoadedTypes().forEach((string, requirementType) -> {
+        EMFRegistry.REQUIREMENT_TYPE.getRegistry().forEach((string, requirementType) -> {
             Component show = EMFSingleMessage.fromString(
                 "Author: " + requirementType.getAuthor() + "\n" +
                     "Registered Plugin: " + requirementType.getPlugin().getName()

@@ -1,8 +1,10 @@
 package com.oheers.fish.api.requirement;
 
 import com.oheers.fish.api.plugin.EMFPlugin;
+import com.oheers.fish.api.registry.EMFRegistry;
 import org.jetbrains.annotations.NotNull;
 
+import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,7 @@ public class Requirement {
                 EMFPlugin.getInstance().getLogger().warning("Attempted to process an invalid Requirement. Please check for earlier warnings.");
                 continue;
             }
-            RequirementType requirementType = RequirementType.get(key);
+            RequirementType requirementType = EMFRegistry.REQUIREMENT_TYPE.get(key);
             if (requirementType == null) {
                 EMFPlugin.getInstance().getLogger().warning("Invalid requirement. Possible typo?: " + key);
                 continue;

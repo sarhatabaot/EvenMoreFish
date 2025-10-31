@@ -3,6 +3,7 @@ package com.oheers.fish.commands;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.addons.ItemAddon;
+import com.oheers.fish.api.registry.EMFRegistry;
 import com.oheers.fish.api.requirement.RequirementType;
 import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.api.utils.ManifestUtil;
@@ -351,7 +352,7 @@ public class AdminCommand {
         listMessage.setVariable("{addon-type}", RequirementType.class.getSimpleName());
         builder.append(listMessage.getComponentMessage());
 
-        RequirementType.getLoadedTypes().forEach((string, requirementType) -> {
+        EMFRegistry.REQUIREMENT_TYPE.getRegistry().forEach((string, requirementType) -> {
             Component show = EMFSingleMessage.fromString(
                     "Author: " + requirementType.getAuthor() + "\n" +
                             "Registered Plugin: " + requirementType.getPlugin().getName()
