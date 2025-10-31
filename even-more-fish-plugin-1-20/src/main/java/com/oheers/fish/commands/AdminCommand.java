@@ -133,7 +133,7 @@ public class AdminCommand {
                     }
 
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
-                    message.setVariable("{player}", getPlayersVariable(arguments.getRaw("targets"), targets));
+                    message.setVariable("{player}", CommandUtils.getPlayersVariable(targets));
 
                     message.setFishCaught(initialFish.getName());
                     message.send(sender);
@@ -226,7 +226,7 @@ public class AdminCommand {
                 }
 
                 EMFMessage giveMessage = ConfigMessage.ADMIN_CUSTOM_ROD_GIVEN.getMessage();
-                giveMessage.setVariable("{player}", getPlayersVariable(args.getRaw("targets"), players));
+                giveMessage.setVariable("{player}", CommandUtils.getPlayersVariable(players));
 
                 giveMessage.send(sender);
             }));
@@ -264,7 +264,7 @@ public class AdminCommand {
                         FishUtils.giveItems(List.of(baitItem), target);
                     }
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
-                    message.setVariable("{player}", getPlayersVariable(args.getRaw("targets"), targets));
+                    message.setVariable("{player}", CommandUtils.getPlayersVariable(targets));
                     message.setBait(bait.getId());
                     message.send(sender);
                 });
@@ -598,14 +598,6 @@ public class AdminCommand {
                     competition.setAdminStarted(true);
                     competition.begin();
                 });
-    }
-
-    private @NotNull String getPlayersVariable(@Nullable String raw, @NotNull List<Player> players) {
-        if ("@a".equals(raw)) {
-            return "All Players";
-        } else {
-            return String.join(", ", players.stream().map(Player::getName).toList());
-        }
     }
 
 }
