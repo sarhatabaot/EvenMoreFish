@@ -70,7 +70,6 @@ public class AdminCommand {
                         getClearBaits(),
                         getReload(),
                         getVersion(),
-                        getRewardTypes(),
                         getMigrate(),
                         getRawItem(),
                         getHelp(),
@@ -443,29 +442,6 @@ public class AdminCommand {
 
     private String getFeatureBranchBuildOrDate() {
         return ManifestUtil.getAttributeFromManifest(Attributes.Name.IMPLEMENTATION_VERSION.toString(), "");
-    }
-
-    private CommandAPICommand getRewardTypes() {
-        HELP_MESSAGE.addUsage(
-                "admin rewardtypes",
-                ConfigMessage.HELP_ADMIN_REWARDTYPES::getMessage
-        );
-        return new CommandAPICommand("rewardtypes")
-                .executes(info -> {
-                    TextComponent.Builder builder = Component.text();
-                    builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
-                    RewardType.getLoadedTypes().forEach((string, rewardType) -> {
-                        Component show = EMFSingleMessage.fromString(
-                                "Author: " + rewardType.getAuthor() + "\n" +
-                                        "Registered Plugin: " + rewardType.getPlugin().getName()
-                        ).getComponentMessage();
-
-                        TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
-                        typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-                        builder.append(typeBuilder).append(Component.text(", "));
-                    });
-                    info.sender().sendMessage(builder.build());
-                });
     }
 
     private CommandAPICommand getMigrate() {
