@@ -112,57 +112,48 @@ public class MainCommand {
         new ApplyBaitsGui(player, null).open();
     }
 
-    @Subcommand("journal")
+    @Executes("journal")
     @Permission(UserPerms.JOURNAL)
-    public record JournalCommand(Player player) {
-
-        @Executes
-        public void execute(CommandSender sender, @Executor Player player) {
-            if (!DatabaseUtil.isDatabaseOnline()) {
-                ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
-                return;
-            }
-            new FishJournalGui(player, null).open();
+    public void onJournal(CommandSender sender, @Executor Player player) {
+        if (!DatabaseUtil.isDatabaseOnline()) {
+            ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
+            return;
         }
-
-        @Executes
-        public void execute(CommandSender sender, @Executor Player player, @CustomArg(RarityArgument.class) Rarity rarity) {
-            if (!DatabaseUtil.isDatabaseOnline()) {
-                ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
-                return;
-            }
-            new FishJournalGui(player, rarity).open();
-        }
+        new FishJournalGui(player, null).open();
     }
 
+    @Executes("journal")
+    @Permission(UserPerms.JOURNAL)
+    public void onJournal(CommandSender sender, @Executor Player player, @CustomArg(RarityArgument.class) Rarity rarity) {
+        if (!DatabaseUtil.isDatabaseOnline()) {
+            ConfigMessage.JOURNAL_DISABLED.getMessage().send(player);
+            return;
+        }
+        new FishJournalGui(player, rarity).open();
+    }
 
-    @Subcommand("shop")
+    @Executes("shop")
     @Permission(UserPerms.SHOP)
-    record ShopCommand(Player player, Player target) {
-
-        @Executes
-        public void execute(CommandSender sender, @Executor Player player) {
-            if (!Economy.getInstance().isEnabled()) {
-                ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
-                return;
-            };
-
-            new SellGui(player, SellGui.SellState.NORMAL, null).open();
-        }
-        @Executes
-        @Permission(AdminPerms.ADMIN)
-        public void execute(CommandSender sender, @Executor Player player, Player target) {
-            if (!Economy.getInstance().isEnabled()) {
-                ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
-                return;
-            };
-
-            new SellGui(target, SellGui.SellState.NORMAL, null).open();
-            EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
-            message.setPlayer(target);
-            message.send(sender);
-        }
+    public void onShop(CommandSender sender, @Executor Player player) {
+        if (!Economy.getInstance().isEnabled()) {
+            ConfigMessage.ECONOMY_DISABLED.getMessage().send(player);
+            return;
+        };
+        new SellGui(player, SellGui.SellState.NORMAL, null).open();
     }
 
+    @Executes("shop")
+    @Permission(AdminPerms.ADMIN)
+    public void onShop(CommandSender sender, @Executor Player player, Player target) {
+        if (!Economy.getInstance().isEnabled()) {
+            ConfigMessage.ECONOMY_DISABLED.getMessage().send(sender);
+            return;
+        };
+
+        new SellGui(target, SellGui.SellState.NORMAL, null).open();
+        EMFMessage message = ConfigMessage.ADMIN_OPEN_FISH_SHOP.getMessage();
+        message.setPlayer(target);
+        message.send(sender);
+    }
 
 }
