@@ -27,6 +27,10 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings("UnstableApiUsage")
 public class FishArgument implements CustomArgumentType.Converted<String, String> {
 
+    public static final DynamicCommandExceptionType INVALID_FISH = new DynamicCommandExceptionType(
+        obj -> MessageComponentSerializer.message().serialize(Component.text("Invalid Fish: " + obj))
+    );
+
     @NotNull
     @Override
     public ArgumentType<String> getNativeType() {

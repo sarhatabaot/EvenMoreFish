@@ -1,5 +1,6 @@
 package com.oheers.fish.commands.admin.subcommand;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.commands.CommandUtils;
 import com.oheers.fish.commands.admin.AdminCommand;
@@ -29,12 +30,10 @@ public class FishSubcommand {
     }
 
     @Executes
-    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) int amount, List<Player> targets) {
+    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) int amount, List<Player> targets) throws CommandSyntaxException {
         Fish initialFish = FishArgument.resolveFish(rarity, fishStr);
         if (initialFish == null) {
-            // This will look the same as a brigadier error
-            sender.sendMessage(Component.text("Invalid Fish: " + fishStr).color(NamedTextColor.RED));
-            return;
+            throw FishArgument.INVALID_FISH.create(fishStr);
         }
 
         targets.forEach(target -> {
@@ -61,7 +60,7 @@ public class FishSubcommand {
     }
 
     @Executes
-    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) Integer amount) {
+    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) Integer amount) throws CommandSyntaxException {
         if (sender instanceof Player player) {
             execute(sender, rarity, fishStr, amount, List.of(player));
             return;
@@ -70,7 +69,7 @@ public class FishSubcommand {
     }
 
     @Executes
-    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr) {
+    public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr) throws CommandSyntaxException {
         execute(sender, rarity, fishStr, 1);
     }
 
