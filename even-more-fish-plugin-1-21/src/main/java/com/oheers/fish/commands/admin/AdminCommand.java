@@ -53,7 +53,16 @@ import java.util.jar.Attributes;
 public class AdminCommand {
 
     private static final HelpMessageBuilder HELP_MESSAGE = HelpMessageBuilder.create()
-        .addUsage("admin fish", ConfigMessage.HELP_ADMIN_FISH::getMessage);
+        .addUsage("admin fish", ConfigMessage.HELP_ADMIN_FISH::getMessage)
+        .addUsage("admin custom-rod", ConfigMessage.HELP_ADMIN_CUSTOMROD::getMessage)
+        .addUsage("admin bait", ConfigMessage.HELP_ADMIN_BAIT::getMessage)
+        .addUsage("admin clearbaits", ConfigMessage.HELP_ADMIN_CLEARBAITS::getMessage)
+        .addUsage("admin reload", ConfigMessage.HELP_ADMIN_RELOAD::getMessage)
+        .addUsage("admin version", ConfigMessage.HELP_ADMIN_VERSION::getMessage)
+        .addUsage("admin migrate", ConfigMessage.HELP_ADMIN_MIGRATE::getMessage)
+        .addUsage("admin rawItem", ConfigMessage.HELP_ADMIN_RAWITEM::getMessage)
+        .addUsage("admin help", ConfigMessage.HELP_GENERAL_HELP::getMessage)
+        .addUsage("admin competition", ConfigMessage.HELP_ADMIN_COMPETITION::getMessage);
 
     @Subcommand("database")
     @Permission("emf.admin.debug.database")
