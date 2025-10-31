@@ -39,7 +39,6 @@ public class FishArgument implements CustomArgumentType.Converted<String, String
         try {
             rarity = context.getLastChild().getArgument("rarity", Rarity.class);
         } catch (Exception exception) {
-            System.out.println("Rarity invalid :(");
             return builder.buildFuture();
         }
         rarity.getOriginalFishList().stream()
