@@ -16,7 +16,7 @@ dependencies {
     }
     compileOnly(libs.annotations)
     compileOnly(libs.universalscheduler)
-    compileOnly(libs.boostedyaml)
+    compileOnlyApi(libs.boostedyaml)
 }
 
 

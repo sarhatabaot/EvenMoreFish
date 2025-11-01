@@ -97,7 +97,7 @@ dependencies {
     library(libs.annotations)
     library(libs.guava)
 
-    compileOnly(libs.boostedyaml)
+    compileOnlyApi(libs.boostedyaml)
 
     jooqGenerator(project(":even-more-fish-database-extras"))
     jooqGenerator(libs.jooq.meta.extensions)
