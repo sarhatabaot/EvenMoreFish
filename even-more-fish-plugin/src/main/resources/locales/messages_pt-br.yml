@@ -141,7 +141,6 @@ help-admin:
   reload: '[noPrefix]Recarrega os arquivos de configuração do plugin.'
   migrate: '[noPrefix]Migra o banco de dados do Legacy (V2) para o V3.'
   addons: '[noPrefix]Exibe todos os addons.'
-  rewardtypes: '[noPrefix]Exibe todos os tipos de recompensas.'
   version: '[noPrefix]Exibe informações do plugin.'
   rawitem: '[noPrefix]Displays the item in your main hand as raw NBT.'
 # Shown when the emf %emf_competition_place_player_*% placeholder requests a position in the leaderboard that doesn't exist

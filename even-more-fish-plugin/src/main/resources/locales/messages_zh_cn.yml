@@ -141,7 +141,6 @@ help-admin:
   reload: '[noPrefix]重新加载插件的配置文件.'
   migrate: '[noPrefix]将数据库从旧版(V2) 迁移到 V3.'
   addons: '[noPrefix]显示所有插件.'
-  rewardtypes: '[noPrefix]显示所有奖励类型.'
   version: '[noPrefix]显示插件信息.'
   rawitem: '[noPrefix]将主手中的物品显示为原生NBT格式.'
 # Shown when the emf %emf_competition_place_player_*% placeholder requests a position in the leaderboard that doesn't exist
