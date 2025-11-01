@@ -103,7 +103,7 @@ public class AdminCommand {
     }
 
     @Executes("custom-rod")
-    public void onCustomRod(CommandSender sender, @CustomArg(CustomRodArgument.class) CustomRod rod) {
+    public void onCustomRod(CommandSender sender, @CustomArg(CustomRodArgument.class) CustomRod rod) throws CommandSyntaxException {
         if (sender instanceof Player player) {
             onCustomRod(sender, rod, List.of(player));
             return;
@@ -128,7 +128,7 @@ public class AdminCommand {
     }
 
     @Executes("bait")
-    public void onBait(CommandSender sender, @CustomArg(BaitArgument.class) BaitHandler bait, @IntArg(min = 1) int quantity) {
+    public void onBait(CommandSender sender, @CustomArg(BaitArgument.class) BaitHandler bait, @IntArg(min = 1) int quantity) throws CommandSyntaxException {
         if (sender instanceof Player player) {
             onBait(sender, bait, quantity, List.of(player));
             return;
@@ -137,7 +137,7 @@ public class AdminCommand {
     }
 
     @Executes("bait")
-    public void onBait(CommandSender sender, @CustomArg(BaitArgument.class) BaitHandler bait) {
+    public void onBait(CommandSender sender, @CustomArg(BaitArgument.class) BaitHandler bait) throws CommandSyntaxException {
         onBait(sender, bait, 1);
     }
 
@@ -170,7 +170,7 @@ public class AdminCommand {
     }
 
     @Executes("clearbaits")
-    public void onClearBaits(CommandSender sender) {
+    public void onClearBaits(CommandSender sender) throws CommandSyntaxException {
         if (sender instanceof Player player) {
             onClearBaits(sender, List.of(player));
             return;
