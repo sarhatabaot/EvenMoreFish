@@ -45,6 +45,9 @@ afterEvaluate {
         relocate("org.jooq", "com.oheers.fish.libs.jooq")
         relocate("com.zaxxer", "com.oheers.fish.libs.hikaricp")
     }
+    tasks.named<Jar>("jar") {
+        enabled = false
+    }
 }
 
 
