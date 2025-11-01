@@ -45,9 +45,8 @@ public class BaitArgument implements CustomArgumentType.Converted<BaitHandler, S
     public <S> CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
         BaitManager.getInstance().getItemMap().keySet().stream()
                 .map(s -> s.replace(" ", "_"))
-                .filter(name -> name.startsWith(builder.getRemainingLowerCase()))
+                .filter(name -> name.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
-
         return builder.buildFuture();
     }
 }

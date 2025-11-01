@@ -44,7 +44,6 @@ public class CompetitionTypeArgument implements CustomArgumentType.Converted<Com
                 .map(CompetitionType::toString)
                 .filter(name -> name.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
-
         return builder.buildFuture();
     }
 }

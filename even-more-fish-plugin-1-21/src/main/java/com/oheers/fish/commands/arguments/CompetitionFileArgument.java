@@ -41,8 +41,8 @@ public class CompetitionFileArgument implements CustomArgumentType.Converted<Com
     @NotNull
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
-        EvenMoreFish.getInstance().getCompetitionQueue().getItemMap().keySet()
-            .forEach(string -> builder.suggest(string.toLowerCase()));
+        EvenMoreFish.getInstance().getCompetitionQueue().getItemMap().keySet().stream()
+            .forEach(builder::suggest);
         return builder.buildFuture();
     }
 

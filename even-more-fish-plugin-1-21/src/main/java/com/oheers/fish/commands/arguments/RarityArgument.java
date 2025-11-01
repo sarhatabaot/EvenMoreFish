@@ -43,7 +43,6 @@ public class RarityArgument implements CustomArgumentType.Converted<Rarity, Stri
         FishManager.getInstance().getRarityMap().keySet().stream()
                 .filter(name -> name.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
-
         return builder.buildFuture();
     }
 }

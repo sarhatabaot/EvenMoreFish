@@ -43,7 +43,6 @@ public class CustomRodArgument implements CustomArgumentType.Converted<CustomRod
         RodManager.getInstance().getItemMap().keySet().stream()
                 .filter(name -> name.toLowerCase().startsWith(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
-
         return builder.buildFuture();
     }
 }
