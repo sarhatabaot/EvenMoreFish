@@ -2,23 +2,15 @@ package com.oheers.fish.commands;
 
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
-import com.oheers.fish.api.addons.ItemAddon;
-import com.oheers.fish.api.requirement.RequirementType;
-import com.oheers.fish.api.reward.RewardType;
 import com.oheers.fish.api.utils.ManifestUtil;
 import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.baits.manager.BaitNBTManager;
-import com.oheers.fish.commands.arguments.ArgumentHelper;
-import com.oheers.fish.commands.arguments.BaitArgument;
-import com.oheers.fish.commands.arguments.CompetitionTypeArgument;
-import com.oheers.fish.commands.arguments.CustomRodArgument;
-import com.oheers.fish.commands.arguments.FishArgument;
-import com.oheers.fish.commands.arguments.RarityArgument;
+import com.oheers.fish.commands.arguments.*;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.CompetitionType;
 import com.oheers.fish.competition.configs.CompetitionFile;
-import com.oheers.fish.config.ConfigBase;
+import com.oheers.fish.api.config.ConfigBase;
 import com.oheers.fish.database.Database;
 import com.oheers.fish.database.DatabaseUtil;
 import com.oheers.fish.fishing.items.Fish;
@@ -36,7 +28,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -47,7 +38,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -75,7 +65,6 @@ public class AdminCommand {
                         getClearBaits(),
                         getReload(),
                         getVersion(),
-                        getRewardTypes(),
                         getMigrate(),
                         getRawItem(),
                         getHelp(),
@@ -138,7 +127,7 @@ public class AdminCommand {
                     }
 
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_FISH.getMessage();
-                    message.setVariable("{player}", getPlayersVariable(arguments.getRaw("targets"), targets));
+                    message.setVariable("{player}", CommandUtils.getPlayersVariable(targets));
 
                     message.setFishCaught(initialFish.getName());
                     message.send(sender);
@@ -193,9 +182,9 @@ public class AdminCommand {
                             }
                             sender.sendMessage(builder.build());
                         }
-                        case "requirementTypes" -> listRequirementTypes(sender);
-                        case "rewardTypes" -> listRewardTypes(sender);
-                        case "itemAddons" -> listItemAddons(sender);
+                        case "requirementTypes" -> CommandUtils.listRequirementTypes(sender);
+                        case "rewardTypes" -> CommandUtils.listRewardTypes(sender);
+                        case "itemAddons" -> CommandUtils.listItemAddons(sender);
                     }
                 });
     }
@@ -231,7 +220,7 @@ public class AdminCommand {
                 }
 
                 EMFMessage giveMessage = ConfigMessage.ADMIN_CUSTOM_ROD_GIVEN.getMessage();
-                giveMessage.setVariable("{player}", getPlayersVariable(args.getRaw("targets"), players));
+                giveMessage.setVariable("{player}", CommandUtils.getPlayersVariable(players));
 
                 giveMessage.send(sender);
             }));
@@ -269,7 +258,7 @@ public class AdminCommand {
                         FishUtils.giveItems(List.of(baitItem), target);
                     }
                     EMFMessage message = ConfigMessage.ADMIN_GIVE_PLAYER_BAIT.getMessage();
-                    message.setVariable("{player}", getPlayersVariable(args.getRaw("targets"), targets));
+                    message.setVariable("{player}", CommandUtils.getPlayersVariable(targets));
                     message.setBait(bait.getId());
                     message.send(sender);
                 });
@@ -328,65 +317,6 @@ public class AdminCommand {
                 .executes(info -> {
                     EvenMoreFish.getInstance().reload(info.sender());
                 });
-    }
-
-    private void listRewardTypes(@NotNull Audience audience) {
-        TextComponent.Builder builder = Component.text();
-
-        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
-        listMessage.setVariable("{addon-type}", RewardType.class.getSimpleName());
-        builder.append(listMessage.getComponentMessage());
-
-        RewardType.getLoadedTypes().forEach((string, rewardType) -> {
-            Component show = EMFSingleMessage.fromString(
-                    "Author: " + rewardType.getAuthor() + "\n" +
-                            "Registered Plugin: " + rewardType.getPlugin().getName()
-            ).getComponentMessage();
-
-            TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
-            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-            builder.append(typeBuilder).append(Component.text(", "));
-        });
-        audience.sendMessage(builder.build());
-    }
-
-    private void listRequirementTypes(@NotNull Audience audience) {
-        TextComponent.Builder builder = Component.text();
-
-        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
-        listMessage.setVariable("{addon-type}", RequirementType.class.getSimpleName());
-        builder.append(listMessage.getComponentMessage());
-
-        RequirementType.getLoadedTypes().forEach((string, requirementType) -> {
-            Component show = EMFSingleMessage.fromString(
-                    "Author: " + requirementType.getAuthor() + "\n" +
-                            "Registered Plugin: " + requirementType.getPlugin().getName()
-            ).getComponentMessage();
-
-            TextComponent.Builder typeBuilder = Component.text().content(requirementType.getIdentifier());
-            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-            builder.append(typeBuilder).append(Component.text(", "));
-        });
-        audience.sendMessage(builder.build());
-    }
-
-    private void listItemAddons(@NotNull Audience audience) {
-        TextComponent.Builder builder = Component.text();
-
-        EMFMessage listMessage = ConfigMessage.ADMIN_LIST_ADDONS.getMessage();
-        listMessage.setVariable("{addon-type}", ItemAddon.class.getSimpleName());
-        builder.append(listMessage.getComponentMessage());
-
-        ItemAddon.getLoadedAddons().forEach((string, itemAddon) -> {
-            Component show = EMFSingleMessage.fromString(
-                    "Author: " + itemAddon.getAuthor()
-            ).getComponentMessage();
-
-            TextComponent.Builder typeBuilder = Component.text().content(itemAddon.getIdentifier());
-            typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-            builder.append(typeBuilder).append(Component.text(", "));
-        });
-        audience.sendMessage(builder.build());
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -448,29 +378,6 @@ public class AdminCommand {
 
     private String getFeatureBranchBuildOrDate() {
         return ManifestUtil.getAttributeFromManifest(Attributes.Name.IMPLEMENTATION_VERSION.toString(), "");
-    }
-
-    private CommandAPICommand getRewardTypes() {
-        HELP_MESSAGE.addUsage(
-                "admin rewardtypes",
-                ConfigMessage.HELP_ADMIN_REWARDTYPES::getMessage
-        );
-        return new CommandAPICommand("rewardtypes")
-                .executes(info -> {
-                    TextComponent.Builder builder = Component.text();
-                    builder.append(ConfigMessage.ADMIN_LIST_REWARD_TYPES.getMessage().getComponentMessage());
-                    RewardType.getLoadedTypes().forEach((string, rewardType) -> {
-                        Component show = EMFSingleMessage.fromString(
-                                "Author: " + rewardType.getAuthor() + "\n" +
-                                        "Registered Plugin: " + rewardType.getPlugin().getName()
-                        ).getComponentMessage();
-
-                        TextComponent.Builder typeBuilder = Component.text().content(rewardType.getIdentifier());
-                        typeBuilder.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, show));
-                        builder.append(typeBuilder).append(Component.text(", "));
-                    });
-                    info.sender().sendMessage(builder.build());
-                });
     }
 
     private CommandAPICommand getMigrate() {
@@ -603,14 +510,6 @@ public class AdminCommand {
                     competition.setAdminStarted(true);
                     competition.begin();
                 });
-    }
-
-    private @NotNull String getPlayersVariable(@Nullable String raw, @NotNull List<Player> players) {
-        if ("@a".equals(raw)) {
-            return "All Players";
-        } else {
-            return String.join(", ", players.stream().map(Player::getName).toList());
-        }
     }
 
 }

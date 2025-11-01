@@ -1,6 +1,7 @@
 package com.oheers.fish.config;
 
 import com.oheers.fish.EvenMoreFish;
+import com.oheers.fish.api.config.ConfigBase;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
 public class GuiConfig extends ConfigBase {

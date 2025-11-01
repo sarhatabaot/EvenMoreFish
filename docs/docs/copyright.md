@@ -25,6 +25,8 @@ YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/p
 ## Plugin
 
 - https://papermc.io/
+- https://github.com/CommandAPI/CommandAPI (1.20)
+- https://github.com/Strokkur424/StrokkCommands (1.21+)
 
 :::info[This page is a WIP]
 

@@ -128,7 +128,6 @@ public enum ConfigMessage {
     HELP_ADMIN_RELOAD("[noPrefix]Reloads the plugin's config files", PrefixType.ADMIN, false, true, "help-admin.reload"),
     HELP_ADMIN_VERSION("[noPrefix]Displays plugin information.", PrefixType.ADMIN, false, true, "help-admin.version"),
     HELP_ADMIN_MIGRATE("[noPrefix]Migrate the database from Legacy (V2) to V3", PrefixType.ADMIN, false, true, "help-admin.migrate"),
-    HELP_ADMIN_REWARDTYPES("[noPrefix]Display all registered reward types", PrefixType.ADMIN, false, true, "help-admin.rewardtypes"),
     HELP_ADMIN_ADDONS("[noPrefix]Show all registered addons", PrefixType.ADMIN, false, true, "help-admin.addons"),
     HELP_ADMIN_RAWITEM("[noPrefix]Displays the item in your main hand as raw NBT.", PrefixType.ADMIN, false, true, "help-admin.rawitem"),
     HELP_LIST_FISH("[noPrefix]Display all fish in a specific rarity.", PrefixType.ADMIN, false, true, "help-list.fish"),
