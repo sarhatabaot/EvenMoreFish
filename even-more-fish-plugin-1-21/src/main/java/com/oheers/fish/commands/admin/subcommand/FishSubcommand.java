@@ -2,6 +2,7 @@ package com.oheers.fish.commands.admin.subcommand;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.oheers.fish.FishUtils;
+import com.oheers.fish.commands.BrigCommandUtils;
 import com.oheers.fish.commands.CommandUtils;
 import com.oheers.fish.commands.admin.AdminCommand;
 import com.oheers.fish.commands.arguments.FishArgument;
@@ -31,6 +32,10 @@ public class FishSubcommand {
 
     @Executes
     public void execute(CommandSender sender, @CustomArg(RarityArgument.class) Rarity rarity, @CustomArg(FishArgument.class) String fishStr, @IntArg(min = 1) int amount, List<Player> targets) throws CommandSyntaxException {
+        if (targets.isEmpty()) {
+            throw BrigCommandUtils.ERROR_NO_PLAYERS.create();
+        }
+
         Fish initialFish = FishArgument.resolveFish(rarity, fishStr);
         if (initialFish == null) {
             throw FishArgument.INVALID_FISH.create(fishStr);

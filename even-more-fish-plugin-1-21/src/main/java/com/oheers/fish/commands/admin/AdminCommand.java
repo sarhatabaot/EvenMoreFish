@@ -1,11 +1,13 @@
 package com.oheers.fish.commands.admin;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.oheers.fish.EvenMoreFish;
 import com.oheers.fish.FishUtils;
 import com.oheers.fish.api.utils.ManifestUtil;
 import com.oheers.fish.baits.BaitHandler;
 import com.oheers.fish.baits.manager.BaitManager;
 import com.oheers.fish.baits.manager.BaitNBTManager;
+import com.oheers.fish.commands.BrigCommandUtils;
 import com.oheers.fish.commands.CommandUtils;
 import com.oheers.fish.commands.HelpMessageBuilder;
 import com.oheers.fish.commands.admin.subcommand.CompetitionSubcommand;
@@ -83,7 +85,11 @@ public class AdminCommand {
     }
 
     @Executes("custom-rod")
-    public void onCustomRod(CommandSender sender, @CustomArg(CustomRodArgument.class) CustomRod rod, List<Player> targets) {
+    public void onCustomRod(CommandSender sender, @CustomArg(CustomRodArgument.class) CustomRod rod, List<Player> targets) throws CommandSyntaxException {
+        if (targets.isEmpty()) {
+            throw BrigCommandUtils.ERROR_NO_PLAYERS.create();
+        }
+
         ItemStack rodItem = rod.create();
 
         for (Player player : targets) {
@@ -106,7 +112,10 @@ public class AdminCommand {
     }
 
     @Executes("bait")
-    public void onBait(CommandSender sender, @CustomArg(BaitArgument.class) BaitHandler bait, @IntArg(min = 1) int quantity, List<Player> targets) {
+    public void onBait(CommandSender sender, @CustomArg(BaitArgument.class) BaitHandler bait, @IntArg(min = 1) int quantity, List<Player> targets) throws CommandSyntaxException {
+        if (targets.isEmpty()) {
+            throw BrigCommandUtils.ERROR_NO_PLAYERS.create();
+        }
         for (Player target : targets) {
             ItemStack baitItem = bait.create(target);
             baitItem.setAmount(quantity);
@@ -133,7 +142,10 @@ public class AdminCommand {
     }
 
     @Executes("clearbaits")
-    public void onClearBaits(CommandSender sender, List<Player> targets) {
+    public void onClearBaits(CommandSender sender, List<Player> targets) throws CommandSyntaxException {
+        if (targets.isEmpty()) {
+            throw BrigCommandUtils.ERROR_NO_PLAYERS.create();
+        }
         targets.forEach(player -> {
             if (player.getInventory().getItemInMainHand().getType() != Material.FISHING_ROD) {
                 ConfigMessage.ADMIN_NOT_HOLDING_ROD.getMessage().send(player);
