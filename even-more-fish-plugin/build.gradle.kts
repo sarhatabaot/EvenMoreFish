@@ -1,6 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import nu.studer.gradle.jooq.JooqExtension
-import org.gradle.kotlin.dsl.named
 import org.jooq.meta.jaxb.Property
 
 
@@ -14,7 +12,7 @@ plugins {
     alias(libs.plugins.jooq)
     alias(libs.plugins.sonar)
     id("com.oheers.evenmorefish.plugin-yml-conventions")
-    id("com.oheers.evenmorefish.shadow-conventions")
+    //id("com.oheers.evenmorefish.shadow-conventions")
     id("com.oheers.evenmorefish.publishing-conventions")
 }
 
@@ -141,13 +139,6 @@ tasks {
         dependsOn(copyAddons)
     }
 
-    build {
-        dependsOn(
-            shadowJar
-        )
-
-    }
-
     jooq {
         version.set(libs.versions.jooq.asProvider().get())
 
@@ -208,7 +199,7 @@ publishing {
             artifactId = project.name
             version = project.version.toString()
 
-            from(components["shadow"])
+            from(components["java"])
         }
     }
 }

@@ -32,7 +32,7 @@ dependencies {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    dependsOn(":even-more-fish-plugin:shadowJar")
+    dependsOn(":even-more-fish-plugin:jar")
 
     from(project(":even-more-fish-plugin").sourceSets["main"].output)
     relocate("dev.jorel.commandapi", "com.oheers.fish.libs.commandapi")
