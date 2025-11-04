@@ -4,7 +4,6 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.oheers.fish.api.addons.ItemAddon;
 import com.oheers.fish.api.registry.EMFRegistry;
 import com.oheers.fish.competition.Competition;
 import com.oheers.fish.competition.configs.CompetitionFile;
@@ -31,6 +30,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -425,17 +425,9 @@ public class FishUtils {
     }
 
     public static @Nullable Biome getBiome(@NotNull String keyString) {
-        // Get the key and check if null
-        NamespacedKey key = NamespacedKey.fromString(keyString.toLowerCase());
-        if (key == null) {
-            EvenMoreFish.getInstance().getLogger().severe(keyString + " is not a valid biome.");
-            return null;
-        }
-        // Get the biome and check if null
-        Biome biome = Registry.BIOME.get(key);
+        Biome biome = getFromBukkitRegistry(keyString, Registry.BIOME);
         if (biome == null) {
             EvenMoreFish.getInstance().getLogger().severe(keyString + " is not a valid biome.");
-            return null;
         }
         return biome;
     }
@@ -653,12 +645,7 @@ public class FishUtils {
     }
 
     public static @Nullable Enchantment getEnchantment(@NotNull String namespace) {
-        namespace = namespace.toLowerCase();
-        NamespacedKey key = NamespacedKey.fromString(namespace);
-        if (key == null) {
-            return null;
-        }
-        return Registry.ENCHANTMENT.get(key);
+        return getFromBukkitRegistry(namespace, Registry.ENCHANTMENT);
     }
 
     public static BossBar.Overlay modernizeBarStyle(@NotNull BarStyle style) {
@@ -669,6 +656,15 @@ public class FishUtils {
             case SEGMENTED_12 -> BossBar.Overlay.NOTCHED_12;
             case SEGMENTED_20 -> BossBar.Overlay.NOTCHED_20;
         };
+    }
+
+    private static <T extends Keyed> @Nullable T getFromBukkitRegistry(@NotNull String namespace, @NotNull Registry<T> registry) {
+        namespace = namespace.toLowerCase();
+        NamespacedKey key = NamespacedKey.fromString(namespace);
+        if (key == null) {
+            return null;
+        }
+        return registry.get(key);
     }
 
 }
