@@ -72,25 +72,24 @@ public class FishUtils {
     }
 
     // checks for the "emf-fish-name" nbt tag, to determine if this ItemStack is a fish or not.
-    public static boolean isFish(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR || !item.hasItemMeta()) {
+    public static boolean isFish(@Nullable ItemStack item) {
+        if (item == null || item.isEmpty()) {
             return false;
         }
-
         return NbtUtils.hasKey(item, NbtKeys.EMF_FISH_NAME);
     }
 
-    public static boolean isFish(Skull skull) {
+    public static boolean isFish(@Nullable Skull skull) {
         if (skull == null) {
             return false;
         }
-
         return NbtUtils.hasKey(skull, NbtKeys.EMF_FISH_NAME);
     }
 
-    public static @Nullable Fish getFish(ItemStack item) {
-        // all appropriate null checks can be safely assumed to have passed to get to a point where we're running this method.
-
+    public static @Nullable Fish getFish(@Nullable ItemStack item) {
+        if (item == null || item.isEmpty()) {
+            return null;
+        }
         String nameString = NbtUtils.getString(item, NbtKeys.EMF_FISH_NAME);
         String playerString = NbtUtils.getString(item, NbtKeys.EMF_FISH_PLAYER);
         String rarityString = NbtUtils.getString(item, NbtKeys.EMF_FISH_RARITY);
@@ -128,8 +127,10 @@ public class FishUtils {
         return fish;
     }
 
-    public static @Nullable Fish getFish(Skull skull, Player fisher) throws InvalidFishException {
-        // all appropriate null checks can be safely assumed to have passed to get to a point where we're running this method.
+    public static @Nullable Fish getFish(@Nullable Skull skull, @Nullable Player fisher) throws InvalidFishException {
+        if (skull == null) {
+            return null;
+        }
         final String nameString = NBT.getPersistentData(skull, nbt -> nbt.getString(NbtUtils.getNamespacedKey(NbtKeys.EMF_FISH_NAME).toString()));
         final String playerString = NBT.getPersistentData(skull, nbt -> nbt.getString(NbtUtils.getNamespacedKey(NbtKeys.EMF_FISH_PLAYER).toString()));
         final String rarityString = NBT.getPersistentData(skull, nbt -> nbt.getString(NbtUtils.getNamespacedKey(NbtKeys.EMF_FISH_RARITY).toString()));
@@ -162,15 +163,15 @@ public class FishUtils {
             } catch (IllegalArgumentException exception) {
                 fish.setFisherman(null);
             }
-        } else {
+        } else if (fisher != null) {
             fish.setFisherman(fisher.getUniqueId());
         }
 
         return fish;
     }
 
-    public static void giveItems(List<ItemStack> items, Player player) {
-        if (items == null || items.isEmpty()) {
+    public static void giveItems(@NotNull List<ItemStack> items, @NotNull Player player) {
+        if (items.isEmpty()) {
             return; // Early return if the list is null or empty
         }
 
@@ -195,15 +196,15 @@ public class FishUtils {
     }
 
 
-    public static void giveItems(ItemStack[] items, Player player) {
+    public static void giveItems(@NotNull ItemStack[] items, @NotNull Player player) {
         giveItems(Arrays.asList(items), player);
     }
 
-    public static void giveItem(ItemStack item, Player player) {
+    public static void giveItem(@NotNull ItemStack item, @NotNull Player player) {
         giveItems(List.of(item), player);
     }
 
-    public static boolean checkRegion(Location location, List<String> whitelistedRegions) {
+    public static boolean checkRegion(@NotNull Location location, @NotNull List<String> whitelistedRegions) {
         // If no whitelist is defined, allow all regions
         if (whitelistedRegions.isEmpty()) {
             return true;
@@ -239,7 +240,7 @@ public class FishUtils {
     }
 
 
-    public static @Nullable String getRegionName(Location location) {
+    public static @Nullable String getRegionName(@NotNull Location location) {
         if (!MainConfig.getInstance().isRegionBoostsEnabled()) {
             EvenMoreFish.getInstance().debug("Region boosts are disabled.");
             return null;
@@ -276,7 +277,7 @@ public class FishUtils {
     }
 
 
-    public static boolean checkWorld(Location l) {
+    public static boolean checkWorld(@NotNull Location l) {
         // if the user has defined a world whitelist
         if (!MainConfig.getInstance().worldWhitelist()) {
             return true;
@@ -344,7 +345,7 @@ public class FishUtils {
         return returning;
     }
 
-    public static void broadcastFishMessage(EMFMessage message, Player referencePlayer, boolean actionBar) {
+    public static void broadcastFishMessage(@NotNull EMFMessage message, @NotNull Player referencePlayer, boolean actionBar) {
         if (message.isEmpty()) {
             return;
         }
@@ -390,8 +391,8 @@ public class FishUtils {
                 || player.getInventory().getItemInOffHand().getType().equals(material);
     }
 
-    private static boolean isWithinRange(Player player1, Player player2, int rangeSquared) {
-        return player1.getWorld() == player2.getWorld() && player1.getLocation().distanceSquared(player2.getLocation()) <= rangeSquared;
+    private static boolean isWithinRange(@NotNull Player player1, @NotNull Player player2, int rangeSquared) {
+        return player1.getWorld().equals(player2.getWorld()) && player1.getLocation().distanceSquared(player2.getLocation()) <= rangeSquared;
     }
 
     /**
@@ -401,11 +402,10 @@ public class FishUtils {
      * @param item The item being considered.
      * @return Whether this ItemStack is a bait.
      */
-    public static boolean isBaitObject(ItemStack item) {
-        if (item.getItemMeta() != null) {
+    public static boolean isBaitObject(@NotNull ItemStack item) {
+        if (!item.isEmpty()) {
             return NbtUtils.hasKey(item, NbtKeys.EMF_BAIT);
         }
-
         return false;
     }
 
@@ -440,39 +440,6 @@ public class FishUtils {
         return biome;
     }
 
-    /**
-     * Calculates the total weight of a list of fish, applying a boost to specific fish if applicable.
-     *
-     * @param fishList    The list of fish to process.
-     * @param boostRate   The boost multiplier for certain fish. If set to -1, only boosted fish are considered.
-     * @param boostedFish The list of fish that should receive the boost. Can be null if no boost is applied.
-     * @return The total calculated weight.
-     */
-    public static double getTotalWeight(List<Fish> fishList, double boostRate, List<Fish> boostedFish) {
-        double totalWeight = 0;
-        boolean applyBoost = boostRate != -1 && boostedFish != null;
-
-        for (Fish fish : fishList) {
-            // When boostRate is -1, we need to guarantee a fish, so fishList has already been filtered
-            // to only contain boosted fish. Otherwise, check if the fish should receive a boost.
-            boolean isBoosted = applyBoost && boostedFish.contains(fish);
-
-            // If the fish has no weight, assign a default weight of 1.
-            double weight = fish.getWeight();
-            double baseWeight = (weight == 0.0d) ? 1 : weight;
-
-            // Apply the boost if applicable.
-            if (isBoosted) {
-                totalWeight += baseWeight * boostRate;
-            } else {
-                totalWeight += baseWeight;
-            }
-        }
-
-        return totalWeight;
-    }
-
-
     public static @Nullable DayOfWeek getDay(@NotNull String day) {
         try {
             return DayOfWeek.valueOf(day.toUpperCase());
@@ -489,27 +456,18 @@ public class FishUtils {
         }
     }
 
-    public static boolean classExists(@NotNull String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException exception) {
-            return false;
-        }
-    }
-
-    public static String getPlayerName(@Nullable OfflinePlayer player) {
+    public static @Nullable String getPlayerName(@Nullable OfflinePlayer player) {
         return player == null ? null : player.getName();
     }
 
-    public static String getPlayerName(@Nullable UUID uuid) {
+    public static @Nullable String getPlayerName(@Nullable UUID uuid) {
         if (uuid == null) {
             return null;
         }
         return getPlayerName(Bukkit.getOfflinePlayer(uuid));
     }
 
-    public static String getPlayerName(@Nullable String uuidString) {
+    public static @Nullable String getPlayerName(@Nullable String uuidString) {
         if (uuidString == null) {
             return null;
         }
@@ -541,7 +499,10 @@ public class FishUtils {
      * @param materialString The string to parse.
      * @return The ItemStack, or null if the material is invalid.
      */
-    public static @Nullable ItemStack getItem(@NotNull final String materialString) {
+    public static @Nullable ItemStack getItem(@Nullable final String materialString) {
+        if (materialString == null) {
+            return null;
+        }
         // Colon assumes an addon item
         if (materialString.contains(":")) {
             return getCustomItem(materialString);
@@ -555,7 +516,7 @@ public class FishUtils {
         return new ItemStack(material);
     }
 
-    public static @NotNull ItemStack getSkullFromBase64(String base64) {
+    public static @NotNull ItemStack getSkullFromBase64(@NotNull String base64) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         skull.editMeta(SkullMeta.class, meta -> {
             PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), "EMFSkull");
@@ -565,7 +526,7 @@ public class FishUtils {
         return skull;
     }
 
-    public static @NotNull ItemStack getSkullFromUUID(UUID uuid) {
+    public static @NotNull ItemStack getSkullFromUUID(@NotNull UUID uuid) {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         skull.editMeta(SkullMeta.class, meta -> {
             PlayerProfile profile = Bukkit.createProfile(uuid, "EMFSkull");
@@ -601,7 +562,7 @@ public class FishUtils {
      * @param value The double value to be formatted.
      * @return The formatted double
      */
-    public static Component formatDouble(@NotNull final String formatStr, final double value) {
+    public static @NotNull Component formatDouble(@NotNull final String formatStr, final double value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return Component.text(format.format(value));
@@ -626,7 +587,7 @@ public class FishUtils {
      * @param value The float value to be formatted.
      * @return The formatted float
      */
-    public static String formatFloat(@NotNull final String formatStr, final float value) {
+    public static @NotNull String formatFloat(@NotNull final String formatStr, final float value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(MainConfig.getInstance().getDecimalLocale());
         DecimalFormat format = new DecimalFormat(formatStr, symbols);
         return format.format(value);
@@ -645,7 +606,7 @@ public class FishUtils {
         }
     }
 
-    private static String getMiniMessageFormat(@NotNull String colour) {
+    private static @NotNull String getMiniMessageFormat(@NotNull String colour) {
         int openingTagEnd = colour.indexOf(">");
 
         if (openingTagEnd == -1) {
@@ -662,7 +623,7 @@ public class FishUtils {
         return colour.substring(0, openingTagEnd + 1) + "{name}";
     }
 
-    public static PotionEffect getPotionEffect(@NotNull String effectString) {
+    public static @Nullable PotionEffect getPotionEffect(@NotNull String effectString) {
         String[] split = effectString.split(":");
         if (split.length != 3) {
             Logging.error("Potion effect string is formatted incorrectly. Use \"potion:duration:amplifier\".");
@@ -691,7 +652,7 @@ public class FishUtils {
         );
     }
 
-    public static Enchantment getEnchantment(@NotNull String namespace) {
+    public static @Nullable Enchantment getEnchantment(@NotNull String namespace) {
         namespace = namespace.toLowerCase();
         NamespacedKey key = NamespacedKey.fromString(namespace);
         if (key == null) {

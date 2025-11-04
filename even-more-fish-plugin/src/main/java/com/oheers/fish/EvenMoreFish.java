@@ -46,8 +46,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.oheers.fish.FishUtils.classExists;
-
 public abstract class EvenMoreFish extends EMFPlugin {
     private final Random random = ThreadLocalRandom.current();
 
