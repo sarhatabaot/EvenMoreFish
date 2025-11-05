@@ -12,11 +12,6 @@ version = properties["project-version"] as String
 
 extra["variant"] = "1.20"
 
-afterEvaluate {
-    bukkit {
-        main = "com.oheers.fish.EMFModule"
-    }
-}
 dependencies {
     compileOnly(libs.paper.api) {
         version {

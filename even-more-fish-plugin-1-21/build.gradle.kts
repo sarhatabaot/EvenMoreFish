@@ -39,7 +39,6 @@ dependencies {
 
 afterEvaluate {
     bukkit {
-        main = "com.oheers.fish.EMFModule"
         apiVersion = "1.21"
     }
 }
