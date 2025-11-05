@@ -13,7 +13,7 @@ afterEvaluate {
             "FireML",
             "sarhatabaot"
         )
-        main = "com.oheers.fish.EvenMoreFish"
+        main = "com.oheers.fish.EMFModule"
         version = project.version.toString()
         description = "A fishing extension bringing an exciting new experience to fishing."
         website = "https://github.com/EvenMoreFish/EvenMoreFish"
