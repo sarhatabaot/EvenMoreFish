@@ -21,6 +21,15 @@ dependencies {
         }
     }
 
+    library(libs.bundles.flyway) {
+        exclude("org.xerial", "sqlite-jdbc")
+        exclude("com.mysql", "mysql-connector-j")
+    }
+    library(libs.friendlyid)
+    library(libs.maven.artifact)
+    library(libs.annotations)
+    library(libs.guava)
+
     library(libs.boostedyaml)
     compileOnlyApi(libs.boostedyaml)
 

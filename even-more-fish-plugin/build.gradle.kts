@@ -1,7 +1,6 @@
 import nu.studer.gradle.jooq.JooqExtension
 import org.jooq.meta.jaxb.Property
 
-
 plugins {
     `java-library`
     `maven-publish`
@@ -11,7 +10,6 @@ plugins {
     //alias(libs.plugins.grgit)
     alias(libs.plugins.jooq)
     alias(libs.plugins.sonar)
-    id("com.oheers.evenmorefish.plugin-yml-conventions")
     //id("com.oheers.evenmorefish.shadow-conventions")
     id("com.oheers.evenmorefish.publishing-conventions")
 }
@@ -85,15 +83,14 @@ dependencies {
     implementation(libs.bundles.connectors)
     implementation(libs.hikaricp)
 
-    library(libs.bundles.flyway) {
+    compileOnly(libs.bundles.flyway) {
         exclude("org.xerial", "sqlite-jdbc")
         exclude("com.mysql", "mysql-connector-j")
     }
-
-    library(libs.friendlyid)
-    library(libs.maven.artifact)
-    library(libs.annotations)
-    library(libs.guava)
+    compileOnly(libs.friendlyid)
+    compileOnly(libs.maven.artifact)
+    compileOnly(libs.annotations)
+    compileOnly(libs.guava)
 
     compileOnlyApi(libs.boostedyaml)
 
