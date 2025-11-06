@@ -94,6 +94,14 @@ public class FishManager extends AbstractFishManager<Rarity> {
         return FishUtils.getFish(item);
     }
 
+    @Override
+    public @Nullable IFish getFish(@NotNull Entity itemEntity) {
+        if (!(itemEntity instanceof Item item)) {
+            return null;
+        }
+        return getFish(item.getItemStack());
+    }
+
     private Rarity loadRaritySafely(File file) throws InvalidConfigurationException {
         EvenMoreFish.getInstance().debug("Loading " + file.getName() + " rarity");
         return new Rarity(file);

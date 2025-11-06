@@ -34,6 +34,8 @@ public abstract class AbstractFishManager<T extends IRarity> extends AbstractFil
 
     public abstract @Nullable IFish getFish(@NotNull ItemStack item);
 
+    public abstract @Nullable IFish getFish(@NotNull Entity itemEntity);
+
     public abstract @NotNull TreeMap<String, ? extends IRarity> getRarityMap();
 
 }
