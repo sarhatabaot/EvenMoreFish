@@ -1,7 +1,6 @@
-package com.oheers.fish.api;
+package com.oheers.fish.api.events;
 
 import com.oheers.fish.api.fishing.items.IFish;
-import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -10,23 +9,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 
-/**
- * Called when an EMF Fish is caught via hunting
- * @deprecated Use {@link com.oheers.fish.api.events.EMFFishHuntEvent} instead.
- */
-@Deprecated(forRemoval = true, since = "2.1.2")
-public class EMFFishHuntEvent extends Event implements Cancellable {
+public class EMFFishCaughtEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final IFish fish;
     private final Player player;
-    private final LocalDateTime huntTime;
+    private final LocalDateTime catchTime;
     private boolean cancel;
 
-    public EMFFishHuntEvent(@NotNull IFish fish, @NotNull Player player, @NotNull LocalDateTime huntTime) {
+    public EMFFishCaughtEvent(@NotNull IFish fish, @NotNull Player player, final LocalDateTime catchTime) {
         this.fish = fish;
         this.player = player;
-        this.huntTime = huntTime;
+        this.catchTime = catchTime;
     }
 
     public static HandlerList getHandlerList() {
@@ -46,7 +40,7 @@ public class EMFFishHuntEvent extends Event implements Cancellable {
     }
 
     /**
-     * @return The player that hunted the fish
+     * @return The player that has fished the fish
      */
     public @NotNull Player getPlayer() {
         return player;
@@ -62,7 +56,9 @@ public class EMFFishHuntEvent extends Event implements Cancellable {
         this.cancel = cancel;
     }
 
-    public LocalDateTime getHuntTime() {
-        return huntTime;
+
+    public LocalDateTime getCatchTime() {
+        return catchTime;
     }
 }
+

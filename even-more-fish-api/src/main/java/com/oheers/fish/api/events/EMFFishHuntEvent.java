@@ -1,7 +1,6 @@
-package com.oheers.fish.api;
+package com.oheers.fish.api.events;
 
 import com.oheers.fish.api.fishing.items.IFish;
-import com.oheers.fish.fishing.items.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -12,9 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * Called when an EMF Fish is caught via hunting
- * @deprecated Use {@link com.oheers.fish.api.events.EMFFishHuntEvent} instead.
  */
-@Deprecated(forRemoval = true, since = "2.1.2")
 public class EMFFishHuntEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -65,4 +62,5 @@ public class EMFFishHuntEvent extends Event implements Cancellable {
     public LocalDateTime getHuntTime() {
         return huntTime;
     }
+
 }
