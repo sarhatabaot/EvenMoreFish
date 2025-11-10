@@ -119,7 +119,6 @@ alerts:
 rewards:
   # These are given to the first place winner.
   '1':
-    - COMMAND:give {player} diamond 5
     - MESSAGE:<green>Congratulations for coming 1st!
     - MONEY:5000
     - EFFECT:SPEED,2,5
